@@ -12,27 +12,28 @@ const Landing = () => {
 
   return (
     <div className='w-full'>
-      <navbar className="w-full p-[10%] fixed h-[18rem] flex justify-between text-white ">
+      <nav className="w-full px-4 py-2 border border-b bg-slate-900/80 z-50 flex justify-between items-center text-white ">
         <div className='flex gap-[10px]'>
-          <img src={'icons.svg'} />
+          <img src="/favicon.svg" />
           <h2>Red de Casas Hogar Qro</h2>
         </div>
-        <div className='flex justify-around'>
-          <h2>Home</h2>
-          <h2>La Red</h2>
+
+        <div className='flex items-center gap-6'>
+          <h2><a href='#landing'>Home</a></h2>
+          <h2 className='whitespace-nowrap'>La Red</h2>
           <h2>Nosotros</h2>
           <Button onClick={toSignIn}>
             Login
           </Button>
         </div>
-      </navbar>
+      </nav>
 
-      <section className='h-[80vh] w-full p-auto'>
-        <h1>Foto para la Landing</h1>
+      <section className='h-[90vh] w-full border border-black flex items-center justify-center' id='landing'>
+        <h1 className='m-auto'>Foto para la Landing</h1>
       </section>
 
-      <section className='h-[80vh] w-full p-auto'>
-        <h1>Seccion para la red</h1>
+      <section className='h-[90vh] w-full border border-black flex items-center justify-center' id='landing'>
+        <h1 className='m-auto'>Seccion #2</h1>
       </section>
 
       <footer className='h-[80vh] w-full p-auto'>
