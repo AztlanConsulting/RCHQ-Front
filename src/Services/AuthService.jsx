@@ -23,4 +23,22 @@ const loginService = async (email, password) => {
   return data;
 };
 
-export default loginService;
+const getToken = () => localStorage.getItem("token");
+
+const validateSession = async () => {
+  // call backend to validate the token?
+  const validSession = true;
+
+  return validSession;
+};
+
+const logoutService = async () => {
+  localStorage.removeItem('token');
+};
+
+export {
+  loginService,
+  getToken,
+  validateSession,
+  logoutService,
+};

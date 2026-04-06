@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Form from "../Components/Forms";
-import loginService from "../Services/LoginService";
+import { loginService } from "../Services/AuthService";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +19,7 @@ const LoginPage = () => {
       console.log("Login exitoso:", data);
 
       // Aquí puedes redirigir después
-      // navigate("/dashboard");
+      navigate("/app/dashboard");
 
     } catch (err) {
       setError(err.message);
