@@ -1,10 +1,7 @@
-import React from 'react';
-
+import React from "react";
 
 const Casas = () => {
-    <div>
-        Casas
-    </div>
+  <div>Casas</div>;
 };
 
 export default Casas;

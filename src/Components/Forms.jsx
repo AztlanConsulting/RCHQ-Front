@@ -22,10 +22,7 @@ const Form = ({ onSubmit, loading }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <label
-          htmlFor="email"
-          className="text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="email" className="text-sm font-medium text-slate-700">
           Correo electrónico
         </label>
         <input
@@ -70,7 +67,10 @@ const Form = ({ onSubmit, loading }) => {
           />
           Recordarme
         </label>
-        <a href="#recuperar" className="font-medium text-sky-700 transition hover:text-sky-900">
+        <a
+          href="#recuperar"
+          className="font-medium text-sky-700 transition hover:text-sky-900"
+        >
           ¿Olvidaste tu contraseña?
         </a>
       </div>

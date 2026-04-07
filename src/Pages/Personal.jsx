@@ -1,10 +1,7 @@
-import React from 'react';
-
+import React from "react";
 
 const Personal = () => {
-    <div>
-        Personal
-    </div>
+  <div>Personal</div>;
 };
 
 export default Personal;

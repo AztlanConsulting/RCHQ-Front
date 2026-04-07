@@ -26,11 +26,7 @@ const loginService = async (email, password) => {
 const getToken = () => localStorage.getItem("token");
 
 const logoutService = async () => {
-  localStorage.removeItem('token');
+  localStorage.removeItem("token");
 };
 
-export {
-  loginService,
-  getToken,
-  logoutService,
-};
+export { loginService, getToken, logoutService };

@@ -1,10 +1,7 @@
-import React from 'react';
-
+import React from "react";
 
 const Calendario = () => {
-    <div>
-        Calendario
-    </div>
+  <div>Calendario</div>;
 };
 
 export default Calendario;

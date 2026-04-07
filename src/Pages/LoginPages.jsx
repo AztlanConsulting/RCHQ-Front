@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import Form from "../Components/Forms";
 import { loginService } from "../Services/AuthService";
 
@@ -20,7 +20,6 @@ const LoginPage = () => {
 
       // Aquí puedes redirigir después
       navigate("/app/dashboard");
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -48,22 +47,28 @@ const LoginPage = () => {
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-300 sm:text-lg">
-              Accede a tu espacio de trabajo con una interfaz más clara,
-              moderna y enfocada en el flujo diario del equipo.
+              Accede a tu espacio de trabajo con una interfaz más clara, moderna
+              y enfocada en el flujo diario del equipo.
             </p>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <p className="text-sm text-slate-400">Módulo</p>
-                <p className="mt-2 text-lg font-semibold text-white">Recursos Humanos</p>
+                <p className="mt-2 text-lg font-semibold text-white">
+                  Recursos Humanos
+                </p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <p className="text-sm text-slate-400">Estado</p>
-                <p className="mt-2 text-lg font-semibold text-emerald-300">Operativo</p>
+                <p className="mt-2 text-lg font-semibold text-emerald-300">
+                  Operativo
+                </p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <p className="text-sm text-slate-400">Seguridad</p>
-                <p className="mt-2 text-lg font-semibold text-white">Acceso protegido</p>
+                <p className="mt-2 text-lg font-semibold text-white">
+                  Acceso protegido
+                </p>
               </div>
             </div>
           </section>

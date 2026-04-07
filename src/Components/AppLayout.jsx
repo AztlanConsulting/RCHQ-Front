@@ -8,13 +8,13 @@ const navLinkClass = ({ isActive }) =>
   }`;
 
 export default function AppLayout() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const logout = () => {
-        logoutService();
+  const logout = () => {
+    logoutService();
 
-        navigate("/login");
-    }
+    navigate("/login");
+  };
 
   return (
     <div className="flex min-h-screen text-slate-100">
@@ -25,25 +25,25 @@ export default function AppLayout() {
         <nav className="flex flex-col h-full justify-between gap-1">
           <div>
             <NavLink to="/app/dashboard" className={navLinkClass} end>
-                Dashboard
+              Dashboard
             </NavLink>
             <NavLink to="/app/casas" className={navLinkClass}>
-                Casas
+              Casas
             </NavLink>
             <NavLink to="/app/personal" className={navLinkClass}>
-                Personal
+              Personal
             </NavLink>
             <NavLink to="/app/calendario" className={navLinkClass}>
-                Calendario
+              Calendario
             </NavLink>
             <NavLink to="/app/perfil" className={navLinkClass}>
-                Perfil
+              Perfil
             </NavLink>
           </div>
 
           <div>
             <Button onClick={logout} className="mb-6">
-                Logout
+              Logout
             </Button>
           </div>
         </nav>

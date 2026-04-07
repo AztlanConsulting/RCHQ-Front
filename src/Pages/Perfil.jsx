@@ -1,10 +1,7 @@
-import React from 'react';
-
+import React from "react";
 
 const Perfil = () => {
-    <div>
-        Perfil
-    </div>
+  <div>Perfil</div>;
 };
 
 export default Perfil;
