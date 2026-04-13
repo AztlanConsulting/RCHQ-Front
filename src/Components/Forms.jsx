@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Button from "./Button";
+import Button from "./Atoms/Button";
 
 const Form = ({ onSubmit, loading }) => {
   const [form, setForm] = useState({
