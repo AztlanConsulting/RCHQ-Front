@@ -1,5 +1,5 @@
-import TextFieldGroup from "./molecules/TextFieldGroup";
-import Button from "./atoms/Button";
+import TextFieldGroup from "../Molecules/TextLabel";
+import Button from "../Atoms/Button";
 
 const LoginForms = ({
   email,
@@ -41,11 +41,13 @@ const LoginForms = ({
         ¿Has olvidado tu contraseña?
       </div>
 
+      <center>
       <Button
         text={loading ? "Cargando..." : "Ingresar"}
         type="submit"
         disabled={loading}
       />
+      </center>
     </form>
   );
 };

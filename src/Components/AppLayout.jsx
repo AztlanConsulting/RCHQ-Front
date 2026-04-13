@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { logoutService } from "../Services/AuthService";
-import Button from "./Button";
+import Button from "../Components/Atoms/Button";
 
 const navLinkClass = ({ isActive }) =>
   `block rounded px-3 py-2 text-sm ${

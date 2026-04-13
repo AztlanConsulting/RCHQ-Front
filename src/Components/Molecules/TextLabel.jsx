@@ -1,5 +1,5 @@
-import Label from "./atoms/Label";
-import TextField from "./atoms/TextField";
+import Label from "../Atoms/Label";
+import TextField from "../Atoms/TextField";
 
 const TextFieldGroup = ({
   value,

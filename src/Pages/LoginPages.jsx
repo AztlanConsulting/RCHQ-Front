@@ -1,7 +1,10 @@
 import { useState } from "react";
-import LoginForms from "../organisms/LoginForms";
+import { useNavigate } from "react-router-dom";
+import LoginForms from "../Components/Organism/LoginForms";
+import LoginService from "../Services/AuthService";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -10,7 +13,12 @@ const LoginPage = () => {
     setLoading(true);
 
     // simula API
-    console.log({ email, password });
+    const response = await LoginService.loginService(email, password);
+    if (!response) {
+      setLoading(false);
+      return;
+    }
+      navigate("/app/dashboard");
 
     setTimeout(() => {
       setLoading(false);
@@ -21,7 +29,7 @@ const LoginPage = () => {
     <div className="flex h-screen">
       {/* Left */}
       <div className="w-1/2 bg-white flex items-center justify-center">
-        <img src="/logo.png" alt="logo" />
+        <img src="../../public/RCHQ-LOGO.svg" alt="logo" />
       </div>
 
       {/* Right */}
