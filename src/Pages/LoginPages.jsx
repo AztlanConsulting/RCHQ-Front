@@ -29,7 +29,7 @@ const LoginPage = () => {
     <div className="flex h-screen">
       {/* Left */}
       <div className="w-1/2 bg-white flex items-center justify-center">
-        <img src="../../public/RCHQ-LOGO.svg" alt="logo" />
+        <img src="/RCHQ-LOGO.svg" alt="logo" />
       </div>
 
       {/* Right */}
