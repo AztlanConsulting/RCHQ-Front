@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForms from "../Components/Organism/LoginForms";
-import LoginService from "../Services/AuthService";
+import { loginService } from "../Services/AuthService";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const LoginPage = () => {
     setLoading(true);
 
     // simula API
-    const response = await LoginService.loginService(email, password);
+    const response = await loginService(email, password);
     if (!response) {
       setLoading(false);
       return;
