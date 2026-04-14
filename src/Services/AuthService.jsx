@@ -15,8 +15,8 @@ const loginService = async (email, password) => {
     throw new Error(data.message || "Error al iniciar sesión");
   }
 
-  if (data.tempToken) {
-    localStorage.setItem("tempToken", data.tempToken);
+  if (data.tempToken || data.firstLoginToken) {
+    localStorage.setItem("tempToken", data.tempToken || data.firstLoginToken);
   }
 
   if (data.token) {
@@ -95,6 +95,32 @@ const skip2FAService = async () => {
   return data;
 };
 
+const changePasswordService = async (currentPassword, newPassword) => {
+  const tempToken = getTempToken();
+
+  const response = await fetch(`${API_URL}/users/first-login/change-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${tempToken}`,
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al cambiar la contraseña");
+  }
+
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+    localStorage.removeItem("tempToken");
+  }
+
+  return data;
+};
+
 const getToken = () => localStorage.getItem("token");
 const getTempToken = () => localStorage.getItem("tempToken");
 
@@ -108,6 +134,7 @@ export {
   activateTwoFactorAuthService,
   verify2FAService,
   skip2FAService,
+  changePasswordService,
   getToken,
   getTempToken,
   logoutService,

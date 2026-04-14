@@ -29,7 +29,7 @@ const LoginPage = () => {
         return;
       }
 
-      if (response.tempToken && !response.token) {
+      if ((response.tempToken || response.firstLoginToken) && !response.token && response.nextStep === "CHANGE_PASSWORD") {
         navigate("/change-password");
         return;
       }

@@ -8,6 +8,7 @@ import Calendario from "./Pages/Calendario";
 import Perfil from "./Pages/Perfil";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
+import ChangePassword from "./Pages/ChangePassword";
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
