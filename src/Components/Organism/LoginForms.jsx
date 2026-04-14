@@ -1,5 +1,8 @@
+import { useState } from "react";
 import TextFieldGroup from "../Molecules/TextLabel";
 import Button from "../Atoms/Button";
+import eye from "/showEye.svg";
+import hideEye from "/hideEye.svg";
 
 const LoginForms = ({
   email,
@@ -9,6 +12,27 @@ const LoginForms = ({
   onSubmit,
   loading,
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword((value) => !value);
+  };
+
+  const passwordToggleButton = (
+    <button
+      type="button"
+      onClick={toggleShowPassword}
+      className="flex h-10 w-10 items-center justify-center rounded-lg bg-transparent"
+      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+    >
+      <img
+        src={showPassword ? eye : hideEye}
+        alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+        className="h-5 w-5"
+      />
+    </button>
+  );
+
   return (
     <form
       onSubmit={(e) => {
@@ -31,15 +55,17 @@ const LoginForms = ({
 
       <TextFieldGroup
         id="password"
+        type={showPassword ? "text" : "password"}
         label="Contraseña"
+        iconRight={passwordToggleButton}
         value={password}
         setValue={setPassword}
         placeholder="Ingresa tu contraseña"
       />
 
-      <div className="text-right text-sm text-white cursor-pointer hover:underline">
+      <p className="text-right text-sm text-white cursor-pointer hover:underline">
         ¿Has olvidado tu contraseña?
-      </div>
+      </p>
 
       <center>
       <Button

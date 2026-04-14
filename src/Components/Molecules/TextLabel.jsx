@@ -8,6 +8,7 @@ const TextFieldGroup = ({
   placeholder,
   iconRight,
   id,
+  type = "text",
 }) => {
   return (
     <div className="relative w-[500px] h-[118px]">
@@ -16,6 +17,7 @@ const TextFieldGroup = ({
 
       <TextField
         id={id}
+        type={type}
         value={value}
         setValue={setValue}
         placeholder={placeholder}
