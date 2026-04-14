@@ -1,38 +1,43 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TwoFactorForm from "../Components/Organism/TwoFactorForm";
+import TwoFactorCode from "../Components/Organism/TwoFactorCode";
 import Button from "../Components/Atoms/Button";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
-  skip2FAService
+  skip2FAService,
 } from "../Services/AuthService";
 
 const TwoFactorAuth = () => {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState("prompt"); 
+  const [step, setStep] = useState("prompt");
   const [code, setCode] = useState("");
   const [qr, setQr] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 👉 Activar 2FA
   const handleActivate = async () => {
-    const response = await activateTwoFactorAuthService();
+    try {
+      const response = await activateTwoFactorAuthService();
 
-    if (response) {
-      setQr(response.qr);
-      setStep("qr");
+      if (response) {
+        setQr(response.qr);
+        setStep("qr");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  // 👉 Saltar 2FA
   const handleSkip = async () => {
-    const response = await skip2FAService();
+    try {
+      const response = await skip2FAService();
 
-    if (response) {
-      // guardar token real aquí
-      navigate("/app/dashboard");
+      if (response) {
+        navigate("/app/dashboard");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -46,7 +51,6 @@ const TwoFactorAuth = () => {
       return;
     }
 
-    // guardar token real aquí
     navigate("/app/dashboard");
     setLoading(false);
   };
@@ -80,7 +84,7 @@ const TwoFactorAuth = () => {
 
           <img src={qr} alt="QR" className="w-48 h-48" />
 
-          <TwoFactorForm
+          <TwoFactorCode
             code={code}
             setCode={setCode}
             onSubmit={handleSubmit}

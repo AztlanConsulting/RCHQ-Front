@@ -48,7 +48,7 @@ const activateTwoFactorAuthService = async () => {
 const verify2FAService = async (code) => {
   const tempToken = getTempToken();
 
-  const response = await fetch(`${API_URL}/users/2fa/verify`, {
+  const response = await fetch(`${API_URL}/users/2fa/verify-setup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const verify2FAService = async (code) => {
 const skip2FAService = async () => {
   const tempToken = getTempToken();
 
-  const response = await fetch(`${API_URL}/users/2fa/skip`, {
+  const response = await fetch(`${API_URL}/users/first-login/change-password`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${tempToken}`,

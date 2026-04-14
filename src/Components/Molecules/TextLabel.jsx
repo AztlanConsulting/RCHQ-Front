@@ -7,12 +7,14 @@ const TextFieldGroup = ({
   label,
   placeholder,
   iconRight,
+  onIconRightClick,
+  iconRightAlt,
+  iconRightAriaLabel,
   id,
   type = "text",
 }) => {
   return (
     <div className="relative w-[500px] h-[118px]">
-      
       <Label text={label} htmlFor={id} />
 
       <TextField
@@ -22,8 +24,10 @@ const TextFieldGroup = ({
         setValue={setValue}
         placeholder={placeholder}
         iconRight={iconRight}
+        onIconRightClick={onIconRightClick}
+        iconRightAlt={iconRightAlt}
+        iconRightAriaLabel={iconRightAriaLabel}
       />
-
     </div>
   );
 };
