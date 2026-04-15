@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TwoFactorCode from "../Components/Organism/TwoFactorCode";
-import Button from "../Components/Atoms/Button";
+import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
+import Button from "../../Components/Atoms/Button";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
   skip2FAService,
-} from "../Services/AuthService";
+} from "../../Services/AuthService";
 
 const TwoFactorAuth = () => {
   const navigate = useNavigate();

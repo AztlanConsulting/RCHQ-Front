@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./Pages/Landing";
-import LoginPage from "./Pages/LoginPages";
+import LoginPage from "./Pages/Auth/LoginPages";
 import Dashboard from "./Pages/Dashboard";
 import Casas from "./Pages/Casas";
 import Personal from "./Pages/Personal";
@@ -8,7 +8,7 @@ import Calendario from "./Pages/Calendario";
 import Perfil from "./Pages/Perfil";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
-import ChangePassword from "./Pages/ChangePassword";
+import ChangePassword from "./Pages/Auth/ChangePassword";
 
 function App() {
   return (

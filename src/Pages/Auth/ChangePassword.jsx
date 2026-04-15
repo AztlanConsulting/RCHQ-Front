@@ -1,11 +1,14 @@
 import {useState} from "react";
-import Forms from "../Components/Organism/Forms";
-import {changePasswordService} from "../Services/AuthService";
-import Alert from "../Components/Atoms/Alerts";
+import { useNavigate } from "react-router-dom";
+import Forms from "../../Components/Organism/Forms";
+import Button from "../../Components/Atoms/Button";
+import {changePasswordService} from "../../Services/AuthService";
+import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 
 const ChangePassword = () => {
+  const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,6 +24,14 @@ const ChangePassword = () => {
     setShowConfirmPassword((value) => !value);
   };
 
+  const handleSkip2FASetup = () => {
+    navigate("/app/dashboard");
+  };
+
+  const handle2FASetup = () => {
+    navigate("/setup-2fa");
+  };
+
   const handleSubmit = async () => {
     if (newPassword !== confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -31,7 +42,14 @@ const ChangePassword = () => {
     setError("");
 
     try {
-      await changePasswordService(newPassword, confirmPassword);
+       const response = await changePasswordService(newPassword, confirmPassword);
+
+       // Si no hay un siguiente paso específico, podrías redirigir al usuario al dashboard o mostrar un mensaje de éxito
+       // Por ejemplo:
+       // navigate("/app/dashboard");
+       // o
+       // setSuccess("Contraseña cambiada exitosamente");
+       // Aquí podrías redirigir al usuario o mostrar un mensaje de éxito
       // Aquí podrías redirigir al usuario o mostrar un mensaje de éxito
     } catch (err) {
       console.error(err);
@@ -96,6 +114,23 @@ const ChangePassword = () => {
           onSubmit={handleSubmit}
         />
       </div>
+      <Button
+        text="Omitir este 2FASetup"
+        onClick={handleSkip2FASetup}
+        bgColor="bg-transparent"
+        textColor="text-white/80"
+        hoverColor="hover:bg-white/10"
+        activeColor="active:bg-white/20"
+      />
+
+      <Button
+        text="Configurar 2FA ahora"
+        onClick={handle2FASetup}
+        bgColor="bg-transparent"
+        textColor="text-white/80"
+        hoverColor="hover:bg-white/10"
+        activeColor="active:bg-white/20"
+      />
     </div>
   );
 };
