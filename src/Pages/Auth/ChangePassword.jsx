@@ -1,9 +1,9 @@
 import {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import Forms from "../Components/Organism/Forms";
-import Button from "../Components/Atoms/Button";
-import {changePasswordService} from "../Services/AuthService";
-import Alert from "../Components/Atoms/Alerts";
+import Forms from "../../Components/Organism/Forms";
+import Button from "../../Components/Atoms/Button";
+import {changePasswordService} from "../../Services/AuthService";
+import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 
