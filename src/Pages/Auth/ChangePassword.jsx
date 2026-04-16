@@ -1,8 +1,8 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../Components/Organism/Forms";
 import Button from "../../Components/Atoms/Button";
-import {changePasswordService} from "../../Services/AuthService";
+import { changePasswordService, getFirstLoginToken } from "../../Services/AuthService";
 import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
@@ -15,6 +15,13 @@ const ChangePassword = () => {
   const [error, setError] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const token = getFirstLoginToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   const toggleShowNewPassword = () => {
     setShowNewPassword((value) => !value);

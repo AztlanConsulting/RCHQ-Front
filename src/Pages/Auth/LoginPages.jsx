@@ -29,12 +29,32 @@ const LoginPage = () => {
         return;
       }
 
-      if ((response.tempToken || response.firstLoginToken) && !response.token && response.nextStep === "CHANGE_PASSWORD") {
+      if (response.nextStep === "CHANGE_PASSWORD") {
         navigate("/change-password");
         return;
       }
 
-      navigate("/app/dashboard");
+      if (response.nextStep === "VALIDATE_2FA") {
+        navigate("/two-factor-login");
+        return;
+      }
+
+      if (response.nextStep === "WAIT_BLOCK") {
+        setError("Tu cuenta está bloqueada temporalmente. Intenta más tarde.");
+        return;
+      }
+
+      if (response.nextStep === "WAIT_2FA_BLOCK") {
+        setError("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
+        return;
+      }
+
+      if (response.nextStep === "LOGIN_COMPLETE") {
+        navigate("/app/dashboard");
+        return;
+      }
+
+      setError("El servidor devolvió un flujo no reconocido");
     } catch (err) {
       console.error(err);
       setError(err.message || "Credenciales inválidas");
