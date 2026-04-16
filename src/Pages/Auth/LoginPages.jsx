@@ -24,6 +24,7 @@ const LoginPage = () => {
 
     try {
       const response = await loginService(email, password);
+      console.log("response completo:", response);
       if (!response) {
         setError("No se pudo iniciar sesión");
         return;
@@ -49,8 +50,10 @@ const LoginPage = () => {
         return;
       }
 
-      if (response.nextStep === "LOGIN_COMPLETE") {
-        navigate("/app/dashboard");
+      if (response.message === "Login successful") {
+          localStorage.setItem("token", response.data.token);  // ← guardar token
+          localStorage.setItem("user", JSON.stringify(response.data.user));  // ← opcional pero útil
+          navigate("/app/dashboard");
         return;
       }
 
@@ -70,6 +73,8 @@ const LoginPage = () => {
       value: email,
       setValue: setEmail,
       placeholder: "Ingresa tu correo",
+      htmlFor: "email",
+      text: "Correo electrónico",
     },
     {
       id: "password",
@@ -86,6 +91,8 @@ const LoginPage = () => {
       iconRightAriaLabel: showPassword
         ? "Ocultar contraseña"
         : "Mostrar contraseña",
+      htmlFor: "password",
+      text: "Contraseña",
     },
   ];
 

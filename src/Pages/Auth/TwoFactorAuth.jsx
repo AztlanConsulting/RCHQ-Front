@@ -21,17 +21,21 @@ const TwoFactorAuth = () => {
 
   useEffect(() => {
     const token = getToken();
-    if (!token) {
+    // ← setupToken también es válido para entrar a esta página
+    const setupToken = localStorage.getItem("setupToken");
+
+    if (!token && !setupToken) {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
-  
+
   const handleActivate = async () => {
     setLoading(true);
     setError("");
 
     try {
       const response = await activateTwoFactorAuthService();
+      // activateTwoFactorAuthService ya usa setupToken internamente
 
       if (!response) {
         setError("No se pudo iniciar la configuración de 2FA");
@@ -54,6 +58,7 @@ const TwoFactorAuth = () => {
 
     try {
       const response = await skip2FAService();
+      // skip2FAService ya limpia setupToken internamente
 
       if (response?.nextStep === "LOGIN_COMPLETE") {
         navigate("/app/dashboard");
@@ -70,11 +75,19 @@ const TwoFactorAuth = () => {
   };
 
   const handleSubmit = async () => {
+
+    if (code.length !== 6){
+      setError("El código debe tener 6 dígitos");
+      return;
+    }
     setLoading(true);
     setError("");
 
     try {
       const response = await verify2FAService(code);
+      console.log("verify2FAService response:", response); // ← agrega esto
+
+      // verify2FAService ya limpia setupToken internamente en todos los casos
 
       if (!response) {
         setError("No se pudo validar el código");
@@ -82,6 +95,13 @@ const TwoFactorAuth = () => {
       }
 
       if (response.nextStep === "2FA_SETUP_COMPLETE") {
+        navigate("/app/dashboard");
+        return;
+      }
+
+      if (response.nextStep === "2FA_SETUP_FAILED") {
+        // setupToken ya fue limpiado en verify2FAService
+        // token de sesión ya fue guardado en verify2FAService
         navigate("/app/dashboard");
         return;
       }
@@ -126,34 +146,34 @@ const TwoFactorAuth = () => {
         )}
 
         {step === "qr" && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-slate-900">
-              Escanea el código QR
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Después ingresa el código generado por tu aplicación autenticadora.
-            </p>
-          </div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Escanea el código QR
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Después ingresa el código generado por tu aplicación autenticadora.
+              </p>
+            </div>
 
-          {error && <Alert type="error" message={error} />}
+            {error && <Alert type="error" message={error} />}
 
-          {qr && (
-            <img
-              src={qr}
-              alt="QR de configuración 2FA"
-              className="h-36 w-36"
+            {qr && (
+              <img
+                src={qr}
+                alt="QR de configuración 2FA"
+                className="h-36 w-36"
+              />
+            )}
+
+            <TwoFactorCode
+              code={code}
+              setCode={setCode}
+              onSubmit={handleSubmit}
+              loading={loading}
             />
-          )}
-
-          <TwoFactorCode
-            code={code}
-            setCode={setCode}
-            onSubmit={handleSubmit}
-            loading={loading}
-          />
-        </div>
-      )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import TextFieldGroup from "../Molecules/TextLabel";
+import TextField from "../Atoms/TextField";
 import Button from "../Atoms/Button";
 
 const Forms = ({
@@ -26,7 +26,7 @@ const Forms = ({
       )}
 
       {fields.map((field) => (
-        <TextFieldGroup
+        <TextField
           key={field.id}
           id={field.id}
           label={field.label}
@@ -38,6 +38,8 @@ const Forms = ({
           onIconRightClick={field.onIconRightClick}
           iconRightAlt={field.iconRightAlt}
           iconRightAriaLabel={field.iconRightAriaLabel}
+          htmlFor={field.htmlFor}
+          text={field.text}
         />
       ))}
 
