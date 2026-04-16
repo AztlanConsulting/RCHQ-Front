@@ -33,12 +33,7 @@ const LoginPage = () => {
       navigate("/app/dashboard");
     } catch (err) {
       console.error(err);
-
-      if (err.status === 423) {
-        setErrors(["Tu cuenta está bloqueada temporalmente. Intenta más tarde."]);
-      } else {
-        setErrors(getReadableErrors(err));
-      }
+      setErrors(getReadableErrors(err));
     } finally {
       setLoading(false);
     }
