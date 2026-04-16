@@ -7,13 +7,14 @@ const Button = ({
   textColor = "text-[#121212]",
   hoverColor = "hover:bg-neutral-100",
   activeColor = "active:bg-neutral-200",
+  height = "h-[50px]",
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-[206px] h-[50px] flex items-center justify-center rounded-lg overflow-hidden cursor-pointer transition-colors
+      className={`w-[206px] ${height} flex items-center justify-center rounded-lg overflow-hidden cursor-pointer transition-colors
       ${bgColor} ${hoverColor} ${activeColor}
       disabled:cursor-not-allowed disabled:opacity-60`}
     >
