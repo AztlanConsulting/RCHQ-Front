@@ -126,28 +126,34 @@ const TwoFactorAuth = () => {
         )}
 
         {step === "qr" && (
-          <div className="flex flex-col items-center gap-6">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-slate-900">
-                Escanea el código QR
-              </h2>
-              <p className="mt-2 text-sm text-slate-600">
-                Después ingresa el código generado por tu aplicación autenticadora.
-              </p>
-            </div>
-
-            {error && <Alert type="error" message={error} />}
-
-            {qr && <img src={qr} alt="QR de configuración 2FA" className="h-48 w-48" />}
-
-            <TwoFactorCode
-              code={code}
-              setCode={setCode}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-slate-900">
+              Escanea el código QR
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Después ingresa el código generado por tu aplicación autenticadora.
+            </p>
           </div>
-        )}
+
+          {error && <Alert type="error" message={error} />}
+
+          {qr && (
+            <img
+              src={qr}
+              alt="QR de configuración 2FA"
+              className="h-36 w-36"
+            />
+          )}
+
+          <TwoFactorCode
+            code={code}
+            setCode={setCode}
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        </div>
+      )}
       </div>
     </div>
   );

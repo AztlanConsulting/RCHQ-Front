@@ -10,7 +10,7 @@ const TextField = ({
   iconRightAriaLabel,
 }) => {
   return (
-    <div className="absolute top-[34px] left-[19px] w-[462px] h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
+    <div className="absolute top-[34px] left-0 right-0 h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
       <input
         id={id}
         type={type}

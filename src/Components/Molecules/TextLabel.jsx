@@ -14,9 +14,8 @@ const TextFieldGroup = ({
   type = "text",
 }) => {
   return (
-    <div className="relative w-[500px] h-[118px]">
+    <div className="relative w-full h-[118px] px-4">
       <Label text={label} htmlFor={id} />
-
       <TextField
         id={id}
         type={type}
