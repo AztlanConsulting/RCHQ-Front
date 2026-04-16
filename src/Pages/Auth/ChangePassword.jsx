@@ -1,9 +1,8 @@
 import {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import Forms from "../Components/Organism/Forms";
-import Button from "../Components/Atoms/Button";
-import {changePasswordService} from "../Services/AuthService";
-import Alert from "../Components/Atoms/Alerts";
+import Forms from "../../Components/Organism/Forms";
+import {changePasswordService} from "../../Services/AuthService";
+import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 
@@ -34,6 +33,9 @@ const ChangePassword = () => {
     setError("");
 
     try {
+      console.log("Intentando cambiar contraseña con:", newPassword, confirmPassword);
+      console.log("Token temporal:", localStorage.getItem("tempToken"));
+      console.log("token:", localStorage.getItem("token"));
        const response = await changePasswordService(newPassword, confirmPassword);
 
        if (response.nextStep === "SETUP_2FA_OPTIONAL" && response.data.shouldPrompt2FASetup) {
