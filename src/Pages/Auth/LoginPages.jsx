@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../Components/Organism/Forms";
-import { loginService } from "../../Services/AuthService";
+import { loginService, getReadableErrors } from "../../Services/AuthService";
 import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
@@ -11,7 +11,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
@@ -20,47 +20,25 @@ const LoginPage = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setError("");
+    setErrors([]);
 
     try {
       const response = await loginService(email, password);
-      console.log("response completo:", response);
-      if (!response) {
-        setError("No se pudo iniciar sesión");
+
+      if (!response?.success) {
+        setErrors(["No se pudo iniciar sesión"]);
         return;
       }
 
-      if (response.nextStep === "CHANGE_PASSWORD") {
-        navigate("/change-password");
-        return;
-      }
-
-      if (response.nextStep === "VALIDATE_2FA") {
-        navigate("/two-factor-login");
-        return;
-      }
-
-      if (response.nextStep === "WAIT_BLOCK") {
-        setError("Tu cuenta está bloqueada temporalmente. Intenta más tarde.");
-        return;
-      }
-
-      if (response.nextStep === "WAIT_2FA_BLOCK") {
-        setError("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
-        return;
-      }
-
-      if (response.message === "Login successful") {
-          localStorage.setItem("token", response.data.token);  // ← guardar token
-          localStorage.setItem("user", JSON.stringify(response.data.user));  // ← opcional pero útil
-          navigate("/app/dashboard");
-        return;
-      }
-
-      setError("El servidor devolvió un flujo no reconocido");
+      navigate("/app/dashboard");
     } catch (err) {
       console.error(err);
-      setError(err.message || "Credenciales inválidas");
+
+      if (err.status === 423) {
+        setErrors(["Tu cuenta está bloqueada temporalmente. Intenta más tarde."]);
+      } else {
+        setErrors(getReadableErrors(err));
+      }
     } finally {
       setLoading(false);
     }
@@ -112,7 +90,19 @@ const LoginPage = () => {
 
       <div className="w-1/2 bg-blue-900 flex items-center justify-center">
         <div className="w-full max-w-md space-y-4">
-          {error && <Alert type="error" message={error} />}
+          {errors.length > 0 && (
+            <Alert
+              type="error"
+              message={
+                <ul className="list-disc pl-5">
+                  {errors.map((item, index) => (
+                    <li key={`${item}-${index}`}>{item}</li>
+                  ))}
+                </ul>
+              }
+            />
+          )}
+
           <Forms
             title="Bienvenido de Vuelta"
             fields={fields}
