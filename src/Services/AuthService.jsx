@@ -1,5 +1,42 @@
 const API_URL = "http://localhost:3000";
 
+const buildApiError = (data, fallbackMessage) => {
+  const error = new Error(data.message || fallbackMessage);
+  error.status = data.status;
+  error.nextStep = data.nextStep;
+  error.blockedUntil = data.blockedUntil;
+  error.data = data.data;
+  return error;
+};
+
+const TOKEN_KEYS = {
+  session: "token",
+  firstLogin: "firstLoginToken",
+  pre2fa: "pre2faToken",
+};
+
+const clearAuthStorage = () => {
+  localStorage.removeItem(TOKEN_KEYS.session);
+  localStorage.removeItem(TOKEN_KEYS.firstLogin);
+  localStorage.removeItem(TOKEN_KEYS.pre2fa);
+};
+
+const saveLoginTokens = (data) => {
+  clearAuthStorage();
+
+  if (data.firstLoginToken) {
+    localStorage.setItem(TOKEN_KEYS.firstLogin, data.firstLoginToken);
+  }
+
+  if (data.pre2faToken) {
+    localStorage.setItem(TOKEN_KEYS.pre2fa, data.pre2faToken);
+  }
+
+  if (data.token) {
+    localStorage.setItem(TOKEN_KEYS.session, data.token);
+  }
+};
+
 const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/users/login`, {
     method: "POST",
@@ -12,121 +49,127 @@ const loginService = async (email, password) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Error al iniciar sesión");
+    throw buildApiError(data, "Error al iniciar sesión");
   }
 
-  if (data.tempToken || data.firstLoginToken) {
-    localStorage.setItem("tempToken", data.tempToken || data.firstLoginToken);
-  }
-
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-  }
+  saveLoginTokens(data);
 
   return data;
 };
 
 const activateTwoFactorAuthService = async () => {
-  const tempToken = getTempToken();
+  const sessionToken = getToken();
 
   const response = await fetch(`${API_URL}/users/2fa/setup`, {
-    method: "GET",
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${tempToken}`,
+      Authorization: `Bearer ${sessionToken}`,
     },
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Error al generar QR");
+    throw buildApiError(data, "Error al generar QR");
   }
 
   return data;
 };
 
-const verify2FAService = async (code) => {
-  const tempToken = getTempToken();
+const verify2FAService = async (token) => {
+  const sessionToken = getToken();
 
   const response = await fetch(`${API_URL}/users/2fa/verify-setup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${tempToken}`,
+      Authorization: `Bearer ${sessionToken}`,
     },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ token }),
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Código inválido");
-  }
-
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.removeItem("tempToken");
+    throw buildApiError(data, "Código inválido");
   }
 
   return data;
 };
 
 const skip2FAService = async () => {
-  const tempToken = getTempToken();
+  const sessionToken = getToken();
 
-  const response = await fetch(`${API_URL}/users/first-login/change-password`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${tempToken}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al omitir 2FA");
+  if (!sessionToken) {
+    throw new Error("No hay sesión activa para omitir la activación de 2FA");
   }
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.removeItem("tempToken");
-  }
-
-  return data;
+  return {
+    success: true,
+    message: "Activación de 2FA omitida",
+    nextStep: "LOGIN_COMPLETE",
+  };
 };
 
-const changePasswordService = async (currentPassword, newPassword) => {
-  const tempToken = getTempToken();
+const changePasswordService = async (newPassword, confirmPassword) => {
+  const firstLoginToken = getFirstLoginToken();
 
   const response = await fetch(`${API_URL}/users/first-login/change-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${tempToken}`,
+      Authorization: `Bearer ${firstLoginToken}`,
     },
-    body: JSON.stringify({ currentPassword, newPassword }),
+    body: JSON.stringify({ newPassword, confirmPassword }),
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Error al cambiar la contraseña");
+    throw buildApiError(data, "Error al cambiar la contraseña");
   }
 
   if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.removeItem("tempToken");
+    localStorage.setItem(TOKEN_KEYS.session, data.token);
   }
+  localStorage.removeItem(TOKEN_KEYS.firstLogin);
 
   return data;
 };
 
-const getToken = () => localStorage.getItem("token");
-const getTempToken = () => localStorage.getItem("tempToken");
+const validateLogin2FAService = async (token) => {
+  const pre2faToken = getPre2faToken();
+
+  const response = await fetch(`${API_URL}/users/2fa/validate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${pre2faToken}`,
+    },
+    body: JSON.stringify({ token }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw buildApiError(data, "Código 2FA inválido");
+  }
+
+  if (data.token) {
+    localStorage.setItem(TOKEN_KEYS.session, data.token);
+  }
+
+  localStorage.removeItem(TOKEN_KEYS.pre2fa);
+
+  return data;
+};
+
+const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
+const getFirstLoginToken = () => localStorage.getItem(TOKEN_KEYS.firstLogin);
+const getPre2faToken = () => localStorage.getItem(TOKEN_KEYS.pre2fa);
 
 const logoutService = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("tempToken");
+  clearAuthStorage();
 };
 
 export {
@@ -136,6 +179,8 @@ export {
   skip2FAService,
   changePasswordService,
   getToken,
-  getTempToken,
+  getFirstLoginToken,
+  getPre2faToken,
   logoutService,
+  validateLogin2FAService,
 };
