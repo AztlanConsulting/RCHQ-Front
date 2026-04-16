@@ -1,12 +1,21 @@
 const API_URL = "http://localhost:3000";
 
 const buildApiError = (data, fallbackMessage) => {
-  const error = new Error(data.message || fallbackMessage);
-  error.status = data.status;
-  error.nextStep = data.nextStep;
-  error.blockedUntil = data.blockedUntil;
-  error.data = data.data;
-  return error;
+  const errorMessage = new Error(data.message || fallbackMessage);
+  errorMessage.status = data.status;
+  errorMessage.nextStep = data.nextStep;
+  errorMessage.blockedUntil = data.blockedUntil;
+  errorMessage.data = data.data;
+  errorMessage.errors = Array.isArray(data.errors) ? data.errors : [];
+  return errorMessage;
+};
+
+const getReadableErrors = (err) => {
+  if (Array.isArray(err?.errors) && err.errors.length > 0) {
+    return err.errors.map((item) => item.message);
+  }
+
+  return [err?.message || "Ocurrió un error inesperado"];
 };
 
 const TOKEN_KEYS = {
@@ -183,4 +192,5 @@ export {
   getPre2faToken,
   logoutService,
   validateLogin2FAService,
+  getReadableErrors,
 };
