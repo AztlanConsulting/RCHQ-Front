@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../Components/Organism/Forms";
 import Button from "../../Components/Atoms/Button";
-import { changePasswordService, getFirstLoginToken } from "../../Services/AuthService";
+import { changePasswordService, getFirstLoginToken, getReadableErrors} from "../../Services/AuthService";
 import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
@@ -12,7 +12,7 @@ const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState([]);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -33,12 +33,12 @@ const ChangePassword = () => {
 
   const handleSubmit = async () => {
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setErrors([]);
       return;
     }
 
     setLoading(true);
-    setError("");
+    setErrors([]);
 
     try {
       console.log("Intentando cambiar contraseña con:", newPassword, confirmPassword);
@@ -55,7 +55,7 @@ const ChangePassword = () => {
 
     } catch (err) {
       console.error(err);
-      setError(err.message || "Error al cambiar la contraseña");
+      setErrors(getReadableErrors(err));
     } finally {
       setLoading(false);
     }
@@ -98,8 +98,19 @@ const ChangePassword = () => {
           </p>
         </div>
 
-        {error && <Alert type="error" message={error} />}
-
+        {errors.length > 0 && (
+          <Alert
+            type="error"
+            message={
+              <ul className="list-disc pl-5">
+                {errors.map((item, index) => (
+                  <li key={`${item}-${index}`}>{item}</li>
+                ))}
+              </ul>
+            }
+          />
+        )}
+        
         <Forms
           fields={fields}
           actions={[
