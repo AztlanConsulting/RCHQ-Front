@@ -5,8 +5,8 @@ const Button = ({
   disabled = false,
   bgColor = "bg-neutral-50",
   textColor = "text-[#121212]",
-  hoverColor = "hover:bg-neutral-100",
-  activeColor = "active:bg-neutral-200",
+  hoverColor = "hover:bg-neutral-200",
+  activeColor = "active:bg-neutral-300",
   height = "h-[50px]",
   fullWidth = false,
 }) => {
@@ -19,7 +19,7 @@ const Button = ({
         ${fullWidth ? "w-full" : "w-full max-w-60"}
         ${height}
         flex items-center justify-center rounded-lg overflow-hidden
-        transition-colors
+        cursor-pointer transition-colors
         ${bgColor} ${hoverColor} ${activeColor}
         disabled:cursor-not-allowed disabled:opacity-60
       `}
