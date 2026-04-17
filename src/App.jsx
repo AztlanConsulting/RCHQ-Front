@@ -8,33 +8,41 @@ import Calendario from "./Pages/Calendario";
 import Perfil from "./Pages/Perfil";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
+import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
 // import ChangePassword from "./Pages/Auth/ChangePassword";
 // import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 // import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        {/* <Route path="/change-password" element={<ChangePassword />} />
-        <Route path="/two-factor-login" element={<TwoFactorLogin />} />
-        <Route path="/setup-2fa" element={<TwoFactorAuth />} /> */}
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                {/* <Route path="/change-password" element={<ChangePassword />} />
+                    <Route path="/two-factor-login" element={<TwoFactorLogin />} />
+                    <Route path="/setup-2fa" element={<TwoFactorAuth />} /> */}
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="casas" element={<Casas />} />
-            <Route path="personal" element={<Personal />} />
-            <Route path="calendario" element={<Calendario />} />
-            <Route path="perfil" element={<Perfil />} />
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/app" element={<AppLayout />}>
+                        <Route
+                            index
+                            element={<Navigate to="dashboard" replace />}
+                        />
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="casas" element={<Casas />} />
+                        <Route path="personal" element={<Personal />} />
+                        <Route
+                            path="personal/nuevo"
+                            element={<AltaNuevoUsuarioPage />}
+                        />
+                        <Route path="calendario" element={<Calendario />} />
+                        <Route path="perfil" element={<Perfil />} />
+                    </Route>
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
