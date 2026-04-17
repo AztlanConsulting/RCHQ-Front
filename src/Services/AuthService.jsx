@@ -22,30 +22,6 @@ const getReadableErrors = (err) => {
   return ["Ocurrió un error inesperado"];
 };
 
-const TOKEN_KEYS = {
-  session: "token",
-};
-
-const clearAuthStorage = () => {
-  localStorage.removeItem(TOKEN_KEYS.session);
-  localStorage.removeItem("user");
-};
-
-const saveLoginSession = (responseData) => {
-  clearAuthStorage();
-
-  const token = responseData?.data?.token;
-  const user = responseData?.data?.user;
-
-  if (token) {
-    localStorage.setItem(TOKEN_KEYS.session, token);
-  }
-
-  if (user) {
-    localStorage.setItem("user", JSON.stringify(user));
-  }
-};
-
 const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/users/login`, {
     method: "POST",
@@ -61,20 +37,10 @@ const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
-  saveLoginSession(data);
-
   return data;
-};
-
-const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
-
-const logoutService = () => {
-  clearAuthStorage();
 };
 
 export {
   loginService,
-  getToken,
-  logoutService,
   getReadableErrors,
 };

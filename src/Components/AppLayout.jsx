@@ -1,19 +1,18 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { logoutService } from "../Services/AuthService";
 import Button from "../Components/Atoms/Button";
+import useAuth from "../hooks/useAuth";
 
 const navLinkClass = ({ isActive }) =>
-  `block rounded px-3 py-2 text-sm ${
-    isActive ? "bg-slate-700 text-white" : "text-black"
+  `block rounded px-3 py-2 text-sm ${isActive ? "bg-slate-700 text-white" : "text-black"
   }`;
 
 export default function AppLayout() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const logout = () => {
-    logoutService();
-
-    navigate("/login");
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -22,7 +21,8 @@ export default function AppLayout() {
         <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
           Menú
         </p>
-        <nav className="flex flex-col h-full justify-between gap-1">
+
+        <nav className="flex h-full flex-col justify-between gap-1">
           <div>
             <NavLink to="/app/dashboard" className={navLinkClass} end>
               Dashboard
@@ -41,13 +41,21 @@ export default function AppLayout() {
             </NavLink>
           </div>
 
-          <div>
-            <Button onClick={logout} className="mb-6">
-              Logout
-            </Button>
+          <div className="mb-6">
+            <Button
+              text="Cerrar sesión"
+              type="button"
+              onClick={handleLogout}
+              bgColor="bg-red-600"
+              textColor="text-white"
+              hoverColor="hover:bg-red-700"
+              activeColor="active:bg-red-800"
+              fullWidth={true}
+            />
           </div>
         </nav>
       </aside>
+
       <main className="min-w-0 flex-1 p-6">
         <Outlet />
       </main>
