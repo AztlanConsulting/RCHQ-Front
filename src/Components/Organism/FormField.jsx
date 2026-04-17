@@ -13,6 +13,7 @@ const FormField = ({
     maxLength,
     iconRightAlt = "icono",
     labelColor = "text-[#121212]",
+    autoComplete = "off",
 }) => {
     const handlesetValue = (val) => {
         const syntheticEvent = {
@@ -51,6 +52,7 @@ const FormField = ({
                 iconRight={iconRight}
                 onIconRightClick={onIconRightClick}
                 iconRightAlt={iconRightAlt}
+                autoComplete={autoComplete}
             />
         </div>
     );
