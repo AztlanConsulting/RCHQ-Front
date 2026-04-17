@@ -1,4 +1,4 @@
-import FormField from "../Organism/FormField";
+import FormField from "./FormField";
 import SelectField from "../Atoms/SelectField";
 import PhotoUploader from "../Atoms/PhotoUploader";
 import Button from "../Atoms/Button";
