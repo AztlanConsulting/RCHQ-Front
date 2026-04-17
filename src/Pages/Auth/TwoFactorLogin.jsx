@@ -19,7 +19,6 @@ const TwoFactorLogin = () => {
     }, [navigate]);
     
     const handleSubmit = async () => {
-        // 👈 Si ya está bloqueado, no hacemos nada y salimos de la función
         if (isBlocked) return; 
 
         setLoading(true);

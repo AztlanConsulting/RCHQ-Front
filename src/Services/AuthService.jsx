@@ -96,7 +96,6 @@ const activateTwoFactorAuthService = async () => {
   const token = getToken();
   const id = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).employeeId : null;
 
-  console.log("Activando 2FA para employeeId:", id); // ← agrega esto
 
   if (!token) {
     throw new Error("No se encontró token de sesión");
@@ -146,7 +145,6 @@ const verify2FAService = async (code) => {
 
 const validateLogin2FAService = async (code) => {
   const token = getPre2faToken();
-  console.log(token);
 
   if(!token) throw new Error("No se encontró token de pre-autenticación");
 
@@ -168,6 +166,32 @@ const validateLogin2FAService = async (code) => {
   return data;
 };
 
+const getStatus2FA = async () =>{
+  const token = getToken();
+
+
+   if (!token) {
+    throw new Error("No se encontró token de sesión");
+  }
+
+  const response = await fetch(`${API_URL}/users/status/2FA`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+  }
+
+  return data;
+
+
+}
 const desactivate2FAService = async (password) => {
   const token = getToken()
 
@@ -199,5 +223,6 @@ export {
   activateTwoFactorAuthService,
   verify2FAService,
   validateLogin2FAService,
+  getStatus2FA,
   desactivate2FAService,
 };
