@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
 import Alert from "../../Components/Atoms/Alerts";
-import { validateLogin2FAService, getPre2faToken } from "../../Services/AuthService";
+import { validateLogin2FAService, getPre2faToken, getToken } from "../../Services/AuthService";
 
 const TwoFactorLogin = () => {
     const navigate = useNavigate();
@@ -12,9 +12,18 @@ const TwoFactorLogin = () => {
     const [isBlocked, setIsBlocked] = useState(false);
 
     useEffect(() => {
-        const token = getPre2faToken();
-        if (!token) {
-            navigate("/login", { replace: true });
+        const pre2faToken = getPre2faToken();
+        const sessionToken = getToken(); // ← también importar getToken
+
+        // Si ya tiene session token, ya completó el login
+        if (sessionToken) {
+            navigate("/app/dashboard", { replace: true });
+            return;
+        }
+
+        // Si no tiene ni pre2fa, mandar al login
+        if (!pre2faToken) {
+            navigate("/iniciar-sesion", { replace: true });
         }
     }, [navigate]);
     
@@ -30,8 +39,8 @@ const TwoFactorLogin = () => {
             if (response.nextStep === "LOGIN_COMPLETE") {
                 localStorage.setItem("token", response.token);
                 localStorage.setItem("user", JSON.stringify(response.data));
-                localStorage.removeItem("PRE_2FA");
-                navigate("/app/dashboard");
+                navigate("/app/dashboard", { replace: true }); 
+                localStorage.removeItem("PRE_2FA");            
                 return;
             }
 

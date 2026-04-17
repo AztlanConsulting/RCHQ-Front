@@ -1,13 +1,10 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { getToken } from "../Services/AuthService";
+import { Navigate, Outlet } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
-export default function ProtectedRoute() {
-  const location = useLocation();
-  const token = getToken();
+const ProtectedRoute = () => {
+  const { isAuthenticated } = useAuth();
 
-  if (!token) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
+  return isAuthenticated ? <Outlet /> : <Navigate to="/iniciar-sesion" replace />;
+};
 
-  return <Outlet />;
-}
+export default ProtectedRoute;

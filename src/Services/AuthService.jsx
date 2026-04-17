@@ -3,6 +3,7 @@ const API_URL = "http://localhost:3000";
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
   errorMessage.status = response.status;
+  errorMessage.code = data?.code;
   errorMessage.blockedUntil = data?.blockedUntil;
   errorMessage.data = data?.data;
   errorMessage.errors = Array.isArray(data?.errors) ? data.errors : [];
@@ -41,17 +42,10 @@ const clearAuthStorage = () => {
 
 const saveLoginSession = (responseData) => {
   clearAuthStorage();
-
   const token = responseData?.data?.token;
   const user = responseData?.data?.user;
-
-  if (token) {
-    localStorage.setItem(TOKEN_KEYS.session, token);
-  }
-
-  if (user) {
-    localStorage.setItem("user", JSON.stringify(user));
-  }
+  if (token) localStorage.setItem(TOKEN_KEYS.session, token);
+  if (user) localStorage.setItem("user", JSON.stringify(user));
 };
 
 const loginService = async (email, password) => {

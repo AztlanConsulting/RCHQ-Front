@@ -6,6 +6,7 @@ import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
+  getToken
 } from "../../Services/AuthService";
 
 const TwoFactorAuth = ({ onClose }) => {

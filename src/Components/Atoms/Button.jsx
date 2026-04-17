@@ -5,8 +5,8 @@ const Button = ({
   disabled = false,
   bgColor = "bg-neutral-50",
   textColor = "text-[#121212]",
-  hoverColor = "hover:bg-neutral-100",
-  activeColor = "active:bg-neutral-200",
+  hoverColor = "hover:bg-neutral-200",
+  activeColor = "active:bg-neutral-300",
   height = "h-[50px]",
   width = "w-[206px]", // Por defecto conserva el ancho que tenías
   textSize = "text-xl",
@@ -20,7 +20,13 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${width} ${height} flex items-center justify-center gap-2 rounded-lg overflow-hidden cursor-pointer transition-all ${bgColor} ${hoverColor} ${activeColor} disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={
+        `${width}
+        ${height} 
+        flex items-center justify-center rounded-lg overflow-hidden 
+        cursor-pointer transition-all
+        ${bgColor} ${hoverColor} ${activeColor} 
+        disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
     >
       {/* Si se le pasan hijos (como en OptionCard), renderiza los hijos. Si no, renderiza el texto e ícono */}
       {children ? (
