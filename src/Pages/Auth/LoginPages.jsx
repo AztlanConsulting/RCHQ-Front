@@ -30,6 +30,10 @@ const LoginPage = () => {
         return;
       }
 
+      if(response.isActive2FA){
+        navigate("/2FA")
+      }
+
       navigate("/app/dashboard");
     } catch (err) {
       console.error(err);
