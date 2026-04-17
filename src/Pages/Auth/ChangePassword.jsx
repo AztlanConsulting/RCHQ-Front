@@ -19,7 +19,7 @@ const ChangePassword = () => {
   useEffect(() => {
     const token = getFirstLoginToken();
     if (!token) {
-      navigate("/login", { replace: true });
+      navigate("/iniciar-sesion", { replace: true });
     }
   }, [navigate]);
 

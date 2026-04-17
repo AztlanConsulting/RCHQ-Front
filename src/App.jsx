@@ -20,7 +20,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
 
         <Route element={<PublicRoute />}>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/iniciar-sesion" element={<LoginPage />} />
           {/* <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/2fa/setup" element={<TwoFactorAuth />} />
           <Route path="/2fa/login" element={<TwoFactorLogin />} /> */}

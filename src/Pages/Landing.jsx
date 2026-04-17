@@ -6,7 +6,7 @@ const Landing = () => {
   const navigate = useNavigate();
 
   const toSignIn = () => {
-    navigate("/login");
+    navigate("/iniciar-sesion");
   };
 
   return (

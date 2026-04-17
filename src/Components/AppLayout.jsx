@@ -12,7 +12,7 @@ export default function AppLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate("/iniciar-sesion", { replace: true });
   };
 
   return (
