@@ -11,6 +11,7 @@ const Forms = ({
 }) => {
   return (
     <form
+    autoComplete="off"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -39,6 +40,9 @@ const Forms = ({
           iconRightAriaLabel={field.iconRightAriaLabel}
           htmlFor={field.htmlFor}
           text={field.text}
+          autoComplete={field.autoComplete}
+          inputMode={field.inputMode}
+          maxLength={field.maxLength}
         />
       ))}
 
