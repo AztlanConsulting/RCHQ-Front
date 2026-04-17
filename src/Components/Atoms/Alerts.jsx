@@ -7,7 +7,7 @@ const Alert = ({ icon = "", type = "success", message }) => {
       icon: icon,
     },
     error: {
-      container: "bg-red-500 text-black",
+      container: "bg-[#dd4344] text-white",
       icon: error,
     },
     warning: {
