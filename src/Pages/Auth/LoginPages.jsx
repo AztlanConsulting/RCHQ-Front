@@ -62,7 +62,6 @@ const LoginPage = () => {
   const fields = [
     {
       id: "email",
-      label: "Correo electrónico",
       value: email,
       setValue: handleEmailChange,
       placeholder: "Ingresa tu correo",
@@ -75,7 +74,6 @@ const LoginPage = () => {
     },
     {
       id: "password",
-      label: "Contraseña",
       value: password,
       setValue: handlePasswordChange,
       placeholder: "Ingresa tu contraseña",

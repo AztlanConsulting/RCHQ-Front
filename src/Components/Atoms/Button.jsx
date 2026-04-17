@@ -8,19 +8,23 @@ const Button = ({
   hoverColor = "hover:bg-neutral-100",
   activeColor = "active:bg-neutral-200",
   height = "h-[50px]",
+  fullWidth = false,
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-[206px] ${height} flex items-center justify-center rounded-lg overflow-hidden cursor-pointer transition-colors
-      ${bgColor} ${hoverColor} ${activeColor}
-      disabled:cursor-not-allowed disabled:opacity-60`}
+      className={`
+        ${fullWidth ? "w-full" : "w-full max-w-60"}
+        ${height}
+        flex items-center justify-center rounded-lg overflow-hidden
+        transition-colors
+        ${bgColor} ${hoverColor} ${activeColor}
+        disabled:cursor-not-allowed disabled:opacity-60
+      `}
     >
-      <span
-        className={`font-bold text-xl ${textColor}`}
-      >
+      <span className={`font-bold text-base sm:text-lg ${textColor}`}>
         {text}
       </span>
     </button>

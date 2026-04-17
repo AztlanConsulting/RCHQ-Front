@@ -23,9 +23,22 @@ const Alert = ({ icon = "", type = "success", message }) => {
   const current = styles[type];
 
   return (
-    <div className={`flex items-center gap-3 p-4 rounded-lg shadow-md ${current.container}`}>
-      {current.icon && <img src={current.icon} alt={type} className="h-5 w-5" />}
-      <p className="font-medium whitespace-pre-line">{message}</p>
+    <div
+      className={`flex w-full gap-3 rounded-lg p-4 shadow-md ${current.container}`}
+    >
+      {current.icon && (
+        <div className="flex shrink-0 items-center self-center">
+          <img
+            src={current.icon}
+            alt={type}
+            className="h-5 w-5"
+          />
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1 text-sm font-medium whitespace-pre-line sm:text-base">
+        {message}
+      </div>
     </div>
   );
 };
