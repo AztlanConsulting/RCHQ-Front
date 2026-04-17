@@ -8,21 +8,31 @@ const Button = ({
   hoverColor = "hover:bg-neutral-100",
   activeColor = "active:bg-neutral-200",
   height = "h-[50px]",
+  width = "w-[206px]", // Por defecto conserva el ancho que tenías
+  textSize = "text-xl",
+  fontWeight = "font-bold",
+  className = "",
+  icon = null,
+  children,
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-[206px] ${height} flex items-center justify-center rounded-lg overflow-hidden cursor-pointer transition-colors
-      ${bgColor} ${hoverColor} ${activeColor}
-      disabled:cursor-not-allowed disabled:opacity-60`}
+      className={`${width} ${height} flex items-center justify-center gap-2 rounded-lg overflow-hidden cursor-pointer transition-all ${bgColor} ${hoverColor} ${activeColor} disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
     >
-      <span
-        className={`font-bold text-xl ${textColor}`}
-      >
-        {text}
-      </span>
+      {/* Si se le pasan hijos (como en OptionCard), renderiza los hijos. Si no, renderiza el texto e ícono */}
+      {children ? (
+        children
+      ) : (
+        <>
+          {icon && <span className="flex items-center">{icon}</span>}
+          <span className={`${fontWeight} ${textSize} ${textColor}`}>
+            {text}
+          </span>
+        </>
+      )}
     </button>
   );
 };
