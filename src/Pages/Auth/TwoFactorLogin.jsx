@@ -35,6 +35,10 @@ const TwoFactorLogin = () => {
             }
 
             if (response.nextStep === "LOGIN_COMPLETE") {
+
+                localStorage.setItem("token", response.token);
+                localStorage.setItem("user", JSON.stringify(response.data));
+                localStorage.removeItem("PRE_2FA");
                 navigate("/app/dashboard");
                 return;
             }

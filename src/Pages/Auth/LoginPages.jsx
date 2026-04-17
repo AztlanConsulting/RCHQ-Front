@@ -32,6 +32,7 @@ const LoginPage = () => {
 
       if(response.isActive2FA){
         navigate("/2FA")
+        return;
       }
 
       navigate("/app/dashboard");

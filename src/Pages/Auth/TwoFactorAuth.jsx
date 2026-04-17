@@ -6,7 +6,6 @@ import Alert from "../../Components/Atoms/Alerts";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
-  getToken,
 } from "../../Services/AuthService";
 
 const TwoFactorAuth = () => {
@@ -55,7 +54,6 @@ useEffect(() => {
 
     try {
       const response = await verify2FAService(code);
-      console.log("verify2FAService response:", response); // ← agrega esto
 
       if (!response) {
         setError("No se pudo validar el código");

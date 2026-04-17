@@ -9,7 +9,7 @@ import Perfil from "./Pages/Perfil";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
 // import ChangePassword from "./Pages/Auth/ChangePassword";
-// import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
+import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        {/* <Route path="/2FA" element={<TwoFactorLogin />} /> */}
+        <Route path="/2FA" element={<TwoFactorLogin />} />
         <Route path="/setup-2fa" element={<TwoFactorAuth />} /> 
 
         <Route element={<ProtectedRoute />}>

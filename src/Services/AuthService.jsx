@@ -17,16 +17,24 @@ const getReadableErrors = (err) => {
   return [err?.message || "Ocurrió un error inesperado"];
 };
 
+const savePre2faSession = (responseData) => {
+  clearAuthStorage();
+  const pre2faToken = responseData?.pre2FAToken;
+  if (pre2faToken) {
+    localStorage.setItem(TOKEN_KEYS.pre2fa, pre2faToken); // "PRE_2FA"
+  }
+};
+
 const TOKEN_KEYS = {
   session: "token",
   // firstLogin: "firstLoginToken",
-  // pre2fa: "pre2faToken",
+  pre2fa: "PRE_2FA",
 };
 
 const clearAuthStorage = () => {
   localStorage.removeItem(TOKEN_KEYS.session);
   // localStorage.removeItem(TOKEN_KEYS.firstLogin);
-  // localStorage.removeItem(TOKEN_KEYS.pre2fa);
+  localStorage.removeItem(TOKEN_KEYS.pre2fa);
 
   localStorage.removeItem("user");
 };
@@ -61,12 +69,18 @@ const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
+  if(data.isActive2FA) {
+    savePre2faSession(data);
+  }else {
   saveLoginSession(data);
+  }
 
   return data;
 };
 
 const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
+const getPre2faToken = () => localStorage.getItem(TOKEN_KEYS.pre2fa);
+
 
 const logoutService = () => {
   clearAuthStorage();
@@ -74,11 +88,8 @@ const logoutService = () => {
 
 /* Fuera de alcance de la us 3
 const getFirstLoginToken = () => localStorage.getItem("firstLoginToken");
-const getPre2faToken = () => localStorage.getItem("pre2faToken");
 
-const skip2FAService = async () => {};
 const changePasswordService = async () => {};
-const validateLogin2FAService = async () => {};
 */
 
 const activateTwoFactorAuthService = async () => {
@@ -133,12 +144,59 @@ const verify2FAService = async (code) => {
   return data;
 };
 
+const validateLogin2FAService = async (code) => {
+  const token = getPre2faToken();
+
+  if(!token) throw new Error("No se encontró token de pre-autenticación");
+
+    const response = await fetch(`${API_URL}/users/2fa/validate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ token: code }),
+  });
+
+  const data = await response.json();
+
+    if (!response.ok) {
+    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+  }
+
+  return data;
+};
+
+const desactivate2FAService = async (password) => {
+  const token = getToken()
+
+  const response = await fetch(`${API_URL}/users/2fa/disable`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+  }
+
+  return data;
+};
+
 
 export {
   loginService,
   getToken,
+  getPre2faToken,
   logoutService,
   getReadableErrors,
   activateTwoFactorAuthService,
   verify2FAService,
+  validateLogin2FAService,
+  desactivate2FAService,
 };
