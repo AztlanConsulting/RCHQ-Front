@@ -146,6 +146,7 @@ const verify2FAService = async (code) => {
 
 const validateLogin2FAService = async (code) => {
   const token = getPre2faToken();
+  console.log(token);
 
   if(!token) throw new Error("No se encontró token de pre-autenticación");
 

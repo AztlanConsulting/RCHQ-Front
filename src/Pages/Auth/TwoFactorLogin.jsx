@@ -9,6 +9,7 @@ const TwoFactorLogin = () => {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isBlocked, setIsBlocked] = useState(false);
 
     useEffect(() => {
         const token = getPre2faToken();
@@ -18,24 +19,16 @@ const TwoFactorLogin = () => {
     }, [navigate]);
     
     const handleSubmit = async () => {
+        // 👈 Si ya está bloqueado, no hacemos nada y salimos de la función
+        if (isBlocked) return; 
+
         setLoading(true);
         setError("");
 
         try {
             const response = await validateLogin2FAService(code);
 
-            if (!response) {
-                setError("No se pudo validar el código");
-                return;
-            }
-
-            if (response.nextStep === "WAIT_2FA_BLOCK") {
-                setError("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
-                return;
-            }
-
             if (response.nextStep === "LOGIN_COMPLETE") {
-
                 localStorage.setItem("token", response.token);
                 localStorage.setItem("user", JSON.stringify(response.data));
                 localStorage.removeItem("PRE_2FA");
@@ -43,10 +36,15 @@ const TwoFactorLogin = () => {
                 return;
             }
 
-            setError("El servidor devolvió un flujo no reconocido");
         } catch (err) {
             console.error(err);
-            setError(err.message || "Código 2FA inválido");
+            
+            if (err.status === 423 || err.data?.nextStep === "WAIT_2FA_BLOCK") {
+                setError("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
+                setIsBlocked(true); 
+            } else {
+                setError(err.message || "Código 2FA inválido");
+            }
         } finally {
             setLoading(false);
         }
@@ -71,6 +69,7 @@ const TwoFactorLogin = () => {
                     setCode={setCode}
                     onSubmit={handleSubmit}
                     loading={loading}
+                    disabled={isBlocked}
                 />
             </div>
         </div>
