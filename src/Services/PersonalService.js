@@ -24,39 +24,49 @@ export const getEmployeeFormData = async () => {
     return data;
 };
 
-export const createEmployee = async (formData) => {
+// 🔥 AQUÍ EL CAMBIO IMPORTANTE
+export const createEmployee = async (data) => {
     const token = getToken();
+
+    const formData = new FormData();
+
+    // 👇 campos normales
+    Object.keys(data).forEach((key) => {
+        if (data[key] !== null && data[key] !== undefined) {
+            formData.append(key, data[key]);
+        }
+    });
 
     const res = await fetch(`${API_URL}/employee/add`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            // ❌ NO pongas Content-Type
         },
-        body: JSON.stringify(formData),
+        body: formData,
     });
 
-    const data = await res.json();
+    const response = await res.json();
 
     if (!res.ok) {
         let errorMessage = "Error desconocido. Intente más tarde";
 
-        if (data.errors) {
-            errorMessage = data.errors
+        if (response.errors) {
+            errorMessage = response.errors
                 .map((e) => `${e.campo}: ${e.mensaje}`)
                 .join("\n");
-        } else if (data.error) {
-            errorMessage = data.error;
+        } else if (response.error) {
+            errorMessage = response.error;
         }
 
         const error = new Error(errorMessage);
 
-        if (data.redirect) {
-            error.redirect = data.redirect;
+        if (response.redirect) {
+            error.redirect = response.redirect;
         }
 
         throw error;
     }
 
-    return data;
+    return response;
 };

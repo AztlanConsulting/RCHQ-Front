@@ -17,15 +17,15 @@ const INITIAL_FORM = {
     curp: "",
     rfc: "",
     nss: "",
-    clabe: "",
-    birthdate: "",
+    bank_account: "", // 👈 asegúrate que coincida con backend
+    birth_date: "",   // 👈 también
 };
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
     const navigate = useNavigate();
 
     const [roles, setRoles] = useState([]);
-    const [photo, setPhoto] = useState(null);
+    const [photo, setPhoto] = useState(null); // 👈 archivo real
     const [form, setForm] = useState(INITIAL_FORM);
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +57,7 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                 finalValue = value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, "");
                 break;
             case "nss":
-            case "clabe":
+            case "bank_account":
                 finalValue = value.replace(/\D/g, "");
                 break;
             case "curp":
@@ -87,7 +87,13 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         setIsLoading(true);
 
         try {
-            const response = await createEmployee({ ...result.data });
+            // 🔥 AQUÍ INTEGRAMOS LA FOTO
+            const payload = {
+                ...result.data,
+                picture: photo, // 👈 archivo real
+            };
+
+            const response = await createEmployee(payload);
 
             setForm(INITIAL_FORM);
             setPhoto(null);
@@ -141,7 +147,7 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                             handleChange={handleChange}
                             roles={roles}
                             photo={photo}
-                            onPhotoChange={setPhoto}
+                            onPhotoChange={setPhoto} // 👈 esto debe recibir File
                             onSubmit={handleSubmit}
                             onCancel={onCancel || (() => navigate(-1))}
                             isLoading={isLoading}
