@@ -1,11 +1,14 @@
+// TwoFactorLogin.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
 import Alert from "../../Components/Atoms/Alerts";
 import { validateLogin2FAService, getPre2faToken, getToken } from "../../Services/AuthService";
+import { useAuthContext } from "../../context/AuthContext";
 
 const TwoFactorLogin = () => {
     const navigate = useNavigate();
+    const { login } = useAuthContext();
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -13,23 +16,19 @@ const TwoFactorLogin = () => {
 
     useEffect(() => {
         const pre2faToken = getPre2faToken();
-        const sessionToken = getToken(); // ← también importar getToken
+        const sessionToken = getToken();
 
-        // Si ya tiene session token, ya completó el login
         if (sessionToken) {
             navigate("/app/dashboard", { replace: true });
             return;
         }
-
-        // Si no tiene ni pre2fa, mandar al login
         if (!pre2faToken) {
             navigate("/iniciar-sesion", { replace: true });
         }
     }, [navigate]);
-    
-    const handleSubmit = async () => {
-        if (isBlocked) return; 
 
+    const handleSubmit = async () => {
+        if (isBlocked) return;
         setLoading(true);
         setError("");
 
@@ -37,19 +36,20 @@ const TwoFactorLogin = () => {
             const response = await validateLogin2FAService(code);
 
             if (response.nextStep === "LOGIN_COMPLETE") {
-                localStorage.setItem("token", response.token);
-                localStorage.setItem("user", JSON.stringify(response.data));
-                navigate("/app/dashboard", { replace: true }); 
-                localStorage.removeItem("PRE_2FA");            
+                localStorage.removeItem("PRE_2FA");
+                login({
+                    token: response.token,
+                    user: response.data,
+                });
+                navigate("/app/dashboard", { replace: true });
                 return;
             }
 
         } catch (err) {
             console.error(err);
-            
-            if (err.status === 423 || err.data?.nextStep === "WAIT_2FA_BLOCK") {
+            if (err.status === 423) {
                 setError("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
-                setIsBlocked(true); 
+                setIsBlocked(true);
             } else {
                 setError(err.message || "Código 2FA inválido");
             }
