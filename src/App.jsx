@@ -19,7 +19,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
 
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />

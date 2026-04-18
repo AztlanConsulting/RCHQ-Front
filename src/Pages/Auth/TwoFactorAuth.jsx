@@ -10,7 +10,7 @@ import {
 
 const TwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();
-  const [step, setStep] = useState("qr"); // "qr" | "code"
+  const [step, setStep] = useState("qr");
   const [code, setCode] = useState("");
   const [qr, setQr] = useState("");
   const [manualCode, setManualCode] = useState("");
@@ -55,9 +55,9 @@ const TwoFactorAuth = ({ onClose }) => {
       }
       if (response.nextStep === "2FA_SETUP_COMPLETE") {
         if (onClose) {
-          onClose(); // ← viene de modal, solo cerrar y notificar
+          onClose();
         } else {
-          navigate("/app/opciones"); // ← viene de página independiente
+          navigate("/app/opciones");
         }
         return;
       }
@@ -71,7 +71,6 @@ const TwoFactorAuth = ({ onClose }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-2xl p-8 w-[500px] max-w-full flex flex-col">
-      {/* Paso 1 — Modal QR */}
       {step === "qr" && (
         <>
           <div className="text-left w-full mb-6">
@@ -99,10 +98,10 @@ const TwoFactorAuth = ({ onClose }) => {
                 text="Continuar"
                 onClick={() => { setError(""); setStep("code"); }}
                 disabled={loading || !qr}
-                bgColor="bg-[#1d4ed8]" // Azul brillante del diseño
+                bgColor="bg-[#1d4ed8]"
                 hoverColor="hover:bg-blue-800"
                 textColor="text-white"
-                width="w-56" // Ancho similar al QR
+                width="w-56"
                 className="shadow-sm"
               />
             </div>
@@ -126,7 +125,6 @@ const TwoFactorAuth = ({ onClose }) => {
         </>
       )}
 
-      {/* Paso 2 — Ingresar código */}
       {step === "code" && (
         <div className="flex flex-col items-center gap-6 w-full">
           <div className="text-center w-full">
@@ -148,7 +146,7 @@ const TwoFactorAuth = ({ onClose }) => {
           />
 
           <Button
-            text="← Volver al QR"
+            text="Volver al QR"
             onClick={() => { setError(""); setStep("qr"); }}
             bgColor="bg-transparent"
             hoverColor="hover:bg-slate-50"

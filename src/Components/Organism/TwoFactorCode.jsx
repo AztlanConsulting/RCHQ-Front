@@ -13,12 +13,16 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
         placeholder="Ingresa el código"
         htmlFor="two-factor-code"
         text="Código de autenticación"
-        disabled={disabled} 
+        disabled={disabled}
+        maxLength={6} 
       />
       <Button
         text={loading ? "Verificando..." : "Verificar"}
         onClick={onSubmit}
         disabled={loading || disabled}
+        bgColor="bg-[#1d4ed8]"
+        hoverColor="hover:bg-blue-800"
+        textColor="text-white"
       />
     </div>
   );

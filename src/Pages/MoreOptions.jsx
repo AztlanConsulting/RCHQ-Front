@@ -22,7 +22,6 @@ const MoreOptions = () => {
 
   const toggleShowPassword = () => setShowPassword((v) => !v);
 
-  // Auto-ocultar notificación después de 4 segundos
   useEffect(() => {
     if (!successMessage) return;
     const timer = setTimeout(() => setSuccessMessage(""), 4000);
@@ -33,7 +32,6 @@ const MoreOptions = () => {
     const fetchStatus = async () => {
       try {
         const response = await getStatus2FA();
-        console.log("response complete: ", response);
         setIs2FAActive(response.Status2FA ?? false);
       } catch (err) {
         console.error("Error al obtener estado 2FA:", err);
