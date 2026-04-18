@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OptionCard from "../Components/Molecules/OptionCard";
 import Button from "../Components/Atoms/Button";
+import TextField from "../Components/Atoms/TextField";
 import Alert from "../Components/Atoms/Alerts";
 import TwoFactorAuth from "./Auth/TwoFactorAuth";
 import { getStatus2FA, desactivate2FAService } from "../Services/AuthService";
+import eye from "/showEye.svg";
+import hideEye from "/hideEye.svg";
 
 const MoreOptions = () => {
   const navigate = useNavigate();
@@ -14,13 +17,24 @@ const MoreOptions = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(""); // ← agregar
+
+  const toggleShowPassword = () => setShowPassword((v) => !v);
+
+  // Auto-ocultar notificación después de 4 segundos
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = setTimeout(() => setSuccessMessage(""), 4000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
   useEffect(() => {
     const fetchStatus = async () => {
       try {
         const response = await getStatus2FA();
+        console.log("response complete: ", response);
         setIs2FAActive(response.Status2FA ?? false);
-        console.log("2fa: ", is2FAActive);
       } catch (err) {
         console.error("Error al obtener estado 2FA:", err);
       }
@@ -41,6 +55,8 @@ const MoreOptions = () => {
         setIs2FAActive(false);
         setShowDisableModal(false);
         setPassword("");
+        setShowPassword(false);
+        setSuccessMessage("La autenticación en dos pasos ha sido desactivada correctamente."); // ← agregar
       }
     } catch (err) {
       setError(err.message || "Error al desactivar 2FA");
@@ -52,6 +68,13 @@ const MoreOptions = () => {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras Opciones</h1>
+
+      {/* Notificación de éxito */}
+      {successMessage && (
+        <div className="mb-4">
+          <Alert type="success" message={successMessage} />
+        </div>
+      )}
 
       <div className="bg-transparent rounded-2xl border border-slate-200 p-8 min-h-96">
         <Button
@@ -74,8 +97,6 @@ const MoreOptions = () => {
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
-
-          {/* ← condicional correcto: un solo OptionCard con onClick distinto */}
           <OptionCard
             icon={<img src="/key.svg" alt="2FA" className="w-9 h-9" />}
             label={is2FAActive ? "Desactivar 2FA" : "Activar 2FA"}
@@ -104,7 +125,8 @@ const MoreOptions = () => {
             <TwoFactorAuth
               onClose={() => {
                 setShow2FAModal(false);
-                setIs2FAActive(true); // ← actualizar estado al completar
+                setIs2FAActive(true);
+                setSuccessMessage("La autenticación en dos pasos ha sido activada correctamente."); // ← agregar
               }}
             />
           </div>
@@ -124,17 +146,28 @@ const MoreOptions = () => {
 
             {error && <Alert type="error" message={error} />}
 
-            <input
-              type="password"
+            <TextField
+              id="disable-password"
+              type={showPassword ? "text" : "password"}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              setValue={setPassword}
               placeholder="Tu contraseña"
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+              text=""
+              htmlFor="disable-password"
+              iconRight={showPassword ? eye : hideEye}
+              onIconRightClick={toggleShowPassword}
+              iconRightAlt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRightAriaLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             />
 
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => { setShowDisableModal(false); setPassword(""); setError(""); }}
+                onClick={() => {
+                  setShowDisableModal(false);
+                  setPassword("");
+                  setError("");
+                  setShowPassword(false);
+                }}
                 className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900"
               >
                 Cancelar

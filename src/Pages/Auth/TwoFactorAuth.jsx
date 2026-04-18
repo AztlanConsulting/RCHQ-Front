@@ -6,7 +6,6 @@ import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
-  getToken
 } from "../../Services/AuthService";
 
 const TwoFactorAuth = ({ onClose }) => {
@@ -55,8 +54,11 @@ const TwoFactorAuth = ({ onClose }) => {
         return;
       }
       if (response.nextStep === "2FA_SETUP_COMPLETE") {
-        onClose?.(); 
-        navigate("/app/perfil");
+        if (onClose) {
+          onClose(); // ← viene de modal, solo cerrar y notificar
+        } else {
+          navigate("/app/opciones"); // ← viene de página independiente
+        }
         return;
       }
       setError("El servidor devolvió un flujo no reconocido");
