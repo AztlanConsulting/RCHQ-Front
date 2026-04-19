@@ -1,10 +1,11 @@
 import error from "/error.svg";
+import check from "/check.svg";
 
 const Alert = ({ icon = "", type = "success", message }) => {
   const styles = {
     success: {
       container: "bg-green-500 text-black",
-      icon: icon,
+      icon: check,
     },
     error: {
       container: "bg-[#dd4344] text-white",

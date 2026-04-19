@@ -1,7 +1,7 @@
 import TextField from "../Atoms/TextField";
 import Button from "../Atoms/Button";
 
-const TwoFactorCode = ({ code, setCode, onSubmit, loading }) => {
+const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   return (
     <div className="flex flex-col items-center gap-6">
       <TextField
@@ -13,11 +13,16 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading }) => {
         placeholder="Ingresa el código"
         htmlFor="two-factor-code"
         text="Código de autenticación"
+        disabled={disabled}
+        maxLength={6} 
       />
       <Button
         text={loading ? "Verificando..." : "Verificar"}
         onClick={onSubmit}
-        disabled={loading}
+        disabled={loading || disabled}
+        bgColor="bg-[#1d4ed8]"
+        hoverColor="hover:bg-blue-800"
+        textColor="text-white"
       />
     </div>
   );

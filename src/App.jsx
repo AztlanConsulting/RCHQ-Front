@@ -10,8 +10,9 @@ import PublicRoute from "./Components/PublicRoute";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
 // import ChangePassword from "./Pages/Auth/ChangePassword";
-// import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
-// import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
+import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
+import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
+import MoreOptions from "./Pages/MoreOptions";
 
 function App() {
   return (
@@ -21,13 +22,13 @@ function App() {
 
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />
-          {/* <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/2fa/setup" element={<TwoFactorAuth />} />
-          <Route path="/2fa/login" element={<TwoFactorLogin />} /> */}
+          <Route path="/2FA" element={<TwoFactorLogin />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
+          <Route path="opciones" element={<MoreOptions/>}/>
+          <Route path="setup-2fa" element={<TwoFactorAuth />} /> 
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="personal" element={<Personal />} />
