@@ -88,8 +88,6 @@ const changePasswordService = async () => {};
 
 const activateTwoFactorAuthService = async () => {
   const token = getToken();
-  const id = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).employeeId : null;
-
 
   if (!token) {
     throw new Error("No se encontró token de sesión");
@@ -101,7 +99,6 @@ const activateTwoFactorAuthService = async () => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ id: id }),
   });
   const data = await response.json();
 
