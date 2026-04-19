@@ -29,6 +29,12 @@ const TwoFactorLogin = () => {
 
     const handleSubmit = async () => {
         if (isBlocked) return;
+
+        if (code.length !== 6) {
+            setError("El código debe tener 6 dígitos");
+            return;
+        }
+        
         setLoading(true);
         setError("");
 
@@ -77,7 +83,7 @@ const TwoFactorLogin = () => {
                     setCode={setCode}
                     onSubmit={handleSubmit}
                     loading={loading}
-                    disabled={isBlocked}
+                    disabled={isBlocked || code.length !== 6}
                 />
             </div>
         </div>
