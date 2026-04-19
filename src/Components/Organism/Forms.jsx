@@ -11,6 +11,7 @@ const Forms = ({
 }) => {
   return (
     <form
+    noValidate
     autoComplete="off"
       onSubmit={(e) => {
         e.preventDefault();
