@@ -86,6 +86,6 @@ export const employeeCreateSchema = z.object({
             ) {
                 age--;
             }
-            return age >= 14;
-        }, "El usuario debe tener al menos 14 años de edad"),
+            return age >= 18;
+        }, "El usuario debe tener al menos 18 años de edad"),
 });

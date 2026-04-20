@@ -4,7 +4,7 @@ import {
     getEmployeeFormData,
     createEmployee,
 } from "../../Services/PersonalService";
-import { employeeCreateSchema } from "../../Utils/Schema/employeeAdd.schema";
+import { employeeCreateSchema } from "../../Utils/Schema/Employee/employeeAdd.schema";
 
 import UserInfoSection from "../../Components/Organism/UserInfoSection";
 import Alert from "../../Components/Atoms/Alerts";
@@ -17,15 +17,15 @@ const INITIAL_FORM = {
     curp: "",
     rfc: "",
     nss: "",
-    bank_account: "", // 👈 asegúrate que coincida con backend
-    birth_date: "",   // 👈 también
+    bank_account: "",
+    birthdate: "",
 };
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
     const navigate = useNavigate();
 
     const [roles, setRoles] = useState([]);
-    const [photo, setPhoto] = useState(null); // 👈 archivo real
+    const [photo, setPhoto] = useState(null);
     const [form, setForm] = useState(INITIAL_FORM);
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -87,11 +87,25 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         setIsLoading(true);
 
         try {
-            // 🔥 AQUÍ INTEGRAMOS LA FOTO
             const payload = {
                 ...result.data,
-                picture: photo, // 👈 archivo real
+                birth_date: result.data.birthdate,
+                picture: photo,
             };
+            console.group("🚀 Enviando Datos de Empleado");
+            console.log("Datos del Formulario:", result.data);
+            console.log(
+                "Archivo de Foto:",
+                photo
+                    ? {
+                          name: photo.name,
+                          size: `${(photo.size / (1024 * 1024)).toFixed(2)} MB`,
+                          type: photo.type,
+                      }
+                    : "No hay foto seleccionada",
+            );
+            console.log("Payload Completo:", payload);
+            console.groupEnd();
 
             const response = await createEmployee(payload);
 
@@ -147,7 +161,7 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                             handleChange={handleChange}
                             roles={roles}
                             photo={photo}
-                            onPhotoChange={setPhoto} // 👈 esto debe recibir File
+                            onPhotoChange={setPhoto}
                             onSubmit={handleSubmit}
                             onCancel={onCancel || (() => navigate(-1))}
                             isLoading={isLoading}

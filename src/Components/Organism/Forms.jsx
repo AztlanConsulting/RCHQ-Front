@@ -11,6 +11,8 @@ const Forms = ({
 }) => {
   return (
     <form
+    noValidate
+    autoComplete="off"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -18,7 +20,7 @@ const Forms = ({
       className="flex flex-col gap-6"
     >
       {title && (
-        <h2 className="text-center text-xl font-bold text-white">{title}</h2>
+        <h2 className="text-center text-2xl font-bold text-white">{title}</h2>
       )}
 
       {description && (
@@ -29,7 +31,6 @@ const Forms = ({
         <TextField
           key={field.id}
           id={field.id}
-          label={field.label}
           value={field.value}
           setValue={field.setValue}
           placeholder={field.placeholder}
@@ -40,6 +41,9 @@ const Forms = ({
           iconRightAriaLabel={field.iconRightAriaLabel}
           htmlFor={field.htmlFor}
           text={field.text}
+          autoComplete={field.autoComplete}
+          inputMode={field.inputMode}
+          maxLength={field.maxLength}
         />
       ))}
 
@@ -47,7 +51,7 @@ const Forms = ({
 
       {actions.length > 0 && (
         <div
-          className={`flex items-center ${
+          className={`mt-3 flex w-full items-center ${
             actions.length > 1
               ? "flex-col gap-4"
               : "justify-center"

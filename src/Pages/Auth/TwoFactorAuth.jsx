@@ -25,7 +25,7 @@ const TwoFactorAuth = () => {
     const setupToken = localStorage.getItem("setupToken");
 
     if (!token && !setupToken) {
-      navigate("/login", { replace: true });
+      navigate("/iniciar-sesion", { replace: true });
     }
   }, [navigate]);
 

@@ -13,7 +13,7 @@ const TwoFactorLogin = () => {
     useEffect(() => {
         const token = getPre2faToken();
         if (!token) {
-            navigate("/login", { replace: true });
+            navigate("/iniciar-sesion", { replace: true });
         }
     }, [navigate]);
     
