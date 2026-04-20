@@ -77,7 +77,9 @@ describe("TextField — interacción del usuario", () => {
     render(<TextField {...makeProps({ setValue })} />);
 
     // Act
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "hola" } });
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "hola" },
+    });
 
     // Assert
     expect(setValue).toHaveBeenCalledWith("hola");
@@ -99,7 +101,7 @@ describe("TextField — ícono derecho", () => {
 
     // Assert
     expect(
-      screen.getByRole("button", { name: "Mostrar contraseña" })
+      screen.getByRole("button", { name: "Mostrar contraseña" }),
     ).toBeInTheDocument();
   });
 
@@ -113,7 +115,7 @@ describe("TextField — ícono derecho", () => {
           iconRightAriaLabel: "Mostrar contraseña",
           onIconRightClick: handleClick,
         })}
-      />
+      />,
     );
 
     // Act
@@ -154,7 +156,7 @@ describe("TextField — tipo de input", () => {
 
     // Assert
     expect(
-      document.querySelector("input[type='password']")
+      document.querySelector("input[type='password']"),
     ).toBeInTheDocument();
   });
 
@@ -163,8 +165,6 @@ describe("TextField — tipo de input", () => {
     render(<TextField {...makeProps({ type: "email" })} />);
 
     // Assert
-    expect(
-      document.querySelector("input[type='email']")
-    ).toBeInTheDocument();
+    expect(document.querySelector("input[type='email']")).toBeInTheDocument();
   });
 });

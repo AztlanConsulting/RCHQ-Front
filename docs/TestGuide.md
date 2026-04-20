@@ -4,24 +4,24 @@
 
 En este proyecto manejamos tres niveles de pruebas, formando lo que conocemos como la "Pirámide de Pruebas":
 
-1. **Pruebas Unitarias:** Evalúan una pieza diminuta y aislada (ej. un botón, una alerta, o una función de cálculo). Son extremadamente rápidas.  
-2. **Pruebas de Integración:** Evalúan cómo interactúan varias piezas juntas (ej. Una página completa que usa un formulario y simula llamar a un servicio).  
+1. **Pruebas Unitarias:** Evalúan una pieza diminuta y aislada (ej. un botón, una alerta, o una función de cálculo). Son extremadamente rápidas.
+2. **Pruebas de Integración:** Evalúan cómo interactúan varias piezas juntas (ej. Una página completa que usa un formulario y simula llamar a un servicio).
 3. **Pruebas End-to-End (E2E):** El jefe final. Abren un navegador real (Chrome, Firefox), hacen clic, escriben texto y navegan como lo haría un humano.
 
 ## **1\. Instalación y Herramientas Principales**
 
 En lugar de Jest y Supertest (que usamos en el backend), en el frontend nuestro stack es distinto:
 
-* **Vitest (vitest):** Es nuestro motor principal, el reemplazo moderno y ultrarrápido de Jest. Busca archivos .test.jsx, los ejecuta y nos dice si pasaron o fallaron.  
-* **React Testing Library (@testing-library/react):** Es nuestra herramienta para renderizar componentes en la memoria. Piensa en RTL como un "usuario ciego" que navega por tu app leyendo textos, etiquetas (labels) y roles de botones.  
-* **Playwright (@playwright/test):** Es nuestro "robot fantasma". Levanta navegadores de verdad y toma el control del ratón y el teclado.
+- **Vitest (vitest):** Es nuestro motor principal, el reemplazo moderno y ultrarrápido de Jest. Busca archivos .test.jsx, los ejecuta y nos dice si pasaron o fallaron.
+- **React Testing Library (@testing-library/react):** Es nuestra herramienta para renderizar componentes en la memoria. Piensa en RTL como un "usuario ciego" que navega por tu app leyendo textos, etiquetas (labels) y roles de botones.
+- **Playwright (@playwright/test):** Es nuestro "robot fantasma". Levanta navegadores de verdad y toma el control del ratón y el teclado.
 
 **Tus comandos del día a día (en el package.json):**
 
-* "test:unit": Ejecuta solo las pruebas atómicas.  
-* "test:integration": Ejecuta las pruebas de páginas complejas.  
-* "test:e2e": Ejecuta al robot en la terminal.  
-* "test:e2e:ui": Abre la interfaz gráfica de Playwright para ver al robot en acción (¡ideal para depurar\!).
+- "test:unit": Ejecuta solo las pruebas atómicas.
+- "test:integration": Ejecuta las pruebas de páginas complejas.
+- "test:e2e": Ejecuta al robot en la terminal.
+- "test:e2e:ui": Abre la interfaz gráfica de Playwright para ver al robot en acción (¡ideal para depurar\!).
 
 ## **2\. Configuración (El "Detrás de Escena")**
 
@@ -48,7 +48,7 @@ JavaScript
 ```
 describe("Alert — renderizado base", () => {
   it("aplica la clase de fondo verde para el tipo success", () => {
-    
+
     // 1. ARRANGE (Preparar) & ACT (Actuar)
     // Usamos render() de RTL para "dibujar" el componente en nuestro DOM virtual.
     const { container } = render(<Alert type="success" message="OK" />);
@@ -68,7 +68,7 @@ JavaScript
 
 ```
 // Usamos screen para "buscar" en la pantalla
-const input = screen.getByRole("textbox"); 
+const input = screen.getByRole("textbox");
 
 // Disparamos un evento de cambio simulando que el usuario teclea "hola"
 fireEvent.change(input, { target: { value: "hola" } });
@@ -106,14 +106,14 @@ JavaScript
 ```
 it("guarda el token y navega al dashboard cuando el login es exitoso", async () => {
   // --- ARRANGE ---
-  // Le ordenamos a nuestro clon del servicio: "Cuando la página te llame, 
+  // Le ordenamos a nuestro clon del servicio: "Cuando la página te llame,
   // finge que el backend devolvió este token perfecto".
   loginService.mockResolvedValue({
     success: true,
     isActive2FA: false,
     data: { token: "real-token-123", user: { id: 1 } },
   });
-  
+
   // Dibujamos la página completa. Como LoginPage usa rutas, lo envolvemos en <MemoryRouter>
   render(<MemoryRouter><LoginPage /></MemoryRouter>);
 
@@ -123,7 +123,7 @@ it("guarda el token y navega al dashboard cuando el login es exitoso", async () 
   fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
 
   // --- ASSERT ---
-  // await waitFor() es vital. Como el login es asíncrono (Promesa), 
+  // await waitFor() es vital. Como el login es asíncrono (Promesa),
   // le decimos a Vitest que espere un milisegundo a que la pantalla se actualice.
   await waitFor(() => {
     // Verificamos que nuestro Mock de navegación intentó llevar al usuario al dashboard
@@ -152,7 +152,7 @@ const interceptLogin = async (page, body) => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(body), 
+      body: JSON.stringify(body),
     })
   );
 };
@@ -166,7 +166,7 @@ JavaScript
 
 ```
 test("navega a /2FA cuando el login indica que 2FA está activo", async ({ page }) => {
-  
+
   // 1. ARRANGE
   // Intervenimos la red. Cuando el frontend intente hacer fetch(), recibirá esto:
   await interceptLogin(page, {
@@ -174,7 +174,7 @@ test("navega a /2FA cuando el login indica que 2FA está activo", async ({ page 
     isActive2FA: true,
     pre2FAToken: "pre-token-abc",
   });
-  
+
   // Le decimos al navegador que cargue la URL
   await page.goto("/iniciar-sesion");
 
@@ -192,8 +192,8 @@ test("navega a /2FA cuando el login indica que 2FA está activo", async ({ page 
 
 ### **Resumen Visual de Conceptos Frontend**
 
-* **render(\<Componente/\>)**: Vitest/RTL. Dibuja un pedacito de tu app en la memoria.  
-* **screen.getByRole()**: Vitest/RTL. Busca un elemento visual en ese dibujo.  
-* **page.goto('/ruta')**: Playwright. Le ordena al navegador abrir esa pestaña.  
-* **page.route()**: Playwright. Hackea la tarjeta de red del navegador para simular respuestas del backend.  
-* **vi.mock()**: Vitest. Un actor de doblaje que reemplaza código complejo (como servicios o librerías) por funciones vacías que tú controlas.
+- **render(\<Componente/\>)**: Vitest/RTL. Dibuja un pedacito de tu app en la memoria.
+- **screen.getByRole()**: Vitest/RTL. Busca un elemento visual en ese dibujo.
+- **page.goto('/ruta')**: Playwright. Le ordena al navegador abrir esa pestaña.
+- **page.route()**: Playwright. Hackea la tarjeta de red del navegador para simular respuestas del backend.
+- **vi.mock()**: Vitest. Un actor de doblaje que reemplaza código complejo (como servicios o librerías) por funciones vacías que tú controlas.

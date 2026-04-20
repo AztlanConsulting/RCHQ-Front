@@ -32,7 +32,7 @@ const renderPage = () =>
   render(
     <MemoryRouter>
       <TwoFactorLogin />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 beforeEach(() => {
@@ -52,7 +52,9 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
     renderPage();
 
     // Assert
-    expect(mockNavigate).toHaveBeenCalledWith("/iniciar-sesion", { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith("/iniciar-sesion", {
+      replace: true,
+    });
   });
 
   it("llama a login() con el token final y navega al dashboard cuando el código es válido", async () => {
@@ -76,7 +78,9 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
         token: "final-session-token",
         user: { id: 1, name: "Test User" },
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+        replace: true,
+      });
     });
   });
 
@@ -95,14 +99,18 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
 
     // Assert
     await waitFor(() =>
-      expect(screen.getByText(/código 2fa inválido/i)).toBeInTheDocument()
+      expect(screen.getByText(/código 2fa inválido/i)).toBeInTheDocument(),
     );
-    expect(mockNavigate).not.toHaveBeenCalledWith("/app/dashboard", { replace: true });
+    expect(mockNavigate).not.toHaveBeenCalledWith("/app/dashboard", {
+      replace: true,
+    });
   });
 
   it("deshabilita el botón y muestra mensaje de bloqueo cuando el error es 423", async () => {
     // Arrange
-    const error = new Error("La verificación 2FA está bloqueada temporalmente. Intenta más tarde.");
+    const error = new Error(
+      "La verificación 2FA está bloqueada temporalmente. Intenta más tarde.",
+    );
     error.status = 423;
     validateLogin2FAService.mockRejectedValue(error);
     renderPage();
@@ -115,7 +123,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
 
     // Assert
     await waitFor(() =>
-      expect(screen.getByText(/bloqueada temporalmente/i)).toBeInTheDocument()
+      expect(screen.getByText(/bloqueada temporalmente/i)).toBeInTheDocument(),
     );
     expect(screen.getByRole("button", { name: /verificar/i })).toBeDisabled();
   });

@@ -54,7 +54,9 @@ const MoreOptions = () => {
         setShowDisableModal(false);
         setPassword("");
         setShowPassword(false);
-        setSuccessMessage("La autenticación en dos pasos ha sido desactivada correctamente."); // ← agregar
+        setSuccessMessage(
+          "La autenticación en dos pasos ha sido desactivada correctamente.",
+        ); // ← agregar
       }
     } catch (err) {
       setError(err.message || "Error al desactivar 2FA");
@@ -86,12 +88,20 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9" />}
+            icon={
+              <img
+                src="/certificate.svg"
+                alt="Certificaciones"
+                className="w-9 h-9"
+              />
+            }
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9" />}
+            icon={
+              <img src="/document.svg" alt="Documentos" className="w-9 h-9" />
+            }
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
@@ -124,7 +134,9 @@ const MoreOptions = () => {
               onClose={() => {
                 setShow2FAModal(false);
                 setIs2FAActive(true);
-                setSuccessMessage("La autenticación en dos pasos ha sido activada correctamente."); // ← agregar
+                setSuccessMessage(
+                  "La autenticación en dos pasos ha sido activada correctamente.",
+                ); // ← agregar
               }}
             />
           </div>
@@ -154,8 +166,12 @@ const MoreOptions = () => {
               htmlFor="disable-password"
               iconRight={showPassword ? eye : hideEye}
               onIconRightClick={toggleShowPassword}
-              iconRightAlt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              iconRightAriaLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRightAlt={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              iconRightAriaLabel={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
             />
 
             <div className="flex gap-3 justify-end">

@@ -31,7 +31,8 @@ const TwoFactorAuth = ({ onClose }) => {
         return;
       }
       setQr(response.data?.qrImage || "");
-      const secret = response.data?.otpauthUrl?.match(/secret=([^&]+)/)?.[1] || "";
+      const secret =
+        response.data?.otpauthUrl?.match(/secret=([^&]+)/)?.[1] || "";
       setManualCode(secret);
     } catch (err) {
       setError(err.message || "Error al generar el código QR");
@@ -78,7 +79,8 @@ const TwoFactorAuth = ({ onClose }) => {
               2 Factor Authentication
             </h2>
             <p className="mt-2 text-sm text-slate-600 font-medium">
-              Usa una aplicación de autentificación (ej. Google auth) y escanea el código QR.
+              Usa una aplicación de autentificación (ej. Google auth) y escanea
+              el código QR.
             </p>
           </div>
 
@@ -96,7 +98,10 @@ const TwoFactorAuth = ({ onClose }) => {
             <div className="mt-6">
               <Button
                 text="Continuar"
-                onClick={() => { setError(""); setStep("code"); }}
+                onClick={() => {
+                  setError("");
+                  setStep("code");
+                }}
                 disabled={loading || !qr}
                 bgColor="bg-[#1d4ed8]"
                 hoverColor="hover:bg-blue-800"
@@ -114,10 +119,12 @@ const TwoFactorAuth = ({ onClose }) => {
                 <span className="text-xs font-semibold text-slate-400">o</span>
                 <hr className="flex-1 border-slate-200" />
               </div>
-                <div className="text-center flex flex-col items-center w-full px-4">
-                <p className="text-sm font-medium text-slate-500 mb-2">Ingresa este código</p>
-              <div className=" border-2 border-slate-100  rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">                  
-                {manualCode}
+              <div className="text-center flex flex-col items-center w-full px-4">
+                <p className="text-sm font-medium text-slate-500 mb-2">
+                  Ingresa este código
+                </p>
+                <div className=" border-2 border-slate-100  rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
+                  {manualCode}
                 </div>
               </div>
             </div>
@@ -147,7 +154,10 @@ const TwoFactorAuth = ({ onClose }) => {
 
           <Button
             text="Volver al QR"
-            onClick={() => { setError(""); setStep("qr"); }}
+            onClick={() => {
+              setError("");
+              setStep("qr");
+            }}
             bgColor="bg-transparent"
             hoverColor="hover:bg-slate-50"
             activeColor="active:bg-slate-100"

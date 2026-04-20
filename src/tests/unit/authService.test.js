@@ -185,7 +185,9 @@ describe("loginService", () => {
     // Assert
     expect(result).toEqual(apiResponse);
     expect(localStorage.getItem("token")).toBe("session-token");
-    expect(localStorage.getItem("user")).toBe(JSON.stringify({ id: 1, name: "Test" }));
+    expect(localStorage.getItem("user")).toBe(
+      JSON.stringify({ id: 1, name: "Test" }),
+    );
   });
 
   it("guarda PRE_2FA y no guarda token de sesión cuando 2FA está activo", async () => {
@@ -203,7 +205,10 @@ describe("loginService", () => {
 
   it("lanza un error con status 401 y código cuando las credenciales son inválidas", async () => {
     // Arrange
-    const errorBody = { message: "Credenciales incorrectas", code: "INVALID_CREDENTIALS" };
+    const errorBody = {
+      message: "Credenciales incorrectas",
+      code: "INVALID_CREDENTIALS",
+    };
     mockFetch(errorBody, false, 401);
 
     // Act & Assert
@@ -226,8 +231,11 @@ describe("loginService", () => {
       expect.stringContaining("/users/login"),
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ email: "user@test.com", password: "mypassword" }),
-      })
+        body: JSON.stringify({
+          email: "user@test.com",
+          password: "mypassword",
+        }),
+      }),
     );
   });
 });
@@ -242,7 +250,7 @@ describe("activateTwoFactorAuthService", () => {
 
     // Act & Assert
     await expect(activateTwoFactorAuthService()).rejects.toThrow(
-      "No se encontró token de sesión"
+      "No se encontró token de sesión",
     );
   });
 
@@ -279,7 +287,7 @@ describe("activateTwoFactorAuthService", () => {
         headers: expect.objectContaining({
           Authorization: "Bearer my-session-token",
         }),
-      })
+      }),
     );
   });
 });
@@ -294,7 +302,7 @@ describe("verify2FAService", () => {
 
     // Act & Assert
     await expect(verify2FAService("123456")).rejects.toThrow(
-      "No se encontró token de sesión"
+      "No se encontró token de sesión",
     );
   });
 
@@ -334,7 +342,7 @@ describe("validateLogin2FAService", () => {
 
     // Act & Assert
     await expect(validateLogin2FAService("123456")).rejects.toThrow(
-      "No se encontró token de pre-autenticación"
+      "No se encontró token de pre-autenticación",
     );
   });
 
@@ -376,7 +384,9 @@ describe("getStatus2FA", () => {
     // Arrange — localStorage vacío por beforeEach
 
     // Act & Assert
-    await expect(getStatus2FA()).rejects.toThrow("No se encontró token de sesión");
+    await expect(getStatus2FA()).rejects.toThrow(
+      "No se encontró token de sesión",
+    );
   });
 
   it("retorna el estado 2FA del usuario cuando la petición es exitosa", async () => {
@@ -411,7 +421,7 @@ describe("desactivate2FAService", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ password: "myPassword" }),
-      })
+      }),
     );
   });
 });

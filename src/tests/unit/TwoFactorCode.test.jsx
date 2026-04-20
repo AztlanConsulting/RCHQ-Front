@@ -18,8 +18,12 @@ describe("TwoFactorCode — renderizado", () => {
     render(<TwoFactorCode {...makeProps()} />);
 
     // Assert
-    expect(screen.getByPlaceholderText("Ingresa el código")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /verificar/i })).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Ingresa el código"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /verificar/i }),
+    ).toBeInTheDocument();
   });
 
   it("muestra el código actual en el input", () => {

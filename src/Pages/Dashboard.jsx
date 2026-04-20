@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import Button from "../Components/Atoms/Button";
 
 const Dashboard = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleActivate = () => {
     navigate("/setup-2fa");
-};
+  };
   return (
     <div>
       <h2>Red de Casas Hogar Queretaro</h2>
@@ -26,11 +26,7 @@ const Dashboard = () => {
           <img src="/favicon.png" />
         </div>
       </div>
-      <Button
-      text="Activar 2FA"
-      onClick={handleActivate}
-    />
-
+      <Button text="Activar 2FA" onClick={handleActivate} />
     </div>
   );
 };

@@ -33,11 +33,11 @@ El código que corre en el cliente **puede ocultar pantallas** y **adjuntar toke
 
 ### Comparación rápida
 
-| Enfoque              | Resistencia típica a XSS | Complejidad | CSRF |
-|----------------------|---------------------------|-------------|------|
-| `localStorage`       | Baja (token legible por JS) | Baja        | No aplica al mismo token en cabecera |
-| Cookie `HttpOnly`    | Mejor para el token       | Media       | Hay que tratarla |
-| Memoria              | No persiste en disco      | Media       | Depende del diseño |
+| Enfoque           | Resistencia típica a XSS    | Complejidad | CSRF                                 |
+| ----------------- | --------------------------- | ----------- | ------------------------------------ |
+| `localStorage`    | Baja (token legible por JS) | Baja        | No aplica al mismo token en cabecera |
+| Cookie `HttpOnly` | Mejor para el token         | Media       | Hay que tratarla                     |
+| Memoria           | No persiste en disco        | Media       | Depende del diseño                   |
 
 ---
 
@@ -95,12 +95,12 @@ Herramientas útiles en el ecosistema:
 
 ## 7. Herramientas y librerías (referencias)
 
-| Ámbito | Ejemplos (no exhaustivo) |
-|--------|---------------------------|
-| Cliente HTTP | `fetch` nativo, **axios** (interceptores), **ky**, **ofetch** |
-| Decodificación JWT (solo payload) | **jwt-decode** (no sustituye verificación en servidor) |
-| Auth “llave en mano” | **Auth0**, **Clerk**, **Firebase Auth**, **Keycloak** (según necesidad) |
-| Cookies + SPA | Diseño backend + CORS/credenciales; a veces **BFF** (Backend for Frontend) para no exponer tokens al JS |
+| Ámbito                            | Ejemplos (no exhaustivo)                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Cliente HTTP                      | `fetch` nativo, **axios** (interceptores), **ky**, **ofetch**                                           |
+| Decodificación JWT (solo payload) | **jwt-decode** (no sustituye verificación en servidor)                                                  |
+| Auth “llave en mano”              | **Auth0**, **Clerk**, **Firebase Auth**, **Keycloak** (según necesidad)                                 |
+| Cookies + SPA                     | Diseño backend + CORS/credenciales; a veces **BFF** (Backend for Frontend) para no exponer tokens al JS |
 
 ---
 

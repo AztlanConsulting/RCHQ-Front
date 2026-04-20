@@ -19,7 +19,9 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 // ← mockear AuthService pero con implementaciones controladas
 vi.mock("../../../src/Services/AuthService", () => ({
   loginService: vi.fn(),
-  getReadableErrors: vi.fn((err) => [err?.message || "Ocurrió un error inesperado"]),
+  getReadableErrors: vi.fn((err) => [
+    err?.message || "Ocurrió un error inesperado",
+  ]),
 }));
 
 import { loginService } from "../../../src/Services/AuthService";
@@ -28,7 +30,7 @@ const renderLogin = () =>
   render(
     <MemoryRouter>
       <LoginPage />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 const fillAndSubmit = async (email, password) => {
@@ -65,7 +67,9 @@ describe("LoginPage + AuthService — flujo de login", () => {
         token: "real-token-123",
         user: { id: 1, name: "Test" },
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+        replace: true,
+      });
     });
   });
 
@@ -101,7 +105,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
 
     // Assert
     await waitFor(() =>
-      expect(screen.getByText(/credenciales inválidas/i)).toBeInTheDocument()
+      expect(screen.getByText(/credenciales inválidas/i)).toBeInTheDocument(),
     );
   });
 
@@ -118,7 +122,9 @@ describe("LoginPage + AuthService — flujo de login", () => {
 
   it("muestra error de bloqueo temporal cuando el servidor responde 423", async () => {
     // Arrange
-    const error = new Error("Tu cuenta está bloqueada temporalmente. Intenta más tarde.");
+    const error = new Error(
+      "Tu cuenta está bloqueada temporalmente. Intenta más tarde.",
+    );
     error.status = 423;
     error.errors = [];
     loginService.mockRejectedValue(error);
@@ -129,9 +135,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
 
     // Assert
     await waitFor(() =>
-      expect(
-        screen.getByText(/bloqueada temporalmente/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/bloqueada temporalmente/i)).toBeInTheDocument(),
     );
   });
 });

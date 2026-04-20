@@ -29,11 +29,7 @@ const Alert = ({ icon = "", type = "success", message }) => {
     >
       {current.icon && (
         <div className="flex shrink-0 items-center self-center">
-          <img
-            src={current.icon}
-            alt={type}
-            className="h-5 w-5"
-          />
+          <img src={current.icon} alt={type} className="h-5 w-5" />
         </div>
       )}
 

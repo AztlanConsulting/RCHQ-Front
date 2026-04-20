@@ -33,7 +33,9 @@ describe("Alert — renderizado base", () => {
 
   it("aplica la clase de fondo amarillo para el tipo warning", () => {
     // Arrange & Act
-    const { container } = render(<Alert type="warning" message="Advertencia" />);
+    const { container } = render(
+      <Alert type="warning" message="Advertencia" />,
+    );
 
     // Assert
     expect(container.firstChild).toHaveClass("bg-yellow-400");
@@ -74,7 +76,9 @@ describe("Alert — renderizado base", () => {
 
   it("no lanza errores cuando el tipo warning no tiene ícono asignado", () => {
     // Arrange & Act
-    const { container } = render(<Alert type="warning" message="Advertencia" />);
+    const { container } = render(
+      <Alert type="warning" message="Advertencia" />,
+    );
 
     // Assert
     expect(container.firstChild).toBeInTheDocument();

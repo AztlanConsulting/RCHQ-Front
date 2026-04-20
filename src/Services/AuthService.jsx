@@ -63,10 +63,10 @@ const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
-  if(data.isActive2FA) {
+  if (data.isActive2FA) {
     savePre2faSession(data);
-  }else {
-  saveLoginSession(data);
+  } else {
+    saveLoginSession(data);
   }
 
   return data;
@@ -74,7 +74,6 @@ const loginService = async (email, password) => {
 
 const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
 const getPre2faToken = () => localStorage.getItem(TOKEN_KEYS.pre2fa);
-
 
 const logoutService = () => {
   clearAuthStorage();
@@ -103,7 +102,11 @@ const activateTwoFactorAuthService = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al activar la autenticación de dos factores");
+    throw buildApiError(
+      response,
+      data,
+      "Error al activar la autenticación de dos factores",
+    );
   }
 
   return data;
@@ -124,11 +127,15 @@ const verify2FAService = async (code) => {
     },
     body: JSON.stringify({ token: code }),
   });
-  
+
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos factores",
+    );
   }
 
   return data;
@@ -137,9 +144,9 @@ const verify2FAService = async (code) => {
 const validateLogin2FAService = async (code) => {
   const token = getPre2faToken();
 
-  if(!token) throw new Error("No se encontró token de pre-autenticación");
+  if (!token) throw new Error("No se encontró token de pre-autenticación");
 
-    const response = await fetch(`${API_URL}/users/2fa/validate`, {
+  const response = await fetch(`${API_URL}/users/2fa/validate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -150,18 +157,21 @@ const validateLogin2FAService = async (code) => {
 
   const data = await response.json();
 
-    if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+  if (!response.ok) {
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos factores",
+    );
   }
 
   return data;
 };
 
-const getStatus2FA = async () =>{
+const getStatus2FA = async () => {
   const token = getToken();
 
-
-   if (!token) {
+  if (!token) {
     throw new Error("No se encontró token de sesión");
   }
 
@@ -172,19 +182,21 @@ const getStatus2FA = async () =>{
       Authorization: `Bearer ${token}`,
     },
   });
-  
+
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos factores",
+    );
   }
 
   return data;
-
-
-}
+};
 const desactivate2FAService = async (password) => {
-  const token = getToken()
+  const token = getToken();
 
   const response = await fetch(`${API_URL}/users/2fa/disable`, {
     method: "POST",
@@ -198,12 +210,15 @@ const desactivate2FAService = async (password) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos factores");
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos factores",
+    );
   }
 
   return data;
 };
-
 
 export {
   loginService,
