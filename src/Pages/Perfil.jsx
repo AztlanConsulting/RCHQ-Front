@@ -13,22 +13,18 @@ const STATUS_MAP = {
   401: {
     title: "Sin permisos",
     message: "No tienes permisos para ver esta información.",
-    icon: "🔒",
   },
   404: {
     title: "Ruta no encontrada",
     message: "No se encontró la ruta para obtener el perfil.",
-    icon: "🗺️",
   },
   501: {
     title: "Error del servidor",
     message: "Ocurrió un problema al obtener la información. Intenta más tarde.",
-    icon: "⚠️",
   },
   default: {
     title: "Error inesperado",
     message: "Ocurrió un error inesperado al cargar tu perfil.",
-    icon: "⚠️",
   },
 };
 
@@ -99,14 +95,11 @@ const Perfil = () => {
       const data  = await getUserData(token);
 
       // Mapeo 1:1 con el shape de mapProfile() del backend.
-      // houseId y roleId son IDs numéricos por ahora (el backend
-      // resolverá los nombres en una iteración futura).
-      // picture llega null hasta que el backend lo implemente.
       const raw = data?.data ?? data;
       setUser({
-        foto:           raw?.picture    ?? null,
-        casaHogar:      raw?.houseId    ?? null,   // ID numérico por ahora
-        puesto:         raw?.roleId     ?? null,   // ID numérico por ahora
+        foto:           raw?.picture    ?? "",
+        casaHogar:      raw?.houseName   ?? "",
+        puesto:         raw?.roleName     ?? "",
         nombre:         raw?.name       ?? "",
         apellidos:      raw?.surname    ?? "",
         correo:         raw?.email      ?? "",
@@ -114,7 +107,13 @@ const Perfil = () => {
         curp:           raw?.curp       ?? "",
         nss:            raw?.nss        ?? "",
         cuentaBancaria: raw?.bankAccount ?? "",
-        cumpleanos:     raw?.birthDate  ?? "",
+        cumpleanos: raw?.birthDate
+        ? new Date(raw.birthDate).toLocaleDateString("es-MX", {
+            day:   "2-digit",
+            month: "2-digit",
+            year:  "numeric",
+          })
+        : "",
       });
     } catch (err) {
       setError({
@@ -126,7 +125,6 @@ const Perfil = () => {
     }
   };
 
-  // Llama a la API cuando monta el componente (paso 4 del flujo principal)
   useEffect(() => {
     fetchProfile();
   }, []);
