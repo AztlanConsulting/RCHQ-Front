@@ -27,7 +27,7 @@ const TwoFactorAuth = ({ onClose }) => {
     try {
       const response = await activateTwoFactorAuthService();
       if (!response) {
-        setError("No se pudo iniciar la configuración de 2FA");
+        setError("No se pudo iniciar la configuración de autenticación en dos pasos");
         return;
       }
       setQr(response.data?.qrImage || "");
@@ -64,7 +64,7 @@ const TwoFactorAuth = ({ onClose }) => {
       }
       setError("El servidor devolvió un flujo no reconocido");
     } catch (err) {
-      setError(err.message || "Código 2FA inválido");
+      setError(err.message || "Código de autenticación en dos pasos inválido");
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ const TwoFactorAuth = ({ onClose }) => {
         <>
           <div className="text-left w-full mb-6">
             <h2 className="text-2xl font-bold text-slate-900">
-              2 Factor Authentication
+              Autenticación en dos pasos
             </h2>
             <p className="mt-2 text-sm text-slate-600 font-medium">
               Usa una aplicación de autentificación (ej. Google auth) y escanea
@@ -121,7 +121,7 @@ const TwoFactorAuth = ({ onClose }) => {
               </div>
               <div className="text-center flex flex-col items-center w-full px-4">
                 <p className="text-sm font-medium text-slate-500 mb-2">
-                  Ingresa este código
+                  Ingresa el siguiente código
                 </p>
                 <div className=" border-2 border-slate-100  rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
                   {manualCode}
@@ -139,7 +139,7 @@ const TwoFactorAuth = ({ onClose }) => {
               Verifica el código
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Ingresa los 6 dígitos generados por tu aplicación:
+              Ingresa los 6 dígitos generados por la aplicación de autentificación:
             </p>
           </div>
 

@@ -58,11 +58,11 @@ const TwoFactorLogin = () => {
       console.error(err);
       if (err.status === 423) {
         setError(
-          "La verificación 2FA está bloqueada temporalmente. Intenta más tarde.",
+          "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
         );
         setIsBlocked(true);
       } else {
-        setError(err.message || "Código 2FA inválido");
+        setError(err.message || "Código de autenticación en dos pasos inválido");
       }
     } finally {
       setLoading(false);

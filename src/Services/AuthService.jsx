@@ -105,7 +105,7 @@ const activateTwoFactorAuthService = async () => {
     throw buildApiError(
       response,
       data,
-      "Error al activar la autenticación de dos factores",
+      "Error al activar la autenticación de dos pasos",
     );
   }
 
@@ -134,7 +134,7 @@ const verify2FAService = async (code) => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos factores",
+      "Error al verificar el código de autenticación de dos pasos",
     );
   }
 
@@ -161,7 +161,7 @@ const validateLogin2FAService = async (code) => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos factores",
+      "Error al verificar el código de autenticación de dos pasos",
     );
   }
 
@@ -189,7 +189,7 @@ const getStatus2FA = async () => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos factores",
+      "Error al verificar el código de autenticación de dos pasos",
     );
   }
 
@@ -213,7 +213,7 @@ const desactivate2FAService = async (password) => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos factores",
+      "Error al verificar el código de autenticación de dos pasos",
     );
   }
 

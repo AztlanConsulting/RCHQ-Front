@@ -148,7 +148,7 @@ const LoginPage = () => {
           )}
 
           <Forms
-            title="Bienvenido de Vuelta"
+            title="Bienvenido de vuelta"
             fields={fields}
             actions={actions}
             onSubmit={handleSubmit}

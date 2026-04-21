@@ -34,7 +34,7 @@ const MoreOptions = () => {
         const response = await getStatus2FA();
         setIs2FAActive(response.Status2FA ?? false);
       } catch (err) {
-        console.error("Error al obtener estado 2FA:", err);
+        console.error("Error al obtener estado de la autentificación en dos pasos:", err);
       }
     };
     fetchStatus();
@@ -59,7 +59,7 @@ const MoreOptions = () => {
         ); // ← agregar
       }
     } catch (err) {
-      setError(err.message || "Error al desactivar 2FA");
+      setError(err.message || "Error al desactivar la autentificación en dos pasos");
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ const MoreOptions = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras Opciones</h1>
+      <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras opciones</h1>
 
       {/* Notificación de éxito */}
       {successMessage && (
