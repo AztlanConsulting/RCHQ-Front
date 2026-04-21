@@ -136,7 +136,7 @@ const MoreOptions = () => {
                 setIs2FAActive(true);
                 setSuccessMessage(
                   "La autenticación en dos pasos ha sido activada correctamente.",
-                ); // ← agregar
+                ); 
               }}
             />
           </div>
