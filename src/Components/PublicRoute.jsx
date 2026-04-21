@@ -1,14 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
-const ProtectedRoute = () => {
+const PublicRoute = () => {
   const { isAuthenticated } = useAuth();
 
   return isAuthenticated ? (
-    <Outlet />
+    <Navigate to="/app/dashboard" replace />
   ) : (
-    <Navigate to="/iniciar-sesion" replace />
+    <Outlet />
   );
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

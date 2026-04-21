@@ -1,13 +1,12 @@
 import React from "react";
-// import { Typography } from 'mui/Typography';
-import Button from "../Components/Button";
+import Button from "../Components/Atoms/Button";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
   const navigate = useNavigate();
 
   const toSignIn = () => {
-    navigate("/login");
+    navigate("/iniciar-sesion");
   };
 
   return (
