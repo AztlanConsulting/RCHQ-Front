@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../Components/Organism/Forms";
 import Button from "../../Components/Atoms/Button";
-import { changePasswordService, getFirstLoginToken, getReadableErrors} from "../../Services/AuthService";
+import {
+  changePasswordService,
+  getFirstLoginToken,
+  getReadableErrors,
+} from "../../Services/AuthService";
 import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
@@ -19,7 +23,7 @@ const ChangePassword = () => {
   useEffect(() => {
     const token = getFirstLoginToken();
     if (!token) {
-      navigate("/login", { replace: true });
+      navigate("/iniciar-sesion", { replace: true });
     }
   }, [navigate]);
 
@@ -41,18 +45,20 @@ const ChangePassword = () => {
     setErrors([]);
 
     try {
-      console.log("Intentando cambiar contraseña con:", newPassword, confirmPassword);
-      console.log("Token temporal:", localStorage.getItem("tempToken"));
-      console.log("token:", localStorage.getItem("token"));
-       const response = await changePasswordService(newPassword, confirmPassword);
+      const response = await changePasswordService(
+        newPassword,
+        confirmPassword,
+      );
 
-       if (response.nextStep === "SETUP_2FA_OPTIONAL" && response.data.shouldPrompt2FASetup) {
-         navigate("/setup-2fa");
-         return;
-       }
+      if (
+        response.nextStep === "SETUP_2FA_OPTIONAL" &&
+        response.data.shouldPrompt2FASetup
+      ) {
+        navigate("/setup-2fa");
+        return;
+      }
 
-       navigate("/app/dashboard");
-
+      navigate("/app/dashboard");
     } catch (err) {
       console.error(err);
       setErrors(getReadableErrors(err));
@@ -71,8 +77,12 @@ const ChangePassword = () => {
       placeholder: "Ingresa tu nueva contraseña",
       iconRight: showNewPassword ? hideEye : eye,
       onIconRightClick: toggleShowNewPassword,
-      iconRightAlt: showNewPassword ? "Ocultar contraseña" : "Mostrar contraseña",
-      iconRightAriaLabel: showNewPassword ? "Ocultar contraseña" : "Mostrar contraseña",
+      iconRightAlt: showNewPassword
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
+      iconRightAriaLabel: showNewPassword
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
     },
     {
       id: "confirmPassword",
@@ -83,8 +93,12 @@ const ChangePassword = () => {
       placeholder: "Confirma tu nueva contraseña",
       iconRight: showConfirmPassword ? hideEye : eye,
       onIconRightClick: toggleShowConfirmPassword,
-      iconRightAlt: showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña",
-      iconRightAriaLabel: showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña",
+      iconRightAlt: showConfirmPassword
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
+      iconRightAriaLabel: showConfirmPassword
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
     },
   ];
 
@@ -92,7 +106,9 @@ const ChangePassword = () => {
     <div className="min-h-screen bg-[#1F3664] shadow-[0_4px_6px_rgba(0,47,142,0.35)] px-4 py-12">
       <div className="mx-auto max-w-xl rounded-[32px] border border-slate-200 bg-white p-10 shadow-xl shadow-slate-950/40">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-slate-900">Primer inicio de sesión</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Primer inicio de sesión
+          </h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">
             Por seguridad, debes cambiar tu contraseña antes de continuar.
           </p>
@@ -110,7 +126,7 @@ const ChangePassword = () => {
             }
           />
         )}
-        
+
         <Forms
           fields={fields}
           actions={[

@@ -3,7 +3,8 @@ import Button from "../Components/Atoms/Button";
 import useAuth from "../hooks/useAuth";
 
 const navLinkClass = ({ isActive }) =>
-  `block rounded px-3 py-2 text-sm ${isActive ? "bg-slate-700 text-white" : "text-black"
+  `block rounded px-3 py-2 text-sm ${
+    isActive ? "bg-slate-700 text-white" : "text-black"
   }`;
 
 export default function AppLayout() {
@@ -12,7 +13,7 @@ export default function AppLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate("/iniciar-sesion", { replace: true });
   };
 
   return (

@@ -1,10 +1,11 @@
 import error from "/error.svg";
+import check from "/check.svg";
 
 const Alert = ({ icon = "", type = "success", message }) => {
   const styles = {
     success: {
       container: "bg-green-500 text-black",
-      icon: icon,
+      icon: check,
     },
     error: {
       container: "bg-[#dd4344] text-white",
@@ -28,11 +29,7 @@ const Alert = ({ icon = "", type = "success", message }) => {
     >
       {current.icon && (
         <div className="flex shrink-0 items-center self-center">
-          <img
-            src={current.icon}
-            alt={type}
-            className="h-5 w-5"
-          />
+          <img src={current.icon} alt={type} className="h-5 w-5" />
         </div>
       )}
 
