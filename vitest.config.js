@@ -10,7 +10,7 @@ export default defineConfig({
     setupFiles: "./vitest.setup.js",
 
     include: [
-      "src/tests/unit/**/*.test.{js,jsx}", // ← ajustar según tu estructura
+      "src/tests/unit/**/*.test.{js,jsx}",
       "src/tests/integration/**/*.test.{js,jsx}",
     ],
 

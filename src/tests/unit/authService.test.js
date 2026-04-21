@@ -23,7 +23,7 @@ const makeLoginSuccess = (overrides = {}) => ({
 // ─── Helpers de infraestructura ───────────────────────────────────────────────
 
 const mockFetch = (body, ok = true, status = 200) => {
-  vi.global.fetch = vi.fn().mockResolvedValue({
+  globalThis.fetch  = vi.fn().mockResolvedValue({
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),
@@ -227,7 +227,7 @@ describe("loginService", () => {
     await loginService("user@test.com", "mypassword");
 
     // Assert
-    expect(vi.global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/users/login"),
       expect.objectContaining({
         method: "POST",
@@ -281,7 +281,7 @@ describe("activateTwoFactorAuthService", () => {
     await activateTwoFactorAuthService();
 
     // Assert
-    expect(vi.global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/users/2fa/setup"),
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -416,7 +416,7 @@ describe("desactivate2FAService", () => {
     await desactivate2FAService("myPassword");
 
     // Assert
-    expect(vi.global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/users/2fa/disable"),
       expect.objectContaining({
         method: "POST",

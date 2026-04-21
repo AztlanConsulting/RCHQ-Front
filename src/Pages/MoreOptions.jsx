@@ -18,7 +18,7 @@ const MoreOptions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(""); // ← agregar
+  const [successMessage, setSuccessMessage] = useState("");
 
   const toggleShowPassword = () => setShowPassword((v) => !v);
 
@@ -56,7 +56,7 @@ const MoreOptions = () => {
         setShowPassword(false);
         setSuccessMessage(
           "La autenticación en dos pasos ha sido desactivada correctamente.",
-        ); // ← agregar
+        );
       }
     } catch (err) {
       setError(err.message || "Error al desactivar la autentificación en dos pasos");

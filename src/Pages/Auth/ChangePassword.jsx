@@ -45,13 +45,6 @@ const ChangePassword = () => {
     setErrors([]);
 
     try {
-      console.log(
-        "Intentando cambiar contraseña con:",
-        newPassword,
-        confirmPassword,
-      );
-      console.log("Token temporal:", localStorage.getItem("tempToken"));
-      console.log("token:", localStorage.getItem("token"));
       const response = await changePasswordService(
         newPassword,
         confirmPassword,

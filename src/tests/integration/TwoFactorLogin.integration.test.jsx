@@ -86,7 +86,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
 
   it("muestra error y permanece en la página cuando el código es inválido", async () => {
     // Arrange
-    const error = new Error("Código 2FA inválido");
+    const error = new Error("Código de verificación de dos pasos inválido");
     error.status = 401;
     validateLogin2FAService.mockRejectedValue(error);
     renderPage();
@@ -99,7 +99,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
 
     // Assert
     await waitFor(() =>
-      expect(screen.getByText(/código 2fa inválido/i)).toBeInTheDocument(),
+      expect(screen.getByText(/Código de verificación de dos pasos inválido/i)).toBeInTheDocument(),
     );
     expect(mockNavigate).not.toHaveBeenCalledWith("/app/dashboard", {
       replace: true,
@@ -109,7 +109,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
   it("deshabilita el botón y muestra mensaje de bloqueo cuando el error es 423", async () => {
     // Arrange
     const error = new Error(
-      "La verificación 2FA está bloqueada temporalmente. Intenta más tarde.",
+      "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
     );
     error.status = 423;
     validateLogin2FAService.mockRejectedValue(error);
