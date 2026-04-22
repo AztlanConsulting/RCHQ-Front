@@ -20,7 +20,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "@untitledui/icons": "^0.0.22",
     "react": "^19.2.4",
+    "react-aria": "^3.48.0",
+    "react-aria-components": "^1.17.0",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
     "tailwind-merge": "^3.5.0",
