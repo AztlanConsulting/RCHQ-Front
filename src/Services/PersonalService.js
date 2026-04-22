@@ -24,13 +24,11 @@ export const getEmployeeFormData = async () => {
     return data;
 };
 
-// 🔥 AQUÍ EL CAMBIO IMPORTANTE
 export const createEmployee = async (data) => {
     const token = getToken();
 
     const formData = new FormData();
 
-    // 👇 campos normales
     Object.keys(data).forEach((key) => {
         if (data[key] !== null && data[key] !== undefined) {
             formData.append(key, data[key]);
@@ -41,7 +39,6 @@ export const createEmployee = async (data) => {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
-            // ❌ NO pongas Content-Type
         },
         body: formData,
     });

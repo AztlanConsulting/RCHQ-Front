@@ -56,6 +56,11 @@ const LoginPage = () => {
                 return;
             }
 
+            if (response.isActive2FA) {
+                navigate("/2FA");
+                return;
+            }
+
             const token = response?.data?.token;
             const user = response?.data?.user;
 

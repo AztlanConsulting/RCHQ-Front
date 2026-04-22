@@ -11,8 +11,8 @@ const Forms = ({
 }) => {
   return (
     <form
-    noValidate
-    autoComplete="off"
+      noValidate
+      autoComplete="off"
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -52,9 +52,7 @@ const Forms = ({
       {actions.length > 0 && (
         <div
           className={`mt-3 flex w-full items-center ${
-            actions.length > 1
-              ? "flex-col gap-4"
-              : "justify-center"
+            actions.length > 1 ? "flex-col gap-4" : "justify-center"
           }`}
         >
           {actions.map((action) => (
