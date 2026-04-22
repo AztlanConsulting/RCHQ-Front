@@ -83,7 +83,7 @@ const DetalleEmpleado = () => {
 
             {/* Notificación de éxito */}
             {alert && alert.message && (
-                <div className="mb-4">
+                <div className="mb-4 fixed top-4 left-1/2 -translate-x-1/2 z-50">
                     <Alert type={alert?.type} message={alert?.message} />
                 </div>
             )}
