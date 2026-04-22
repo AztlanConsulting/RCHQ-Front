@@ -6,6 +6,7 @@ import { secureFetch } from "@/utils/secureFetchWrapper";
 import { Tabs } from "../Components/untitled/tabs/tabs";
 import { NativeSelect } from "../Components/untitled/base/select/select-native";
 import Chip from '../Components/Atoms/Chip';
+import Alert from "../Components/Atoms/Alerts";
 
 const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 
@@ -30,6 +31,13 @@ const DetalleEmpleado = () => {
     const [currentTab, setCurrentTab] = useState("overview");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [alert, setAlert] = useState({});
+
+    useEffect(() => {
+        if (!alert) return;
+        const timer = setTimeout(() => setAlert({}), 4000);
+        return () => clearTimeout(timer);
+      }, [alert]);
 
     useEffect(() => {
         const getEmployeeDetail = async () => {
@@ -42,9 +50,12 @@ const DetalleEmpleado = () => {
                     },
                 })
 
+                console.log("Response: ", response);
                 const data = await response.json();
+                console.log("data: ", data);
 
                 if (!response.ok) {
+                    setAlert({ type: "error", message: `${data?.message}` });
                     throw new Error(data?.message || `Solicitud fallida (${response.status})`);
                 }
                 const basicInfo = data?.data?.employee?.employeeBasicInfo ?? null;
@@ -69,6 +80,13 @@ const DetalleEmpleado = () => {
 
     return (
         <div className='p-6 flex flex-col text-black'>
+
+            {/* Notificación de éxito */}
+            {alert && alert.message && (
+                <div className="mb-4">
+                    <Alert type={alert?.type} message={alert?.message} />
+                </div>
+            )}
 
             {/* Row for Page Title and Tabs */}
             <div className='flex'>
