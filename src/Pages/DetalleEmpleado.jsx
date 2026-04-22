@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import userCircleUrl from "../assets/user-circle.svg?url";
 import { useParams } from 'react-router-dom';
 import Loader from '../Components/Atoms/Loader';
-// import type { Key } from "react-aria-components";
+import { secureFetch } from "@/utils/secureFetchWrapper";
 import { Tabs } from "../Components/untitled/tabs/tabs";
 import { NativeSelect } from "../Components/untitled/base/select/select-native";
-import TextField from '../Components/Atoms/TextField';
 import Chip from '../Components/Atoms/Chip';
+
+const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 
 const tabs = [
     { id: "overview", label: "Overview" },
@@ -32,14 +33,13 @@ const DetalleEmpleado = () => {
 
     useEffect(() => {
         const getEmployeeDetail = async () => {
+            console.log("Is it even firig?")
             try {
-                const response = await fetch("", {
+                const response = await secureFetch(`${API_URL}/employee/employee-detail/${employeeId}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
                     },
-                    body: JSON.stringify(employeeId),
                 })
 
                 const data = await response.json();
@@ -68,7 +68,7 @@ const DetalleEmpleado = () => {
     if (isLoading) return <Loader />
 
     return (
-        <div className='p-6 flex flex-col '>
+        <div className='p-6 flex flex-col text-black'>
 
             {/* Row for Page Title and Tabs */}
             <div className='flex'>
