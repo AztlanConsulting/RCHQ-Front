@@ -27,8 +27,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
-          <Route path="opciones" element={<MoreOptions/>}/>
-          <Route path="setup-2fa" element={<TwoFactorAuth />} /> 
+            <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="personal" element={<Personal />} />

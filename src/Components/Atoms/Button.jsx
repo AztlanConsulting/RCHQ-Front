@@ -20,8 +20,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={
-        `${width}
+      className={`${width}
         ${height} 
         flex items-center justify-center rounded-lg overflow-hidden 
         cursor-pointer transition-all

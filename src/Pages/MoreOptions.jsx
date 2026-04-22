@@ -18,7 +18,7 @@ const MoreOptions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(""); // ← agregar
+  const [successMessage, setSuccessMessage] = useState("");
 
   const toggleShowPassword = () => setShowPassword((v) => !v);
 
@@ -34,7 +34,7 @@ const MoreOptions = () => {
         const response = await getStatus2FA();
         setIs2FAActive(response.Status2FA ?? false);
       } catch (err) {
-        console.error("Error al obtener estado 2FA:", err);
+        console.error("Error al obtener estado de la autentificación en dos pasos:", err);
       }
     };
     fetchStatus();
@@ -54,10 +54,12 @@ const MoreOptions = () => {
         setShowDisableModal(false);
         setPassword("");
         setShowPassword(false);
-        setSuccessMessage("La autenticación en dos pasos ha sido desactivada correctamente."); // ← agregar
+        setSuccessMessage(
+          "La autenticación en dos pasos ha sido desactivada correctamente.",
+        );
       }
     } catch (err) {
-      setError(err.message || "Error al desactivar 2FA");
+      setError(err.message || "Error al desactivar la autentificación en dos pasos");
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ const MoreOptions = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras Opciones</h1>
+      <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras opciones</h1>
 
       {/* Notificación de éxito */}
       {successMessage && (
@@ -86,12 +88,20 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9" />}
+            icon={
+              <img
+                src="/certificate.svg"
+                alt="Certificaciones"
+                className="w-9 h-9"
+              />
+            }
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9" />}
+            icon={
+              <img src="/document.svg" alt="Documentos" className="w-9 h-9" />
+            }
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
@@ -124,7 +134,9 @@ const MoreOptions = () => {
               onClose={() => {
                 setShow2FAModal(false);
                 setIs2FAActive(true);
-                setSuccessMessage("La autenticación en dos pasos ha sido activada correctamente."); // ← agregar
+                setSuccessMessage(
+                  "La autenticación en dos pasos ha sido activada correctamente.",
+                ); 
               }}
             />
           </div>
@@ -154,8 +166,12 @@ const MoreOptions = () => {
               htmlFor="disable-password"
               iconRight={showPassword ? eye : hideEye}
               onIconRightClick={toggleShowPassword}
-              iconRightAlt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              iconRightAriaLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRightAlt={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              iconRightAriaLabel={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
             />
 
             <div className="flex gap-3 justify-end">

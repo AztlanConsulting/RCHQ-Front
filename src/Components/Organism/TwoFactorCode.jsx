@@ -2,6 +2,11 @@ import TextField from "../Atoms/TextField";
 import Button from "../Atoms/Button";
 
 const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
+  const handleChange = (value) => {
+    const onlyNumbers = value.replace(/\D/g, "").slice(0, 6);
+    setCode(onlyNumbers);
+  };
+
   return (
     <div className="flex flex-col items-center gap-6">
       <TextField
@@ -9,12 +14,12 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
         label="Código de autenticación"
         type="text"
         value={code}
-        setValue={setCode}
+        setValue={handleChange}
         placeholder="Ingresa el código"
         htmlFor="two-factor-code"
         text="Código de autenticación"
         disabled={disabled}
-        maxLength={6} 
+        maxLength={6}
       />
       <Button
         text={loading ? "Verificando..." : "Verificar"}

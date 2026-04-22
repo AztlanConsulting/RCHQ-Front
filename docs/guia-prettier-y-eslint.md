@@ -12,9 +12,9 @@ npm run <nombre-del-script>
 
 ## Prettier
 
-| Comando | Qué hace |
-|--------|----------|
-| `npm run format` | Aplica el formato a **todo** el proyecto según Prettier (modifica archivos). Equivale a `prettier --write .` |
+| Comando                | Qué hace                                                                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run format`       | Aplica el formato a **todo** el proyecto según Prettier (modifica archivos). Equivale a `prettier --write .`                     |
 | `npm run format:check` | **No** escribe archivos: solo comprueba si algo no cumple el formato. Útil para CI o para ver si falta formatear sin tocar nada. |
 
 **Archivos:** respeta `.prettierignore` (por ejemplo `node_modules`, `dist`).
@@ -25,9 +25,9 @@ npm run <nombre-del-script>
 
 ## ESLint
 
-| Comando | Qué hace |
-|--------|----------|
-| `npm run lint` | Analiza **todo** el proyecto y muestra errores y avisos. No modifica archivos. Equivale a `eslint .` |
+| Comando            | Qué hace                                                                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run lint`     | Analiza **todo** el proyecto y muestra errores y avisos. No modifica archivos. Equivale a `eslint .`                             |
 | `npm run lint:fix` | Igual que `lint`, pero **corrige automáticamente** lo que ESLint pueda (no todo es auto-arreglable). Equivale a `eslint . --fix` |
 
 **Cuándo usar cada uno:** `lint` para ver el estado; `lint:fix` cuando queráis aplicar correcciones automáticas. Después de `lint:fix`, conviene volver a ejecutar `lint` por si quedan problemas que hay que resolver a mano.
@@ -38,8 +38,8 @@ npm run <nombre-del-script>
 
 A veces no queréis formatear ni analizar **todo** el repo, sino solo lo que vais a commitear (archivos ya añadidos con `git add`).
 
-| Comando | Qué hace |
-|--------|----------|
+| Comando               | Qué hace                                                                                                                                                                                                                   |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run lint:staged` | Ejecuta **lint-staged**: según la configuración en `package.json`, pasa ESLint con `--fix` y Prettier con `--write` solo sobre los archivos **staged** que coincidan con los patrones (por ejemplo `*.js`, `*.jsx`, etc.). |
 
 **Flujo típico:** `git add` de los archivos → `npm run lint:staged` → revisar → `git commit`.

@@ -46,15 +46,18 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await loginService(result.data.email, result.data.password);
+      const response = await loginService(
+        result.data.email,
+        result.data.password,
+      );
 
       if (!response?.success) {
         setErrors(["No se pudo iniciar sesión"]);
         return;
       }
 
-      if(response.isActive2FA){
-        navigate("/2FA")
+      if (response.isActive2FA) {
+        navigate("/2FA");
         return;
       }
 
@@ -97,9 +100,7 @@ const LoginPage = () => {
       type: showPassword ? "text" : "password",
       iconRight: showPassword ? eye : hideEye,
       onIconRightClick: toggleShowPassword,
-      iconRightAlt: showPassword
-        ? "Ocultar contraseña"
-        : "Mostrar contraseña",
+      iconRightAlt: showPassword ? "Ocultar contraseña" : "Mostrar contraseña",
       iconRightAriaLabel: showPassword
         ? "Ocultar contraseña"
         : "Mostrar contraseña",
@@ -147,7 +148,7 @@ const LoginPage = () => {
           )}
 
           <Forms
-            title="Bienvenido de Vuelta"
+            title="Bienvenido de vuelta"
             fields={fields}
             actions={actions}
             onSubmit={handleSubmit}
