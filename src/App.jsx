@@ -28,7 +28,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
-            <Route path="documentos" element={<Documents />} />
+            <Route path=":employeeId/documentos" element={<Documents />} />
             <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />

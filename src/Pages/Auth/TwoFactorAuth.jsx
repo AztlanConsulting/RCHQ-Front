@@ -27,7 +27,9 @@ const TwoFactorAuth = ({ onClose }) => {
     try {
       const response = await activateTwoFactorAuthService();
       if (!response) {
-        setError("No se pudo iniciar la configuración de autenticación en dos pasos");
+        setError(
+          "No se pudo iniciar la configuración de autenticación en dos pasos",
+        );
         return;
       }
       setQr(response.data?.qrImage || "");
@@ -139,7 +141,8 @@ const TwoFactorAuth = ({ onClose }) => {
               Verifica el código
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Ingresa los 6 dígitos generados por la aplicación de autentificación:
+              Ingresa los 6 dígitos generados por la aplicación de
+              autentificación:
             </p>
           </div>
 

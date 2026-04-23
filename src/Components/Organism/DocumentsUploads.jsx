@@ -50,7 +50,12 @@ const DocumentUploadModal = ({
     const selected = e.target.files[0];
     if (!selected) return;
 
-    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+    ];
     if (!allowedTypes.includes(selected.type)) {
       setLocalError("Solo se permiten archivos PDF, PNG o JPG.");
       setFile(null);
@@ -82,7 +87,7 @@ const DocumentUploadModal = ({
     }
 
     const formData = new FormData();
-    formData.append("type", selectedType);
+    formData.append("documentField", selectedType);
     if (file) formData.append("file", file);
 
     onSubmit(formData);
@@ -93,7 +98,6 @@ const DocumentUploadModal = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 flex flex-col gap-6">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900">
@@ -147,7 +151,9 @@ const DocumentUploadModal = ({
               ${fileName ? "border-[#1e2b4d]" : "border-slate-300 hover:border-slate-400"}
             `}
           >
-            <span className={`text-sm font-medium truncate ${fileName ? "text-[#222]" : "text-[#aaaaaa]"}`}>
+            <span
+              className={`text-sm font-medium truncate ${fileName ? "text-[#222]" : "text-[#aaaaaa]"}`}
+            >
               {fileName || "Selecciona un archivo (PDF, PNG, JPG)"}
             </span>
             <span className="ml-3 shrink-0 text-xs font-semibold text-[#1e2b4d] bg-slate-100 rounded px-2 py-1">
@@ -163,7 +169,9 @@ const DocumentUploadModal = ({
             className="hidden"
           />
 
-          <p className="text-xs text-slate-400">Máximo 10 MB · PDF, PNG o JPG</p>
+          <p className="text-xs text-slate-400">
+            Máximo 10 MB · PDF, PNG o JPG
+          </p>
         </div>
 
         {/* Actions */}
@@ -175,7 +183,9 @@ const DocumentUploadModal = ({
             Cancelar
           </button>
           <Button
-            text={loading ? "Guardando..." : isEditing ? "Guardar cambios" : "Subir"}
+            text={
+              loading ? "Guardando..." : isEditing ? "Guardar cambios" : "Subir"
+            }
             onClick={handleSubmit}
             disabled={loading}
             bgColor="bg-[#1e2b4d]"

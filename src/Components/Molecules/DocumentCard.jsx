@@ -26,21 +26,47 @@ const isPdf = (doc) => {
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const PdfIcon = () => (
-  <svg width="40" height="48" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="40"
+    height="48"
+    viewBox="0 0 40 48"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <rect width="40" height="48" rx="4" fill="#E5E7EB" />
-    <path d="M8 6h16l8 8v28a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z" fill="white" />
+    <path
+      d="M8 6h16l8 8v28a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z"
+      fill="white"
+    />
     <path d="M24 6l8 8h-8V6z" fill="#D1D5DB" />
     <rect x="8" y="22" width="24" height="6" rx="1" fill="#DD4344" />
-    <text x="20" y="27" textAnchor="middle" fill="white" fontSize="5" fontWeight="bold" fontFamily="sans-serif">
+    <text
+      x="20"
+      y="27"
+      textAnchor="middle"
+      fill="white"
+      fontSize="5"
+      fontWeight="bold"
+      fontFamily="sans-serif"
+    >
       PDF
     </text>
   </svg>
 );
 
 const DocIcon = () => (
-  <svg width="40" height="48" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="40"
+    height="48"
+    viewBox="0 0 40 48"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <rect width="40" height="48" rx="4" fill="#E5E7EB" />
-    <path d="M8 6h16l8 8v28a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z" fill="white" />
+    <path
+      d="M8 6h16l8 8v28a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z"
+      fill="white"
+    />
     <path d="M24 6l8 8h-8V6z" fill="#D1D5DB" />
     <rect x="10" y="22" width="20" height="2" rx="1" fill="#60A5FA" />
     <rect x="10" y="27" width="16" height="2" rx="1" fill="#93C5FD" />
@@ -71,7 +97,6 @@ const DocumentCard = ({ doc, onEdit, onDelete, deleting }) => {
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col w-[200px] shadow-sm hover:shadow-md transition-shadow">
-
       {/* Thumbnail */}
       <button
         onClick={handlePreview}
@@ -93,14 +118,22 @@ const DocumentCard = ({ doc, onEdit, onDelete, deleting }) => {
         <p className="text-xs text-slate-400">{date}</p>
 
         <div className="flex gap-2 mt-2 justify-end">
-
           {/* Edit */}
           <button
             onClick={() => onEdit(doc)}
             title="Editar"
             className="w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 flex items-center justify-center transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
@@ -114,12 +147,29 @@ const DocumentCard = ({ doc, onEdit, onDelete, deleting }) => {
             className="w-8 h-8 rounded-lg bg-[#dd4344] hover:bg-red-700 active:bg-red-800 flex items-center justify-center transition-colors disabled:opacity-60"
           >
             {isBeingDeleted ? (
-              <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <svg
+                className="animate-spin"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+              >
                 <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
                 <path d="M12 2a10 10 0 010 20" />
               </svg>
             ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
                 <path d="M10 11v6M14 11v6" />
@@ -127,7 +177,6 @@ const DocumentCard = ({ doc, onEdit, onDelete, deleting }) => {
               </svg>
             )}
           </button>
-
         </div>
       </div>
     </div>

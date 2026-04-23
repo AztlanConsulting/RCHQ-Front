@@ -62,7 +62,9 @@ const TwoFactorLogin = () => {
         );
         setIsBlocked(true);
       } else {
-        setError(err.message || "Código de autenticación en dos pasos inválido");
+        setError(
+          err.message || "Código de autenticación en dos pasos inválido",
+        );
       }
     } finally {
       setLoading(false);
