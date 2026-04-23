@@ -56,8 +56,13 @@ const LoginPage = () => {
         return;
       }
 
-      if (response.isActive2FA) {
-        navigate("/2FA");
+      if (response?.nextStep === "CHANGE_PASSWORD_FIRST_LOGIN") {
+        navigate("/primer-inicio/cambiar-contrasena", { replace: true });
+        return;
+      }
+
+      if (response?.isActive2FA) {
+        navigate("/2FA", { replace: true });
         return;
       }
 

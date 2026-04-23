@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../Components/Organism/Forms";
-import Button from "../../Components/Atoms/Button";
-import {
-  changePasswordService,
-  getFirstLoginToken,
-  getReadableErrors,
-} from "../../Services/AuthService";
+import { getReadableErrors } from "../../utils/apiErrors";
+import { getFirstLoginToken } from "../../utils/authStorage";
+import { changePasswordFirstLoginService } from "../../Services/PasswordService";
 import Alert from "../../Components/Atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
+import useAuth from "../../hooks/useAuth";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,29 +36,27 @@ const ChangePassword = () => {
   };
 
   const handleSubmit = async () => {
-    if (newPassword !== confirmPassword) {
-      setErrors([]);
-      return;
-    }
-
     setLoading(true);
     setErrors([]);
 
     try {
-      const response = await changePasswordService(
+      const response = await changePasswordFirstLoginService(
         newPassword,
         confirmPassword,
       );
 
-      if (
-        response.nextStep === "SETUP_2FA_OPTIONAL" &&
-        response.data.shouldPrompt2FASetup
-      ) {
-        navigate("/setup-2fa");
+      const token = response?.data?.token;
+      const user = response?.data?.user;
+
+      if (!token) {
+        setErrors(["No se recibió un token de sesión válido"]);
         return;
       }
 
-      navigate("/app/dashboard");
+      login({ token, user });
+
+      // Por ahora ignoramos el prompt opcional de 2FA y continuamos
+      navigate("/app/dashboard", { replace: true });
     } catch (err) {
       console.error(err);
       setErrors(getReadableErrors(err));
@@ -70,7 +68,6 @@ const ChangePassword = () => {
   const fields = [
     {
       id: "newPassword",
-      label: "Nueva contraseña",
       type: showNewPassword ? "text" : "password",
       value: newPassword,
       setValue: setNewPassword,
@@ -83,10 +80,13 @@ const ChangePassword = () => {
       iconRightAriaLabel: showNewPassword
         ? "Ocultar contraseña"
         : "Mostrar contraseña",
+      htmlFor: "newPassword",
+      text: "Nueva contraseña",
+      maxLength: 64,
+      autoComplete: "new-password",
     },
     {
       id: "confirmPassword",
-      label: "Confirmar nueva contraseña",
       type: showConfirmPassword ? "text" : "password",
       value: confirmPassword,
       setValue: setConfirmPassword,
@@ -99,11 +99,15 @@ const ChangePassword = () => {
       iconRightAriaLabel: showConfirmPassword
         ? "Ocultar contraseña"
         : "Mostrar contraseña",
+      htmlFor: "confirmPassword",
+      text: "Confirmar nueva contraseña",
+      maxLength: 64,
+      autoComplete: "new-password",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#1F3664] shadow-[0_4px_6px_rgba(0,47,142,0.35)] px-4 py-12">
+    <div className="min-h-screen bg-[#1F3664] px-4 py-12">
       <div className="mx-auto max-w-xl rounded-[32px] border border-slate-200 bg-white p-10 shadow-xl shadow-slate-950/40">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-semibold text-slate-900">
@@ -131,10 +135,10 @@ const ChangePassword = () => {
           fields={fields}
           actions={[
             {
-              text: loading ? "Cambiando..." : "Cambiar Contraseña",
+              text: loading ? "Cambiando..." : "Cambiar contraseña",
               type: "submit",
               disabled: loading,
-              bgColor: "bg-[#1F3664] shadow-[0_4px_6px_rgba(0,47,142,0.35)]",
+              bgColor: "bg-[#1F3664]",
               textColor: "text-white",
               hoverColor: "hover:bg-[#1F3664]/90",
               activeColor: "active:bg-[#1F3664]/80",

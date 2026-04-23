@@ -9,7 +9,7 @@ import Perfil from "./Pages/Perfil";
 import PublicRoute from "./Components/PublicRoute";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
-// import ChangePassword from "./Pages/Auth/ChangePassword";
+import ChangePassword from "./Pages/Auth/ChangePassword";
 import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 import MoreOptions from "./Pages/MoreOptions";
@@ -23,6 +23,7 @@ function App() {
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />
           <Route path="/2FA" element={<TwoFactorLogin />} />
+          <Route path="/primer-inicio/cambiar-contrasena" element={<ChangePassword />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
