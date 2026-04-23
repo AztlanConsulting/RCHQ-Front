@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 /** Mock rows shaped like public.employee + house name, aligned with rhcq_back/data/seed.sql */
 const MOCK_EMPLOYEES = [
   {
-    employeeId: "a0000003-0000-4000-8000-000000000003",
+    employeeId: "d5af9fe8-42d5-495c-a978-804d332f8842",
     name: "Carlos",
     surname: "Ramírez",
     house: "Desarrollo",

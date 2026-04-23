@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import userCircleUrl from "../assets/user-circle.svg?url";
 import { useParams } from 'react-router-dom';
 import Loader from '../Components/Atoms/Loader';
 import { secureFetch } from "@/utils/secureFetchWrapper";
@@ -9,6 +8,7 @@ import Chip from '../Components/Atoms/Chip';
 import Alert from "../Components/Atoms/Alerts";
 
 const API_URL = import.meta.env.API_URL || "http://localhost:3000";
+const AVATAR_PLACEHOLDER = "/user-circle.svg";
 
 const tabs = [
     { id: "overview", label: "Overview" },
@@ -58,9 +58,9 @@ const DetalleEmpleado = () => {
                     setAlert({ type: "error", message: `${data?.message}` });
                     throw new Error(data?.message || `Solicitud fallida (${response.status})`);
                 }
-                const basicInfo = data?.data?.employee?.employeeBasicInfo ?? null;
-                const adminInfo = data?.data?.employee?.employeeAdminInfo ?? null;
-                const record = data?.data?.employee?.employeeRecord ?? null;
+                const basicInfo = data?.data?.employee?.basicInfo ?? null;
+                const adminInfo = data?.data?.employee?.adminInfo ?? null;
+                const record = data?.data?.employee?.record ?? null;
                 
                 setEmployeeBasicInfo(basicInfo);
                 setEmployeeAdminInfo(adminInfo);
@@ -79,7 +79,7 @@ const DetalleEmpleado = () => {
     if (isLoading) return <Loader />
 
     return (
-        <div className='p-6 flex flex-col text-black'>
+        <div className='p-2 flex flex-col text-black'>
 
             {/* Notificación de éxito */}
             {alert && alert.message && (
@@ -110,14 +110,18 @@ const DetalleEmpleado = () => {
             </div>
 
             {/* Box/Section for Basic Employee Info, Persistent across tabs */}
-            <div className="w-full flex p-2 items-center justify-between rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="w-full flex p-4 items-center gap-4 rounded-2xl border border-slate-200 bg-white shadow-sm">
                 {/* First column: avatar + status chip; second: text metrics */}
-                <div className="h-full w-full flex">
-                    <div className="relative h-32 w-32 shrink-0 sm:h-40 sm:w-40">
+                <div className="h-full flex basis-1/5">
+                    <div className="relative h-20 w-20 shrink-0 sm:h-40 sm:w-40">
                         <img
-                            src={employeeBasicInfo?.picture || userCircleUrl}
+                            src={employeeBasicInfo?.picture?.trim() ? employeeBasicInfo.picture : AVATAR_PLACEHOLDER}
                             alt=""
-                            className="h-full w-full object-cover rounded-2xl"
+                            className="h-full w-full object-cover rounded-full ring-1 ring-slate-200"
+                            onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = AVATAR_PLACEHOLDER;
+                            }}
                         />
                         <div className="absolute bottom-1 right-1 z-10">
                             <Chip active={employeeBasicInfo?.isActive ?? true} />
@@ -126,10 +130,10 @@ const DetalleEmpleado = () => {
                 </div>
 
                 {/* Second column for the text information, broken into 2 columns */}
-                <div className='flex flex-col justify-between'>
+                <div className='w-full h-full flex flex-col basis-4/5 gap-6 justify-between'>
                     
                     {/* Top row for name/house and edit button, columns */}
-                    <div className='h-full flex flex-col justify-between'>
+                    <div className='h-full flex justify-between'>
                         
                         {/* Name/House */}
                         <div className='w-full'>
@@ -141,7 +145,9 @@ const DetalleEmpleado = () => {
 
                         {/* Edit button */}
                         <div>
-
+                            <button type="button" aria-label="Editar" className="rounded-lg p-2 hover:bg-slate-100">
+                                <img src="/edit.svg" alt="" className="h-5 w-5" />
+                            </button>
                         </div>
                     </div>
 
@@ -170,10 +176,10 @@ const DetalleEmpleado = () => {
             {/* Final row, box depends on currentTab */}
             {/* Either the basic/admin info boxes or record/expediente box */}
             {currentTab == "overview" && (
-                    <div className='flex'>
+                    <div className='flex mt-4 gap-4'>
                         
                         {/* Basic Info Box */}
-                        <div className='w-full p-2'>
+                        <div className='w-full p-2 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm'>
                             <div className='flex jusfity-between'>
                                 <h3>Información Básica</h3>
                                 {/* edit button */}
@@ -191,7 +197,7 @@ const DetalleEmpleado = () => {
                         </div>
                         
                         {/* Admin Info Box */}
-                        <div className=''>
+                        <div className='rounded-2xl border border-slate-200 bg-white p-8 shadow-sm'>
                             <div className='flex jusfity-between'>
                                 <h3>Información Administrativa</h3>
                                 {/* edit button */}
