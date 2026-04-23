@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useState, useEffect } from "react";
+//import { useNavigate } from "react-router-dom";
 import Button from "../../Components/Atoms/Button";
 import Alert from "../../Components/Atoms/Alerts";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
@@ -9,66 +9,7 @@ import {
 } from "../../Services/AuthService";
 
 const TwoFactorAuth = ({ onClose }) => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState("qr");
-  const [code, setCode] = useState("");
-  const [qr, setQr] = useState("");
-  const [manualCode, setManualCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  useEffect(() => {
-    handleActivate();
-  }, []);
-
-  const handleActivate = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await activateTwoFactorAuthService();
-      if (!response) {
-        setError("No se pudo iniciar la configuración de autenticación en dos pasos");
-        return;
-      }
-      setQr(response.data?.qrImage || "");
-      const secret =
-        response.data?.otpauthUrl?.match(/secret=([^&]+)/)?.[1] || "";
-      setManualCode(secret);
-    } catch (err) {
-      setError(err.message || "Error al generar el código QR");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (code.length !== 6) {
-      setError("El código debe tener 6 dígitos");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const response = await verify2FAService(code);
-      if (!response) {
-        setError("No se pudo validar el código");
-        return;
-      }
-      if (response.nextStep === "2FA_SETUP_COMPLETE") {
-        if (onClose) {
-          onClose();
-        } else {
-          navigate("/app/opciones");
-        }
-        return;
-      }
-      setError("El servidor devolvió un flujo no reconocido");
-    } catch (err) {
-      setError(err.message || "Código de autenticación en dos pasos inválido");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-2xl p-8 w-[500px] max-w-full flex flex-col">
