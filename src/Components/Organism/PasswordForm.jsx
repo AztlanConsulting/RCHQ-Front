@@ -172,10 +172,10 @@ const PasswordForm = ({
                 </p>
 
                 <ul className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm text-slate-600 sm:grid-cols-2">
-                    <li>• Un mínimo de 8 caracteres</li>
-                    <li>• Al menos una letra minúscula</li>
-                    <li>• Al menos un número</li>
-                    <li>• Al menos una letra mayúscula</li>
+                    <li>- Un mínimo de 8 caracteres</li>
+                    <li>- Al menos una letra minúscula</li>
+                    <li>- Al menos un número</li>
+                    <li>- Al menos una letra mayúscula</li>
                 </ul>
             </div>
 
@@ -203,8 +203,8 @@ const PasswordForm = ({
                 actions={actions}
                 footer={footer}
                 onSubmit={handleSubmit}
-                titleClassName="text-center text-2xl font-bold text-slate-900"
-                descriptionClassName="text-center text-sm text-slate-600"
+                titleClassName="text-left text-2xl font-bold text-slate-900"
+                descriptionClassName="text-left text-sm text-slate-600"
             />
         </div>
     );
