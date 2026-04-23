@@ -1,14 +1,14 @@
-  import { UseState, UseCallback } from "react";
+  import { useState, useCallback } from "react";
   import { activateTwoFactorAuthService } from "../../Services/AuthService";
   
   
-  export const generate2FACode = () => {
-  const [qr, setQr] = UseState("");
-  const [manualCode, setManualCode] = UseState("");
-  const [loading, setLoading] = UseState(false);
-  const [error, setError] = UseState("");
+  export const useGenerate2FACode = () => {
+  const [qr, setQr] = useState("");
+  const [manualCode, setManualCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const generateQR = UseCallback(async () => {
+  const generateQR = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
