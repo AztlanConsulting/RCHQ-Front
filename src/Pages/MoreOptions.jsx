@@ -5,6 +5,7 @@ import Button from "../Components/Atoms/Button";
 import TextField from "../Components/Atoms/TextField";
 import Alert from "../Components/Atoms/Alerts";
 import TwoFactorAuth from "./Auth/TwoFactorAuth";
+import ChangePasswordModal from "../Components/Organism/ChangePasswordModal";
 import { getStatus2FA, desactivate2FAService } from "../Services/AuthService";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
@@ -19,6 +20,7 @@ const MoreOptions = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const toggleShowPassword = () => setShowPassword((v) => !v);
 
@@ -117,6 +119,14 @@ const MoreOptions = () => {
               }
             }}
           />
+          <OptionCard
+            icon={<img src="/lock.svg" alt="Cambiar contraseña" className="w-9 h-9" />}
+            label="Cambiar contraseña"
+            onClick={() => {
+              setError("");
+              setShowChangePasswordModal(true);
+            }}
+          />
         </div>
       </div>
 
@@ -197,6 +207,13 @@ const MoreOptions = () => {
           </div>
         </div>
       )}
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        onSuccess={() => {
+          setSuccessMessage("La contraseña se actualizó correctamente.");
+        }}
+      />
     </div>
   );
 };
