@@ -1,7 +1,5 @@
 import { DOCUMENT_TYPES } from "../../Services/DocumentService";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const getDocumentLabel = (typeValue) => {
   const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
   return found ? found.label : typeValue;
@@ -22,8 +20,6 @@ const isPdf = (doc) => {
   const mime = doc?.mimeType || doc?.fileType || "";
   return url.toLowerCase().endsWith(".pdf") || mime.includes("pdf");
 };
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
 
 const PdfIcon = () => (
   <svg
@@ -74,17 +70,6 @@ const DocIcon = () => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-/**
- * Molecule: DocumentCard
- *
- * Props:
- *  - doc: object              — document data from the API
- *  - onEdit: (doc) => void
- *  - onDelete: (doc) => void
- *  - deleting: string | null  — id of the document currently being deleted
- */
 const DocumentCard = ({ doc, onEdit, onDelete, deleting }) => {
   const label = getDocumentLabel(doc.type || doc.documentType);
   const date = formatDate(doc.createdAt || doc.date || doc.uploadedAt);

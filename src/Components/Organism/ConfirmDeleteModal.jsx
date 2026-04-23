@@ -1,23 +1,10 @@
 import { DOCUMENT_TYPES } from "../../Services/DocumentService";
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
 const getDocumentLabel = (typeValue) => {
   const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
   return found ? found.label : typeValue;
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-/**
- * Organism: ConfirmDeleteModal
- *
- * Props:
- *  - doc: object | null   — document to delete; renders null if not set
- *  - onConfirm: () => void
- *  - onCancel: () => void
- *  - loading: boolean
- */
 const ConfirmDeleteModal = ({ doc, onConfirm, onCancel, loading }) => {
   if (!doc) return null;
 

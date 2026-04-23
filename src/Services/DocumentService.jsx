@@ -47,7 +47,6 @@ export const DOCUMENT_TYPES = [
   { value: "induction_manual", label: "Manual de Inducción" },
 ];
 
-// ✅ employeeId en la ruta
 export const getDocumentsService = async (employeeId) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
@@ -66,7 +65,6 @@ export const getDocumentsService = async (employeeId) => {
   return data;
 };
 
-// ✅ employeeId en la ruta, documentField en el FormData
 export const uploadDocumentService = async (employeeId, formData) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
@@ -87,7 +85,6 @@ export const uploadDocumentService = async (employeeId, formData) => {
   return data;
 };
 
-// ✅ employeeId en la ruta, documentId identifica el campo a actualizar
 export const updateDocumentService = async (
   employeeId,
   documentField,
@@ -114,7 +111,6 @@ export const updateDocumentService = async (
   return data;
 };
 
-// ✅ employeeId + documentField identifican qué campo borrar
 export const deleteDocumentService = async (employeeId, documentField) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");

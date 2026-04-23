@@ -48,12 +48,15 @@ const Documents = () => {
       }
 
       // Convierte el objeto de documentos en array de { type, url }
-    const docsArray = Object.entries(docRow.documents)
-    .filter(([key, value]) => key !== "document_id" && value !== null && value !== "")
-    .map(([type, url]) => ({
-        type,
-        url: `http://localhost:3000/${url}`, // ✅ agrega el servidor
-    }));
+      const docsArray = Object.entries(docRow.documents)
+        .filter(
+          ([key, value]) =>
+            key !== "document_id" && value !== null && value !== "",
+        )
+        .map(([type, url]) => ({
+          type,
+          url: `http://localhost:3000/${url}`,
+        }));
 
       setDocuments(docsArray);
     } catch (err) {

@@ -3,18 +3,6 @@ import Alert from "../Atoms/Alerts";
 import Button from "../Atoms/Button";
 import { DOCUMENT_TYPES } from "../../Services/DocumentService";
 
-/**
- * Organism: DocumentUploadModal
- * Handles both creating a new document and editing an existing one.
- *
- * Props:
- *  - isOpen: boolean
- *  - onClose: () => void
- *  - onSubmit: (formData: FormData) => Promise<void>
- *  - editingDocument: object | null  — if set, prefills form for editing
- *  - loading: boolean
- *  - error: string
- */
 const DocumentUploadModal = ({
   isOpen,
   onClose,
