@@ -91,8 +91,8 @@ const UserInfoSection = ({
                 />
                 <FormField
                     label="Clave Bancaria Estandarizada (CLABE)"
-                    name="clabe"
-                    value={form.clabe}
+                    name="bank_account"
+                    value={form.bank_account}
                     onChange={handleChange}
                     maxLength={18}
                     labelColor={LABEL_COLOR}

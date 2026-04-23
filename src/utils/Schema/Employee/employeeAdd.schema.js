@@ -53,7 +53,7 @@ export const employeeCreateSchema = z.object({
         .or(z.literal(""))
         .nullable()
         .optional(),
-    clabe: z
+    bank_account: z
         .string()
         .trim()
         .length(18, "La CLABE debe tener exactamente 18 dígitos")
