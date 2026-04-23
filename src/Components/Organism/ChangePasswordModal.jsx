@@ -82,7 +82,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess }) => {
                 loading={loading}
                 errors={errors}
                 onSubmit={handleSubmit}
-                submitText="Guardar cambios"
+                submitText="Cambiar contraseña"
             />
         </ModalShell>
     );

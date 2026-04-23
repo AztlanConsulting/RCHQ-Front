@@ -64,6 +64,11 @@ const Forms = ({
               textColor={action.textColor}
               hoverColor={action.hoverColor}
               activeColor={action.activeColor}
+              width={action.width}
+              height={action.height}
+              textSize={action.textSize}
+              fontWeight={action.fontWeight}
+              className={action.className}
             />
           ))}
         </div>

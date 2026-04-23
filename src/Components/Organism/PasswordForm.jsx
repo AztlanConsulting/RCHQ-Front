@@ -161,6 +161,8 @@ const PasswordForm = ({
             textColor: "text-white",
             hoverColor: "hover:bg-[#1F3664]/90",
             activeColor: "active:bg-[#1F3664]/80",
+            width: "w-auto",
+            className: "px-8",
         },
     ];
 
