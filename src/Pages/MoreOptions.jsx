@@ -34,7 +34,10 @@ const MoreOptions = () => {
         const response = await getStatus2FA();
         setIs2FAActive(response.Status2FA ?? false);
       } catch (err) {
-        console.error("Error al obtener estado de la autentificación en dos pasos:", err);
+        console.error(
+          "Error al obtener estado de la autentificación en dos pasos:",
+          err,
+        );
       }
     };
     fetchStatus();
@@ -59,7 +62,9 @@ const MoreOptions = () => {
         );
       }
     } catch (err) {
-      setError(err.message || "Error al desactivar la autentificación en dos pasos");
+      setError(
+        err.message || "Error al desactivar la autentificación en dos pasos",
+      );
     } finally {
       setLoading(false);
     }
@@ -136,7 +141,7 @@ const MoreOptions = () => {
                 setIs2FAActive(true);
                 setSuccessMessage(
                   "La autenticación en dos pasos ha sido activada correctamente.",
-                ); 
+                );
               }}
             />
           </div>

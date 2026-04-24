@@ -1,15 +1,24 @@
-//import { useState, useEffect } from "react";
-//import { useNavigate } from "react-router-dom";
 import Button from "../../Components/Atoms/Button";
 import Alert from "../../Components/Atoms/Alerts";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
-import {
-  verify2FAService,
-  activateTwoFactorAuthService,
-} from "../../Services/AuthService";
+import{useTwoFactorAuth} from "../../hooks/Organism/useTwoFactorAuth"
+
 
 const TwoFactorAuth = ({ onClose }) => {
-
+  const {
+    step,
+    handleGoToCode,
+    handleGoToQr,
+    qr,
+    manualCode,
+    isGenerating,
+    generationError,
+    code,
+    setCode,
+    isVerifying,
+    verificationError,
+    submitCode,
+  } = useTwoFactorAuth({ onClose });
 
   return (
     <div className="bg-white rounded-xl shadow-2xl p-8 w-[500px] max-w-full flex flex-col">
@@ -25,10 +34,10 @@ const TwoFactorAuth = ({ onClose }) => {
             </p>
           </div>
 
-          {error && <Alert type="error" message={error} />}
+          {generationError && <Alert type="error" message={generationError} />}
 
           <div className="flex flex-col items-center justify-center w-full">
-            {loading ? (
+            {isGenerating ? (
               <div className="h-56 w-56 flex items-center justify-center text-sm text-slate-400 border border-slate-100 rounded-lg">
                 Generando QR...
               </div>
@@ -39,11 +48,8 @@ const TwoFactorAuth = ({ onClose }) => {
             <div className="mt-6">
               <Button
                 text="Continuar"
-                onClick={() => {
-                  setError("");
-                  setStep("code");
-                }}
-                disabled={loading || !qr}
+                onClick={handleGoToCode}
+                disabled={isGenerating || !qr}
                 bgColor="bg-[#1d4ed8]"
                 hoverColor="hover:bg-blue-800"
                 textColor="text-white"
@@ -64,7 +70,7 @@ const TwoFactorAuth = ({ onClose }) => {
                 <p className="text-sm font-medium text-slate-500 mb-2">
                   Ingresa el siguiente código
                 </p>
-                <div className=" border-2 border-slate-100  rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
+                <div className=" border-2 border-slate-100 rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
                   {manualCode}
                 </div>
               </div>
@@ -80,25 +86,25 @@ const TwoFactorAuth = ({ onClose }) => {
               Verifica el código
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Ingresa los 6 dígitos generados por la aplicación de autentificación:
+              Ingresa los 6 dígitos generados por la aplicación de
+              autentificación:
             </p>
           </div>
 
-          {error && <Alert type="error" message={error} />}
+          {verificationError && (
+            <Alert type="error" message={verificationError} />
+          )}
 
           <TwoFactorCode
             code={code}
             setCode={setCode}
-            onSubmit={handleSubmit}
-            loading={loading}
+            onSubmit={submitCode}
+            loading={isVerifying}
           />
 
           <Button
             text="Volver al QR"
-            onClick={() => {
-              setError("");
-              setStep("qr");
-            }}
+            onClick={handleGoToQr}
             bgColor="bg-transparent"
             hoverColor="hover:bg-slate-50"
             activeColor="active:bg-slate-100"
