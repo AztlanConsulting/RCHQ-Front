@@ -24,7 +24,7 @@ export const use2FAVerification = (onSuccess) => {
     try {
       const response = await verify2FAService(code);
       if (!response) throw new Error("No se pudo validar el código");
-      
+
       if (response.nextStep === "2FA_SETUP_COMPLETE") {
         onSuccess();
       } else {

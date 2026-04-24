@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGenerate2FACode } from "../Atoms/use2FAGeneration";
-import { use2FAVerification } from "../Atoms/use2FAVerification";
+import { useGenerate2FACode } from "../Molecules/use2FAGeneration";
+import { use2FAVerification } from "../Molecules/use2FAVerification";
 
 export const useTwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();

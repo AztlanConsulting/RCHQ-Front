@@ -1,8 +1,7 @@
 import Button from "../../Components/Atoms/Button";
 import Alert from "../../Components/Atoms/Alerts";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
-import{useTwoFactorAuth} from "../../hooks/Organism/useTwoFactorAuth"
-
+import { useTwoFactorAuth } from "../../hooks/Organism/useTwoFactorAuth";
 
 const TwoFactorAuth = ({ onClose }) => {
   const {
