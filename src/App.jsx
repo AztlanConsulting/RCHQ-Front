@@ -36,6 +36,7 @@ function App() {
             <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />
+            <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />}/>
             <Route path="personal" element={<Personal />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
