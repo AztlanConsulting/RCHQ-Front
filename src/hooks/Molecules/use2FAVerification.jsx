@@ -3,7 +3,7 @@ import { useField } from "../Atoms/useField";
 import { verify2FAService } from "../../Services/AuthService";
 
 export const use2FAVerification = (onSuccess) => {
-  const [code, setCode] = useField(6);
+  const { value: code, handleValue: setCode } = useField(6); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
