@@ -5,7 +5,7 @@ import Button from "../components/atoms/Button";
 import TextField from "../components/atoms/TextField";
 import Alert from "../components/atoms/Alerts";
 import TwoFactorAuth from "./auth/TwoFactorAuth";
-import { getStatus2FA, desactivate2FAService } from "../services/AuthService";
+import { getStatus2FA, desactivate2FAService } from "../services/authService";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 

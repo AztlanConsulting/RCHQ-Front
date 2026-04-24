@@ -6,7 +6,7 @@ import TwoFactorCode from "../../components/organism/TwoFactorCode";
 import {
   verify2FAService,
   activateTwoFactorAuthService,
-} from "../../services/AuthService";
+} from "../../services/authService";
 
 const TwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();

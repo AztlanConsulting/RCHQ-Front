@@ -91,7 +91,7 @@ JavaScript
 
 ```
 // Secuestramos todo el AuthService
-vi.mock("../../../src/services/AuthService", () => ({
+vi.mock("../../../src/services/authService", () => ({
   loginService: vi.fn(), // Reemplazamos la llamada real (fetch) por una función vacía
   getReadableErrors: vi.fn(),
 }));

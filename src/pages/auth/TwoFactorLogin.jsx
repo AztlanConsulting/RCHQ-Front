@@ -7,7 +7,7 @@ import {
   validateLogin2FAService,
   getPre2faToken,
   getToken,
-} from "../../services/AuthService";
+} from "../../services/authService";
 import { useAuthContext } from "../../context/AuthContext";
 
 const TwoFactorLogin = () => {

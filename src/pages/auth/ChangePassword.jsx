@@ -6,7 +6,7 @@ import {
   changePasswordService,
   getFirstLoginToken,
   getReadableErrors,
-} from "../../services/AuthService";
+} from "../../services/authService";
 import Alert from "../../components/atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";

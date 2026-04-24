@@ -17,14 +17,14 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 }));
 
 // ← mockear AuthService pero con implementaciones controladas
-vi.mock("../../../src/services/AuthService", () => ({
+vi.mock("../../../src/services/authService", () => ({
   loginService: vi.fn(),
   getReadableErrors: vi.fn((err) => [
     err?.message || "Ocurrió un error inesperado",
   ]),
 }));
 
-import { loginService } from "../../../src/services/AuthService";
+import { loginService } from "../../../src/services/authService";
 
 const renderLogin = () =>
   render(

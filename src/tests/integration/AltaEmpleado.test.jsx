@@ -20,7 +20,7 @@ vi.mock("react-router-dom", async (importOriginal) => {
 });
 
 // Mock Services
-vi.mock("../../services/PersonalService", () => ({
+vi.mock("../../services/personalService", () => ({
     getEmployeeFormData: vi.fn(),
     createEmployee: vi.fn(),
 }));
@@ -28,7 +28,7 @@ vi.mock("../../services/PersonalService", () => ({
 import {
     getEmployeeFormData,
     createEmployee,
-} from "../../services/PersonalService";
+} from "../../services/personalService";
 
 const renderPage = () =>
     render(

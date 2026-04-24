@@ -16,7 +16,7 @@ vi.mock("../../../src/context/AuthContext", () => ({
   useAuthContext: () => ({ login: mockLogin }),
 }));
 
-vi.mock("../../../src/services/AuthService", () => ({
+vi.mock("../../../src/services/authService", () => ({
   validateLogin2FAService: vi.fn(),
   getPre2faToken: vi.fn(),
   getToken: vi.fn(),
@@ -26,7 +26,7 @@ import {
   validateLogin2FAService,
   getPre2faToken,
   getToken,
-} from "../../../src/services/AuthService";
+} from "../../../src/services/authService";
 
 const renderPage = () =>
   render(

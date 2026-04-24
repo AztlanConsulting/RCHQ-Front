@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from "../../components/organism/Forms";
-import { loginService, getReadableErrors } from "../../services/AuthService";
+import { loginService, getReadableErrors } from "../../services/authService";
 import Alert from "../../components/atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
