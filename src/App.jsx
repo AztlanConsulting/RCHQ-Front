@@ -9,7 +9,7 @@ import Perfil from "./pages/Perfil";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
-import AltaNuevoUsuarioPage from "./pages/Personal/AltaPersonal";
+import AltaNuevoUsuarioPage from "./pages/personal/AltaPersonal";
 // import ChangePassword from "./pages/auth/ChangePassword";
 import TwoFactorLogin from "./pages/auth/TwoFactorLogin";
 import TwoFactorAuth from "./pages/auth/TwoFactorAuth";

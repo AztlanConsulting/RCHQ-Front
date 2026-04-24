@@ -8,7 +8,7 @@ import {
     act,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import AltaPersonal from "../../pages/Personal/AltaPersonal";
+import AltaPersonal from "../../pages/personal/AltaPersonal";
 
 const mockNavigate = vi.fn();
 const mockOnSuccess = vi.fn();
