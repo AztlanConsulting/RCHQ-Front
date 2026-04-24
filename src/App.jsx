@@ -11,15 +11,16 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import FirstLoginRoute from "./Components/FirstLoginRoute";
 import AppLayout from "./Components/AppLayout";
 import ChangePassword from "./Pages/Auth/ChangePassword";
+import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
 import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 import MoreOptions from "./Pages/MoreOptions";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
 
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />

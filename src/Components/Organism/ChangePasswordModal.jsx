@@ -5,7 +5,7 @@ import { changePasswordService } from "../../Services/PasswordService";
 import {
     selfServiceChangePasswordSchema,
     getFirstSchemaError,
-} from "../../schemas/password.schemas";
+} from "../../utils/Schema/Auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 const ChangePasswordModal = ({ isOpen, onClose, onSuccess }) => {

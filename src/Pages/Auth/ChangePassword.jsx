@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import {
   firstLoginChangePasswordSchema,
   getFirstSchemaError,
-} from "../../schemas/password.schemas";
+} from "../../utils/Schema/Auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 const ChangePassword = () => {
