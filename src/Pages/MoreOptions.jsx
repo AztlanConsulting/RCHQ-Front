@@ -11,11 +11,11 @@ import { useTwoFactorAuthOptions } from "../hooks/Organism/useMoreOptions";
 const MoreOptions = () => {
   const navigate = useNavigate();
   const {
-    show2FAModal,
+    showTwoFactorAuthModal,
     showDisableModal,
     showPassword,
     password,
-    is2FAActive,
+    isTwoFactorAuthActive,
     loading,
     error,
     setError,
@@ -47,47 +47,62 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9 invert opacity-90" />}
+            icon={
+              <img
+                src="/certificate.svg"
+                alt="Certificaciones"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9 invert opacity-90" />}
+            icon={
+              <img
+                src="/document.svg"
+                alt="Documentos"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
           <OptionCard
-            icon={<img src="/key.svg" alt="2FA" className="w-9 h-9 invert opacity-90" />}
-            label={is2FAActive ? "Desactivar 2FA" : "Activar 2FA"}
+            icon={
+              <img
+                src="/key.svg"
+                alt="2FA"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
+            label={isTwoFactorAuthActive ? "Desactivar 2FA" : "Activar 2FA"}
             onClick={() => {
               setError("");
-              if (is2FAActive) {
-                showDisableModal.toggle(); 
+              if (isTwoFactorAuthActive) {
+                showDisableModal.toggle();
               } else {
-                show2FAModal.toggle();     
+                showTwoFactorAuthModal.toggle();
               }
             }}
           />
         </div>
       </div>
 
-      {/* Modal activar 2FA */}
-      {show2FAModal.value && (                   
+      {showTwoFactorAuthModal.value && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="relative">
             <button
-              onClick={() => show2FAModal.toggle()} 
+              onClick={() => showTwoFactorAuthModal.toggle()}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 text-xl font-bold z-10"
             >
               ✕
             </button>
-            <TwoFactorAuth
-            onClose={handleEnableSuccess}/>
+            <TwoFactorAuth onClose={handleEnableSuccess} />
           </div>
         </div>
       )}
 
-      {/* Modal desactivar 2FA */}
       {showDisableModal.value && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl space-y-4">
@@ -102,16 +117,20 @@ const MoreOptions = () => {
 
             <TextField
               id="disable-password"
-              type={showPassword.value ? "text" : "password"} 
-              value={password.value}                           
-              setValue={password.handleValue}                  
+              type={showPassword.value ? "text" : "password"}
+              value={password.value}
+              setValue={password.handleValue}
               placeholder="Tu contraseña"
               text=""
               htmlFor="disable-password"
-              iconRight={showPassword.value ? eye : hideEye}  
-              onIconRightClick={showPassword.toggle}           
-              iconRightAlt={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
-              iconRightAriaLabel={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRight={showPassword.value ? eye : hideEye}
+              onIconRightClick={showPassword.toggle}
+              iconRightAlt={
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              iconRightAriaLabel={
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
             />
 
             <div className="flex gap-3 justify-end">

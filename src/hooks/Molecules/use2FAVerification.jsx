@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useField } from "../Atoms/useField";
-import { verify2FAService } from "../../Services/AuthService";
+import { verifyTwoFactorAuthService } from "../../Services/AuthService";
 
-export const use2FAVerification = (onSuccess) => {
-  const { value: code, handleValue: setCode } = useField(6); 
+export const useTwoFactorVerification = (onSuccess) => {
+  const { value: code, handleValue: setCode } = useField(6);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,7 +22,7 @@ export const use2FAVerification = (onSuccess) => {
     setError("");
 
     try {
-      const response = await verify2FAService(code);
+      const response = await verifyTwoFactorAuthService(code);
       if (!response) throw new Error("No se pudo validar el código");
 
       if (response.nextStep === "2FA_SETUP_COMPLETE") {

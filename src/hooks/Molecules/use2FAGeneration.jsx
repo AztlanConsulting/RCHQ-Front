@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { activateTwoFactorAuthService } from "../../Services/AuthService";
 
-export const useGenerate2FACode = () => {
+export const useGenerateTwoFactorCode = () => {
   const [qr, setQr] = useState("");
   const [manualCode, setManualCode] = useState("");
   const [loading, setLoading] = useState(false);

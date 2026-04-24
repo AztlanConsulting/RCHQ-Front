@@ -36,11 +36,6 @@ export const useLogin = () => {
         result.data.password,
       );
 
-      if (!response?.success) {
-        setErrors(["No se pudo iniciar sesión"]);
-        return;
-      }
-
       if (response.isActive2FA) {
         navigate("/2FA");
         return;

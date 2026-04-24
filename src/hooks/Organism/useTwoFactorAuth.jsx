@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGenerate2FACode } from "../Molecules/use2FAGeneration";
-import { use2FAVerification } from "../Molecules/use2FAVerification";
+import { useGenerateTwoFactorCode } from "../Molecules/use2FAGeneration";
+import { useTwoFactorVerification } from "../Molecules/use2FAVerification";
 
 export const useTwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState("qr");
 
-  const generation = useGenerate2FACode();
+  const generation = useGenerateTwoFactorCode();
 
   const handleSuccess = () => {
     if (onClose) {
@@ -17,7 +17,7 @@ export const useTwoFactorAuth = ({ onClose }) => {
     }
   };
 
-  const verification = use2FAVerification(handleSuccess);
+  const verification = useTwoFactorVerification(handleSuccess);
 
   useEffect(() => {
     generation.generateQR();

@@ -86,7 +86,7 @@ const TwoFactorAuth = ({ onClose }) => {
             </h2>
             <p className="mt-2 text-sm text-slate-600">
               Ingresa los 6 dígitos generados por la aplicación de
-              autentificación:
+              Autenticación:
             </p>
           </div>
 

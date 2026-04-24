@@ -16,33 +16,30 @@ import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 import MoreOptions from "./Pages/MoreOptions";
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
 
-                <Route element={<PublicRoute />}>
-                    <Route path="/iniciar-sesion" element={<LoginPage />} />
-                    <Route path="/2FA" element={<TwoFactorLogin />} />
-                </Route>
+        <Route element={<PublicRoute />}>
+          <Route path="/iniciar-sesion" element={<LoginPage />} />
+          <Route path="/2FA" element={<TwoFactorLogin />} />
+        </Route>
 
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/app" element={<AppLayout />}>
-                        <Route path="opciones" element={<MoreOptions />} />
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="perfil" element={<Perfil />} />
-                        <Route
-                            path="personal/nuevo"
-                            element={<AltaNuevoUsuarioPage />}
-                        />
-                        <Route path="personal" element={<Personal />} />
-                        <Route path="casas" element={<Casas />} />
-                        <Route path="calendario" element={<Calendario />} />
-                    </Route>
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+        <Route element={<ProtectedRoute />}>
+          <Route path="/app" element={<AppLayout />}>
+            <Route path="opciones" element={<MoreOptions />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="perfil" element={<Perfil />} />
+            <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
+            <Route path="personal" element={<Personal />} />
+            <Route path="casas" element={<Casas />} />
+            <Route path="calendario" element={<Calendario />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

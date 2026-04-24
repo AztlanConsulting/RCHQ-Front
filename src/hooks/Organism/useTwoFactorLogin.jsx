@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  validateLogin2FAService,
-  getPre2faToken,
+  validateLoginTwoFactorAuthService,
+  getPreTwoFactorToken,
   getToken,
 } from "../../Services/AuthService";
 import { useAuthContext } from "../../context/AuthContext";
@@ -18,14 +18,14 @@ export const useTwoFactorLogin = () => {
   const { value: isBlocked, toggle: blockToggle } = useToggle(false);
 
   useEffect(() => {
-    const pre2faToken = getPre2faToken();
+    const preTwoFactorAuthToken = getPreTwoFactorToken();
     const sessionToken = getToken();
 
     if (sessionToken) {
       navigate("/app/dashboard", { replace: true });
       return;
     }
-    if (!pre2faToken) {
+    if (!preTwoFactorAuthToken) {
       navigate("/iniciar-sesion", { replace: true });
     }
   }, [navigate]);
@@ -42,7 +42,7 @@ export const useTwoFactorLogin = () => {
     setError("");
 
     try {
-      const response = await validateLogin2FAService(codeField.value);
+      const response = await validateLoginTwoFactorAuthService(codeField.value);
 
       if (response.nextStep === "LOGIN_COMPLETE") {
         localStorage.removeItem("PRE_2FA");
