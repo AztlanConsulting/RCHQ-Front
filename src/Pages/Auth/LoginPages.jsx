@@ -14,6 +14,8 @@ const LoginPage = () => {
       value: email.value,
       setValue: email.handleValue,
       placeholder: "Ingresa tu correo",
+      htmlFor:"email",
+      text:"Correo electrónico",
       type: "email",
     },
     {
@@ -21,6 +23,8 @@ const LoginPage = () => {
       value: password.value,
       setValue: password.handleValue,
       placeholder: "Ingresa la contraseña",
+      htmlFor: "password",
+      text:"Contraseña",
       type: showPassword.value ? "text" : "password",
       iconRight: showPassword.value ? eye : hideEye,
       onIconRightClick: showPassword.toggle,

@@ -228,7 +228,7 @@ describe("loginService", () => {
 
     // Assert
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/users/login"),
+      expect.stringContaining("/auth/login"),
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
@@ -282,7 +282,7 @@ describe("activateTwoFactorAuthService", () => {
 
     // Assert
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/users/2fa/setup"),
+      expect.stringContaining("/auth/2fa/setup"),
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer my-session-token",
@@ -417,7 +417,7 @@ describe("desactivate2FAService", () => {
 
     // Assert
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/users/2fa/disable"),
+      expect.stringContaining("/auth/2fa/disable"),
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ password: "myPassword" }),
