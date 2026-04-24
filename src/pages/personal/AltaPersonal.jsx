@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
     getEmployeeFormData,
     createEmployee,
-} from "../../services/PersonalService";
-import { employeeCreateSchema } from "../../utils/Schema/Employee/employeeAdd.schema";
+} from "../../services/personalService";
+import { employeeCreateSchema } from "../../utils/schema/Employee/employeeAdd.schema";
 
 import UserInfoSection from "../../components/organism/UserInfoSection";
 import Alert from "../../components/atoms/Alerts";

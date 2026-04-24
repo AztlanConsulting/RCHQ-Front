@@ -5,7 +5,7 @@ import { loginService, getReadableErrors } from "../../services/authService";
 import Alert from "../../components/atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
-import { loginSchema } from "../../utils/Schema/auth/auth.schemas";
+import { loginSchema } from "../../utils/schema/auth/auth.schemas";
 import useAuth from "../../hooks/useAuth";
 
 const LoginPage = () => {
