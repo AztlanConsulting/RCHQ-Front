@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useField } from "../Atoms/useField";
 import { verify2FAService } from "../../Services/AuthService";
 
 export const use2FAVerification = (onSuccess) => {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useField(6);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -14,6 +15,7 @@ export const use2FAVerification = (onSuccess) => {
 
     if (isNaN(Number(code))) {
       setError("El código debe ser número");
+      return;
     }
 
     setLoading(true);
@@ -21,10 +23,8 @@ export const use2FAVerification = (onSuccess) => {
 
     try {
       const response = await verify2FAService(code);
-      console.log("respuesta", response);
-      if (!response) {
-        throw new Error("No se pudo validar el código");
-      }
+      if (!response) throw new Error("No se pudo validar el código");
+      
       if (response.nextStep === "2FA_SETUP_COMPLETE") {
         onSuccess();
       } else {
