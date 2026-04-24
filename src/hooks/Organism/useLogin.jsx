@@ -18,7 +18,10 @@ export const useLogin = () => {
   const handleSubmit = async () => {
     setErrors([]);
 
-    const result = loginSchema.safeParse({ email: email.value, password: password.value });
+    const result = loginSchema.safeParse({
+      email: email.value,
+      password: password.value,
+    });
 
     if (!result.success) {
       setErrors(result.error.issues.map((issue) => issue.message));
