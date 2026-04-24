@@ -10,7 +10,7 @@ import {
   validateLogin2FAService,
   getStatus2FA,
   desactivate2FAService,
-} from "../../Services/AuthService";
+} from "../../services/AuthService";
 
 // ─── Factories de datos ───────────────────────────────────────────────────────
 

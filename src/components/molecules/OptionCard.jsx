@@ -1,4 +1,4 @@
-import Button from "../Atoms/Button"; // Ajusta el path según tu estructura
+import Button from "../atoms/Button"; // Ajusta el path según tu estructura
 
 const OptionCard = ({ icon, label, onClick }) => {
   return (

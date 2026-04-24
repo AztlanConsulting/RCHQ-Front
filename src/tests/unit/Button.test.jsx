@@ -1,7 +1,7 @@
 // tests/unit/Button.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Button from "../../Components/Atoms/Button";
+import Button from "../../components/atoms/Button";
 
 const makeProps = (overrides = {}) => ({
     text: "Haz click",

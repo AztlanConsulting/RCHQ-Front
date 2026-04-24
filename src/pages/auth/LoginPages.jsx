@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Forms from "../../Components/Organism/Forms";
-import { loginService, getReadableErrors } from "../../Services/AuthService";
-import Alert from "../../Components/Atoms/Alerts";
+import Forms from "../../components/organism/Forms";
+import { loginService, getReadableErrors } from "../../services/AuthService";
+import Alert from "../../components/atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
-import { loginSchema } from "../../Utils/Schema/Auth/auth.schemas";
+import { loginSchema } from "../../utils/Schema/auth/auth.schemas";
 import useAuth from "../../hooks/useAuth";
 
 const LoginPage = () => {

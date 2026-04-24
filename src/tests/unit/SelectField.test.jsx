@@ -1,7 +1,7 @@
 // tests/unit/SelectField.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import SelectField from "../../Components/Atoms/SelectField";
+import SelectField from "../../components/atoms/SelectField";
 
 const ROLES = {
     COORDINADOR: "a0000002-0000-4000-8000-000000000001",

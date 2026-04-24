@@ -1,19 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./Pages/Landing";
-import LoginPage from "./Pages/Auth/LoginPages";
-import Dashboard from "./Pages/Dashboard";
-import Casas from "./Pages/Casas";
-import Personal from "./Pages/Personal";
-import Calendario from "./Pages/Calendario";
-import Perfil from "./Pages/Perfil";
-import PublicRoute from "./Components/PublicRoute";
-import ProtectedRoute from "./Components/ProtectedRoute";
-import AppLayout from "./Components/AppLayout";
-import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
-// import ChangePassword from "./Pages/Auth/ChangePassword";
-import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
-import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
-import MoreOptions from "./Pages/MoreOptions";
+import LandingPage from "./pages/Landing";
+import LoginPage from "./pages/auth/LoginPages";
+import Dashboard from "./pages/Dashboard";
+import Casas from "./pages/Casas";
+import Personal from "./pages/Personal";
+import Calendario from "./pages/Calendario";
+import Perfil from "./pages/Perfil";
+import PublicRoute from "./components/PublicRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AppLayout from "./components/AppLayout";
+import AltaNuevoUsuarioPage from "./pages/Personal/AltaPersonal";
+// import ChangePassword from "./pages/auth/ChangePassword";
+import TwoFactorLogin from "./pages/auth/TwoFactorLogin";
+import TwoFactorAuth from "./pages/auth/TwoFactorAuth";
+import MoreOptions from "./pages/MoreOptions";
 
 function App() {
     return (

@@ -1,4 +1,4 @@
-import TextField from "../Atoms/TextField";
+import TextField from "../atoms/TextField";
 
 const FormField = ({
     label,

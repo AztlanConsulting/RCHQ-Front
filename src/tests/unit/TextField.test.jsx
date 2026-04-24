@@ -1,7 +1,7 @@
 // tests/unit/TextField.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TextField from "../../Components/Atoms/TextField";
+import TextField from "../../components/atoms/TextField";
 
 const makeProps = (overrides = {}) => ({
   id: "test-input",

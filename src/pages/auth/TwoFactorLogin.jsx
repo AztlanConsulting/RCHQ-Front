@@ -1,13 +1,13 @@
 // TwoFactorLogin.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
-import Alert from "../../Components/Atoms/Alerts";
+import TwoFactorCode from "../../components/organism/TwoFactorCode";
+import Alert from "../../components/atoms/Alerts";
 import {
   validateLogin2FAService,
   getPre2faToken,
   getToken,
-} from "../../Services/AuthService";
+} from "../../services/AuthService";
 import { useAuthContext } from "../../context/AuthContext";
 
 const TwoFactorLogin = () => {

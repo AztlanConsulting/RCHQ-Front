@@ -1,7 +1,7 @@
 // tests/unit/TwoFactorCode.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
+import TwoFactorCode from "../../components/organism/TwoFactorCode";
 
 const makeProps = (overrides = {}) => ({
   code: "",

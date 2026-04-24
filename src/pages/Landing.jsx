@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../Components/Atoms/Button";
+import Button from "../components/atoms/Button";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {

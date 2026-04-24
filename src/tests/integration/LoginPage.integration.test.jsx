@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import LoginPage from "../../../src/Pages/Auth/LoginPages";
+import LoginPage from "../../../src/pages/auth/LoginPages";
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -17,14 +17,14 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 }));
 
 // ← mockear AuthService pero con implementaciones controladas
-vi.mock("../../../src/Services/AuthService", () => ({
+vi.mock("../../../src/services/AuthService", () => ({
   loginService: vi.fn(),
   getReadableErrors: vi.fn((err) => [
     err?.message || "Ocurrió un error inesperado",
   ]),
 }));
 
-import { loginService } from "../../../src/Services/AuthService";
+import { loginService } from "../../../src/services/AuthService";
 
 const renderLogin = () =>
   render(

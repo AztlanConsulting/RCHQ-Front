@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Forms from "../../Components/Organism/Forms";
-import Button from "../../Components/Atoms/Button";
+import Forms from "../../components/organism/Forms";
+import Button from "../../components/atoms/Button";
 import {
   changePasswordService,
   getFirstLoginToken,
   getReadableErrors,
-} from "../../Services/AuthService";
-import Alert from "../../Components/Atoms/Alerts";
+} from "../../services/AuthService";
+import Alert from "../../components/atoms/Alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 

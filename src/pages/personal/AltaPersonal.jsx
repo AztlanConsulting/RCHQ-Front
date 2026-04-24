@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import {
     getEmployeeFormData,
     createEmployee,
-} from "../../Services/PersonalService";
-import { employeeCreateSchema } from "../../Utils/Schema/Employee/employeeAdd.schema";
+} from "../../services/PersonalService";
+import { employeeCreateSchema } from "../../utils/Schema/Employee/employeeAdd.schema";
 
-import UserInfoSection from "../../Components/Organism/UserInfoSection";
-import Alert from "../../Components/Atoms/Alerts";
+import UserInfoSection from "../../components/organism/UserInfoSection";
+import Alert from "../../components/atoms/Alerts";
 
 const INITIAL_FORM = {
     role_id: "",

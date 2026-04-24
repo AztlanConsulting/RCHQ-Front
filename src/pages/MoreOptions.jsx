@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import OptionCard from "../Components/Molecules/OptionCard";
-import Button from "../Components/Atoms/Button";
-import TextField from "../Components/Atoms/TextField";
-import Alert from "../Components/Atoms/Alerts";
-import TwoFactorAuth from "./Auth/TwoFactorAuth";
-import { getStatus2FA, desactivate2FAService } from "../Services/AuthService";
+import OptionCard from "../components/molecules/OptionCard";
+import Button from "../components/atoms/Button";
+import TextField from "../components/atoms/TextField";
+import Alert from "../components/atoms/Alerts";
+import TwoFactorAuth from "./auth/TwoFactorAuth";
+import { getStatus2FA, desactivate2FAService } from "../services/AuthService";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 

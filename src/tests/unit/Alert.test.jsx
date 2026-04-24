@@ -1,7 +1,7 @@
 // tests/unit/Alert.test.jsx
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Alert from "../../Components/Atoms/Alerts";
+import Alert from "../../components/atoms/Alerts";
 
 describe("Alert — renderizado base", () => {
     it("renderiza el mensaje de texto en el DOM", () => {
