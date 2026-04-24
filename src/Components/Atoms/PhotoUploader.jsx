@@ -20,7 +20,7 @@ const CloudUploadIcon = () => (
 const PhotoUploader = ({
   file,
   onFileChange,
-  label = "Foto del Usuario",
+  label = "Foto del usuario",
   labelColor = "text-[#121212]",
   accept = "image/*",
 }) => {
@@ -94,7 +94,7 @@ const PhotoUploader = ({
           <>
             <CloudUploadIcon />
             <span className="font-bold text-base text-[#121212]">
-              Subir Fotografía
+              Subir fotografía
             </span>
           </>
         )}

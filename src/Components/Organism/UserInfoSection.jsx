@@ -39,7 +39,7 @@ const UserInfoSection = ({
       <div className="flex items-center gap-3">
         <UserIcon />
         <h2 className="font-bold text-xl text-[#121212]">
-          Información del Usuario
+          Información del usuario
         </h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">

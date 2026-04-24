@@ -72,11 +72,17 @@ const MoreOptions = () => {
             icon={
               <img
                 src="/key.svg"
-                alt="2FA"
+                alt="TwoFactorAuth"
                 className="w-9 h-9 invert opacity-90"
               />
             }
-            label={isTwoFactorAuthActive ? "Desactivar 2FA" : "Activar 2FA"}
+          label={
+            <span className="whitespace-pre-line text-center block text-sm">
+              {isTwoFactorAuthActive
+                ? "Desactivar doble\nverificación"
+                : "Activar doble\nverificación"}
+            </span>
+          }
             onClick={() => {
               setError("");
               if (isTwoFactorAuthActive) {

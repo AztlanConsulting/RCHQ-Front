@@ -92,20 +92,6 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         birth_date: result.data.birthdate,
         picture: photo,
       };
-      console.group("🚀 Enviando Datos de Empleado");
-      console.log("Datos del Formulario:", result.data);
-      console.log(
-        "Archivo de Foto:",
-        photo
-          ? {
-              name: photo.name,
-              size: `${(photo.size / (1024 * 1024)).toFixed(2)} MB`,
-              type: photo.type,
-            }
-          : "No hay foto seleccionada",
-      );
-      console.log("Payload Completo:", payload);
-      console.groupEnd();
 
       const response = await createEmployee(payload);
 

@@ -49,8 +49,9 @@ const TwoFactorAuth = ({ onClose }) => {
                 text="Continuar"
                 onClick={handleGoToCode}
                 disabled={isGenerating || !qr}
-                bgColor="bg-[#1d4ed8]"
-                hoverColor="hover:bg-blue-800"
+                bgColor="bg-[#1a2f5e]"
+                hoverColor="hover:opacity-85"
+                activeColor="active:opacity-70"
                 textColor="text-white"
                 width="w-56"
                 className="shadow-sm"

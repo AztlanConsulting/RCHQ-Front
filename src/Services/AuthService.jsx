@@ -10,7 +10,7 @@ const buildApiError = (response, data, fallbackMessage) => {
   return errorMessage;
 };
 
-const getReadableErrors = (err) => {
+export const getReadableErrors = (err) => {
   if (Array.isArray(err?.errors) && err.errors.length > 0) {
     return err.errors.map((item) => item.message);
   }
@@ -18,7 +18,7 @@ const getReadableErrors = (err) => {
   return [err?.message || "Ocurrió un error inesperado"];
 };
 
-const savePreTwoFactorSession = (responseData) => {
+export const savePreTwoFactorSession = (responseData) => {
   clearAuthStorage();
   const preTwoFactorToken = responseData?.pre2FAToken;
   if (preTwoFactorToken) {
@@ -32,7 +32,7 @@ const TOKEN_KEYS = {
   preTwoFactorToken: "preTwoFactorToken",
 };
 
-const clearAuthStorage = () => {
+export const clearAuthStorage = () => {
   localStorage.removeItem(TOKEN_KEYS.session);
   // localStorage.removeItem(TOKEN_KEYS.firstLogin);
   localStorage.removeItem(TOKEN_KEYS.preTwoFactorToken);
@@ -40,7 +40,7 @@ const clearAuthStorage = () => {
   localStorage.removeItem("user");
 };
 
-const saveLoginSession = (responseData) => {
+export const saveLoginSession = (responseData) => {
   clearAuthStorage();
   const token = responseData?.data?.token;
   const user = responseData?.data?.user;
@@ -48,7 +48,7 @@ const saveLoginSession = (responseData) => {
   if (user) localStorage.setItem("user", JSON.stringify(user));
 };
 
-const loginService = async (email, password) => {
+export const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
@@ -72,11 +72,10 @@ const loginService = async (email, password) => {
   return data;
 };
 
-const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
-const getPreTwoFactorToken = () =>
-  localStorage.getItem(TOKEN_KEYS.preTwoFactorToken);
+export const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
+export const getPreTwoFactorToken = () => localStorage.getItem(TOKEN_KEYS.preTwoFactorToken);
 
-const logoutService = () => {
+export const logoutService = () => {
   clearAuthStorage();
 };
 
@@ -86,7 +85,7 @@ const getFirstLoginToken = () => localStorage.getItem("firstLoginToken");
 const changePasswordService = async () => {};
 */
 
-const activateTwoFactorAuthService = async () => {
+export const activateTwoFactorAuthService = async () => {
   const token = getToken();
 
   if (!token) {
@@ -113,7 +112,7 @@ const activateTwoFactorAuthService = async () => {
   return data;
 };
 
-const verifyTwoFactorAuthService = async (code) => {
+export const verifyTwoFactorAuthService = async (code) => {
   const token = getToken();
 
   if (!token) {
@@ -142,7 +141,7 @@ const verifyTwoFactorAuthService = async (code) => {
   return data;
 };
 
-const validateLoginTwoFactorAuthService = async (code) => {
+export const validateLoginTwoFactorAuthService = async (code) => {
   const token = getPreTwoFactorToken();
 
   if (!token) throw new Error("No se encontró token de pre-autenticación");
@@ -169,7 +168,7 @@ const validateLoginTwoFactorAuthService = async (code) => {
   return data;
 };
 
-const getStatusTwoFactorAuth = async () => {
+export const getTwoFactorAuthStatus = async () => {
   const token = getToken();
 
   if (!token) {
@@ -196,7 +195,8 @@ const getStatusTwoFactorAuth = async () => {
 
   return data;
 };
-const desactivateTwoFactorAuthService = async (password) => {
+
+export const deactivateTwoFactorAuthService = async (password) => {
   const token = getToken();
 
   const response = await fetch(`${API_URL}/auth/2fa/disable`, {
@@ -219,17 +219,4 @@ const desactivateTwoFactorAuthService = async (password) => {
   }
 
   return data;
-};
-
-export {
-  loginService,
-  getToken,
-  getPreTwoFactorToken,
-  logoutService,
-  getReadableErrors,
-  activateTwoFactorAuthService,
-  verifyTwoFactorAuthService,
-  validateLoginTwoFactorAuthService,
-  getStatusTwoFactorAuth,
-  desactivateTwoFactorAuthService,
 };

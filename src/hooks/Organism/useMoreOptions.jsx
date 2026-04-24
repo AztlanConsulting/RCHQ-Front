@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useField } from "../Atoms/useField";
 import { useToggle } from "../Atoms/useToggle";
 import {
-  getStatusTwoFactorAuth,
-  desactivateTwoFactorAuthService,
+  getTwoFactorAuthStatus,
+  deactivateTwoFactorAuthService,
 } from "../../Services/AuthService";
 
 export const useTwoFactorAuthOptions = () => {
@@ -26,17 +26,17 @@ export const useTwoFactorAuthOptions = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await getStatusTwoFactorAuth();
+        const response = await getTwoFactorAuthStatus();
         setIsTwoFactorAuthActive(response.Status2FA ?? false);
       } catch (err) {
-        console.error("Error al obtener estado del 2FA:", err);
+        console.error("Error al obtener estado del Two Factor Auth:", err);
       }
     };
     fetchStatus();
   }, []);
 
   const handleEnableSuccess = () => {
-    showTwoFactorAuthModal.toggle(false);
+    showTwoFactorAuthModal.toggle();
     setIsTwoFactorAuthActive(true);
     setSuccessMessage(
       "La autenticación en dos pasos ha sido activada correctamente.",
@@ -52,10 +52,10 @@ export const useTwoFactorAuthOptions = () => {
     setError("");
 
     try {
-      const response = await desactivateTwoFactorAuthService(password.value);
+      const response = await deactivateTwoFactorAuthService(password.value);
       if (response.nextStep === "2FA_DISABLED") {
         setIsTwoFactorAuthActive(false);
-        showDisableModal.toggle(false);
+        showDisableModal.toggle();
         password.handleValue("");
         setSuccessMessage(
           "La autenticación en dos pasos ha sido desactivada correctamente.",
@@ -71,7 +71,7 @@ export const useTwoFactorAuthOptions = () => {
   };
 
   const handleCancelDisable = () => {
-    showDisableModal.toggle(false);
+    showDisableModal.toggle();
     password.handleValue("");
     setError("");
   };

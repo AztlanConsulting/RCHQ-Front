@@ -11,7 +11,7 @@ const Personal = () => {
       </h1>
 
       <Button
-        text="Añadir Nuevo Usuario"
+        text="Añadir nuevo usuario"
         onClick={() => navigate("/app/personal/nuevo")}
         bgColor="bg-[#24375e]"
         hoverColor="hover:bg-[#162d4a]"
