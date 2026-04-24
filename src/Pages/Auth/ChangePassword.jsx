@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordForm from "../../Components/Organism/PasswordForm";
+import { getFirstLoginToken } from "../../utils/authStorage";
 import { changePasswordFirstLoginService } from "../../Services/PasswordService";
 import useAuth from "../../hooks/useAuth";
 import {
@@ -15,6 +16,13 @@ const ChangePassword = () => {
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
+
+  useEffect(() => {
+    const token = getFirstLoginToken();
+    if (!token) {
+      navigate("/iniciar-sesion", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async ({ newPassword, confirmPassword }) => {
     setLoading(true);
