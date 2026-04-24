@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000";
+
+const API_URL = import.meta.env.API_URL;
 
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
