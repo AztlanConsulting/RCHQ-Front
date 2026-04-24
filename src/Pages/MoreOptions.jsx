@@ -47,17 +47,17 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9" />}
+            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9 invert opacity-90" />}
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9" />}
+            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9 invert opacity-90" />}
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
           <OptionCard
-            icon={<img src="/key.svg" alt="2FA" className="w-9 h-9" />}
+            icon={<img src="/key.svg" alt="2FA" className="w-9 h-9 invert opacity-90" />}
             label={is2FAActive ? "Desactivar 2FA" : "Activar 2FA"}
             onClick={() => {
               setError("");

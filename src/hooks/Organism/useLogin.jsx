@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useField } from "../Atoms/useField";
 import { useToggle } from "../Atoms/useToggle";
 import { loginService, getReadableErrors } from "../../Services/AuthService";
-import { loginSchema } from "../../schemas/auth.schemas";
+import { loginSchema } from "../../utils/Schema/Auth/auth.schemas";
 import useAuth from "../useAuth";
 import { useState } from "react";
 
