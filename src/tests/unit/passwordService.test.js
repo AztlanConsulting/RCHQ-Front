@@ -102,7 +102,7 @@ describe("changePasswordFirstLoginService", () => {
         mockFetch(
             {
                 success: false,
-                message: "New password must be different from current password",
+                message: "Nueva contraseña no puede ser igual a la actual",
                 code: "PASSWORD_REUSED",
             },
             false,
@@ -112,7 +112,7 @@ describe("changePasswordFirstLoginService", () => {
         await expect(
             changePasswordFirstLoginService("Nueva123", "Nueva123"),
         ).rejects.toMatchObject({
-            message: "New password must be different from current password",
+            message: "Nueva contraseña no puede ser igual a la actual",
             status: 400,
             code: "PASSWORD_REUSED",
         });
@@ -131,7 +131,7 @@ describe("changePasswordService", () => {
 
         mockFetch({
             success: true,
-            message: "Password changed successfully",
+            message: "Contraseña cambiada exitosamente",
             data: { employeeId: "EMP001" },
         });
 
@@ -159,7 +159,7 @@ describe("changePasswordService", () => {
 
         mockFetch({
             success: true,
-            message: "Password changed successfully",
+            message: "Contraseña cambiada exitosamente",
             data: { employeeId: "EMP001" },
         });
 
@@ -171,7 +171,7 @@ describe("changePasswordService", () => {
 
         expect(result).toEqual({
             success: true,
-            message: "Password changed successfully",
+            message: "Contraseña cambiada exitosamente",
             data: { employeeId: "EMP001" },
         });
     });
@@ -182,7 +182,7 @@ describe("changePasswordService", () => {
         mockFetch(
             {
                 success: false,
-                message: "Invalid credentials",
+                message: "Credenciales inválidas",
                 code: "INVALID_CREDENTIALS",
             },
             false,
@@ -192,7 +192,7 @@ describe("changePasswordService", () => {
         await expect(
             changePasswordService("Mal123", "Nueva123", "Nueva123"),
         ).rejects.toMatchObject({
-            message: "Invalid credentials",
+            message: "Credenciales inválidas",
             status: 401,
             code: "INVALID_CREDENTIALS",
         });
