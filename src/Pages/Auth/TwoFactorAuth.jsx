@@ -1,76 +1,23 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "../../Components/Atoms/Button";
 import Alert from "../../Components/Atoms/Alerts";
 import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
-import {
-  verify2FAService,
-  activateTwoFactorAuthService,
-} from "../../Services/AuthService";
+import { useTwoFactorAuth } from "../../hooks/Organism/useTwoFactorAuth";
 
 const TwoFactorAuth = ({ onClose }) => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState("qr");
-  const [code, setCode] = useState("");
-  const [qr, setQr] = useState("");
-  const [manualCode, setManualCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    handleActivate();
-  }, []);
-
-  const handleActivate = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await activateTwoFactorAuthService();
-      if (!response) {
-        setError(
-          "No se pudo iniciar la configuración de autenticación en dos pasos",
-        );
-        return;
-      }
-      setQr(response.data?.qrImage || "");
-      const secret =
-        response.data?.otpauthUrl?.match(/secret=([^&]+)/)?.[1] || "";
-      setManualCode(secret);
-    } catch (err) {
-      setError(err.message || "Error al generar el código QR");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (code.length !== 6) {
-      setError("El código debe tener 6 dígitos");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const response = await verify2FAService(code);
-      if (!response) {
-        setError("No se pudo validar el código");
-        return;
-      }
-      if (response.nextStep === "2FA_SETUP_COMPLETE") {
-        if (onClose) {
-          onClose();
-        } else {
-          navigate("/app/opciones");
-        }
-        return;
-      }
-      setError("El servidor devolvió un flujo no reconocido");
-    } catch (err) {
-      setError(err.message || "Código de autenticación en dos pasos inválido");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    step,
+    handleGoToCode,
+    handleGoToQr,
+    qr,
+    manualCode,
+    isGenerating,
+    generationError,
+    code,
+    setCode,
+    isVerifying,
+    verificationError,
+    submitCode,
+  } = useTwoFactorAuth({ onClose });
 
   return (
     <div className="bg-white rounded-xl shadow-2xl p-8 w-[500px] max-w-full flex flex-col">
@@ -86,27 +33,25 @@ const TwoFactorAuth = ({ onClose }) => {
             </p>
           </div>
 
-          {error && <Alert type="error" message={error} />}
+          {generationError && <Alert type="error" message={generationError} />}
 
           <div className="flex flex-col items-center justify-center w-full">
-            {loading ? (
+            {isGenerating ? (
               <div className="h-56 w-56 flex items-center justify-center text-sm text-slate-400 border border-slate-100 rounded-lg">
                 Generando QR...
               </div>
             ) : qr ? (
-              <img src={qr} alt="QR 2FA" className="h-56 w-56 object-contain" />
+              <img src={qr} alt="QR TwoFactorAuth" className="h-56 w-56 object-contain" />
             ) : null}
 
             <div className="mt-6">
               <Button
                 text="Continuar"
-                onClick={() => {
-                  setError("");
-                  setStep("code");
-                }}
-                disabled={loading || !qr}
-                bgColor="bg-[#1d4ed8]"
-                hoverColor="hover:bg-blue-800"
+                onClick={handleGoToCode}
+                disabled={isGenerating || !qr}
+                bgColor="bg-[#1a2f5e]"
+                hoverColor="hover:opacity-85"
+                activeColor="active:opacity-70"
                 textColor="text-white"
                 width="w-56"
                 className="shadow-sm"
@@ -125,7 +70,7 @@ const TwoFactorAuth = ({ onClose }) => {
                 <p className="text-sm font-medium text-slate-500 mb-2">
                   Ingresa el siguiente código
                 </p>
-                <div className=" border-2 border-slate-100  rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
+                <div className=" border-2 border-slate-100 rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
                   {manualCode}
                 </div>
               </div>
@@ -142,25 +87,24 @@ const TwoFactorAuth = ({ onClose }) => {
             </h2>
             <p className="mt-2 text-sm text-slate-600">
               Ingresa los 6 dígitos generados por la aplicación de
-              autentificación:
+              Autenticación:
             </p>
           </div>
 
-          {error && <Alert type="error" message={error} />}
+          {verificationError && (
+            <Alert type="error" message={verificationError} />
+          )}
 
           <TwoFactorCode
             code={code}
             setCode={setCode}
-            onSubmit={handleSubmit}
-            loading={loading}
+            onSubmit={submitCode}
+            loading={isVerifying}
           />
 
           <Button
             text="Volver al QR"
-            onClick={() => {
-              setError("");
-              setStep("qr");
-            }}
+            onClick={handleGoToQr}
             bgColor="bg-transparent"
             hoverColor="hover:bg-slate-50"
             activeColor="active:bg-slate-100"

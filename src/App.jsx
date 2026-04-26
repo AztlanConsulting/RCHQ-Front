@@ -9,6 +9,7 @@ import Perfil from "./Pages/Perfil";
 import PublicRoute from "./Components/PublicRoute";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AppLayout from "./Components/AppLayout";
+import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
 // import ChangePassword from "./Pages/Auth/ChangePassword";
 import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
@@ -32,6 +33,7 @@ function App() {
             <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />
+            <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
             <Route path="personal" element={<Personal />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />

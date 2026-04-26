@@ -51,8 +51,8 @@ const ChangePassword = () => {
       );
 
       if (
-        response.nextStep === "SETUP_2FA_OPTIONAL" &&
-        response.data.shouldPrompt2FASetup
+        response.nextStep === "SETUP_TwoFactorAuth_OPTIONAL" &&
+        response.data.shouldPromptTwoFactorAuthSetup
       ) {
         navigate("/setup-2fa");
         return;
