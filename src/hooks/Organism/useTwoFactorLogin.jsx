@@ -45,7 +45,7 @@ export const useTwoFactorLogin = () => {
       const response = await validateLoginTwoFactorAuthService(codeField.value);
 
       if (response.nextStep === "LOGIN_COMPLETE") {
-        localStorage.removeItem("PRE_2FA");
+        localStorage.removeItem("PRE_TwoFactorAuth");
         login({ token: response.token, user: response.data });
         navigate("/app/dashboard", { replace: true });
       }

@@ -40,8 +40,8 @@ beforeEach(() => {
   getToken.mockReturnValue(null);
 });
 
-describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
-  it("redirige a /iniciar-sesion cuando no hay PRE_2FA en localStorage", () => {
+describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", () => {
+  it("redirige a /iniciar-sesion cuando no hay PRE_TwoFactorAuth en localStorage", () => {
     getPreTwoFactorToken.mockReturnValue(null);
     getToken.mockReturnValue(null);
     renderPage();

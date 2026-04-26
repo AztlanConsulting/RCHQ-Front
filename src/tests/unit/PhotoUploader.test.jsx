@@ -39,7 +39,7 @@ describe("PhotoUploader — renderizado base", () => {
     render(<PhotoUploader {...props} />);
 
     // Assert
-    expect(screen.getByText("Subir Fotografía")).toBeInTheDocument();
+    expect(screen.getByText("Subir fotografía")).toBeInTheDocument();
     expect(screen.queryByAltText("Vista previa")).not.toBeInTheDocument();
   });
 

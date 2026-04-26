@@ -27,7 +27,7 @@ export const useTwoFactorAuthOptions = () => {
     const fetchStatus = async () => {
       try {
         const response = await getTwoFactorAuthStatus();
-        setIsTwoFactorAuthActive(response.Status2FA ?? false);
+        setIsTwoFactorAuthActive(response.StatusTwoFactorAuth ?? false);
       } catch (err) {
         console.error("Error al obtener estado del Two Factor Auth:", err);
       }

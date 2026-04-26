@@ -8,14 +8,14 @@ import {
   activateTwoFactorAuthService,
   verifyTwoFactorAuthService,
   validateLoginTwoFactorAuthService,
-  getStatusTwoFactorAuth,
-  desactivateTwoFactorAuthService,
+  getTwoFactorAuthStatus,
+  deactivateTwoFactorAuthService,
 } from "../../Services/AuthService";
 
 // ─── Factories ────────────────────────────────────────────────────────────────
 
 const makeLoginSuccess = (overrides = {}) => ({
-  isActive2FA: false, // ← campo real del servicio
+  isActiveTwoFactorAuth: false, // ← campo real del servicio
   data: { token: "session-token", user: { id: 1, name: "Test" } },
   ...overrides,
 });
@@ -81,8 +81,8 @@ describe("getToken", () => {
 
 // ─── getPreTwoFactorToken ─────────────────────────────────────────────────────
 
-describe("getPre2faToken", () => {
-  it("retorna null cuando no existe el token pre-2FA en localStorage", () => {
+describe("getPreTwoFactorAuthToken", () => {
+  it("retorna null cuando no existe el token pre-TwoFactorAuth en localStorage", () => {
     expect(getPreTwoFactorToken()).toBeNull();
   });
 
@@ -111,7 +111,7 @@ describe("logoutService", () => {
 // ─── loginService ─────────────────────────────────────────────────────────────
 
 describe("loginService", () => {
-  it("guarda el token de sesión en localStorage cuando el login es exitoso sin 2FA", async () => {
+  it("guarda el token de sesión en localStorage cuando el login es exitoso sin TwoFactorAuth", async () => {
     const apiResponse = makeLoginSuccess();
     mockFetch(apiResponse);
     const result = await loginService("test@mail.com", "password123");
@@ -122,8 +122,8 @@ describe("loginService", () => {
     );
   });
 
-  it("guarda preTwoFactorToken y no guarda token de sesión cuando 2FA está activo", async () => {
-    const apiResponse = { isActive2FA: true, pre2FAToken: "pre-token-abc" }; // ← campo real
+  it("guarda preTwoFactorToken y no guarda token de sesión cuando TwoFactorAuth está activo", async () => {
+    const apiResponse = { isActiveTwoFactorAuth: true, preTwoFactorAuthToken: "pre-token-abc" }; // ← campo real
     mockFetch(apiResponse);
     await loginService("test@mail.com", "password123");
     expect(localStorage.getItem("preTwoFactorToken")).toBe("pre-token-abc"); // ← clave real
@@ -205,14 +205,14 @@ describe("verifyTwoFactorAuthService", () => {
     );
   });
 
-  it("retorna nextStep=2FA_SETUP_COMPLETE cuando el código es válido", async () => {
+  it("retorna nextStep=TwoFactorAuth_SETUP_COMPLETE cuando el código es válido", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ nextStep: "2FA_SETUP_COMPLETE" });
+    mockFetch({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
     const result = await verifyTwoFactorAuthService("123456");
-    expect(result).toEqual({ nextStep: "2FA_SETUP_COMPLETE" });
+    expect(result).toEqual({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
   });
 
-  it("lanza error con status 401 cuando el código 2FA es inválido", async () => {
+  it("lanza error con status 401 cuando el código TwoFactorAuth es inválido", async () => {
     seedLocalStorage({ token: "valid-token" });
     mockFetch({ message: "Código inválido" }, false, 401);
     await expect(verifyTwoFactorAuthService("000000")).rejects.toMatchObject({
@@ -256,15 +256,15 @@ describe("validateLoginTwoFactorAuthService", () => {
 
 describe("getStatusTwoFactorAuth", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
-    await expect(getStatusTwoFactorAuth()).rejects.toThrow(
+    await expect(getTwoFactorAuthStatus()).rejects.toThrow(
       "No se encontró token de sesión",
     );
   });
 
-  it("retorna el estado 2FA del usuario cuando la petición es exitosa", async () => {
+  it("retorna el estado TwoFactorAuth del usuario cuando la petición es exitosa", async () => {
     seedLocalStorage({ token: "valid-token" });
     mockFetch({ isActive: true });
-    const result = await getStatusTwoFactorAuth();
+    const result = await getTwoFactorAuthStatus();
     expect(result).toEqual({ isActive: true });
   });
 });
@@ -275,7 +275,7 @@ describe("desactivateTwoFactorAuthService", () => {
   it("envía la password en el body POST al endpoint de desactivación", async () => {
     seedLocalStorage({ token: "valid-token" });
     mockFetch({ success: true });
-    await desactivateTwoFactorAuthService("myPassword");
+    await deactivateTwoFactorAuthService("myPassword");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/auth/2fa/disable"),
       expect.objectContaining({
