@@ -53,7 +53,7 @@ export const useTwoFactorAuthOptions = () => {
 
     try {
       const response = await deactivateTwoFactorAuthService(password.value);
-      if (response.nextStep === "2FA_DISABLED") {
+      if (response.nextStep === "TwoFactorAuth_DISABLED") {
         setIsTwoFactorAuthActive(false);
         showDisableModal.toggle();
         password.handleValue("");

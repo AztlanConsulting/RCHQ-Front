@@ -20,7 +20,7 @@ export const getReadableErrors = (err) => {
 
 export const savePreTwoFactorSession = (responseData) => {
   clearAuthStorage();
-  const preTwoFactorToken = responseData?.pre2FAToken;
+  const preTwoFactorToken = responseData?.preTwoFactorAuthToken;
   if (preTwoFactorToken) {
     localStorage.setItem(TOKEN_KEYS.preTwoFactorToken, preTwoFactorToken); //
   }
@@ -63,7 +63,7 @@ export const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
-  if (data.isActive2FA) {
+  if (data.isActiveTwoFactorAuth) {
     savePreTwoFactorSession(data);
   } else {
     saveLoginSession(data);

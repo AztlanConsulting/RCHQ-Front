@@ -36,7 +36,7 @@ export const useLogin = () => {
         result.data.password,
       );
 
-      if (response.isActive2FA) {
+      if (response.isActiveTwoFactorAuth) {
         navigate("/2FA");
         return;
       }
