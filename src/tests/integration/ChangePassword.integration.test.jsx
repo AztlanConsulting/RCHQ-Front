@@ -5,6 +5,9 @@ import ChangePassword from "../../../src/Pages/Auth/ChangePassword";
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
+const mockSetPre2faToken = vi.fn((token) => {
+    localStorage.setItem("PRE_2FA", token);
+});
 
 vi.mock("react-router-dom", async (importOriginal) => {
     const actual = await importOriginal();
@@ -17,6 +20,9 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 
 vi.mock("../../../src/utils/authStorage", () => ({
     getFirstLoginToken: vi.fn(),
+    setPre2faToken: vi.fn((token) => {
+        localStorage.setItem("PRE_2FA", token);
+    }),
 }));
 
 vi.mock("../../../src/Services/PasswordService", () => ({
@@ -27,7 +33,7 @@ vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
     mapPasswordApiError: vi.fn(() => ["La nueva contraseña debe ser diferente a la temporal"]),
 }));
 
-import { getFirstLoginToken } from "../../../src/utils/authStorage";
+import { getFirstLoginToken, setPre2faToken } from "../../../src/utils/authStorage";
 import { changePasswordFirstLoginService } from "../../../src/Services/PasswordService";
 
 const renderPage = () =>
@@ -46,6 +52,7 @@ const fillAndSubmit = async (newPassword, confirmPassword) => {
 
 beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     getFirstLoginToken.mockReturnValue("first-login-token");
 });
 
@@ -112,12 +119,17 @@ describe("ChangePassword — integración", () => {
         await fillAndSubmit("NuevaPass123", "NuevaPass123");
 
         await waitFor(() => {
+            expect(setPre2faToken).toHaveBeenCalledWith("pre-2fa-token");
             expect(localStorage.getItem("PRE_2FA")).toBe("pre-2fa-token");
             expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
         });
     });
 
     it("muestra error mapeado cuando el servicio falla", async () => {
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => { });
+
         changePasswordFirstLoginService.mockRejectedValue(new Error("backend error"));
 
         renderPage();
@@ -128,5 +140,7 @@ describe("ChangePassword — integración", () => {
                 screen.getByText(/debe ser diferente a la temporal/i),
             ).toBeInTheDocument();
         });
+
+        consoleErrorSpy.mockRestore();
     });
 });

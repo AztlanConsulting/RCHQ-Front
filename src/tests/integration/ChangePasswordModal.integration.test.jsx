@@ -1,36 +1,66 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { useState } from "react";
 import ChangePasswordModal from "../../../src/Components/Organism/ChangePasswordModal";
 
-vi.mock("../../../src/Services/PasswordService", () => ({
-    changePasswordService: vi.fn(),
-}));
+const ChangePasswordModalHarness = ({
+    isOpen = true,
+    loading = false,
+    errors = [],
+    onSubmit = vi.fn(),
+    onClose = vi.fn(),
+}) => {
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
-vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
-    mapPasswordApiError: vi.fn(() => ["La contraseña actual es incorrecta"]),
-}));
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-import { changePasswordService } from "../../../src/Services/PasswordService";
-
-const renderModal = (props = {}) => {
-    const defaultProps = {
-        isOpen: true,
-        onClose: vi.fn(),
-        onSuccess: vi.fn(),
-    };
-
-    return render(<ChangePasswordModal {...defaultProps} {...props} />);
+    return (
+        <ChangePasswordModal
+            isOpen={isOpen}
+            onClose={onClose}
+            loading={loading}
+            errors={errors}
+            onSubmit={onSubmit}
+            currentPassword={currentPassword}
+            setCurrentPassword={setCurrentPassword}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            showCurrentPassword={showCurrentPassword}
+            toggleCurrentPassword={() =>
+                setShowCurrentPassword((value) => !value)
+            }
+            showNewPassword={showNewPassword}
+            toggleNewPassword={() => setShowNewPassword((value) => !value)}
+            showConfirmPassword={showConfirmPassword}
+            toggleConfirmPassword={() =>
+                setShowConfirmPassword((value) => !value)
+            }
+        />
+    );
 };
+
+const renderModal = (props = {}) => render(<ChangePasswordModalHarness {...props} />);
 
 const fillAndSubmit = async ({
     currentPassword = "",
     newPassword = "",
     confirmPassword = "",
 } = {}) => {
-    const inputs = screen.getAllByDisplayValue("");
-    fireEvent.change(inputs[0], { target: { value: currentPassword } });
-    fireEvent.change(inputs[1], { target: { value: newPassword } });
-    fireEvent.change(inputs[2], { target: { value: confirmPassword } });
+    fireEvent.change(screen.getByLabelText(/contraseña actual/i), {
+        target: { value: currentPassword },
+    });
+    fireEvent.change(screen.getByLabelText(/^nueva contraseña$/i), {
+        target: { value: newPassword },
+    });
+    fireEvent.change(screen.getByLabelText(/confirmar nueva contraseña/i), {
+        target: { value: confirmPassword },
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /cambiar contraseña/i }));
 };
@@ -40,30 +70,10 @@ beforeEach(() => {
 });
 
 describe("ChangePasswordModal — integración", () => {
-    it("no llama al servicio si falla la validación", async () => {
-        renderModal();
+    it("llama onSubmit con los datos capturados", async () => {
+        const onSubmit = vi.fn();
 
-        await fillAndSubmit({
-            currentPassword: "",
-            newPassword: "123",
-            confirmPassword: "123",
-        });
-
-        await waitFor(() => {
-            expect(
-                screen.getByText(/contraseña actual es requerida/i),
-            ).toBeInTheDocument();
-        });
-
-        expect(changePasswordService).not.toHaveBeenCalled();
-    });
-
-    it("llama al servicio con los datos correctos", async () => {
-        changePasswordService.mockResolvedValue({ success: true });
-        const onSuccess = vi.fn();
-        const onClose = vi.fn();
-
-        renderModal({ onSuccess, onClose });
+        renderModal({ onSubmit });
 
         await fillAndSubmit({
             currentPassword: "Actual123",
@@ -71,32 +81,30 @@ describe("ChangePasswordModal — integración", () => {
             confirmPassword: "NuevaPass123",
         });
 
-        await waitFor(() => {
-            expect(changePasswordService).toHaveBeenCalledWith(
-                "Actual123",
-                "NuevaPass123",
-                "NuevaPass123",
-            );
-            expect(onSuccess).toHaveBeenCalled();
-            expect(onClose).toHaveBeenCalled();
-        });
-    });
-
-    it("muestra error cuando la contraseña actual es incorrecta", async () => {
-        changePasswordService.mockRejectedValue(new Error("Invalid credentials"));
-
-        renderModal();
-
-        await fillAndSubmit({
-            currentPassword: "Mal123",
+        expect(onSubmit).toHaveBeenCalledWith({
+            currentPassword: "Actual123",
             newPassword: "NuevaPass123",
             confirmPassword: "NuevaPass123",
         });
+    });
 
-        await waitFor(() => {
-            expect(
-                screen.getByText(/contraseña actual es incorrecta/i),
-            ).toBeInTheDocument();
+    it("muestra errores recibidos por props", () => {
+        renderModal({
+            errors: ["La contraseña actual es incorrecta"],
         });
+
+        expect(
+            screen.getByText(/la contraseña actual es incorrecta/i),
+        ).toBeInTheDocument();
+    });
+
+    it("llama onClose al presionar el botón de cerrar", () => {
+        const onClose = vi.fn();
+
+        renderModal({ onClose });
+
+        fireEvent.click(screen.getByRole("button", { name: /cerrar/i }));
+
+        expect(onClose).toHaveBeenCalled();
     });
 });
