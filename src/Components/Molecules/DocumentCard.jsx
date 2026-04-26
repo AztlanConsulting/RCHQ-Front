@@ -1,6 +1,5 @@
 import Button from "../Atoms/Button";
 
-// --- INICIO DE LOS ICONOS ---
 const PdfIcon = () => (
   <svg width="40" height="48" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="40" height="48" rx="4" fill="#E5E7EB" />
@@ -44,9 +43,7 @@ const SpinnerIcon = () => (
     <path d="M12 2a10 10 0 010 20" />
   </svg>
 );
-// --- FIN DE LOS ICONOS ---
 
-// Componente principal DocumentCard
 const DocumentCard = ({ doc, label, date, fileUrl, isPdf, onEdit, onDelete, isBeingDeleted, canModify }) => {
   const handlePreview = () => {
     if (fileUrl) window.open(fileUrl, "_blank", "noopener,noreferrer");

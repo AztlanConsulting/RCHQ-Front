@@ -6,15 +6,14 @@ import {
   deleteDocumentService,
 } from "../../Services/DocumentService";
 
-// ✅ Helper privado del hook para decodificar el token
 const getUserInfoFromToken = () => {
   try {
     const token = localStorage.getItem("token");
     if (!token) return null;
     const payload = JSON.parse(atob(token.split(".")[1]));
     return {
-      role: payload.role, // Ajustar según cómo se llame en tu JWT (ej. 'rol')
-      id: payload.id      // Ajustar según cómo se llame en tu JWT
+      role: payload.role,
+      id: payload.id,
     };
   } catch (error) {
     console.error("error: ", error);
@@ -32,21 +31,17 @@ export const useDocuments = (employeeId) => {
   const [docToDelete, setDocToDelete] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  
-  // ✅ Nuevo estado para la vista
   const [canModify, setCanModify] = useState(false);
+  const [conflictDocument, setConflictDocument] = useState(null);
 
-  // ✅ Calcular permisos al cargar el hook
   useEffect(() => {
     const userInfo = getUserInfoFromToken();
+    if (!userInfo) return;
     const userRole = userInfo.role?.toLowerCase();
-    if (userInfo) {
-      if (userRole === "administrador" || userRole === "coordinador") {
-        setCanModify(true);
-      } else {
-        // Si es empleado normal o es su propio id, solo lee
-        setCanModify(false);
-      }
+    if (userRole === "administrador" || userRole === "coordinador") {
+      setCanModify(true);
+    } else {
+      setCanModify(false);
     }
   }, [employeeId]);
 
@@ -67,10 +62,11 @@ export const useDocuments = (employeeId) => {
         setDocuments([]);
         return;
       }
-
+      
+      const BASEURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
       const docsArray = Object.entries(docRow.documents)
         .filter(([key, value]) => key !== "document_id" && value !== null && value !== "")
-        .map(([type, url]) => ({ type, url: `http://localhost:3000/${url}` }));
+        .map(([type, url]) => ({ type, url: `${BASEURL}/${url}` }));
 
       setDocuments(docsArray);
     } catch (err) {
@@ -84,7 +80,6 @@ export const useDocuments = (employeeId) => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // ✅ Validamos canModify antes de permitir acciones
   const handleModalSubmit = useCallback(async (formData) => {
     if (!canModify) {
       setModalError("Operación denegada. No tienes permisos para modificar.");
@@ -105,7 +100,11 @@ export const useDocuments = (employeeId) => {
       setEditingDocument(null);
       fetchDocuments();
     } catch (err) {
-      if (err.status === 403) {
+      if (err.status === 409) {
+        const field = err.field || formData.get("documentField");
+        setConflictDocument({ field, formData });
+        setShowUploadModal(false);
+      } else if (err.status === 403) {
         setModalError("No tienes permisos para realizar esta acción.");
       } else {
         setModalError(err.message || "Error al guardar el documento");
@@ -115,9 +114,27 @@ export const useDocuments = (employeeId) => {
     }
   }, [employeeId, editingDocument, fetchDocuments, canModify]);
 
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!canModify) return; // ✅ Bloqueo de seguridad
+  const handleConflictConfirm = useCallback(async () => {
+    if (!conflictDocument) return;
+    setModalLoading(true);
+    try {
+      await updateDocumentService(employeeId, conflictDocument.field, conflictDocument.formData);
+      setSuccessMessage("Documento reemplazado correctamente.");
+      fetchDocuments();
+    } catch (err) {
+      setFetchError(err.message || "Error al reemplazar el documento");
+    } finally {
+      setModalLoading(false);
+      setConflictDocument(null);
+    }
+  }, [employeeId, conflictDocument, fetchDocuments]);
 
+  const handleConflictCancel = useCallback(() => {
+    setConflictDocument(null);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!canModify) return;
     if (!docToDelete) return;
     setDeletingId(docToDelete.type);
     try {
@@ -133,14 +150,14 @@ export const useDocuments = (employeeId) => {
   }, [employeeId, docToDelete, canModify]);
 
   const handleOpenEdit = useCallback((doc) => {
-    if (!canModify) return; // ✅ Bloqueo de seguridad
+    if (!canModify) return;
     setEditingDocument(doc);
     setModalError("");
     setShowUploadModal(true);
   }, [canModify]);
 
   const handleOpenUpload = useCallback(() => {
-    if (!canModify) return; // ✅ Bloqueo de seguridad
+    if (!canModify) return;
     setEditingDocument(null);
     setModalError("");
     setShowUploadModal(true);
@@ -163,12 +180,15 @@ export const useDocuments = (employeeId) => {
     docToDelete,
     deletingId,
     successMessage,
-    canModify, // ✅ Exportamos la bandera para la vista
+    canModify,
+    conflictDocument,
     setDocToDelete,
     handleModalSubmit,
     handleDeleteConfirm,
     handleOpenEdit,
     handleOpenUpload,
     handleCloseModal,
+    handleConflictConfirm,
+    handleConflictCancel,
   };
 };

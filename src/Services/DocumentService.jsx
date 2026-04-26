@@ -1,9 +1,10 @@
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
   errorMessage.status = response.status;
   errorMessage.code = data?.code;
+  errorMessage.field = data?.field;
   errorMessage.data = data?.data;
   errorMessage.errors = Array.isArray(data?.errors) ? data.errors : [];
   return errorMessage;
@@ -73,7 +74,6 @@ export const uploadDocumentService = async (employeeId, formData) => {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      // NO poner Content-Type con multipart/form-data — el browser lo setea solo
     },
     body: formData,
   });

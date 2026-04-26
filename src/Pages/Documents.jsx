@@ -45,12 +45,15 @@ const Documents = () => {
     deletingId,
     successMessage,
     canModify,
+    conflictDocument,
     setDocToDelete,
     handleModalSubmit,
     handleDeleteConfirm,
     handleOpenEdit,
     handleOpenUpload,
     handleCloseModal,
+    handleConflictConfirm,
+    handleConflictCancel,
   } = useDocuments(employeeId);
 
   const {
@@ -94,7 +97,7 @@ const Documents = () => {
       ) : documents.length === 0 ? (
         <p className="text-slate-400 text-sm">Este empleado aún no tiene documentos.</p>
       ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">          
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
           {documents.map((doc) => (
             <DocumentCard
               key={doc.type}
@@ -126,11 +129,24 @@ const Documents = () => {
         loading={modalLoading}
       />
 
+      {/* Modal de confirmación para eliminar */}
       <ConfirmDeleteModal
         label={docToDelete ? getDocumentLabel(docToDelete.type || docToDelete.documentType) : null}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDocToDelete(null)}
         loading={!!deletingId}
+      />
+
+      {/* Modal de confirmación para reemplazar documento existente */}
+      <ConfirmDeleteModal
+        label={
+          conflictDocument
+            ? `"${getDocumentLabel(conflictDocument.field)}" ya existe. ¿Deseas reemplazarlo?`
+            : null
+        }
+        onConfirm={handleConflictConfirm}
+        onCancel={handleConflictCancel}
+        loading={modalLoading}
       />
     </div>
   );
