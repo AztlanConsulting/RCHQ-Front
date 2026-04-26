@@ -8,9 +8,10 @@ import Calendario from "./Pages/Calendario";
 import Perfil from "./Pages/Perfil";
 import PublicRoute from "./Components/PublicRoute";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import FirstLoginRoute from "./Components/FirstLoginRoute";
 import AppLayout from "./Components/AppLayout";
+import ChangePassword from "./Pages/Auth/ChangePassword";
 import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
-// import ChangePassword from "./Pages/Auth/ChangePassword";
 import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 import MoreOptions from "./Pages/MoreOptions";
@@ -21,28 +22,29 @@ function App() {
             <Routes>
                 <Route path="/" element={<LandingPage />} />
 
-                <Route element={<PublicRoute />}>
-                    <Route path="/iniciar-sesion" element={<LoginPage />} />
-                    <Route path="/2FA" element={<TwoFactorLogin />} />
-                </Route>
+        <Route element={<PublicRoute />}>
+          <Route path="/iniciar-sesion" element={<LoginPage />} />
+        </Route>
 
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/app" element={<AppLayout />}>
-                        <Route path="opciones" element={<MoreOptions />} />
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="perfil" element={<Perfil />} />
-                        <Route
-                            path="personal/nuevo"
-                            element={<AltaNuevoUsuarioPage />}
-                        />
-                        <Route path="personal" element={<Personal />} />
-                        <Route path="casas" element={<Casas />} />
-                        <Route path="calendario" element={<Calendario />} />
-                    </Route>
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+        <Route element={<FirstLoginRoute />}>
+          <Route path="/primer-inicio/cambiar-contrasena" element={<ChangePassword />} />
+        </Route>
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/2FA" element={<TwoFactorLogin />} />
+          <Route path="/app" element={<AppLayout />}>
+            <Route path="opciones" element={<MoreOptions />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="perfil" element={<Perfil />} />
+            <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />}/>
+            <Route path="personal" element={<Personal />} />
+            <Route path="casas" element={<Casas />} />
+            <Route path="calendario" element={<Calendario />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
