@@ -7,6 +7,9 @@ import Alert from "../Components/Atoms/Alerts";
 import TwoFactorAuth from "./Auth/TwoFactorAuth";
 import ChangePasswordModal from "../Components/Organism/ChangePasswordModal";
 import { getStatus2FA, desactivate2FAService } from "../Services/AuthService";
+import { changePasswordService } from "../Services/PasswordService";
+import { selfServiceChangePasswordSchema, getFirstSchemaError, } from "../utils/Schema/Auth/password.schemas";
+import { mapPasswordApiError } from "../utils/password/passwordErrorMapper";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 
@@ -14,15 +17,26 @@ const MoreOptions = () => {
   const navigate = useNavigate();
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [is2FAActive, setIs2FAActive] = useState(false);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [changePasswordErrors, setChangePasswordErrors] = useState([]);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const toggleShowPassword = () => setShowPassword((v) => !v);
+  const toggleCurrentPassword = () => setShowCurrentPassword((value) => !value);
+  const toggleNewPassword = () => setShowNewPassword((value) => !value);
+  const toggleConfirmPassword = () => setShowConfirmPassword((value) => !value);
 
   useEffect(() => {
     if (!successMessage) return;
@@ -64,6 +78,65 @@ const MoreOptions = () => {
       setError(err.message || "Error al desactivar la autentificación en dos pasos");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCloseChangePasswordModal = () => {
+    if (changePasswordLoading) return;
+
+    setShowChangePasswordModal(false);
+    setChangePasswordErrors([]);
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  const handleSubmitChangePassword = async ({
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  }) => {
+    setChangePasswordLoading(true);
+    setChangePasswordErrors([]);
+
+    const validation = selfServiceChangePasswordSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+
+    if (!validation.success) {
+      setChangePasswordErrors([
+        getFirstSchemaError(validation) || "Revisa los campos del formulario",
+      ]);
+      setChangePasswordLoading(false);
+      return;
+    }
+
+    try {
+      const response = await changePasswordService(
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      );
+
+      if (!response?.success) {
+        setChangePasswordErrors(["No se pudo cambiar la contraseña"]);
+        return;
+      }
+
+      setSuccessMessage("La contraseña se actualizó correctamente.");
+      handleCloseChangePasswordModal();
+    } catch (err) {
+      console.error(err);
+      setChangePasswordErrors(mapPasswordApiError(err, "self-service"));
+    } finally {
+      setChangePasswordLoading(false);
     }
   };
 
@@ -209,10 +282,22 @@ const MoreOptions = () => {
       )}
       <ChangePasswordModal
         isOpen={showChangePasswordModal}
-        onClose={() => setShowChangePasswordModal(false)}
-        onSuccess={() => {
-          setSuccessMessage("La contraseña se actualizó correctamente.");
-        }}
+        onClose={handleCloseChangePasswordModal}
+        loading={changePasswordLoading}
+        errors={changePasswordErrors}
+        onSubmit={handleSubmitChangePassword}
+        currentPassword={currentPassword}
+        setCurrentPassword={setCurrentPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        showCurrentPassword={showCurrentPassword}
+        toggleCurrentPassword={toggleCurrentPassword}
+        showNewPassword={showNewPassword}
+        toggleNewPassword={toggleNewPassword}
+        showConfirmPassword={showConfirmPassword}
+        toggleConfirmPassword={toggleConfirmPassword}
       />
     </div>
   );

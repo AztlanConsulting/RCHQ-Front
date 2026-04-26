@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordForm from "../../Components/Organism/PasswordForm";
-import { getFirstLoginToken } from "../../utils/authStorage";
+import { getFirstLoginToken, setPre2faToken } from "../../utils/authStorage";
 import { changePasswordFirstLoginService } from "../../Services/PasswordService";
 import useAuth from "../../hooks/useAuth";
 import {
@@ -17,12 +17,22 @@ const ChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
 
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
     const token = getFirstLoginToken();
     if (!token) {
       navigate("/iniciar-sesion", { replace: true });
     }
   }, [navigate]);
+
+  const toggleNewPassword = () => setShowNewPassword((value) => !value);
+  const toggleConfirmPassword = () =>
+    setShowConfirmPassword((value) => !value);
 
   const handleSubmit = async ({ newPassword, confirmPassword }) => {
     setLoading(true);
@@ -55,7 +65,7 @@ const ChangePassword = () => {
           return;
         }
 
-        localStorage.setItem("PRE_2FA", pre2FAToken);
+        setPre2faToken(pre2FAToken);
         navigate("/2FA", { replace: true });
         return;
       }
@@ -89,6 +99,14 @@ const ChangePassword = () => {
           errors={errors}
           onSubmit={handleSubmit}
           submitText="Cambiar contraseña"
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          showNewPassword={showNewPassword}
+          toggleNewPassword={toggleNewPassword}
+          showConfirmPassword={showConfirmPassword}
+          toggleConfirmPassword={toggleConfirmPassword}
         />
       </div>
     </div>
