@@ -53,7 +53,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
     // Arrange
     loginService.mockResolvedValue({
       success: true,
-      isActive2FA: false,
+      isActiveTwoFactorAuth: false,
       data: { token: "real-token-123", user: { id: 1, name: "Test" } },
     });
     renderLogin();
@@ -73,12 +73,12 @@ describe("LoginPage + AuthService — flujo de login", () => {
     });
   });
 
-  it("guarda PRE_2FA en localStorage y navega a /2FA cuando el usuario tiene 2FA activo", async () => {
+  it("guarda PRE_TwoFactorAuth en localStorage y navega a /2FA cuando el usuario tiene TwoFactorAuth activo", async () => {
     // Arrange
     loginService.mockResolvedValue({
       success: true,
-      isActive2FA: true,
-      pre2FAToken: "pre-token-abc",
+      isActiveTwoFactorAuth: true,
+      preTwoFactorAuthToken: "pre-token-abc",
     });
     renderLogin();
 

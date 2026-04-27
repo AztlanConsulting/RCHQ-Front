@@ -72,20 +72,20 @@ export const employeeCreateSchema = z.object({
             return birthDate <= today;
         }, "La fecha de nacimiento no puede ser en el futuro")
 
-        .refine((val) => {
-            if (!val) return true;
-            const birthDate = new Date(val + "T00:00:00");
-            const today = new Date();
+    .refine((val) => {
+      if (!val) return true;
+      const birthDate = new Date(val + "T00:00:00");
+      const today = new Date();
 
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
 
-            if (
-                monthDiff < 0 ||
-                (monthDiff === 0 && today.getDate() < birthDate.getDate())
-            ) {
-                age--;
-            }
-            return age >= 18;
-        }, "El usuario debe tener al menos 18 años de edad"),
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+      return age >= 18;
+    }, "El usuario debe tener al menos 18 años de edad"),
 });

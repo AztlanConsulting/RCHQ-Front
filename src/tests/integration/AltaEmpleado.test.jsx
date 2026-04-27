@@ -1,11 +1,11 @@
 // tests/integration/AltaEmpleado.test.jsx
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
-    render,
-    screen,
-    fireEvent,
-    waitFor,
-    act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import AltaPersonal from "../../Pages/Personal/AltaPersonal";
@@ -15,27 +15,27 @@ const mockOnSuccess = vi.fn();
 
 // Mock Router
 vi.mock("react-router-dom", async (importOriginal) => {
-    const actual = await importOriginal();
-    return { ...actual, useNavigate: () => mockNavigate };
+  const actual = await importOriginal();
+  return { ...actual, useNavigate: () => mockNavigate };
 });
 
 // Mock Services
 vi.mock("../../Services/PersonalService", () => ({
-    getEmployeeFormData: vi.fn(),
-    createEmployee: vi.fn(),
+  getEmployeeFormData: vi.fn(),
+  createEmployee: vi.fn(),
 }));
 
 import {
-    getEmployeeFormData,
-    createEmployee,
+  getEmployeeFormData,
+  createEmployee,
 } from "../../Services/PersonalService";
 
 const renderPage = () =>
-    render(
-        <MemoryRouter>
-            <AltaPersonal onSuccess={mockOnSuccess} />
-        </MemoryRouter>,
-    );
+  render(
+    <MemoryRouter>
+      <AltaPersonal onSuccess={mockOnSuccess} />
+    </MemoryRouter>,
+  );
 
 const validFormData = {
     name: "Juan",
@@ -82,130 +82,120 @@ const fillAndSubmit = async (data) => {
                         ? role.name || role.label
                         : "Administrador";
 
-                    const option = await screen.findByText(roleName);
-                    fireEvent.click(option);
-                }
-            }
-        } else {
-            const input =
-                document.getElementById(key) ||
-                document.querySelector(`input[name="${key}"]`);
-
-            if (input) {
-                fireEvent.change(input, {
-                    target: { name: key, value: value },
-                });
-            }
+          const option = await screen.findByText(roleName);
+          fireEvent.click(option);
         }
+      }
+    } else {
+      const input =
+        document.getElementById(key) ||
+        document.querySelector(`input[name="${key}"]`);
+
+      if (input) {
+        fireEvent.change(input, {
+          target: { name: key, value: value },
+        });
+      }
     }
+  }
 
-    const submitBtn = screen.getByRole("button", {
-        name: /guardar|crear|registrar|alta/i,
-    });
+  const submitBtn = screen.getByRole("button", {
+    name: /guardar|crear|registrar|alta/i,
+  });
 
-    await act(async () => {
-        fireEvent.click(submitBtn);
-    });
+  await act(async () => {
+    fireEvent.click(submitBtn);
+  });
 };
 
 beforeEach(() => {
-    vi.clearAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.clearAllMocks();
+  vi.spyOn(console, "log").mockImplementation(() => {});
 });
 
 afterEach(() => {
-    vi.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("AltaPersonal — integración de formulario y servicios", () => {
-    it("carga los roles iniciales y quita el estado de carga", async () => {
-        // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+  it("carga los roles iniciales y quita el estado de carga", async () => {
+    // Arrange
+    getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
 
-        // Act
-        renderPage();
+    // Act
+    renderPage();
 
-        // Assert
-        expect(screen.getByText(/cargando datos/i)).toBeInTheDocument();
+    // Assert
+    expect(screen.getByText(/cargando datos/i)).toBeInTheDocument();
 
-        await waitFor(() => {
-            expect(
-                screen.queryByText(/cargando datos/i),
-            ).not.toBeInTheDocument();
-        });
-        expect(getEmployeeFormData).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando datos/i)).not.toBeInTheDocument();
+    });
+    expect(getEmployeeFormData).toHaveBeenCalledTimes(1);
+  });
+
+  it("muestra un error de Zod si el formulario está vacío", async () => {
+    // Arrange
+    getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.queryByText(/cargando datos/i)).not.toBeInTheDocument(),
+    );
+
+    // Act
+    const submitBtn = screen.getByRole("button", {
+      name: /guardar|crear|registrar|alta/i,
+    });
+    await act(async () => {
+      fireEvent.click(submitBtn);
     });
 
-    it("muestra un error de Zod si el formulario está vacío", async () => {
-        // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        renderPage();
-        await waitFor(() =>
-            expect(
-                screen.queryByText(/cargando datos/i),
-            ).not.toBeInTheDocument(),
-        );
-
-        // Act
-        const submitBtn = screen.getByRole("button", {
-            name: /guardar|crear|registrar|alta/i,
-        });
-        await act(async () => {
-            fireEvent.click(submitBtn);
-        });
-
-        // Assert
-        await waitFor(() => {
-            expect(createEmployee).not.toHaveBeenCalled();
-            expect(
-                screen.getByText(/El nombre es obligatorio/i),
-            ).toBeInTheDocument();
-        });
+    // Assert
+    await waitFor(() => {
+      expect(createEmployee).not.toHaveBeenCalled();
+      expect(screen.getByText(/El nombre es obligatorio/i)).toBeInTheDocument();
     });
+  });
 
-    it("crea el empleado exitosamente", async () => {
-        // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        createEmployee.mockResolvedValue({ success: true });
-        renderPage();
-        await waitFor(() =>
-            expect(
-                screen.queryByText(/cargando datos/i),
-            ).not.toBeInTheDocument(),
-        );
+  it("crea el empleado exitosamente", async () => {
+    // Arrange
+    getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+    createEmployee.mockResolvedValue({ success: true });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.queryByText(/cargando datos/i)).not.toBeInTheDocument(),
+    );
 
-        // Act
-        await fillAndSubmit(validFormData);
+    // Act
+    await fillAndSubmit(validFormData);
 
-        // Assert
-        await waitFor(() => {
-            expect(createEmployee).toHaveBeenCalledTimes(1);
-        });
-        expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+    // Assert
+    await waitFor(() => {
+      expect(createEmployee).toHaveBeenCalledTimes(1);
     });
+    expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+  });
 
-    it("muestra error si el backend falla", async () => {
-        // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        createEmployee.mockRejectedValue(
-            new Error("El correo electrónico ya está registrado"),
-        );
-        renderPage();
-        await waitFor(() =>
-            expect(
-                screen.queryByText(/cargando datos/i),
-            ).not.toBeInTheDocument(),
-        );
+  it("muestra error si el backend falla", async () => {
+    // Arrange
+    getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+    createEmployee.mockRejectedValue(
+      new Error("El correo electrónico ya está registrado"),
+    );
+    renderPage();
+    await waitFor(() =>
+      expect(screen.queryByText(/cargando datos/i)).not.toBeInTheDocument(),
+    );
 
-        // Act
-        await fillAndSubmit(validFormData);
+    // Act
+    await fillAndSubmit(validFormData);
 
-        // Assert
-        await waitFor(() => {
-            expect(createEmployee).toHaveBeenCalledTimes(1);
-        });
-        expect(
-            screen.getByText("El correo electrónico ya está registrado"),
-        ).toBeInTheDocument();
+    // Assert
+    await waitFor(() => {
+      expect(createEmployee).toHaveBeenCalledTimes(1);
     });
+    expect(
+      screen.getByText("El correo electrónico ya está registrado"),
+    ).toBeInTheDocument();
+  });
 });
