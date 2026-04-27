@@ -6,6 +6,7 @@ import { Tabs } from "../Components/untitled/tabs/tabs";
 import { NativeSelect } from "../Components/untitled/base/select/select-native";
 import Chip from '../Components/Atoms/Chip';
 import Alert from "../Components/Atoms/Alerts";
+import Type from "../Components/Atoms/Type";
 
 const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -79,7 +80,7 @@ const DetalleEmpleado = () => {
     if (isLoading) return <Loader />
 
     return (
-        <div className='p-2 flex flex-col text-black'>
+        <div className='flex flex-col gap-4 text-black'>
 
             {/* Notificación de éxito */}
             {alert && alert.message && (
@@ -89,10 +90,10 @@ const DetalleEmpleado = () => {
             )}
 
             {/* Row for Page Title and Tabs */}
-            <div className='flex'>
-                <h2>
+            <div className="flex items-center gap-4">
+                <Type variant="page-title" as="h2">
                     Gestión de Empleados
-                </h2>
+                </Type>
 
                 <NativeSelect
                     size="sm"
@@ -110,10 +111,10 @@ const DetalleEmpleado = () => {
             </div>
 
             {/* Box/Section for Basic Employee Info, Persistent across tabs */}
-            <div className="w-full flex p-4 items-center gap-4 rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="w-full flex p-4 items-center rounded-xl border border-slate-200 bg-white shadow-sm">
                 {/* First column: avatar + status chip; second: text metrics */}
-                <div className="h-full flex basis-1/5">
-                    <div className="relative h-20 w-20 shrink-0 sm:h-40 sm:w-40">
+                <div className="flex shrink-0 mr-8">
+                    <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
                         <img
                             src={employeeBasicInfo?.picture?.trim() ? employeeBasicInfo.picture : AVATAR_PLACEHOLDER}
                             alt=""
@@ -124,23 +125,31 @@ const DetalleEmpleado = () => {
                             }}
                         />
                         <div className="absolute bottom-1 right-1 z-10">
-                            <Chip active={employeeBasicInfo?.isActive ?? true} />
+                            <Chip active={employeeBasicInfo?.isActive ?? false} />
                         </div>
                     </div>
                 </div>
 
                 {/* Second column for the text information, broken into 2 columns */}
-                <div className='w-full h-full flex flex-col basis-4/5 gap-6 justify-between'>
+                <div className="flex min-w-0 flex-1 flex-col gap-6 justify-between">
                     
                     {/* Top row for name/house and edit button, columns */}
                     <div className='h-full flex justify-between'>
                         
                         {/* Name/House */}
-                        <div className='w-full'>
-                            {/* Name */}
-                            <h2>{employeeBasicInfo?.name ?? "Sin nombre"}</h2>
-                            {/* subtitle */}
-                            <h4>{employeeBasicInfo?.role ?? "Sin role"}</h4>
+                        <div className="w-full min-w-0">
+                            <Type variant="display-name" as="h2">
+                                {`${employeeBasicInfo?.name ?? ""} ${employeeBasicInfo?.surname ?? ""}`}
+                            </Type>
+                            <Type variant="subtitle" as="p" className="mt-1">
+                                {employeeBasicInfo?.role
+                                ? String(employeeBasicInfo.role).toUpperCase() + " - "
+                                : ""}
+                                {employeeBasicInfo?.house?.name
+                                ? String(employeeBasicInfo.house.name)
+                                : ""}
+                                {/* `${employeeBasicInfo?.role ?? "Sin role"} - ${employeeBasicInfo?.house?.name}`} */}
+                            </Type>
                         </div>
 
                         {/* Edit button */}
@@ -152,22 +161,43 @@ const DetalleEmpleado = () => {
                     </div>
 
                     {/* Bottom Row for text-like metrics */}
-                    <div className='flex justify-between items-center'>
+                    <div className="flex flex-wrap justify-between gap-x-4 gap-y-3">
                         <div>
-                            <h6>ID Empleado</h6>
-                            <h4>{employeeBasicInfo?.employeeId ?? "Sin ID"}</h4>
+                            <Type variant="metric-label" as="p">
+                                ID Empleado
+                            </Type>
+                            <Type variant="metric-value" as="p" className="mt-0.5">
+                                {employeeBasicInfo?.employeeId
+                                    ? String(employeeBasicInfo.employeeId).slice(0, 8)
+                                    : "Sin ID"}
+                            </Type>
                         </div>
                         <div>
-                            <h6>Casa</h6>
-                            <h4>{employeeBasicInfo?.house ?? "Sin Casa"}</h4>
+                            <Type variant="metric-label" as="p">
+                                NSS
+                            </Type>
+                            <Type variant="metric-value" as="p" className="mt-0.5">
+                                {employeeBasicInfo?.nss ?? "N/A"}
+                            </Type>
                         </div>
                         <div>
-                            <h6>Fecha de Inicio</h6>
-                            <h4>{employeeBasicInfo?.start ?? "Sin fecha de I"}</h4>
+                            <Type variant="metric-label" as="p">
+                                Fecha de Inicio
+                            </Type>
+                            <Type variant="metric-value" as="p" className="mt-0.5">
+                                {/* {employeeBasicInfo?.startDate ?? "Sin fecha de I"} */}
+                                {employeeBasicInfo?.startDate
+                                    ? String(employeeBasicInfo.startDate).slice(0, 10)
+                                    : "Sin fecha de Inicio"}
+                            </Type>
                         </div>
                         <div>
-                            <h6>Fecha de Terminación</h6>
-                            <h4>{employeeBasicInfo?.end ?? "N/A"}</h4>
+                            <Type variant="metric-label" as="p">
+                                Fecha de Terminación
+                            </Type>
+                            <Type variant="metric-value" as="p" className="mt-0.5">
+                                {employeeBasicInfo?.end ?? "N/A"}
+                            </Type>
                         </div>
                     </div>
                 </div>
@@ -176,32 +206,143 @@ const DetalleEmpleado = () => {
             {/* Final row, box depends on currentTab */}
             {/* Either the basic/admin info boxes or record/expediente box */}
             {currentTab == "overview" && (
-                    <div className='flex mt-4 gap-4'>
+                    <div className='flex gap-4'>
                         
                         {/* Basic Info Box */}
-                        <div className='w-full p-2 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm'>
-                            <div className='flex jusfity-between'>
-                                <h3>Información Básica</h3>
-                                {/* edit button */}
-                                <div>btn</div>
+                        <div className='basis-1/3 p-2 rounded-xl border border-slate-200 bg-white p-8 shadow-sm'>
+                            <div className="flex justify-between">
+                                <Type variant="section-title" as="h3">
+                                    Información Básica
+                                </Type>
+                                <div>
+                                    <button type="button" aria-label="Editar" className="rounded-lg p-2 hover:bg-slate-100">
+                                        <img src="/edit.svg" alt="" className="h-5 w-5" />
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className='flex flex-cols'>
-                                {basicInfoFields.map(field => (
-                                    <div key={field.id}>
-                                        <h6>{field.label ?? ""}</h6>
-                                        <h4>{employeeBasicInfo?.[field.name] ?? "N/A"}</h4>
+                            <div className="mt-4 flex flex-col gap-4">
+                                {basicInfoFields.map((field) => (
+                                    <div key={field.id} className="min-w-[12rem] flex-1">
+                                        <Type variant="metric-label" as="p">
+                                            {field.label ?? ""}
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeBasicInfo?.[field.name] ?? "N/A"}
+                                        </Type>
                                     </div>
                                 ))}
                             </div>
                         </div>
                         
                         {/* Admin Info Box */}
-                        <div className='rounded-2xl border border-slate-200 bg-white p-8 shadow-sm'>
-                            <div className='flex jusfity-between'>
-                                <h3>Información Administrativa</h3>
-                                {/* edit button */}
-                                <div>btn</div>
+                        <div className='basis-2/3 rounded-xl border border-slate-200 bg-white p-8 shadow-sm'>
+                            <div className="flex justify-between">
+                                <Type variant="section-title" as="h3">
+                                    Información Administrativa
+                                </Type>
+                                <div>
+                                    <button type="button" aria-label="Editar" className="rounded-lg p-2 hover:bg-slate-100">
+                                        <img src="/edit.svg" alt="" className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 w-full flex flex-col gap-4">
+                                <div className="w-full flex justify-between">
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Tipo
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Salario
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                </div>
+
+                                <div className="w-full flex justify-between">
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Horario
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            N/A
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                </div>
+
+                                <div className="w-full flex justify-between">
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Ausencias
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Numero
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                </div>
+
+                                <div className="w-full flex justify-between">
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Vacaciones
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Numero
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                </div>
+
+                                <div className="w-full flex justify-between">
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Faltas
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                    <div>
+                                        <Type variant="metric-label" as="p">
+                                            Numero
+                                        </Type>
+                                        <Type variant="metric-value" as="p" className="mt-0.5">
+                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                        </Type>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

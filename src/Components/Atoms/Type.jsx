@@ -3,13 +3,13 @@ import { cx } from "@/utils/cx";
 
 const variantStyles = {
   /** Main page heading (e.g. "Gestión de Empleados") */
-  "page-title": "text-2xl font-bold tracking-tight text-black sm:text-3xl",
+  "page-title": "text-2xl font-semibold tracking-tight text-black sm:text-3xl",
   /** Same scale as page title — employee name, etc. */
-  "display-name": "text-xl font-bold tracking-tight text-black sm:text-3xl",
+  "display-name": "text-xl font-semibold tracking-tight text-black sm:text-3xl",
   /** Role, secondary line — gray, bold */
-  subtitle: "text-sm font-bold text-slate-500 sm:text-base",
+  subtitle: "text-sm font-semibold text-slate-500 sm:text-base",
   /** Small caps-style labels (metrics, form labels) — gray, bold */
-  "metric-label": "text-xs font-bold text-slate-500 sm:text-sm",
+  "metric-label": "text-xs font-semibold text-slate-500 sm:text-sm",
   /** Emphasized values under labels — black, regular weight, larger */
   "metric-value": "text-base font-normal text-black sm:text-xl",
   /** Card / section titles */
