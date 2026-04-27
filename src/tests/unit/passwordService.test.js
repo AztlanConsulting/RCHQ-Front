@@ -43,7 +43,7 @@ describe("changePasswordFirstLoginService", () => {
         await changePasswordFirstLoginService("Nueva123", "Nueva123");
 
         expect(globalThis.fetch).toHaveBeenCalledWith(
-            expect.stringContaining("/users/first-login/change-password"),
+            expect.stringContaining("/auth/first-login/change-password"),
             expect.objectContaining({
                 method: "POST",
                 headers: expect.objectContaining({
@@ -138,7 +138,7 @@ describe("changePasswordService", () => {
         await changePasswordService("Actual123", "Nueva123", "Nueva123");
 
         expect(globalThis.fetch).toHaveBeenCalledWith(
-            expect.stringContaining("/users/change-password"),
+            expect.stringContaining("/auth/change-password"),
             expect.objectContaining({
                 method: "POST",
                 headers: expect.objectContaining({

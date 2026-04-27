@@ -20,7 +20,7 @@ const changePasswordFirstLoginService = async (
         throw new Error("No se encontró token de primer inicio de sesión");
     }
 
-    const response = await fetch(`${API_URL}/users/first-login/change-password`, {
+    const response = await fetch(`${API_URL}/auth/first-login/change-password`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const changePasswordService = async (
         throw new Error("No se encontró token de sesión");
     }
 
-    const response = await fetch(`${API_URL}/users/change-password`, {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

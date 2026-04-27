@@ -26,7 +26,7 @@ const getReadableErrors = (err) => {
  * Requiere token en localStorage (lo inyecta getToken de AuthService).
  */
 const getUserData = async (token) => {
-  const response = await fetch(`${API_URL}/auth/profile`, {
+  const response = await fetch(`${API_URL}/user/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

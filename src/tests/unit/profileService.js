@@ -1,6 +1,8 @@
 // tests/frontend/ProfileService.test.js
 import { getUserData, getReadableErrors } from "../../Services/ProfileService";
 
+const API_URL = "http://localhost:3000";
+
 // ─── Mock global fetch ───────────────────────────────────────────────────────
 const mockFetch = (status, body) => {
   global.fetch = jest.fn().mockResolvedValue({
@@ -40,7 +42,7 @@ describe("ProfileService — getUserData", () => {
       await getUserData(TOKEN);
 
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:3000/auth/profile",
+        `${API_URL}/auth/profile`,
         expect.objectContaining({
           method:  "GET",
           headers: expect.objectContaining({

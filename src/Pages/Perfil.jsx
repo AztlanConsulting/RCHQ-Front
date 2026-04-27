@@ -4,11 +4,6 @@ import { getUserData, getReadableErrors } from "../Services/ProfileService";
 import { getToken } from "../utils/authStorage";
 import ProfileCard from "../Components/Organism/ProfileCard";
 
-/**
- * STATUS_MAP
- * Centraliza los mensajes de retroalimentación por código HTTP
- * conforme al diagrama de actividades y la US.
- */
 const STATUS_MAP = {
   401: {
     title: "Sin permisos",
@@ -60,13 +55,10 @@ const ProfileError = ({ status, messages, onRetry }) => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-red-100 bg-red-50 p-12 text-center">
-      <span className="text-5xl">{info.icon}</span>
       <h3 className="text-lg font-bold text-red-700">{info.title}</h3>
       <p className="text-sm text-red-600 max-w-sm">
         {messages.length > 0 ? messages.join(" ") : info.message}
       </p>
-
-      {/* Botón de reintento — aplica en 404 y 501 (no en 401) */}
       {status !== 401 && (
         <button
           onClick={onRetry}
@@ -84,7 +76,7 @@ const ProfileError = ({ status, messages, onRetry }) => {
 const Perfil = () => {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);   // { status, messages[] }
+  const [error, setError]     = useState(null);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -94,26 +86,25 @@ const Perfil = () => {
       const token = getToken();
       const data  = await getUserData(token);
 
-      // Mapeo 1:1 con el shape de mapProfile() del backend.
       const raw = data?.data ?? data;
       setUser({
-        foto:           raw?.picture    ?? "",
+        foto:           raw?.picture     ?? "",
         casaHogar:      raw?.houseName   ?? "",
-        puesto:         raw?.roleName     ?? "",
-        nombre:         raw?.name       ?? "",
-        apellidos:      raw?.surname    ?? "",
-        correo:         raw?.email      ?? "",
-        rfc:            raw?.rfc        ?? "",
-        curp:           raw?.curp       ?? "",
-        nss:            raw?.nss        ?? "",
+        puesto:         raw?.roleName    ?? "",
+        nombre:         raw?.name        ?? "",
+        apellidos:      raw?.surname     ?? "",
+        correo:         raw?.email       ?? "",
+        rfc:            raw?.rfc         ?? "",
+        curp:           raw?.curp        ?? "",
+        nss:            raw?.nss         ?? "",
         cuentaBancaria: raw?.bankAccount ?? "",
         cumpleanos: raw?.birthDate
-        ? new Date(raw.birthDate).toLocaleDateString("es-MX", {
-            day:   "2-digit",
-            month: "2-digit",
-            year:  "numeric",
-          })
-        : "",
+          ? new Date(raw.birthDate).toLocaleDateString("es-MX", {
+              day:   "2-digit",
+              month: "2-digit",
+              year:  "numeric",
+            })
+          : "",
       });
     } catch (err) {
       setError({
@@ -130,11 +121,15 @@ const Perfil = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Encabezado */}
+    /*
+     * h-full + overflow-y-auto acá → el scroll queda DENTRO de esta
+     * página, no en el layout global, así el sidebar y el header
+     * permanecen fijos y solo esta área desplaza si el viewport es
+     * muy pequeño (móvil). En desktop el contenido entra sin scroll.
+     */
+    <div className="flex flex-col gap-6 h-full overflow-y-auto">
       <h1 className="text-2xl font-bold text-slate-800">Mi Perfil</h1>
 
-      {/* ── Flujos alternativos según diagrama de actividades ── */}
       {loading && <ProfileSkeleton />}
 
       {!loading && error && (
