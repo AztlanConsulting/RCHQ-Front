@@ -173,7 +173,7 @@ export const deactivateTwoFactorAuthService = async (password) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/users/2fa/disable`, {
+  const response = await fetch(`${API_URL}/auth/2fa/disable`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
