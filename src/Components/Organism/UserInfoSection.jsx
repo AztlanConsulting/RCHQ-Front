@@ -32,7 +32,7 @@ const UserInfoSection = ({
   onSubmit,
   isLoading = false,
 }) => {
-  const roleOptions = roles.map((r) => ({ value: r.role_id, label: r.name }));
+    const roleOptions = roles.map((r) => ({ value: r.roleId, label: r.name }));
 
   return (
     <section className="bg-white rounded-xl p-8 flex flex-col gap-6 shadow-sm border border-[#e0e0e0]">
@@ -79,62 +79,62 @@ const UserInfoSection = ({
           labelColor={LABEL_COLOR}
         />
 
-        <FormField
-          label="Correo"
-          name="email"
-          type="text"
-          value={form.email}
-          onChange={handleChange}
-          required
-          maxLength={60}
-          labelColor={LABEL_COLOR}
-        />
-        <FormField
-          label="Clave Bancaria Estandarizada (CLABE)"
-          name="bank_account"
-          value={form.bank_account}
-          onChange={handleChange}
-          maxLength={18}
-          labelColor={LABEL_COLOR}
-        />
+                <FormField
+                    label="Correo"
+                    name="email"
+                    type="text"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    maxLength={60}
+                    labelColor={LABEL_COLOR}
+                />
+                <FormField
+                    label="Clave Bancaria Estandarizada (CLABE)"
+                    name="bankAccount"
+                    value={form.bankAccount}
+                    onChange={handleChange}
+                    maxLength={18}
+                    labelColor={LABEL_COLOR}
+                />
 
-        <FormField
-          label="Clave Única de Registro de Población (CURP)"
-          name="curp"
-          value={form.curp}
-          onChange={handleChange}
-          required
-          maxLength={18}
-          labelColor={LABEL_COLOR}
-        />
-        <FormField
-          label="Fecha de Nacimiento"
-          name="birthdate"
-          type="date"
-          value={form.birthdate}
-          onChange={handleChange}
-          labelColor={LABEL_COLOR}
-        />
+                <FormField
+                    label="Clave Única de Registro de Población (CURP)"
+                    name="curp"
+                    value={form.curp}
+                    onChange={handleChange}
+                    required
+                    maxLength={18}
+                    labelColor={LABEL_COLOR}
+                />
+                <FormField
+                    label="Fecha de Nacimiento"
+                    name="birthDate"
+                    type="date"
+                    value={form.birthDate}
+                    onChange={handleChange}
+                    labelColor={LABEL_COLOR}
+                />
 
-        <SelectField
-          label="Puesto"
-          name="role_id"
-          value={form.role_id}
-          onChange={handleChange}
-          options={roleOptions}
-          placeholder="Selecciona un puesto"
-          required
-          labelColor={LABEL_COLOR}
-        />
-        <div className="row-span-2">
-          <PhotoUploader
-            file={photo}
-            onFileChange={onPhotoChange}
-            label="Foto del Usuario"
-            labelColor={LABEL_COLOR}
-          />
-        </div>
-      </div>
+                <SelectField
+                    label="Puesto"
+                    name="roleId"
+                    value={form.roleId}
+                    onChange={handleChange}
+                    options={roleOptions}
+                    placeholder="Selecciona un puesto"
+                    required
+                    labelColor={LABEL_COLOR}
+                />
+                <div className="row-span-2">
+                    <PhotoUploader
+                        file={photo}
+                        onFileChange={onPhotoChange}
+                        label="Foto del Usuario"
+                        labelColor={LABEL_COLOR}
+                    />
+                </div>
+            </div>
 
       <div className="flex justify-end gap-4 mt-4">
         <Button
