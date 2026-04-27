@@ -11,7 +11,7 @@ import {
 } from "../utils/authStorage";
 import { buildApiError, getReadableErrors } from "../utils/apiErrors";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const saveLoginSession = (responseData) => {
   clearAuthStorage();
@@ -82,7 +82,11 @@ export const activateTwoFactorAuthService = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al activar la autenticación de dos pasos");
+    throw buildApiError(
+      response,
+      data,
+      "Error al activar la autenticación de dos pasos",
+    );
   }
 
   return data;
@@ -104,7 +108,11 @@ export const verifyTwoFactorAuthService = async (code) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos pasos");
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos pasos",
+    );
   }
 
   return data;
@@ -126,7 +134,11 @@ export const validateLoginTwoFactorAuthService = async (code) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al verificar el código de autenticación de dos pasos");
+    throw buildApiError(
+      response,
+      data,
+      "Error al verificar el código de autenticación de dos pasos",
+    );
   }
 
   return data;
@@ -147,7 +159,11 @@ export const getTwoFactorAuthStatus = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al obtener estado de la autenticación de dos pasos");
+    throw buildApiError(
+      response,
+      data,
+      "Error al obtener estado de la autenticación de dos pasos",
+    );
   }
 
   return data;
@@ -169,10 +185,20 @@ export const deactivateTwoFactorAuthService = async (password) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw buildApiError(response, data, "Error al desactivar la autenticación de dos pasos");
+    throw buildApiError(
+      response,
+      data,
+      "Error al desactivar la autenticación de dos pasos",
+    );
   }
 
   return data;
 };
 
-export { getReadableErrors, getToken, getPreTwoFactorAuthToken, getFirstLoginToken, removePreTwoFactorAuthToken };
+export {
+  getReadableErrors,
+  getToken,
+  getPreTwoFactorAuthToken,
+  getFirstLoginToken,
+  removePreTwoFactorAuthToken,
+};

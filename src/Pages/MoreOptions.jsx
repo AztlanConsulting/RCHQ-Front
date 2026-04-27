@@ -63,17 +63,35 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9 invert opacity-90" />}
+            icon={
+              <img
+                src="/certificate.svg"
+                alt="Certificaciones"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9 invert opacity-90" />}
+            icon={
+              <img
+                src="/document.svg"
+                alt="Documentos"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
           <OptionCard
-            icon={<img src="/key.svg" alt="TwoFactorAuth" className="w-9 h-9 invert opacity-90" />}
+            icon={
+              <img
+                src="/key.svg"
+                alt="TwoFactorAuth"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
             label={
               <span className="whitespace-pre-line text-center block text-sm">
                 {isTwoFactorAuthActive
@@ -91,7 +109,13 @@ const MoreOptions = () => {
             }}
           />
           <OptionCard
-            icon={<img src="/lock.svg" alt="Cambiar contraseña" className="w-9 h-9" />}
+            icon={
+              <img
+                src="/lock.svg"
+                alt="Cambiar contraseña"
+                className="w-9 h-9"
+              />
+            }
             label="Cambiar contraseña"
             onClick={() => {
               setError("");
@@ -121,7 +145,9 @@ const MoreOptions = () => {
             <h3 className="text-lg font-semibold text-slate-900">
               Desactivar autenticación en dos pasos
             </h3>
-            <p className="text-sm text-slate-500">Ingresa tu contraseña para confirmar.</p>
+            <p className="text-sm text-slate-500">
+              Ingresa tu contraseña para confirmar.
+            </p>
 
             {error && <Alert type="error" message={error} />}
 
@@ -135,8 +161,12 @@ const MoreOptions = () => {
               htmlFor="disable-password"
               iconRight={showPassword.value ? eye : hideEye}
               onIconRightClick={showPassword.toggle}
-              iconRightAlt={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
-              iconRightAriaLabel={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRightAlt={
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              iconRightAriaLabel={
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
             />
 
             <div className="flex gap-3 justify-end">

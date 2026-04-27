@@ -58,7 +58,11 @@ const TextField = ({
               className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-transparent"
             >
               {typeof iconRight === "string" ? (
-                <img src={iconRight} alt={iconRightAlt} className="h-5 w-5 sm:h-6 sm:w-6" />
+                <img
+                  src={iconRight}
+                  alt={iconRightAlt}
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                />
               ) : (
                 iconRight
               )}
@@ -66,7 +70,11 @@ const TextField = ({
           ) : (
             <div className="ml-3 flex shrink-0 items-center justify-center">
               {typeof iconRight === "string" ? (
-                <img src={iconRight} alt={iconRightAlt} className="h-5 w-5 sm:h-6 sm:w-6" />
+                <img
+                  src={iconRight}
+                  alt={iconRightAlt}
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                />
               ) : (
                 iconRight
               )}

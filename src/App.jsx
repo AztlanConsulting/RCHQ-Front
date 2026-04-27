@@ -9,6 +9,7 @@ import Perfil from "./Pages/Perfil";
 import PublicRoute from "./Components/PublicRoute";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import FirstLoginRoute from "./Components/FirstLoginRoute";
+import Pre2FARoute from "./Components/Pre2FARoute";
 import AppLayout from "./Components/AppLayout";
 import ChangePassword from "./Pages/Auth/ChangePassword";
 import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
@@ -27,11 +28,17 @@ function App() {
         </Route>
 
         <Route element={<FirstLoginRoute />}>
-          <Route path="/primer-inicio/cambiar-contrasena" element={<ChangePassword />} />
+          <Route
+            path="/primer-inicio/cambiar-contrasena"
+            element={<ChangePassword />}
+          />
+        </Route>
+
+        <Route element={<Pre2FARoute />}>
+          <Route path="/2FA" element={<TwoFactorLogin />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/2FA" element={<TwoFactorLogin />} />
           <Route path="/app" element={<AppLayout />}>
             <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />

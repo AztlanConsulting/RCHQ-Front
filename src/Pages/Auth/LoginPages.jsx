@@ -5,7 +5,8 @@ import hideEye from "/hideEye.svg";
 import { useLogin } from "../../hooks/Organism/useLogin";
 
 const LoginPage = () => {
-  const { email, password, showPassword, errors, loading, handleSubmit } = useLogin();
+  const { email, password, showPassword, errors, loading, handleSubmit } =
+    useLogin();
 
   const fields = [
     {
@@ -29,8 +30,12 @@ const LoginPage = () => {
       type: showPassword.value ? "text" : "password",
       iconRight: showPassword.value ? eye : hideEye,
       onIconRightClick: showPassword.toggle,
-      iconRightAlt: showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña",
-      iconRightAriaLabel: showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña",
+      iconRightAlt: showPassword.value
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
+      iconRightAriaLabel: showPassword.value
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
       autoComplete: "current-password",
     },
   ];

@@ -123,7 +123,10 @@ describe("loginService", () => {
   });
 
   it("guarda preTwoFactorToken y no guarda token de sesión cuando TwoFactorAuth está activo", async () => {
-    const apiResponse = { isActiveTwoFactorAuth: true, preTwoFactorAuthToken: "pre-token-abc" }; // ← campo real
+    const apiResponse = {
+      isActiveTwoFactorAuth: true,
+      preTwoFactorAuthToken: "pre-token-abc",
+    }; // ← campo real
     mockFetch(apiResponse);
     await loginService("test@mail.com", "password123");
     expect(localStorage.getItem("preTwoFactorToken")).toBe("pre-token-abc"); // ← clave real

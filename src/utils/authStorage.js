@@ -6,7 +6,6 @@ const TOKEN_KEYS = {
 
 const USER_KEY = "user";
 
-// Tokens de sesión
 export const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
 export const setToken = (token) => {
   localStorage.setItem(TOKEN_KEYS.session, token);
@@ -16,7 +15,6 @@ export const removeToken = () => {
   localStorage.removeItem(TOKEN_KEYS.session);
 };
 
-// Tokens de primer login
 export const getFirstLoginToken = () =>
   localStorage.getItem(TOKEN_KEYS.firstLogin);
 export const setFirstLoginToken = (token) => {
@@ -27,8 +25,8 @@ export const removeFirstLoginToken = () => {
   localStorage.removeItem(TOKEN_KEYS.firstLogin);
 };
 
-// Tokens de pre-2fa
-export const getPreTwoFactorAuthToken = () => localStorage.getItem(TOKEN_KEYS.preTwoFactorAuth);
+export const getPreTwoFactorAuthToken = () =>
+  localStorage.getItem(TOKEN_KEYS.preTwoFactorAuth);
 export const setPreTwoFactorAuthToken = (token) => {
   localStorage.setItem(TOKEN_KEYS.preTwoFactorAuth, token);
 };

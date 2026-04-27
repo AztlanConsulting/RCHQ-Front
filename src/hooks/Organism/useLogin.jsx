@@ -22,12 +22,14 @@ export const useLogin = () => {
 
   const email = {
     value: emailField.value,
-    handleValue: (val) => emailField.handleValue(val.slice(0, EMAIL_MAX_LENGTH)),
+    handleValue: (val) =>
+      emailField.handleValue(val.slice(0, EMAIL_MAX_LENGTH)),
   };
 
   const password = {
     value: passwordField.value,
-    handleValue: (val) => passwordField.handleValue(val.slice(0, PASSWORD_MAX_LENGTH)),
+    handleValue: (val) =>
+      passwordField.handleValue(val.slice(0, PASSWORD_MAX_LENGTH)),
   };
 
   const handleSubmit = async () => {
@@ -46,12 +48,10 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      const response = await loginService(result.data.email, result.data.password);
-
-      if (!response?.success && !response?.nextStep && !response?.isActiveTwoFactorAuth) {
-        setErrors(["No se pudo iniciar sesión"]);
-        return;
-      }
+      const response = await loginService(
+        result.data.email,
+        result.data.password,
+      );
 
       if (response?.nextStep === "CHANGE_PASSWORD_FIRST_LOGIN") {
         navigate("/primer-inicio/cambiar-contrasena", { replace: true });
