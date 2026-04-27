@@ -16,13 +16,6 @@ const tabs = [
     { id: "expediente", label: "Expediente" },
 ];
 
-const basicInfoFields = [
-    { id: "1", label: "Correo Electronico", name: "email", value: "" },
-    { id: "2", label: "Numero de Telefono", name: "phoneNumber", value: "" },
-    { id: "3", label: "Calle", name: "address", value: "" },
-    { id: "4", label: "Codigo Postal", name: "postalCode", value: "" },
-];
-
 const DetalleEmpleado = () => {
     const { employeeId } = useParams();
 
@@ -111,7 +104,7 @@ const DetalleEmpleado = () => {
             </div>
 
             {/* Box/Section for Basic Employee Info, Persistent across tabs */}
-            <div className="w-full flex p-4 items-center rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="w-full flex p-3 items-center rounded-xl border border-slate-200 bg-white shadow-sm">
                 {/* First column: avatar + status chip; second: text metrics */}
                 <div className="flex shrink-0 mr-8">
                     <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
@@ -138,7 +131,7 @@ const DetalleEmpleado = () => {
                         
                         {/* Name/House */}
                         <div className="w-full min-w-0">
-                            <Type variant="display-name" as="h2">
+                            <Type variant="display-name" as="h3">
                                 {`${employeeBasicInfo?.name ?? ""} ${employeeBasicInfo?.surname ?? ""}`}
                             </Type>
                             <Type variant="subtitle" as="p" className="mt-1">
@@ -222,7 +215,39 @@ const DetalleEmpleado = () => {
                             </div>
 
                             <div className="mt-4 flex flex-col gap-4">
-                                {basicInfoFields.map((field) => (
+                                <div className="min-w-[12rem flex-1">
+                                    <Type variant="metric-label" as="p">
+                                        Correo Electronico
+                                    </Type>
+                                    <Type variant="metric-value" as="p">
+                                        {employeeBasicInfo?.email ?? "N/A"}
+                                    </Type>
+                                </div>
+                                <div className="min-w-[12rem flex-1">
+                                    <Type variant="metric-label" as="p">
+                                        Número de Telefono
+                                    </Type>
+                                    <Type variant="metric-value" as="p">
+                                        {employeeBasicInfo?.phoneNumber ?? "N/A"}
+                                    </Type>
+                                </div>
+                                <div className="min-w-[12rem flex-1">
+                                    <Type variant="metric-label" as="p">
+                                        Dirección
+                                    </Type>
+                                    <Type variant="metric-value" as="p">
+                                        {employeeBasicInfo?.address?.street ?? "N/A"}
+                                    </Type>
+                                </div>
+                                <div className="min-w-[12rem flex-1">
+                                    <Type variant="metric-label" as="p">
+                                        Código Postal
+                                    </Type>
+                                    <Type variant="metric-value" as="p">
+                                        {employeeBasicInfo?.address?.postal_code ?? "N/A"}
+                                    </Type>
+                                </div>
+                                {/* {basicInfoFields.map((field) => (
                                     <div key={field.id} className="min-w-[12rem] flex-1">
                                         <Type variant="metric-label" as="p">
                                             {field.label ?? ""}
@@ -231,7 +256,7 @@ const DetalleEmpleado = () => {
                                             {employeeBasicInfo?.[field.name] ?? "N/A"}
                                         </Type>
                                     </div>
-                                ))}
+                                ))} */}
                             </div>
                         </div>
                         
