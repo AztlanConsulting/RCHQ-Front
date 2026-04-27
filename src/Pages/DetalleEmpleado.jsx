@@ -74,7 +74,7 @@ const DetalleEmpleado = () => {
     };
 
     getEmployeeDetail();
-  }, []);
+  }, [employeeId]);
 
   if (isLoading) return <Loader />;
 
