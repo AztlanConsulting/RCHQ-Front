@@ -46,8 +46,12 @@ const Personal = () => {
         <table className="w-full border-collapse border border-neutral-300 text-sm">
           <thead>
             <tr className="bg-neutral-100">
-              <th className="border border-neutral-300 p-2 text-left">Nombre</th>
-              <th className="border border-neutral-300 p-2 text-left">Casa / ubicación</th>
+              <th className="border border-neutral-300 p-2 text-left">
+                Nombre
+              </th>
+              <th className="border border-neutral-300 p-2 text-left">
+                Casa / ubicación
+              </th>
               <th className="border border-neutral-300 p-2 text-left">CURP</th>
             </tr>
           </thead>

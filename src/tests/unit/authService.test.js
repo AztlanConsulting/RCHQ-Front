@@ -23,7 +23,7 @@ const makeLoginSuccess = (overrides = {}) => ({
 // ─── Helpers de infraestructura ───────────────────────────────────────────────
 
 const mockFetch = (body, ok = true, status = 200) => {
-  globalThis.fetch  = vi.fn().mockResolvedValue({
+  globalThis.fetch = vi.fn().mockResolvedValue({
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),

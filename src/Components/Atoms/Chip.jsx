@@ -18,7 +18,9 @@ const Chip = ({ active = true, className = "" }) => {
       <span
         className={[
           "h-2 w-2 shrink-0 rounded-full ring-2 ring-white",
-          active ? "bg-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]" : "bg-slate-400 shadow-[0_0_0_1px_rgba(148,163,184,0.4)]",
+          active
+            ? "bg-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
+            : "bg-slate-400 shadow-[0_0_0_1px_rgba(148,163,184,0.4)]",
         ].join(" ")}
         aria-hidden
       />

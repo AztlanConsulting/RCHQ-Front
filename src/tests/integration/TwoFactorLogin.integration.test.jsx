@@ -99,7 +99,9 @@ describe("TwoFactorLogin + AuthService — flujo de validación 2FA", () => {
 
     // Assert
     await waitFor(() =>
-      expect(screen.getByText(/Código de verificación de dos pasos inválido/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/Código de verificación de dos pasos inválido/i),
+      ).toBeInTheDocument(),
     );
     expect(mockNavigate).not.toHaveBeenCalledWith("/app/dashboard", {
       replace: true,

@@ -32,7 +32,10 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="personal" element={<Personal />} />
-            <Route path="detalle-empleado/:employeeId" element={<DetalleEmpleado />} />
+            <Route
+              path="detalle-empleado/:employeeId"
+              element={<DetalleEmpleado />}
+            />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
           </Route>
