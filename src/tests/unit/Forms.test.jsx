@@ -35,7 +35,9 @@ const mockActions = [
 
 describe("Forms — renderizado", () => {
   it("muestra el título cuando se proporciona", () => {
-    render(<Forms title="Bienvenido" fields={[]} actions={[]} onSubmit={() => {}} />);
+    render(
+      <Forms title="Bienvenido" fields={[]} actions={[]} onSubmit={() => {}} />,
+    );
     expect(screen.getByText("Bienvenido")).toBeInTheDocument();
   });
 
@@ -46,25 +48,39 @@ describe("Forms — renderizado", () => {
 
   it("muestra la descripción cuando se proporciona", () => {
     render(
-      <Forms description="Ingresa tus datos" fields={[]} actions={[]} onSubmit={() => {}} />,
+      <Forms
+        description="Ingresa tus datos"
+        fields={[]}
+        actions={[]}
+        onSubmit={() => {}}
+      />,
     );
     expect(screen.getByText("Ingresa tus datos")).toBeInTheDocument();
   });
 
   it("renderiza los campos correctamente", () => {
     render(<Forms fields={mockFields} actions={[]} onSubmit={() => {}} />);
-    expect(screen.getByPlaceholderText("Correo electrónico")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Correo electrónico"),
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Contraseña")).toBeInTheDocument();
   });
 
   it("renderiza los botones de acción", () => {
     render(<Forms fields={[]} actions={mockActions} onSubmit={() => {}} />);
-    expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    ).toBeInTheDocument();
   });
 
   it("renderiza el footer cuando se proporciona", () => {
     render(
-      <Forms fields={[]} actions={[]} onSubmit={() => {}} footer={<p>¿Olvidaste tu contraseña?</p>} />,
+      <Forms
+        fields={[]}
+        actions={[]}
+        onSubmit={() => {}}
+        footer={<p>¿Olvidaste tu contraseña?</p>}
+      />,
     );
     expect(screen.getByText("¿Olvidaste tu contraseña?")).toBeInTheDocument();
   });
@@ -81,7 +97,9 @@ describe("Forms — interacción", () => {
   it("no llama a onSubmit cuando el botón está deshabilitado", () => {
     const handleSubmit = vi.fn();
     const disabledActions = [{ ...mockActions[0], disabled: true }];
-    render(<Forms fields={[]} actions={disabledActions} onSubmit={handleSubmit} />);
+    render(
+      <Forms fields={[]} actions={disabledActions} onSubmit={handleSubmit} />,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Iniciar sesión" }));
     expect(handleSubmit).not.toHaveBeenCalled();
   });
@@ -89,8 +107,13 @@ describe("Forms — interacción", () => {
   it("previene el comportamiento por defecto del form al hacer submit", () => {
     const handleSubmit = vi.fn();
     render(<Forms fields={[]} actions={mockActions} onSubmit={handleSubmit} />);
-    const form = screen.getByRole("button", { name: "Iniciar sesión" }).closest("form");
-    const submitEvent = new Event("submit", { bubbles: true, cancelable: true });
+    const form = screen
+      .getByRole("button", { name: "Iniciar sesión" })
+      .closest("form");
+    const submitEvent = new Event("submit", {
+      bubbles: true,
+      cancelable: true,
+    });
     form.dispatchEvent(submitEvent);
     expect(submitEvent.defaultPrevented).toBe(true);
   });

@@ -2,18 +2,16 @@
 import { useParams } from "react-router-dom";
 import DocumentsSection from "../Components/Organism/DocumentsSection";
 import { useDocuments } from "../hooks/Organism/useDocuments";
-import { useDocumentUploadModal } from "../hooks/Molecules/useDocumentUploadModal";
 import { DOCUMENT_TYPES } from "../Services/DocumentService";
 
 const Documents = () => {
   const { employeeId } = useParams();
-
   const {
+    // Organism
     documents,
     loadingDocs,
     fetchError,
     showUploadModal,
-    editingDocument,
     modalLoading,
     modalError,
     docToDelete,
@@ -22,27 +20,20 @@ const Documents = () => {
     canModify,
     conflictDocument,
     setDocToDelete,
-    handleModalSubmit,
     handleDeleteConfirm,
     handleOpenEdit,
     handleOpenUpload,
     handleCloseModal,
     handleConflictConfirm,
     handleConflictCancel,
-  } = useDocuments(employeeId);
-
-  const {
+    // Modal (antes molecule)
     isEditing,
     documentType,
     fileName,
     handleFileChange,
-    handleSubmit,
     displayError,
-  } = useDocumentUploadModal({
-    editingDocument,
-    isOpen: showUploadModal,
-    onSubmit: handleModalSubmit,
-  });
+    handleModalSubmit,
+  } = useDocuments(employeeId);
 
   return (
     <DocumentsSection
@@ -67,7 +58,7 @@ const Documents = () => {
       handleOpenUpload={handleOpenUpload}
       handleCloseModal={handleCloseModal}
       handleFileChange={handleFileChange}
-      handleSubmit={handleSubmit}
+      handleSubmit={handleModalSubmit}
       handleOpenEdit={handleOpenEdit}
       setDocToDelete={setDocToDelete}
       handleDeleteConfirm={handleDeleteConfirm}

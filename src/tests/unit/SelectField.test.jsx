@@ -79,7 +79,9 @@ describe("SelectField — renderizado base", () => {
 
     // Act
     render(<SelectField {...props} />);
-    const placeholder = screen.getByText("Selecciona un tipo", { hidden: true });
+    const placeholder = screen.getByText("Selecciona un tipo", {
+      hidden: true,
+    });
 
     // Assert
     expect(placeholder).toBeDisabled();
@@ -89,7 +91,10 @@ describe("SelectField — renderizado base", () => {
 
   it("vincula el label con el select mediante el ID", () => {
     // Arrange
-    const props = makeProps({ id: "document-type", label: "Tipo de documento" });
+    const props = makeProps({
+      id: "document-type",
+      label: "Tipo de documento",
+    });
 
     // Act
     render(<SelectField {...props} />);

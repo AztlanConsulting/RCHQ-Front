@@ -93,7 +93,9 @@ const DocumentsSection = ({
               key={doc.type}
               doc={doc}
               label={getDocumentLabel(doc.type || doc.documentType)}
-              date={formatDocumentDate(doc.createdAt || doc.date || doc.uploadedAt)}
+              date={formatDocumentDate(
+                doc.createdAt || doc.date || doc.uploadedAt,
+              )}
               fileUrl={getDocumentFileUrl(doc)}
               isPdf={isDocumentPdf(doc)}
               onEdit={handleOpenEdit}

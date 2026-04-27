@@ -4,7 +4,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import PhotoUploader from "../../Components/Atoms/PhotoUploader";
 
 beforeAll(() => {
-  globalThis.URL.createObjectURL = vi.fn(() => "blob:http://localhost/mock-url");
+  globalThis.URL.createObjectURL = vi.fn(
+    () => "blob:http://localhost/mock-url",
+  );
   globalThis.URL.revokeObjectURL = vi.fn();
 });
 

@@ -1,7 +1,7 @@
 // tests/unit/ConfirmDeleteModal.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConfirmDeleteModal from "../../Components/Organism/ConfirmDeleteModal";
+import ConfirmDeleteModal from "../../Components/Molecules/ConfirmDeleteModal";
 
 const makeProps = (overrides = {}) => ({
   label: "CV",
@@ -13,18 +13,24 @@ const makeProps = (overrides = {}) => ({
 
 describe("ConfirmDeleteModal — renderizado", () => {
   it("no renderiza nada cuando label es null", () => {
-    const { container } = render(<ConfirmDeleteModal {...makeProps({ label: null })} />);
+    const { container } = render(
+      <ConfirmDeleteModal {...makeProps({ label: null })} />,
+    );
     expect(container.firstChild).toBeNull();
   });
 
   it("muestra el label del documento en el mensaje", () => {
-    render(<ConfirmDeleteModal {...makeProps({ label: "Acta de Nacimiento" })} />);
+    render(
+      <ConfirmDeleteModal {...makeProps({ label: "Acta de Nacimiento" })} />,
+    );
     expect(screen.getByText("Acta de Nacimiento")).toBeInTheDocument();
   });
 
   it("muestra el botón 'Eliminar' cuando no está cargando", () => {
     render(<ConfirmDeleteModal {...makeProps()} />);
-    expect(screen.getByRole("button", { name: /eliminar/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /eliminar/i }),
+    ).toBeInTheDocument();
   });
 
   it("muestra 'Eliminando...' cuando loading=true", () => {

@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { useField } from "../Atoms/useField";
+import { useDocumentFile } from "../Atoms/useDocumentFile";
 import {
   getDocumentsService,
   uploadDocumentService,
@@ -11,16 +13,14 @@ const getUserInfoFromToken = () => {
     const token = localStorage.getItem("token");
     if (!token) return null;
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return {
-      role: payload.role,
-      id: payload.id,
-    };
+    return { role: payload.role, id: payload.id };
   } catch (error) {
     console.error("error: ", error);
   }
 };
 
 export const useDocuments = (employeeId) => {
+  // ── Organism state ──────────────────────────────────────────────
   const [documents, setDocuments] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -34,15 +34,33 @@ export const useDocuments = (employeeId) => {
   const [canModify, setCanModify] = useState(false);
   const [conflictDocument, setConflictDocument] = useState(null);
 
+  // ── Molecule state (useDocumentUploadModal) ─────────────────────
+  const documentType = useField();
+  const {
+    file,
+    fileName,
+    error: fileError,
+    handleFileChange,
+    reset: resetFile,
+  } = useDocumentFile();
+  const [localError, setLocalError] = useState("");
+
+  const isEditing = Boolean(editingDocument);
+  const { handleValue: setDocumentType } = documentType;
+
+  useEffect(() => {
+    setDocumentType(editingDocument?.type || "");
+    resetFile();
+  }, [editingDocument, showUploadModal, setDocumentType, resetFile]);
+
+  const displayError = localError || fileError;
+
+  // ── Organism effects ────────────────────────────────────────────
   useEffect(() => {
     const userInfo = getUserInfoFromToken();
     if (!userInfo) return;
     const userRole = userInfo.role?.toLowerCase();
-    if (userRole === "administrador" || userRole === "coordinador") {
-      setCanModify(true);
-    } else {
-      setCanModify(false);
-    }
+    setCanModify(userRole === "administrador" || userRole === "coordinador");
   }, [employeeId]);
 
   useEffect(() => {
@@ -62,10 +80,13 @@ export const useDocuments = (employeeId) => {
         setDocuments([]);
         return;
       }
-      
+
       const BASEURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
       const docsArray = Object.entries(docRow.documents)
-        .filter(([key, value]) => key !== "document_id" && value !== null && value !== "")
+        .filter(
+          ([key, value]) =>
+            key !== "document_id" && value !== null && value !== "",
+        )
         .map(([type, url]) => ({ type, url: `${BASEURL}/${url}` }));
 
       setDocuments(docsArray);
@@ -80,16 +101,32 @@ export const useDocuments = (employeeId) => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  const handleModalSubmit = useCallback(async (formData) => {
+  // ── Molecule handler (handleSubmit del modal) ───────────────────
+  const handleModalSubmit = useCallback(async () => {
     if (!canModify) {
       setModalError("Operación denegada. No tienes permisos para modificar.");
       return;
     }
 
+    // Validaciones locales del modal
+    setLocalError("");
+    if (!documentType.value) {
+      setLocalError("Selecciona el tipo de documento.");
+      return;
+    }
+    if (!isEditing && !file) {
+      setLocalError("Selecciona un archivo para subir.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("documentField", documentType.value);
+    if (file) formData.append("file", file);
+
     setModalLoading(true);
     setModalError("");
     try {
-      if (editingDocument) {
+      if (isEditing) {
         await updateDocumentService(employeeId, editingDocument.type, formData);
         setSuccessMessage("Documento actualizado correctamente.");
       } else {
@@ -112,13 +149,26 @@ export const useDocuments = (employeeId) => {
     } finally {
       setModalLoading(false);
     }
-  }, [employeeId, editingDocument, fetchDocuments, canModify]);
+  }, [
+    canModify,
+    documentType.value,
+    isEditing,
+    file,
+    employeeId,
+    editingDocument,
+    fetchDocuments,
+  ]);
 
+  // ── Organism handlers ───────────────────────────────────────────
   const handleConflictConfirm = useCallback(async () => {
     if (!conflictDocument) return;
     setModalLoading(true);
     try {
-      await updateDocumentService(employeeId, conflictDocument.field, conflictDocument.formData);
+      await updateDocumentService(
+        employeeId,
+        conflictDocument.field,
+        conflictDocument.formData,
+      );
       setSuccessMessage("Documento reemplazado correctamente.");
       fetchDocuments();
     } catch (err) {
@@ -134,8 +184,7 @@ export const useDocuments = (employeeId) => {
   }, []);
 
   const handleDeleteConfirm = useCallback(async () => {
-    if (!canModify) return;
-    if (!docToDelete) return;
+    if (!canModify || !docToDelete) return;
     setDeletingId(docToDelete.type);
     try {
       await deleteDocumentService(employeeId, docToDelete.type);
@@ -149,12 +198,15 @@ export const useDocuments = (employeeId) => {
     }
   }, [employeeId, docToDelete, canModify]);
 
-  const handleOpenEdit = useCallback((doc) => {
-    if (!canModify) return;
-    setEditingDocument(doc);
-    setModalError("");
-    setShowUploadModal(true);
-  }, [canModify]);
+  const handleOpenEdit = useCallback(
+    (doc) => {
+      if (!canModify) return;
+      setEditingDocument(doc);
+      setModalError("");
+      setShowUploadModal(true);
+    },
+    [canModify],
+  );
 
   const handleOpenUpload = useCallback(() => {
     if (!canModify) return;
@@ -170,6 +222,7 @@ export const useDocuments = (employeeId) => {
   }, []);
 
   return {
+    // Organism
     documents,
     loadingDocs,
     fetchError,
@@ -183,12 +236,18 @@ export const useDocuments = (employeeId) => {
     canModify,
     conflictDocument,
     setDocToDelete,
-    handleModalSubmit,
     handleDeleteConfirm,
     handleOpenEdit,
     handleOpenUpload,
     handleCloseModal,
     handleConflictConfirm,
     handleConflictCancel,
+    // Modal (antes molecule)
+    isEditing,
+    documentType,
+    fileName,
+    handleFileChange,
+    displayError,
+    handleModalSubmit,
   };
 };

@@ -7,7 +7,9 @@ const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl flex flex-col gap-4">
-        <h3 className="text-lg font-semibold text-slate-900">Eliminar documento</h3>
+        <h3 className="text-lg font-semibold text-slate-900">
+          Eliminar documento
+        </h3>
         <p className="text-sm text-slate-500">
           ¿Estás seguro de que deseas eliminar{" "}
           <span className="font-semibold text-slate-700">{label}</span>? Esta

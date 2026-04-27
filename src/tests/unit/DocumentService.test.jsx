@@ -37,7 +37,7 @@ describe("DOCUMENT_TYPES", () => {
 describe("getDocumentsService", () => {
   it("lanza error si no hay token en localStorage", async () => {
     await expect(getDocumentsService("emp-123")).rejects.toThrow(
-      "No se encontró token de sesión"
+      "No se encontró token de sesión",
     );
   });
 
@@ -58,7 +58,7 @@ describe("getDocumentsService", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({ Authorization: "Bearer my-token" }),
-      })
+      }),
     );
   });
 
@@ -74,9 +74,9 @@ describe("getDocumentsService", () => {
 
 describe("uploadDocumentService", () => {
   it("lanza error si no hay token", async () => {
-    await expect(uploadDocumentService("emp-123", new FormData())).rejects.toThrow(
-      "No se encontró token de sesión"
-    );
+    await expect(
+      uploadDocumentService("emp-123", new FormData()),
+    ).rejects.toThrow("No se encontró token de sesión");
   });
 
   it("hace POST al endpoint correcto", async () => {
@@ -86,7 +86,7 @@ describe("uploadDocumentService", () => {
     await uploadDocumentService("emp-123", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents"),
-      expect.objectContaining({ method: "POST", body: formData })
+      expect.objectContaining({ method: "POST", body: formData }),
     );
   });
 
@@ -101,7 +101,9 @@ describe("uploadDocumentService", () => {
   it("lanza error con status 400 cuando faltan campos", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "Faltan campos requeridos" }, false, 400);
-    await expect(uploadDocumentService("emp-123", new FormData())).rejects.toMatchObject({
+    await expect(
+      uploadDocumentService("emp-123", new FormData()),
+    ).rejects.toMatchObject({
       status: 400,
     });
   });
@@ -109,9 +111,9 @@ describe("uploadDocumentService", () => {
 
 describe("updateDocumentService", () => {
   it("lanza error si no hay token", async () => {
-    await expect(updateDocumentService("emp-123", "cv", new FormData())).rejects.toThrow(
-      "No se encontró token de sesión"
-    );
+    await expect(
+      updateDocumentService("emp-123", "cv", new FormData()),
+    ).rejects.toThrow("No se encontró token de sesión");
   });
 
   it("hace PUT al endpoint con el field correcto", async () => {
@@ -121,7 +123,7 @@ describe("updateDocumentService", () => {
     await updateDocumentService("emp-123", "cv", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
-      expect.objectContaining({ method: "PUT", body: formData })
+      expect.objectContaining({ method: "PUT", body: formData }),
     );
   });
 
@@ -136,7 +138,7 @@ describe("updateDocumentService", () => {
 describe("deleteDocumentService", () => {
   it("lanza error si no hay token", async () => {
     await expect(deleteDocumentService("emp-123", "cv")).rejects.toThrow(
-      "No se encontró token de sesión"
+      "No se encontró token de sesión",
     );
   });
 
@@ -146,7 +148,7 @@ describe("deleteDocumentService", () => {
     await deleteDocumentService("emp-123", "cv");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
-      expect.objectContaining({ method: "DELETE" })
+      expect.objectContaining({ method: "DELETE" }),
     );
   });
 

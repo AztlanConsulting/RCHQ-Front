@@ -1,6 +1,11 @@
 import { useState, useCallback } from "react";
 
-const ALLOWED_TYPES = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+];
 const MAX_SIZE = 10 * 1024 * 1024;
 
 export const useDocumentFile = () => {

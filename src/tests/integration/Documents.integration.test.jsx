@@ -43,10 +43,7 @@ const renderPage = (role = "Administrador") => {
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
       <Routes>
-        <Route
-          path="/employee/:employeeId/documents"
-          element={<Documents />}
-        />
+        <Route path="/employee/:employeeId/documents" element={<Documents />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -109,7 +106,9 @@ describe("Documents — permisos por rol", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage("Administrador");
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -117,7 +116,9 @@ describe("Documents — permisos por rol", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage("Coordinador");
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -125,7 +126,9 @@ describe("Documents — permisos por rol", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage("Empleado");
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: /subir documento/i })).toBeNull();
+      expect(
+        screen.queryByRole("button", { name: /subir documento/i }),
+      ).toBeNull();
     });
   });
 });
@@ -136,7 +139,9 @@ describe("Documents — subir documento", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     expect(screen.getByText("Subir documento")).toBeInTheDocument();
@@ -147,7 +152,9 @@ describe("Documents — subir documento", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     expect(screen.getByText("Subir documento")).toBeInTheDocument();
@@ -161,12 +168,16 @@ describe("Documents — subir documento", () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     fireEvent.click(screen.getByRole("button", { name: /^subir$/i }));
     await waitFor(() => {
-      expect(screen.getByText(/selecciona el tipo de documento/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/selecciona el tipo de documento/i),
+      ).toBeInTheDocument();
     });
     expect(uploadDocumentService).not.toHaveBeenCalled();
   });
@@ -176,7 +187,9 @@ describe("Documents — subir documento", () => {
     uploadDocumentService.mockResolvedValue({ success: true });
     renderPage();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /subir documento/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     const select = document.querySelector("select");
@@ -190,7 +203,10 @@ describe("Documents — subir documento", () => {
       fireEvent.click(screen.getByRole("button", { name: /^subir$/i }));
     });
     await waitFor(() => {
-      expect(uploadDocumentService).toHaveBeenCalledWith(TEST_EMPLOYEE_ID, expect.any(FormData));
+      expect(uploadDocumentService).toHaveBeenCalledWith(
+        TEST_EMPLOYEE_ID,
+        expect.any(FormData),
+      );
     });
     await waitFor(() => {
       expect(getDocumentsService).toHaveBeenCalledTimes(2);
@@ -222,7 +238,9 @@ describe("Documents — editar documento", () => {
     await waitFor(() =>
       expect(screen.getByText("Editar documento")).toBeInTheDocument(),
     );
-    const file = new File(["nuevo"], "cv_nuevo.pdf", { type: "application/pdf" });
+    const file = new File(["nuevo"], "cv_nuevo.pdf", {
+      type: "application/pdf",
+    });
     const fileInput = document.querySelector("input[type='file']");
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
@@ -231,7 +249,11 @@ describe("Documents — editar documento", () => {
       fireEvent.click(screen.getByRole("button", { name: /guardar cambios/i }));
     });
     await waitFor(() => {
-      expect(updateDocumentService).toHaveBeenCalledWith(TEST_EMPLOYEE_ID, "cv", expect.any(FormData));
+      expect(updateDocumentService).toHaveBeenCalledWith(
+        TEST_EMPLOYEE_ID,
+        "cv",
+        expect.any(FormData),
+      );
     });
     await waitFor(() => {
       expect(getDocumentsService).toHaveBeenCalledTimes(2);
@@ -243,7 +265,9 @@ describe("Documents — editar documento", () => {
 describe("Documents — eliminar documento", () => {
   // Helper para obtener el botón de confirmar dentro del modal
   const getConfirmButton = () => {
-    const modal = screen.getByText(/esta acción no se puede deshacer/i).closest("div");
+    const modal = screen
+      .getByText(/esta acción no se puede deshacer/i)
+      .closest("div");
     return within(modal).getByRole("button", { name: /^eliminar$/i });
   };
 
@@ -255,7 +279,9 @@ describe("Documents — eliminar documento", () => {
     });
     fireEvent.click(screen.getByTitle("Eliminar"));
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
-    expect(screen.getByText(/esta acción no se puede deshacer/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/esta acción no se puede deshacer/i),
+    ).toBeInTheDocument();
   });
 
   it("cancela la eliminación al hacer click en Cancelar del modal", async () => {
@@ -268,7 +294,9 @@ describe("Documents — eliminar documento", () => {
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
     await waitFor(() => {
-      expect(screen.queryByText(/esta acción no se puede deshacer/i)).toBeNull();
+      expect(
+        screen.queryByText(/esta acción no se puede deshacer/i),
+      ).toBeNull();
     });
     expect(deleteDocumentService).not.toHaveBeenCalled();
   });
@@ -288,7 +316,10 @@ describe("Documents — eliminar documento", () => {
       fireEvent.click(getConfirmButton());
     });
     await waitFor(() => {
-      expect(deleteDocumentService).toHaveBeenCalledWith(TEST_EMPLOYEE_ID, "cv");
+      expect(deleteDocumentService).toHaveBeenCalledWith(
+        TEST_EMPLOYEE_ID,
+        "cv",
+      );
     });
     await waitFor(() => {
       expect(screen.queryByText("CV")).toBeNull();
@@ -304,7 +335,9 @@ describe("Documents — eliminar documento", () => {
     });
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
-      expect(screen.getByText(/esta acción no se puede deshacer/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/esta acción no se puede deshacer/i),
+      ).toBeInTheDocument(),
     );
     await act(async () => {
       fireEvent.click(getConfirmButton());

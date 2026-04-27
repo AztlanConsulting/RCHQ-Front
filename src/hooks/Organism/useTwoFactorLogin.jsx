@@ -48,7 +48,7 @@ export const useTwoFactorLogin = () => {
         setError(
           "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
         );
-        blockToggle(); 
+        blockToggle();
       } else {
         setError(
           err.message || "Código de autenticación en dos pasos inválido",

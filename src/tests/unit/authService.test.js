@@ -87,7 +87,7 @@ describe("getPreTwoFactorAuthToken", () => {
   });
 
   it("retorna el token cuando existe en localStorage", () => {
-    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token-xyz" }); 
+    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token-xyz" });
     expect(getPreTwoFactorAuthToken()).toBe("pre-token-xyz");
   });
 });
@@ -129,7 +129,7 @@ describe("loginService", () => {
     };
     mockFetch(apiResponse);
     await loginService("test@mail.com", "password123");
-    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBe("pre-token-abc"); 
+    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBe("pre-token-abc");
     expect(localStorage.getItem("token")).toBeNull();
   });
 
