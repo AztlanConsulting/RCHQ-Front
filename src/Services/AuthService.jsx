@@ -1,51 +1,41 @@
+import {
+  clearAuthStorage,
+  getToken,
+  getPre2faToken,
+  getFirstLoginToken,
+  setToken,
+  setStoredUser,
+  setPre2faToken,
+  setFirstLoginToken,
+  removePre2faToken,
+} from "../utils/authStorage";
+import { buildApiError, getReadableErrors } from "../utils/apiErrors";
+
 const API_URL = "http://localhost:3000";
 
-const buildApiError = (response, data, fallbackMessage) => {
-  const errorMessage = new Error(data?.message || fallbackMessage);
-  errorMessage.status = response.status;
-  errorMessage.code = data?.code;
-  errorMessage.blockedUntil = data?.blockedUntil;
-  errorMessage.data = data?.data;
-  errorMessage.errors = Array.isArray(data?.errors) ? data.errors : [];
-  return errorMessage;
-};
+const saveLoginSession = (responseData) => {
+  clearAuthStorage();
+  const token = responseData?.data?.token;
+  const user = responseData?.data?.user;
 
-const getReadableErrors = (err) => {
-  if (Array.isArray(err?.errors) && err.errors.length > 0) {
-    return err.errors.map((item) => item.message);
-  }
-
-  return [err?.message || "Ocurrió un error inesperado"];
+  if (token) setToken(token);
+  if (user) setStoredUser(user);
 };
 
 const savePre2faSession = (responseData) => {
   clearAuthStorage();
   const pre2faToken = responseData?.pre2FAToken;
   if (pre2faToken) {
-    localStorage.setItem(TOKEN_KEYS.pre2fa, pre2faToken); // "PRE_2FA"
+    setPre2faToken(pre2faToken);
   }
 };
 
-const TOKEN_KEYS = {
-  session: "token",
-  // firstLogin: "firstLoginToken",
-  pre2fa: "PRE_2FA",
-};
-
-const clearAuthStorage = () => {
-  localStorage.removeItem(TOKEN_KEYS.session);
-  // localStorage.removeItem(TOKEN_KEYS.firstLogin);
-  localStorage.removeItem(TOKEN_KEYS.pre2fa);
-
-  localStorage.removeItem("user");
-};
-
-const saveLoginSession = (responseData) => {
+const saveFirstLoginSession = (responseData) => {
   clearAuthStorage();
-  const token = responseData?.data?.token;
-  const user = responseData?.data?.user;
-  if (token) localStorage.setItem(TOKEN_KEYS.session, token);
-  if (user) localStorage.setItem("user", JSON.stringify(user));
+  const firstLoginToken = responseData?.data?.firstLoginToken;
+  if (firstLoginToken) {
+    setFirstLoginToken(firstLoginToken);
+  }
 };
 
 const loginService = async (email, password) => {
@@ -63,27 +53,23 @@ const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
-  if (data.isActive2FA) {
-    savePre2faSession(data);
-  } else {
-    saveLoginSession(data);
+  if (data?.nextStep === "CHANGE_PASSWORD_FIRST_LOGIN") {
+    saveFirstLoginSession(data);
+    return data;
   }
 
+  if (data?.isActive2FA) {
+    savePre2faSession(data);
+    return data;
+  }
+
+  saveLoginSession(data);
   return data;
 };
-
-const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
-const getPre2faToken = () => localStorage.getItem(TOKEN_KEYS.pre2fa);
 
 const logoutService = () => {
   clearAuthStorage();
 };
-
-/* Fuera de alcance de la us 3
-const getFirstLoginToken = () => localStorage.getItem("firstLoginToken");
-
-const changePasswordService = async () => {};
-*/
 
 const activateTwoFactorAuthService = async () => {
   const token = getToken();
@@ -198,7 +184,11 @@ const getStatus2FA = async () => {
 const desactivate2FAService = async (password) => {
   const token = getToken();
 
-  const response = await fetch(`${API_URL}/auth/2fa/disable`, {
+  if (!token) {
+    throw new Error("No se encontró token de sesión");
+  }
+
+  const response = await fetch(`${API_URL}/users/2fa/disable`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -213,7 +203,7 @@ const desactivate2FAService = async (password) => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos pasos",
+      "Error al desactivar la autenticación de dos pasos",
     );
   }
 
@@ -224,6 +214,7 @@ export {
   loginService,
   getToken,
   getPre2faToken,
+  getFirstLoginToken,
   logoutService,
   getReadableErrors,
   activateTwoFactorAuthService,
@@ -231,4 +222,5 @@ export {
   validateLogin2FAService,
   getStatus2FA,
   desactivate2FAService,
+  removePre2faToken,
 };

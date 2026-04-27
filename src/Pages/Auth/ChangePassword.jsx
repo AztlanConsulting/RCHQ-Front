@@ -1,22 +1,25 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Forms from "../../Components/Organism/Forms";
-import Button from "../../Components/Atoms/Button";
+import PasswordForm from "../../Components/Organism/PasswordForm";
+import { getFirstLoginToken, setPre2faToken } from "../../utils/authStorage";
+import { changePasswordFirstLoginService } from "../../Services/PasswordService";
+import useAuth from "../../hooks/useAuth";
 import {
-  changePasswordService,
-  getFirstLoginToken,
-  getReadableErrors,
-} from "../../Services/AuthService";
-import Alert from "../../Components/Atoms/Alerts";
-import eye from "/showEye.svg";
-import hideEye from "/hideEye.svg";
+  firstLoginChangePasswordSchema,
+  getFirstSchemaError,
+} from "../../utils/Schema/Auth/password.schemas";
+import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { login } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -27,120 +30,83 @@ const ChangePassword = () => {
     }
   }, [navigate]);
 
-  const toggleShowNewPassword = () => {
-    setShowNewPassword((value) => !value);
-  };
-
-  const toggleShowConfirmPassword = () => {
+  const toggleNewPassword = () => setShowNewPassword((value) => !value);
+  const toggleConfirmPassword = () =>
     setShowConfirmPassword((value) => !value);
-  };
 
-  const handleSubmit = async () => {
-    if (newPassword !== confirmPassword) {
-      setErrors([]);
-      return;
-    }
-
+  const handleSubmit = async ({ newPassword, confirmPassword }) => {
     setLoading(true);
     setErrors([]);
 
+    const validation = firstLoginChangePasswordSchema.safeParse({
+      newPassword,
+      confirmPassword,
+    });
+
+    if (!validation.success) {
+      setErrors([
+        getFirstSchemaError(validation) || "Revisa los campos del formulario",
+      ]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await changePasswordService(
+      const response = await changePasswordFirstLoginService(
         newPassword,
         confirmPassword,
       );
 
-      if (
-        response.nextStep === "SETUP_2FA_OPTIONAL" &&
-        response.data.shouldPrompt2FASetup
-      ) {
-        navigate("/setup-2fa");
+      if (response?.nextStep === "VERIFY_2FA") {
+        const pre2FAToken = response?.data?.pre2FAToken;
+
+        if (!pre2FAToken) {
+          setErrors(["No se recibió un token válido para continuar con 2FA"]);
+          return;
+        }
+
+        setPre2faToken(pre2FAToken);
+        navigate("/2FA", { replace: true });
         return;
       }
 
-      navigate("/app/dashboard");
+      const token = response?.data?.token;
+      const user = response?.data?.user;
+
+      if (!token) {
+        setErrors(["No se recibió un token de sesión válido"]);
+        return;
+      }
+
+      login({ token, user });
+      navigate("/app/dashboard", { replace: true });
     } catch (err) {
       console.error(err);
-      setErrors(getReadableErrors(err));
+      setErrors(mapPasswordApiError(err, "first-login"));
     } finally {
       setLoading(false);
     }
   };
 
-  const fields = [
-    {
-      id: "newPassword",
-      label: "Nueva contraseña",
-      type: showNewPassword ? "text" : "password",
-      value: newPassword,
-      setValue: setNewPassword,
-      placeholder: "Ingresa tu nueva contraseña",
-      iconRight: showNewPassword ? hideEye : eye,
-      onIconRightClick: toggleShowNewPassword,
-      iconRightAlt: showNewPassword
-        ? "Ocultar contraseña"
-        : "Mostrar contraseña",
-      iconRightAriaLabel: showNewPassword
-        ? "Ocultar contraseña"
-        : "Mostrar contraseña",
-    },
-    {
-      id: "confirmPassword",
-      label: "Confirmar nueva contraseña",
-      type: showConfirmPassword ? "text" : "password",
-      value: confirmPassword,
-      setValue: setConfirmPassword,
-      placeholder: "Confirma tu nueva contraseña",
-      iconRight: showConfirmPassword ? hideEye : eye,
-      onIconRightClick: toggleShowConfirmPassword,
-      iconRightAlt: showConfirmPassword
-        ? "Ocultar contraseña"
-        : "Mostrar contraseña",
-      iconRightAriaLabel: showConfirmPassword
-        ? "Ocultar contraseña"
-        : "Mostrar contraseña",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#1F3664] shadow-[0_4px_6px_rgba(0,47,142,0.35)] px-4 py-12">
+    <div className="min-h-screen bg-[#1F3664] px-4 py-12">
       <div className="mx-auto max-w-xl rounded-[32px] border border-slate-200 bg-white p-10 shadow-xl shadow-slate-950/40">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-slate-900">
-            Primer inicio de sesión
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-slate-600">
-            Por seguridad, debes cambiar tu contraseña antes de continuar.
-          </p>
-        </div>
-
-        {errors.length > 0 && (
-          <Alert
-            type="error"
-            message={
-              <ul className="list-disc pl-5">
-                {errors.map((item, index) => (
-                  <li key={`${item}-${index}`}>{item}</li>
-                ))}
-              </ul>
-            }
-          />
-        )}
-
-        <Forms
-          fields={fields}
-          actions={[
-            {
-              text: loading ? "Cambiando..." : "Cambiar Contraseña",
-              type: "submit",
-              disabled: loading,
-              bgColor: "bg-[#1F3664] shadow-[0_4px_6px_rgba(0,47,142,0.35)]",
-              textColor: "text-white",
-              hoverColor: "hover:bg-[#1F3664]/90",
-              activeColor: "active:bg-[#1F3664]/80",
-            },
-          ]}
+        <PasswordForm
+          mode="first-login"
+          title="Primer inicio de sesión"
+          description="Por seguridad, debes cambiar tu contraseña antes de continuar."
+          loading={loading}
+          errors={errors}
           onSubmit={handleSubmit}
+          submitText="Cambiar contraseña"
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          showNewPassword={showNewPassword}
+          toggleNewPassword={toggleNewPassword}
+          showConfirmPassword={showConfirmPassword}
+          toggleConfirmPassword={toggleConfirmPassword}
         />
       </div>
     </div>
