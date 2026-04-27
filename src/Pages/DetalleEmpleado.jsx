@@ -280,7 +280,9 @@ const DetalleEmpleado = () => {
                                             Tipo
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {employeeBasicInfo?.type
+                                            ? String(employeeBasicInfo.type).slice(0, 1).toUpperCase() + String(employeeBasicInfo.type).slice(1)
+                                            : "N/A"}
                                         </Type>
                                     </div>
                                     <div>
@@ -288,7 +290,9 @@ const DetalleEmpleado = () => {
                                             Salario
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {employeeBasicInfo?.salary
+                                            ? "$" + employeeBasicInfo.salary
+                                            : "N/A"}
                                         </Type>
                                     </div>
                                 </div>
