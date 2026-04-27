@@ -37,7 +37,6 @@ const renderPage = () =>
         </MemoryRouter>,
     );
 
-// Datos válidos reales (compatibles con Zod)
 const validFormData = {
     name: "Juan",
     surname: "Pérez",
@@ -45,17 +44,17 @@ const validFormData = {
     curp: "AAAA010101HDFNNN01",
     rfc: "AAAA010101A01",
     nss: "12345678901",
-    bank_account: "123456789012345678",
-    birthdate: "1990-01-01",
-    role_id: "a0000002-0000-4000-8000-000000000002",
+    bankAccount: "123456789012345678",
+    birthDate: "1990-01-01",
+    roleId: "a0000002-0000-4000-8000-000000000002",
 };
 
 // Mock roles
 const mockRoles = [
     {
-        id: validFormData.role_id,
-        role_id: validFormData.role_id,
-        value: validFormData.role_id,
+        id: validFormData.roleId,
+        roleId: validFormData.roleId,
+        value: validFormData.roleId,
         name: "Administrador",
         label: "Administrador",
     },
@@ -63,11 +62,11 @@ const mockRoles = [
 
 const fillAndSubmit = async (data) => {
     for (const [key, value] of Object.entries(data)) {
-        if (key === "role_id") {
+        if (key === "roleId") {
             const nativeSelect = document.querySelector("select");
             if (nativeSelect) {
                 fireEvent.change(nativeSelect, {
-                    target: { name: "role_id", value: value },
+                    target: { name: "roleId", value: value },
                 });
             } else {
                 const selectTriggers =
@@ -77,7 +76,7 @@ const fillAndSubmit = async (data) => {
                     fireEvent.click(trigger);
 
                     const role = mockRoles.find(
-                        (r) => r.id === value || r.role_id === value,
+                        (r) => r.id === value || r.roleId === value,
                     );
                     const roleName = role
                         ? role.name || role.label

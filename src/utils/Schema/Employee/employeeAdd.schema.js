@@ -35,7 +35,7 @@ export const employeeCreateSchema = z.object({
         .length(18, "El CURP debe tener exactamente 18 dígitos")
         .toUpperCase()
         .regex(CURP_REGEX, "Formato del CURP inválido"),
-    role_id: z.string().uuid("Selecciona un puesto"),
+    roleId: z.string().uuid("Selecciona un puesto"),
     rfc: z
         .string()
         .trim()
@@ -53,7 +53,7 @@ export const employeeCreateSchema = z.object({
         .or(z.literal(""))
         .nullable()
         .optional(),
-    bank_account: z
+    bankAccount: z
         .string()
         .trim()
         .length(18, "La CLABE debe tener exactamente 18 dígitos")
@@ -61,7 +61,7 @@ export const employeeCreateSchema = z.object({
         .or(z.literal(""))
         .nullable()
         .optional(),
-    birthdate: z
+    birthDate: z
         .string()
         .trim()
         .optional()
