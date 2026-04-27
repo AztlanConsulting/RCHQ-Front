@@ -1,23 +1,101 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../Components/Atoms/Button";
+import React from "react";
+
+/** Mock rows shaped like public.employee + house name, aligned with rhcq_back/data/seed.sql */
+const MOCK_EMPLOYEES = [
+  {
+    employeeId: "d5af9fe8-42d5-495c-a978-804d332f8842",
+    name: "Carlos",
+    surname: "Ramírez",
+    house: "Desarrollo",
+    curp: "XAXX010101HDFXXX01",
+    isActive: true,
+  },
+  {
+    employeeId: "b1111111-1111-4111-8111-111111111111",
+    name: "Ana",
+    surname: "López",
+    house: "Desarrollo",
+    curp: "LOPA850101MDFPLN08",
+    isActive: true,
+  },
+  {
+    employeeId: "c2222222-2222-4222-8222-222222222222",
+    name: "Luis",
+    surname: "Hernández",
+    house: "Tec de Monterrey",
+    curp: "HEHL900315HDFRRS09",
+    isActive: false,
+  },
+];
 
 const Personal = () => {
   const navigate = useNavigate();
 
+  const seeEmployeeDetail = (employeeID) => {
+    navigate(`/app/detalle-empleado/${employeeID}`);
+  };
+
   return (
-    <div className="p-8">
+    <div className="p-8 w-full min-h-[80vh] text-black">
       <h1 className="font-bold text-3xl text-[#121212] ml-1">
         Gestión de Personal
       </h1>
 
-      <Button
-        text="Añadir nuevo usuario"
-        onClick={() => navigate("/app/personal/nuevo")}
-        bgColor="bg-[#24375e]"
-        hoverColor="hover:bg-[#162d4a]"
-        activeColor="active:bg-[#0f2035]"
-        textColor="text-white"
-      />
+      <div className="mt-4 ml-1">
+        <Button
+          text="Añadir nuevo usuario"
+          onClick={() => navigate("/app/personal/nuevo")}
+          bgColor="bg-[#24375e]"
+          hoverColor="hover:bg-[#162d4a]"
+          activeColor="active:bg-[#0f2035]"
+          textColor="text-white"
+        />
+      </div>
+
+      <div className="mt-8">
+        <h2 className="p-4 ml-2 text-lg font-semibold">Empleados</h2>
+
+        <div className="px-4 overflow-x-auto">
+          <table className="w-full border-collapse border border-neutral-300 text-sm">
+            <thead>
+              <tr className="bg-neutral-100">
+                <th className="border border-neutral-300 p-2 text-left">
+                  Nombre
+                </th>
+                <th className="border border-neutral-300 p-2 text-left">
+                  Casa / ubicación
+                </th>
+                <th className="border border-neutral-300 p-2 text-left">CURP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_EMPLOYEES.map((emp) => (
+                <tr
+                  key={emp.employeeId}
+                  role="button"
+                  tabIndex={0}
+                  className="cursor-pointer hover:bg-neutral-50"
+                  onClick={() => seeEmployeeDetail(emp.employeeId)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      seeEmployeeDetail(emp.employeeId);
+                    }
+                  }}
+                >
+                  <td className="border border-neutral-300 p-2">
+                    {emp.name} {emp.surname}
+                  </td>
+                  <td className="border border-neutral-300 p-2">{emp.house}</td>
+                  <td className="border border-neutral-300 p-2">{emp.curp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
