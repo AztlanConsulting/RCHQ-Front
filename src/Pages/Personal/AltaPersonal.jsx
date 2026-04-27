@@ -1,135 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-    getEmployeeFormData,
-    createEmployee,
-} from "../../Services/PersonalService";
-import { employeeCreateSchema } from "../../Utils/Schema/Employee/employeeAdd.schema";
-
 import UserInfoSection from "../../Components/Organism/UserInfoSection";
 import Alert from "../../Components/Atoms/Alerts";
-
-const INITIAL_FORM = {
-    roleId: "",
-    name: "",
-    surname: "",
-    email: "",
-    curp: "",
-    rfc: "",
-    nss: "",
-    bankAccount: "",
-    birthDate: "",
-};
+import useEmployeeCreateForm from "../../hooks/Pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
-    const navigate = useNavigate();
-
-    const [roles, setRoles] = useState([]);
-    const [photo, setPhoto] = useState(null);
-    const [form, setForm] = useState(INITIAL_FORM);
-    const [errors, setErrors] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingData, setIsLoadingData] = useState(true);
-
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await getEmployeeFormData();
-                setRoles(data.roles ?? []);
-            } catch (err) {
-                setErrors("Error cargando datos iniciales");
-            } finally {
-                setIsLoadingData(false);
-            }
-        };
-        load();
-    }, []);
-
-    const handleChange = (e) => {
-        setErrors(null);
-        const { name, value } = e.target;
-
-        let finalValue = value;
-
-        switch (name) {
-            case "name":
-            case "surname":
-                finalValue = value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, "");
-                break;
-            case "nss":
-            case "bankAccount":
-                finalValue = value.replace(/\D/g, "");
-                break;
-            case "curp":
-            case "rfc":
-                finalValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-                break;
-            case "email":
-                finalValue = value.replace(/[^a-zA-Z0-9@._+-]/g, "");
-                break;
-            default:
-                finalValue = value;
-        }
-
-        setForm((prev) => ({ ...prev, [name]: finalValue }));
-    };
-
-    const handleSubmit = async () => {
-        setErrors(null);
-        console.log("FORM:", form);
-
-        const result = employeeCreateSchema.safeParse(form);
-
-        if (!result.success) {
-            setErrors(result.error.issues[0].message);
-            return;
-        }
-
-        setIsLoading(true);
-
-        try {
-            const payload = {
-                ...result.data,
-                picture: photo,
-            };
-            console.group("🚀 Enviando Datos de Empleado");
-            console.log("Datos del Formulario:", result.data);
-            console.log(
-                "Archivo de Foto:",
-                photo
-                    ? {
-                          name: photo.name,
-                          size: `${(photo.size / (1024 * 1024)).toFixed(2)} MB`,
-                          type: photo.type,
-                      }
-                    : "No hay foto seleccionada",
-            );
-            console.log("Payload Completo:", payload);
-            console.groupEnd();
-
-            const response = await createEmployee(payload);
-
-            setForm(INITIAL_FORM);
-            setPhoto(null);
-            onSuccess?.();
-
-            if (response.redirect) {
-                navigate(response.redirect);
-            } else {
-                navigate("/empleados");
-            }
-        } catch (err) {
-            setErrors(err.message);
-
-            if (err.redirect) {
-                setTimeout(() => {
-                    navigate(err.redirect);
-                }, 3000);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const {
+        form,
+        roles,
+        photo,
+        errors,
+        isLoading,
+        isLoadingData,
+        setErrors,
+        setPhoto,
+        handleChange,
+        handleSubmit,
+        navigate,
+    } = useEmployeeCreateForm(onSuccess);
 
     return (
         <div className="min-h-screen bg-[#f2f2f2] px-8 py-12 flex justify-center">
