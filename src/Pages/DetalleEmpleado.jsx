@@ -7,6 +7,7 @@ import { NativeSelect } from "../Components/untitled/base/select/select-native";
 import Chip from '../Components/Atoms/Chip';
 import Alert from "../Components/Atoms/Alerts";
 import Type from "../Components/Atoms/Type";
+import { totalWorkDaysFromApprovedVacationRequests } from "@/utils/detalle-empleado.utils";
 
 const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -247,16 +248,6 @@ const DetalleEmpleado = () => {
                                         {employeeBasicInfo?.address?.postal_code ?? "N/A"}
                                     </Type>
                                 </div>
-                                {/* {basicInfoFields.map((field) => (
-                                    <div key={field.id} className="min-w-[12rem] flex-1">
-                                        <Type variant="metric-label" as="p">
-                                            {field.label ?? ""}
-                                        </Type>
-                                        <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeBasicInfo?.[field.name] ?? "N/A"}
-                                        </Type>
-                                    </div>
-                                ))} */}
                             </div>
                         </div>
                         
@@ -285,7 +276,7 @@ const DetalleEmpleado = () => {
                                             : "N/A"}
                                         </Type>
                                     </div>
-                                    <div>
+                                    <div className="text-right">
                                         <Type variant="metric-label" as="p">
                                             Salario
                                         </Type>
@@ -303,20 +294,25 @@ const DetalleEmpleado = () => {
                                             Horario
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {employeeAdminInfo?.workdays[0]?.name ?? "Sin fecha de I"}
                                         </Type>
                                     </div>
-                                    <div>
+                                    <div className="text-right">
                                         <Type variant="metric-label" as="p">
-                                            N/A
+                                            Horas
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {employeeAdminInfo?.workdays[0]?.start 
+                                            ? String(employeeAdminInfo.workdays[0].start).slice(12, 16) + " - "
+                                            : "N/A - "}
+                                            {employeeAdminInfo?.workdays[0]?.end 
+                                            ? String(employeeAdminInfo.workdays[0].start).slice(12, 16)
+                                            : "N/A"}
                                         </Type>
                                     </div>
                                 </div>
 
-                                <div className="w-full flex justify-between">
+                                {/* <div className="w-full flex justify-between">
                                     <div>
                                         <Type variant="metric-label" as="p">
                                             Ausencias
@@ -333,7 +329,7 @@ const DetalleEmpleado = () => {
                                             {employeeAdminInfo?.start ?? "Sin fecha de I"}
                                         </Type>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <div className="w-full flex justify-between">
                                     <div>
@@ -341,15 +337,17 @@ const DetalleEmpleado = () => {
                                             Vacaciones
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {`${employeeAdminInfo?.vacationRequests?.length ?? 0} Solicitudes`}
                                         </Type>
                                     </div>
-                                    <div>
+                                    <div className="text-right">
                                         <Type variant="metric-label" as="p">
-                                            Numero
+                                            Días
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {`${employeeAdminInfo?.vacationRequests 
+                                            ? totalWorkDaysFromApprovedVacationRequests(employeeAdminInfo.vacationRequests)
+                                            : "0"} / 12 Usados`}
                                         </Type>
                                     </div>
                                 </div>
@@ -360,17 +358,17 @@ const DetalleEmpleado = () => {
                                             Faltas
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
+                                            {employeeAdminInfo?.faults?.length ?? 0}
                                         </Type>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <Type variant="metric-label" as="p">
                                             Numero
                                         </Type>
                                         <Type variant="metric-value" as="p" className="mt-0.5">
                                             {employeeAdminInfo?.start ?? "Sin fecha de I"}
                                         </Type>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ const variantStyles = {
   /** Small caps-style labels (metrics, form labels) — gray, bold */
   "metric-label": "text-xs font-semibold text-slate-500 sm:text-sm",
   /** Emphasized values under labels — black, regular weight, larger */
-  "metric-value": "text-base font-normal text-black sm:text-xl",
+  "metric-value": "text-base font-normal text-black sm:text-lg",
   /** Card / section titles */
   "section-title": "text-lg font-semibold text-black sm:text-xl",
   /** Default paragraph */
