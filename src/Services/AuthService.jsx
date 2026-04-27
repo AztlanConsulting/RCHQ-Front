@@ -49,7 +49,7 @@ const saveLoginSession = (responseData) => {
 };
 
 const loginService = async (email, password) => {
-  const response = await fetch(`${API_URL}/users/login`, {
+  const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -92,7 +92,7 @@ const activateTwoFactorAuthService = async () => {
     throw new Error("No se encontró token de sesión");
   }
 
-  const response = await fetch(`${API_URL}/users/2fa/setup`, {
+  const response = await fetch(`${API_URL}/auth/2fa/setup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -119,7 +119,7 @@ const verify2FAService = async (code) => {
     throw new Error("No se encontró token de sesión");
   }
 
-  const response = await fetch(`${API_URL}/users/2fa/verify`, {
+  const response = await fetch(`${API_URL}/auth/2fa/verify`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -146,7 +146,7 @@ const validateLogin2FAService = async (code) => {
 
   if (!token) throw new Error("No se encontró token de pre-autenticación");
 
-  const response = await fetch(`${API_URL}/users/2fa/validate`, {
+  const response = await fetch(`${API_URL}/auth/2fa/validate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -175,7 +175,7 @@ const getStatus2FA = async () => {
     throw new Error("No se encontró token de sesión");
   }
 
-  const response = await fetch(`${API_URL}/users/status/2FA`, {
+  const response = await fetch(`${API_URL}/auth/status/2FA`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -198,7 +198,7 @@ const getStatus2FA = async () => {
 const desactivate2FAService = async (password) => {
   const token = getToken();
 
-  const response = await fetch(`${API_URL}/users/2fa/disable`, {
+  const response = await fetch(`${API_URL}/auth/2fa/disable`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

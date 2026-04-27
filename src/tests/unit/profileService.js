@@ -40,7 +40,7 @@ describe("ProfileService — getUserData", () => {
       await getUserData(TOKEN);
 
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:3000/users/profile",
+        "http://localhost:3000/auth/profile",
         expect.objectContaining({
           method:  "GET",
           headers: expect.objectContaining({

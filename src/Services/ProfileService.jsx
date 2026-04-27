@@ -22,11 +22,11 @@ const getReadableErrors = (err) => {
 
 /**
  * getUserData
- * GET /users/profile
+ * GET /auth/profile
  * Requiere token en localStorage (lo inyecta getToken de AuthService).
  */
 const getUserData = async (token) => {
-  const response = await fetch(`${API_URL}/users/profile`, {
+  const response = await fetch(`${API_URL}/auth/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
