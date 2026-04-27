@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   validateLoginTwoFactorAuthService,
-  getPreTwoFactorToken,
+  getPreTwoFactorAuthToken,
   getToken,
 } from "../../Services/AuthService";
 import { useAuthContext } from "../../context/AuthContext";
@@ -18,7 +18,7 @@ export const useTwoFactorLogin = () => {
   const { value: isBlocked, toggle: blockToggle } = useToggle(false);
 
   useEffect(() => {
-    const preTwoFactorAuthToken = getPreTwoFactorToken();
+    const preTwoFactorAuthToken = getPreTwoFactorAuthToken();
     const sessionToken = getToken();
 
     if (sessionToken) {

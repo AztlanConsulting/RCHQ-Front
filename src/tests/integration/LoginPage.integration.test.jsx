@@ -87,7 +87,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
 
     // Assert
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith("/2FA");
+      expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
     });
   });
 
@@ -137,5 +137,25 @@ describe("LoginPage + AuthService — flujo de login", () => {
     await waitFor(() =>
       expect(screen.getByText(/bloqueada temporalmente/i)).toBeInTheDocument(),
     );
+  });
+
+  it("navega a primer inicio cuando el backend indica cambio de contraseña obligatorio", async () => {
+    loginService.mockResolvedValue({
+      success: true,
+      nextStep: "CHANGE_PASSWORD_FIRST_LOGIN",
+      data: {
+        firstLoginToken: "first-token",
+      },
+    });
+
+    renderLogin();
+    await fillAndSubmit("usuario@test.com", "Password123!");
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/primer-inicio/cambiar-contrasena",
+        { replace: true },
+      );
+    });
   });
 });

@@ -5,6 +5,12 @@ import {
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
 } from "../../Services/AuthService";
+import { changePasswordService } from "../../Services/PasswordService";
+import {
+  selfServiceChangePasswordSchema,
+  getFirstSchemaError,
+} from "../../utils/Schema/Auth/password.schemas";
+import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 export const useTwoFactorAuthOptions = () => {
   const showTwoFactorAuthModal = useToggle();
@@ -17,6 +23,17 @@ export const useTwoFactorAuthOptions = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Change password state
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [changePasswordErrors, setChangePasswordErrors] = useState([]);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const showCurrentPassword = useToggle();
+  const showNewPassword = useToggle();
+  const showConfirmPassword = useToggle();
+
   useEffect(() => {
     if (!successMessage) return;
     const timer = setTimeout(() => setSuccessMessage(""), 4000);
@@ -27,9 +44,10 @@ export const useTwoFactorAuthOptions = () => {
     const fetchStatus = async () => {
       try {
         const response = await getTwoFactorAuthStatus();
+        // El back responde con "Status2FA" según el conflicto de la rama nueva
         setIsTwoFactorAuthActive(response.StatusTwoFactorAuth ?? false);
       } catch (err) {
-        console.error("Error al obtener estado del Two Factor Auth:", err);
+        console.error("Error al obtener estado de la autenticación en dos pasos:", err);
       }
     };
     fetchStatus();
@@ -38,33 +56,27 @@ export const useTwoFactorAuthOptions = () => {
   const handleEnableSuccess = () => {
     showTwoFactorAuthModal.toggle();
     setIsTwoFactorAuthActive(true);
-    setSuccessMessage(
-      "La autenticación en dos pasos ha sido activada correctamente.",
-    );
+    setSuccessMessage("La autenticación en dos pasos ha sido activada correctamente.");
   };
+
   const handleDisable = async () => {
     if (!password.value) {
       setError("Ingresa tu contraseña para continuar");
       return;
     }
-
     setLoading(true);
     setError("");
-
     try {
       const response = await deactivateTwoFactorAuthService(password.value);
+      // El back responde con nextStep: "2FA_DISABLED"
       if (response.nextStep === "TwoFactorAuth_DISABLED") {
         setIsTwoFactorAuthActive(false);
         showDisableModal.toggle();
         password.handleValue("");
-        setSuccessMessage(
-          "La autenticación en dos pasos ha sido desactivada correctamente.",
-        );
+        setSuccessMessage("La autenticación en dos pasos ha sido desactivada correctamente.");
       }
     } catch (err) {
-      setError(
-        err.message || "Error al desactivar la autenticación en dos pasos",
-      );
+      setError(err.message || "Error al desactivar la autenticación en dos pasos");
     } finally {
       setLoading(false);
     }
@@ -76,7 +88,56 @@ export const useTwoFactorAuthOptions = () => {
     setError("");
   };
 
+  const handleCloseChangePasswordModal = () => {
+    if (changePasswordLoading) return;
+    setShowChangePasswordModal(false);
+    setChangePasswordErrors([]);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    showCurrentPassword.setValue(false);
+    showNewPassword.setValue(false);
+    showConfirmPassword.setValue(false);
+  };
+
+  const handleSubmitChangePassword = async ({ currentPassword, newPassword, confirmPassword }) => {
+    setChangePasswordLoading(true);
+    setChangePasswordErrors([]);
+
+    const validation = selfServiceChangePasswordSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+
+    if (!validation.success) {
+      setChangePasswordErrors([
+        getFirstSchemaError(validation) || "Revisa los campos del formulario",
+      ]);
+      setChangePasswordLoading(false);
+      return;
+    }
+
+    try {
+      const response = await changePasswordService(currentPassword, newPassword, confirmPassword);
+
+      if (!response?.success) {
+        setChangePasswordErrors(["No se pudo cambiar la contraseña"]);
+        return;
+      }
+
+      setSuccessMessage("La contraseña se actualizó correctamente.");
+      handleCloseChangePasswordModal();
+    } catch (err) {
+      console.error(err);
+      setChangePasswordErrors(mapPasswordApiError(err, "self-service"));
+    } finally {
+      setChangePasswordLoading(false);
+    }
+  };
+
   return {
+    // 2FA toggle modals
     showTwoFactorAuthModal,
     showDisableModal,
     showPassword,
@@ -91,5 +152,21 @@ export const useTwoFactorAuthOptions = () => {
     handleDisable,
     handleEnableSuccess,
     handleCancelDisable,
+    // Change password
+    showChangePasswordModal,
+    setShowChangePasswordModal,
+    changePasswordLoading,
+    changePasswordErrors,
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showCurrentPassword,
+    showNewPassword,
+    showConfirmPassword,
+    handleCloseChangePasswordModal,
+    handleSubmitChangePassword,
   };
 };

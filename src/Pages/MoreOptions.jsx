@@ -4,6 +4,7 @@ import Button from "../Components/Atoms/Button";
 import TextField from "../Components/Atoms/TextField";
 import Alert from "../Components/Atoms/Alerts";
 import TwoFactorAuth from "./Auth/TwoFactorAuth";
+import ChangePasswordModal from "../Components/Organism/ChangePasswordModal";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 import { useTwoFactorAuthOptions } from "../hooks/Organism/useMoreOptions";
@@ -23,6 +24,21 @@ const MoreOptions = () => {
     handleDisable,
     handleEnableSuccess,
     handleCancelDisable,
+    showChangePasswordModal,
+    setShowChangePasswordModal,
+    changePasswordLoading,
+    changePasswordErrors,
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showCurrentPassword,
+    showNewPassword,
+    showConfirmPassword,
+    handleCloseChangePasswordModal,
+    handleSubmitChangePassword,
   } = useTwoFactorAuthOptions();
 
   return (
@@ -47,42 +63,24 @@ const MoreOptions = () => {
 
         <div className="flex gap-6 justify-center flex-wrap pt-4">
           <OptionCard
-            icon={
-              <img
-                src="/certificate.svg"
-                alt="Certificaciones"
-                className="w-9 h-9 invert opacity-90"
-              />
-            }
+            icon={<img src="/certificate.svg" alt="Certificaciones" className="w-9 h-9 invert opacity-90" />}
             label="Certificaciones"
             onClick={() => navigate("/app/certificaciones")}
           />
           <OptionCard
-            icon={
-              <img
-                src="/document.svg"
-                alt="Documentos"
-                className="w-9 h-9 invert opacity-90"
-              />
-            }
+            icon={<img src="/document.svg" alt="Documentos" className="w-9 h-9 invert opacity-90" />}
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
           <OptionCard
-            icon={
-              <img
-                src="/key.svg"
-                alt="TwoFactorAuth"
-                className="w-9 h-9 invert opacity-90"
-              />
+            icon={<img src="/key.svg" alt="TwoFactorAuth" className="w-9 h-9 invert opacity-90" />}
+            label={
+              <span className="whitespace-pre-line text-center block text-sm">
+                {isTwoFactorAuthActive
+                  ? "Desactivar doble\nverificación"
+                  : "Activar doble\nverificación"}
+              </span>
             }
-          label={
-            <span className="whitespace-pre-line text-center block text-sm">
-              {isTwoFactorAuthActive
-                ? "Desactivar doble\nverificación"
-                : "Activar doble\nverificación"}
-            </span>
-          }
             onClick={() => {
               setError("");
               if (isTwoFactorAuthActive) {
@@ -90,6 +88,14 @@ const MoreOptions = () => {
               } else {
                 showTwoFactorAuthModal.toggle();
               }
+            }}
+          />
+          <OptionCard
+            icon={<img src="/lock.svg" alt="Cambiar contraseña" className="w-9 h-9" />}
+            label="Cambiar contraseña"
+            onClick={() => {
+              setError("");
+              setShowChangePasswordModal(true);
             }}
           />
         </div>
@@ -115,9 +121,7 @@ const MoreOptions = () => {
             <h3 className="text-lg font-semibold text-slate-900">
               Desactivar autenticación en dos pasos
             </h3>
-            <p className="text-sm text-slate-500">
-              Ingresa tu contraseña para confirmar.
-            </p>
+            <p className="text-sm text-slate-500">Ingresa tu contraseña para confirmar.</p>
 
             {error && <Alert type="error" message={error} />}
 
@@ -131,12 +135,8 @@ const MoreOptions = () => {
               htmlFor="disable-password"
               iconRight={showPassword.value ? eye : hideEye}
               onIconRightClick={showPassword.toggle}
-              iconRightAlt={
-                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
-              iconRightAriaLabel={
-                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
+              iconRightAlt={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
+              iconRightAriaLabel={showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"}
             />
 
             <div className="flex gap-3 justify-end">
@@ -157,6 +157,26 @@ const MoreOptions = () => {
           </div>
         </div>
       )}
+
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={handleCloseChangePasswordModal}
+        loading={changePasswordLoading}
+        errors={changePasswordErrors}
+        onSubmit={handleSubmitChangePassword}
+        currentPassword={currentPassword}
+        setCurrentPassword={setCurrentPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        showCurrentPassword={showCurrentPassword.value}
+        toggleCurrentPassword={showCurrentPassword.toggle}
+        showNewPassword={showNewPassword.value}
+        toggleNewPassword={showNewPassword.toggle}
+        showConfirmPassword={showConfirmPassword.value}
+        toggleConfirmPassword={showConfirmPassword.toggle}
+      />
     </div>
   );
 };

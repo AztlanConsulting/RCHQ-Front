@@ -6,14 +6,29 @@ import { loginSchema } from "../../utils/Schema/Auth/auth.schemas";
 import useAuth from "../useAuth";
 import { useState } from "react";
 
+const EMAIL_MAX_LENGTH = 254;
+const PASSWORD_MAX_LENGTH = 128;
+
 export const useLogin = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const email = useField();
-  const password = useField();
+
+  const emailField = useField();
+  const passwordField = useField();
   const showPassword = useToggle();
+
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const email = {
+    value: emailField.value,
+    handleValue: (val) => emailField.handleValue(val.slice(0, EMAIL_MAX_LENGTH)),
+  };
+
+  const password = {
+    value: passwordField.value,
+    handleValue: (val) => passwordField.handleValue(val.slice(0, PASSWORD_MAX_LENGTH)),
+  };
 
   const handleSubmit = async () => {
     setErrors([]);
@@ -31,13 +46,20 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      const response = await loginService(
-        result.data.email,
-        result.data.password,
-      );
+      const response = await loginService(result.data.email, result.data.password);
 
-      if (response.isActiveTwoFactorAuth) {
-        navigate("/2FA");
+      if (!response?.success && !response?.nextStep && !response?.isActiveTwoFactorAuth) {
+        setErrors(["No se pudo iniciar sesión"]);
+        return;
+      }
+
+      if (response?.nextStep === "CHANGE_PASSWORD_FIRST_LOGIN") {
+        navigate("/primer-inicio/cambiar-contrasena", { replace: true });
+        return;
+      }
+
+      if (response?.isActiveTwoFactorAuth) {
+        navigate("/2FA", { replace: true });
         return;
       }
 

@@ -15,6 +15,7 @@ const TextField = ({
   autoComplete,
   inputMode,
   maxLength,
+  labelClassName = "text-sm font-bold text-white sm:text-base",
 }) => {
   const inputRef = useRef(null);
 
@@ -24,10 +25,7 @@ const TextField = ({
 
   return (
     <div className="flex w-full flex-col gap-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="text-sm font-bold text-white sm:text-base"
-      >
+      <label htmlFor={htmlFor} className={labelClassName}>
         {text}
       </label>
 
@@ -60,11 +58,7 @@ const TextField = ({
               className="ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-transparent"
             >
               {typeof iconRight === "string" ? (
-                <img
-                  src={iconRight}
-                  alt={iconRightAlt}
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                />
+                <img src={iconRight} alt={iconRightAlt} className="h-5 w-5 sm:h-6 sm:w-6" />
               ) : (
                 iconRight
               )}
@@ -72,11 +66,7 @@ const TextField = ({
           ) : (
             <div className="ml-3 flex shrink-0 items-center justify-center">
               {typeof iconRight === "string" ? (
-                <img
-                  src={iconRight}
-                  alt={iconRightAlt}
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                />
+                <img src={iconRight} alt={iconRightAlt} className="h-5 w-5 sm:h-6 sm:w-6" />
               ) : (
                 iconRight
               )}
