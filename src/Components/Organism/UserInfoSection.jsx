@@ -32,7 +32,7 @@ const UserInfoSection = ({
     onSubmit,
     isLoading = false,
 }) => {
-    const roleOptions = roles.map((r) => ({ value: r.role_id, label: r.name }));
+    const roleOptions = roles.map((r) => ({ value: r.roleId, label: r.name }));
 
     return (
         <section className="bg-white rounded-xl p-8 flex flex-col gap-6 shadow-sm border border-[#e0e0e0]">
@@ -91,8 +91,8 @@ const UserInfoSection = ({
                 />
                 <FormField
                     label="Clave Bancaria Estandarizada (CLABE)"
-                    name="bank_account"
-                    value={form.bank_account}
+                    name="bankAccount"
+                    value={form.bankAccount}
                     onChange={handleChange}
                     maxLength={18}
                     labelColor={LABEL_COLOR}
@@ -109,17 +109,17 @@ const UserInfoSection = ({
                 />
                 <FormField
                     label="Fecha de Nacimiento"
-                    name="birthdate"
+                    name="birthDate"
                     type="date"
-                    value={form.birthdate}
+                    value={form.birthDate}
                     onChange={handleChange}
                     labelColor={LABEL_COLOR}
                 />
 
                 <SelectField
                     label="Puesto"
-                    name="role_id"
-                    value={form.role_id}
+                    name="roleId"
+                    value={form.roleId}
                     onChange={handleChange}
                     options={roleOptions}
                     placeholder="Selecciona un puesto"

@@ -10,15 +10,15 @@ import UserInfoSection from "../../Components/Organism/UserInfoSection";
 import Alert from "../../Components/Atoms/Alerts";
 
 const INITIAL_FORM = {
-    role_id: "",
+    roleId: "",
     name: "",
     surname: "",
     email: "",
     curp: "",
     rfc: "",
     nss: "",
-    bank_account: "",
-    birthdate: "",
+    bankAccount: "",
+    birthDate: "",
 };
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
@@ -57,7 +57,7 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                 finalValue = value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, "");
                 break;
             case "nss":
-            case "bank_account":
+            case "bankAccount":
                 finalValue = value.replace(/\D/g, "");
                 break;
             case "curp":
@@ -76,6 +76,7 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
 
     const handleSubmit = async () => {
         setErrors(null);
+        console.log("FORM:", form);
 
         const result = employeeCreateSchema.safeParse(form);
 
@@ -89,7 +90,6 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         try {
             const payload = {
                 ...result.data,
-                birth_date: result.data.birthdate,
                 picture: photo,
             };
             console.group("🚀 Enviando Datos de Empleado");
