@@ -17,17 +17,26 @@ const LoginPage = () => {
       htmlFor: "email",
       text: "Correo electrónico",
       type: "email",
+      autoComplete: "email",
+      inputMode: "email",
     },
     {
       id: "password",
       value: password.value,
       setValue: password.handleValue,
-      placeholder: "Ingresa la contraseña",
+      placeholder: "Ingresa tu contraseña",
       htmlFor: "password",
       text: "Contraseña",
       type: showPassword.value ? "text" : "password",
       iconRight: showPassword.value ? eye : hideEye,
       onIconRightClick: showPassword.toggle,
+      iconRightAlt: showPassword.value
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
+      iconRightAriaLabel: showPassword.value
+        ? "Ocultar contraseña"
+        : "Mostrar contraseña",
+      autoComplete: "current-password",
     },
   ];
 
@@ -66,7 +75,6 @@ const LoginPage = () => {
               />
             </div>
           )}
-
           <Forms
             title="Bienvenido de vuelta"
             fields={fields}

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   loginService,
   getToken,
-  getPreTwoFactorToken,
+  getPreTwoFactorAuthToken,
   logoutService,
   getReadableErrors,
   activateTwoFactorAuthService,
@@ -83,12 +83,12 @@ describe("getToken", () => {
 
 describe("getPreTwoFactorAuthToken", () => {
   it("retorna null cuando no existe el token pre-TwoFactorAuth en localStorage", () => {
-    expect(getPreTwoFactorToken()).toBeNull();
+    expect(getPreTwoFactorAuthToken()).toBeNull();
   });
 
   it("retorna el token cuando existe en localStorage", () => {
-    seedLocalStorage({ preTwoFactorToken: "pre-token-xyz" }); // ← clave real
-    expect(getPreTwoFactorToken()).toBe("pre-token-xyz");
+    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token-xyz" }); 
+    expect(getPreTwoFactorAuthToken()).toBe("pre-token-xyz");
   });
 });
 
@@ -98,12 +98,12 @@ describe("logoutService", () => {
   it("elimina token, preTwoFactorToken y user del localStorage al cerrar sesión", () => {
     seedLocalStorage({
       token: "session-abc",
-      preTwoFactorToken: "pre-token", // ← clave real
+      PRE_TwoFactorAuth: "pre-token",
       user: JSON.stringify({ id: 1 }),
     });
     logoutService();
     expect(localStorage.getItem("token")).toBeNull();
-    expect(localStorage.getItem("preTwoFactorToken")).toBeNull(); // ← clave real
+    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBeNull();
     expect(localStorage.getItem("user")).toBeNull();
   });
 });
@@ -123,10 +123,13 @@ describe("loginService", () => {
   });
 
   it("guarda preTwoFactorToken y no guarda token de sesión cuando TwoFactorAuth está activo", async () => {
-    const apiResponse = { isActiveTwoFactorAuth: true, preTwoFactorAuthToken: "pre-token-abc" }; // ← campo real
+    const apiResponse = {
+      isActiveTwoFactorAuth: true,
+      preTwoFactorAuthToken: "pre-token-abc",
+    };
     mockFetch(apiResponse);
     await loginService("test@mail.com", "password123");
-    expect(localStorage.getItem("preTwoFactorToken")).toBe("pre-token-abc"); // ← clave real
+    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBe("pre-token-abc"); 
     expect(localStorage.getItem("token")).toBeNull();
   });
 
@@ -232,7 +235,7 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("retorna LOGIN_COMPLETE y el token final cuando el código es correcto", async () => {
-    seedLocalStorage({ preTwoFactorToken: "pre-token" }); // ← clave real
+    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token" }); // ← clave real
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
       token: "final-token",
@@ -244,7 +247,7 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("lanza error con status 423 cuando la cuenta está bloqueada", async () => {
-    seedLocalStorage({ preTwoFactorToken: "pre-token" }); // ← clave real
+    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token" });
     mockFetch({ message: "Bloqueado temporalmente" }, false, 423);
     await expect(
       validateLoginTwoFactorAuthService("123456"),

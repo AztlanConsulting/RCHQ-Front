@@ -4,7 +4,6 @@ import { MemoryRouter } from "react-router-dom";
 import TwoFactorLogin from "../../Pages/Auth/TwoFactorLogin";
 import {
   validateLoginTwoFactorAuthService,
-  getPreTwoFactorToken,
   getToken,
 } from "../../Services/AuthService";
 
@@ -22,7 +21,6 @@ vi.mock("../../context/AuthContext", () => ({
 
 vi.mock("../../Services/AuthService", () => ({
   validateLoginTwoFactorAuthService: vi.fn(),
-  getPreTwoFactorToken: vi.fn(),
   getToken: vi.fn(),
 }));
 
@@ -36,16 +34,14 @@ const renderPage = () =>
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getPreTwoFactorToken.mockReturnValue("pre-token-real");
   getToken.mockReturnValue(null);
 });
 
 describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", () => {
-  it("redirige a /iniciar-sesion cuando no hay PRE_TwoFactorAuth en localStorage", () => {
-    getPreTwoFactorToken.mockReturnValue(null);
-    getToken.mockReturnValue(null);
+  it("redirige al dashboard cuando ya hay sessionToken en localStorage", () => {
+    getToken.mockReturnValue("existing-session-token");
     renderPage();
-    expect(mockNavigate).toHaveBeenCalledWith("/iniciar-sesion", {
+    expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
       replace: true,
     });
   });
@@ -117,7 +113,9 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
   it("no llama al servicio cuando el código tiene menos de 6 dígitos", async () => {
     renderPage();
 
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "123" } });
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "123" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /verificar/i }));
 
     await waitFor(() =>

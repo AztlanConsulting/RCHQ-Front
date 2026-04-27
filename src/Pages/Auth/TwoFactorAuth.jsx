@@ -41,7 +41,11 @@ const TwoFactorAuth = ({ onClose }) => {
                 Generando QR...
               </div>
             ) : qr ? (
-              <img src={qr} alt="QR TwoFactorAuth" className="h-56 w-56 object-contain" />
+              <img
+                src={qr}
+                alt="QR TwoFactorAuth"
+                className="h-56 w-56 object-contain"
+              />
             ) : null}
 
             <div className="mt-6">

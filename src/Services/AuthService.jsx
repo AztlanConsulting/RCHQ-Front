@@ -1,59 +1,46 @@
+import {
+  clearAuthStorage,
+  getToken,
+  getPreTwoFactorAuthToken,
+  getFirstLoginToken,
+  setToken,
+  setStoredUser,
+  setPreTwoFactorAuthToken,
+  setFirstLoginToken,
+  removePreTwoFactorAuthToken,
+} from "../utils/authStorage";
+import { buildApiError, getReadableErrors } from "../utils/apiErrors";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
-const buildApiError = (response, data, fallbackMessage) => {
-  const errorMessage = new Error(data?.message || fallbackMessage);
-  errorMessage.status = response.status;
-  errorMessage.code = data?.code;
-  errorMessage.blockedUntil = data?.blockedUntil;
-  errorMessage.data = data?.data;
-  errorMessage.errors = Array.isArray(data?.errors) ? data.errors : [];
-  return errorMessage;
-};
-
-export const getReadableErrors = (err) => {
-  if (Array.isArray(err?.errors) && err.errors.length > 0) {
-    return err.errors.map((item) => item.message);
-  }
-
-  return [err?.message || "Ocurrió un error inesperado"];
+const saveLoginSession = (responseData) => {
+  clearAuthStorage();
+  const token = responseData?.data?.token;
+  const user = responseData?.data?.user;
+  if (token) setToken(token);
+  if (user) setStoredUser(user);
 };
 
 export const savePreTwoFactorSession = (responseData) => {
   clearAuthStorage();
-  const preTwoFactorToken = responseData?.preTwoFactorAuthToken;
-  if (preTwoFactorToken) {
-    localStorage.setItem(TOKEN_KEYS.preTwoFactorToken, preTwoFactorToken); //
+  const preTwoFactorAuthToken = responseData?.preTwoFactorAuthToken;
+  if (preTwoFactorAuthToken) {
+    setPreTwoFactorAuthToken(preTwoFactorAuthToken);
   }
 };
 
-const TOKEN_KEYS = {
-  session: "token",
-  // firstLogin: "firstLoginToken",
-  preTwoFactorToken: "preTwoFactorToken",
-};
-
-export const clearAuthStorage = () => {
-  localStorage.removeItem(TOKEN_KEYS.session);
-  // localStorage.removeItem(TOKEN_KEYS.firstLogin);
-  localStorage.removeItem(TOKEN_KEYS.preTwoFactorToken);
-
-  localStorage.removeItem("user");
-};
-
-export const saveLoginSession = (responseData) => {
+const saveFirstLoginSession = (responseData) => {
   clearAuthStorage();
-  const token = responseData?.data?.token;
-  const user = responseData?.data?.user;
-  if (token) localStorage.setItem(TOKEN_KEYS.session, token);
-  if (user) localStorage.setItem("user", JSON.stringify(user));
+  const firstLoginToken = responseData?.data?.firstLoginToken;
+  if (firstLoginToken) {
+    setFirstLoginToken(firstLoginToken);
+  }
 };
 
 export const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
 
@@ -63,34 +50,27 @@ export const loginService = async (email, password) => {
     throw buildApiError(response, data, "Error al iniciar sesión");
   }
 
-  if (data.isActiveTwoFactorAuth) {
-    savePreTwoFactorSession(data);
-  } else {
-    saveLoginSession(data);
+  if (data?.nextStep === "CHANGE_PASSWORD_FIRST_LOGIN") {
+    saveFirstLoginSession(data);
+    return data;
   }
 
+  if (data?.isActiveTwoFactorAuth) {
+    savePreTwoFactorSession(data);
+    return data;
+  }
+
+  saveLoginSession(data);
   return data;
 };
-
-export const getToken = () => localStorage.getItem(TOKEN_KEYS.session);
-export const getPreTwoFactorToken = () => localStorage.getItem(TOKEN_KEYS.preTwoFactorToken);
 
 export const logoutService = () => {
   clearAuthStorage();
 };
 
-/* Fuera de alcance de la us 3
-const getFirstLoginToken = () => localStorage.getItem("firstLoginToken");
-
-const changePasswordService = async () => {};
-*/
-
 export const activateTwoFactorAuthService = async () => {
   const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
+  if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/setup`, {
     method: "POST",
@@ -114,10 +94,7 @@ export const activateTwoFactorAuthService = async () => {
 
 export const verifyTwoFactorAuthService = async (code) => {
   const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
+  if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/verify`, {
     method: "POST",
@@ -142,8 +119,7 @@ export const verifyTwoFactorAuthService = async (code) => {
 };
 
 export const validateLoginTwoFactorAuthService = async (code) => {
-  const token = getPreTwoFactorToken();
-
+  const token = getPreTwoFactorAuthToken();
   if (!token) throw new Error("No se encontró token de pre-autenticación");
 
   const response = await fetch(`${API_URL}/auth/2fa/validate`, {
@@ -170,10 +146,7 @@ export const validateLoginTwoFactorAuthService = async (code) => {
 
 export const getTwoFactorAuthStatus = async () => {
   const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
+  if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/status/2FA`, {
     method: "GET",
@@ -189,7 +162,7 @@ export const getTwoFactorAuthStatus = async () => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos pasos",
+      "Error al obtener estado de la autenticación de dos pasos",
     );
   }
 
@@ -198,6 +171,7 @@ export const getTwoFactorAuthStatus = async () => {
 
 export const deactivateTwoFactorAuthService = async (password) => {
   const token = getToken();
+  if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/disable`, {
     method: "POST",
@@ -214,9 +188,17 @@ export const deactivateTwoFactorAuthService = async (password) => {
     throw buildApiError(
       response,
       data,
-      "Error al verificar el código de autenticación de dos pasos",
+      "Error al desactivar la autenticación de dos pasos",
     );
   }
 
   return data;
+};
+
+export {
+  getReadableErrors,
+  getToken,
+  getPreTwoFactorAuthToken,
+  getFirstLoginToken,
+  removePreTwoFactorAuthToken,
 };

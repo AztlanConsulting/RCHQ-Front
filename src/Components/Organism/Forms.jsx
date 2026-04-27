@@ -8,6 +8,8 @@ const Forms = ({
   actions = [],
   footer,
   onSubmit,
+  titleClassName = "text-center text-2xl font-bold text-white",
+  descriptionClassName = "text-center text-sm text-white/80",
 }) => {
   return (
     <form
@@ -19,13 +21,9 @@ const Forms = ({
       }}
       className="flex flex-col gap-6"
     >
-      {title && (
-        <h2 className="text-center text-2xl font-bold text-white">{title}</h2>
-      )}
+      {title && <h2 className={titleClassName}>{title}</h2>}
 
-      {description && (
-        <p className="text-center text-sm text-white/80">{description}</p>
-      )}
+      {description && <p className={descriptionClassName}>{description}</p>}
 
       {fields.map((field) => (
         <TextField
@@ -44,6 +42,7 @@ const Forms = ({
           autoComplete={field.autoComplete}
           inputMode={field.inputMode}
           maxLength={field.maxLength}
+          labelClassName={field.labelClassName}
         />
       ))}
 
@@ -66,6 +65,11 @@ const Forms = ({
               textColor={action.textColor}
               hoverColor={action.hoverColor}
               activeColor={action.activeColor}
+              width={action.width}
+              height={action.height}
+              textSize={action.textSize}
+              fontWeight={action.fontWeight}
+              className={action.className}
             />
           ))}
         </div>
