@@ -29,7 +29,6 @@ const isDocumentPdf = (doc) => {
 };
 
 const DocumentsSection = ({
-  // datos
   documents,
   loadingDocs,
   fetchError,
@@ -38,7 +37,6 @@ const DocumentsSection = ({
   deletingId,
   docToDelete,
   conflictDocument,
-  // modal de subida
   showUploadModal,
   isEditing,
   documentType,
@@ -46,7 +44,6 @@ const DocumentsSection = ({
   displayError,
   modalError,
   modalLoading,
-  // handlers
   handleOpenUpload,
   handleCloseModal,
   handleFileChange,

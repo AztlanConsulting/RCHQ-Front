@@ -20,7 +20,6 @@ const getUserInfoFromToken = () => {
 };
 
 export const useDocuments = (employeeId) => {
-  // ── Organism state ──────────────────────────────────────────────
   const [documents, setDocuments] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -34,7 +33,6 @@ export const useDocuments = (employeeId) => {
   const [canModify, setCanModify] = useState(false);
   const [conflictDocument, setConflictDocument] = useState(null);
 
-  // ── Molecule state (useDocumentUploadModal) ─────────────────────
   const documentType = useField();
   const {
     file,
@@ -55,7 +53,6 @@ export const useDocuments = (employeeId) => {
 
   const displayError = localError || fileError;
 
-  // ── Organism effects ────────────────────────────────────────────
   useEffect(() => {
     const userInfo = getUserInfoFromToken();
     if (!userInfo) return;
@@ -101,14 +98,12 @@ export const useDocuments = (employeeId) => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // ── Molecule handler (handleSubmit del modal) ───────────────────
   const handleModalSubmit = useCallback(async () => {
     if (!canModify) {
       setModalError("Operación denegada. No tienes permisos para modificar.");
       return;
     }
 
-    // Validaciones locales del modal
     setLocalError("");
     if (!documentType.value) {
       setLocalError("Selecciona el tipo de documento.");
@@ -159,7 +154,6 @@ export const useDocuments = (employeeId) => {
     fetchDocuments,
   ]);
 
-  // ── Organism handlers ───────────────────────────────────────────
   const handleConflictConfirm = useCallback(async () => {
     if (!conflictDocument) return;
     setModalLoading(true);
@@ -222,7 +216,6 @@ export const useDocuments = (employeeId) => {
   }, []);
 
   return {
-    // Organism
     documents,
     loadingDocs,
     fetchError,
@@ -242,7 +235,6 @@ export const useDocuments = (employeeId) => {
     handleCloseModal,
     handleConflictConfirm,
     handleConflictCancel,
-    // Modal (antes molecule)
     isEditing,
     documentType,
     fileName,

@@ -1,4 +1,3 @@
-// src/Components/Molecules/ConfirmDeleteModal.jsx
 import Button from "../Atoms/Button";
 
 const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading }) => {

@@ -1,4 +1,3 @@
-// src/Pages/Documents.jsx
 import { useParams } from "react-router-dom";
 import DocumentsSection from "../Components/Organism/DocumentsSection";
 import { useDocuments } from "../hooks/Organism/useDocuments";
@@ -7,7 +6,6 @@ import { DOCUMENT_TYPES } from "../Services/DocumentService";
 const Documents = () => {
   const { employeeId } = useParams();
   const {
-    // Organism
     documents,
     loadingDocs,
     fetchError,
@@ -26,7 +24,6 @@ const Documents = () => {
     handleCloseModal,
     handleConflictConfirm,
     handleConflictCancel,
-    // Modal (antes molecule)
     isEditing,
     documentType,
     fileName,
@@ -37,7 +34,6 @@ const Documents = () => {
 
   return (
     <DocumentsSection
-      // datos
       documents={documents}
       loadingDocs={loadingDocs}
       fetchError={fetchError}
@@ -46,7 +42,6 @@ const Documents = () => {
       deletingId={deletingId}
       docToDelete={docToDelete}
       conflictDocument={conflictDocument}
-      // modal de subida
       showUploadModal={showUploadModal}
       isEditing={isEditing}
       documentType={documentType}
@@ -54,7 +49,6 @@ const Documents = () => {
       displayError={displayError}
       modalError={modalError}
       modalLoading={modalLoading}
-      // handlers
       handleOpenUpload={handleOpenUpload}
       handleCloseModal={handleCloseModal}
       handleFileChange={handleFileChange}
