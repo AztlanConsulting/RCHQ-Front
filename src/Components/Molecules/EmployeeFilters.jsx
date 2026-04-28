@@ -15,7 +15,13 @@ const EmployeeFilters = ({
                     text="Buscar por Nombre"
                     placeholder="Ingresa nombre o apellido"
                     value={searchQuery}
-                    setValue={setSearchQuery}
+                    setValue={(value) => {
+                        const onlyLetters = value.replace(
+                            /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
+                            "",
+                        );
+                        setSearchQuery(onlyLetters);
+                    }}
                     labelClassName="text-sm font-bold text-[#121212]"
                 />
 
