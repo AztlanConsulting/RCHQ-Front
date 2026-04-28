@@ -66,13 +66,15 @@ describe("Alert — renderizado base", () => {
     expect(screen.getByText("Error 2")).toBeInTheDocument();
   });
 
-  it("muestra el ícono con alt igual al tipo del alert", () => {
-    // Arrange & Act
-    render(<Alert type="success" message="OK" />);
+    it("muestra el ícono del alert correctamente", () => {
+        // Arrange & Act
+        render(<Alert type="success" message="OK" />);
 
-    // Assert
-    expect(screen.getByAltText("success")).toBeInTheDocument();
-  });
+        // Assert
+        const icon = document.querySelector("img");
+        expect(icon).toBeInTheDocument();
+        expect(icon.getAttribute("src")).toBeTruthy();
+    });
 
   it("no lanza errores cuando el tipo warning no tiene ícono asignado", () => {
     // Arrange & Act

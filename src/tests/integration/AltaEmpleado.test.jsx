@@ -37,48 +37,50 @@ const renderPage = () =>
     </MemoryRouter>,
   );
 
-// Datos válidos reales (compatibles con Zod)
 const validFormData = {
-  name: "Juan",
-  surname: "Pérez",
-  email: "juan.perez@test.com",
-  curp: "AAAA010101HDFNNN01",
-  rfc: "AAAA010101A01",
-  nss: "12345678901",
-  bank_account: "123456789012345678",
-  birthdate: "1990-01-01",
-  role_id: "a0000002-0000-4000-8000-000000000002",
+    name: "Juan",
+    surname: "Pérez",
+    email: "juan.perez@test.com",
+    curp: "AAAA010101HDFNNN01",
+    rfc: "AAAA010101A01",
+    nss: "12345678901",
+    bankAccount: "123456789012345678",
+    birthDate: "1990-01-01",
+    roleId: "a0000002-0000-4000-8000-000000000002",
 };
 
 // Mock roles
 const mockRoles = [
-  {
-    id: validFormData.role_id,
-    role_id: validFormData.role_id,
-    value: validFormData.role_id,
-    name: "Administrador",
-    label: "Administrador",
-  },
+    {
+        id: validFormData.roleId,
+        roleId: validFormData.roleId,
+        value: validFormData.roleId,
+        name: "Administrador",
+        label: "Administrador",
+    },
 ];
 
 const fillAndSubmit = async (data) => {
-  for (const [key, value] of Object.entries(data)) {
-    if (key === "role_id") {
-      const nativeSelect = document.querySelector("select");
-      if (nativeSelect) {
-        fireEvent.change(nativeSelect, {
-          target: { name: "role_id", value: value },
-        });
-      } else {
-        const selectTriggers = screen.queryAllByText(/Selecciona un puesto/i);
-        if (selectTriggers.length > 0) {
-          const trigger = selectTriggers[selectTriggers.length - 1];
-          fireEvent.click(trigger);
+    for (const [key, value] of Object.entries(data)) {
+        if (key === "roleId") {
+            const nativeSelect = document.querySelector("select");
+            if (nativeSelect) {
+                fireEvent.change(nativeSelect, {
+                    target: { name: "roleId", value: value },
+                });
+            } else {
+                const selectTriggers =
+                    screen.queryAllByText(/Selecciona un puesto/i);
+                if (selectTriggers.length > 0) {
+                    const trigger = selectTriggers[selectTriggers.length - 1];
+                    fireEvent.click(trigger);
 
-          const role = mockRoles.find(
-            (r) => r.id === value || r.role_id === value,
-          );
-          const roleName = role ? role.name || role.label : "Administrador";
+                    const role = mockRoles.find(
+                        (r) => r.id === value || r.roleId === value,
+                    );
+                    const roleName = role
+                        ? role.name || role.label
+                        : "Administrador";
 
           const option = await screen.findByText(roleName);
           fireEvent.click(option);
