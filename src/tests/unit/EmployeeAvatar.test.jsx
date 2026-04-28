@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import EmployeeAvatar from "../../Components/Atoms/EmployeeAvatar";
 
-vi.stubEnv("VITE_API_URL", "http://localhost:3000");
+vi.stubEnv("VITE_API_URL");
 
 describe("EmployeeAvatar Component", () => {
     const mockFullName = "John Doe";

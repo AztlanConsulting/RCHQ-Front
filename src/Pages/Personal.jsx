@@ -25,10 +25,10 @@ const Personal = () => {
         <div className="p-8 bg-white min-h-screen">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    Usuarios de la Casa
+                    Usuarios de la casa
                 </h1>
                 <Button
-                    text="Añadir Nuevo Usuario"
+                    text="Añadir nuevo usuario"
                     onClick={() => navigate("/app/personal/nuevo")}
                     bgColor="bg-[#24375e]"
                     hoverColor="hover:bg-[#162d4a]"

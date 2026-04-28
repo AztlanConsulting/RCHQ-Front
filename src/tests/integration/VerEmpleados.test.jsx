@@ -57,7 +57,7 @@ describe("Integración: Componente Personal", () => {
     it("debe orquestar el flujo completo: Título, Botón, Filtros, Tabla y Paginación", () => {
         renderComponent();
 
-        expect(screen.getByText("Usuarios de la Casa")).toBeInTheDocument();
+        expect(screen.getByText("Usuarios de la casa")).toBeInTheDocument();
         expect(
             screen.getByPlaceholderText(/ingresa nombre o apellido/i),
         ).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe("Integración: Componente Personal", () => {
         expect(screen.getByText(/página 1 de 3/i)).toBeInTheDocument();
     });
 
-    it('debe llamar a la navegación al hacer clic en "Añadir Nuevo Usuario"', () => {
+    it('debe llamar a la navegación al hacer clic en "Añadir nuevo usuario"', () => {
         renderComponent();
         const btnNuevo = screen.getByText(/añadir nuevo usuario/i);
         fireEvent.click(btnNuevo);
