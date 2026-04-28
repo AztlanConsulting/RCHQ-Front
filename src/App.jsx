@@ -4,6 +4,7 @@ import LoginPage from "./Pages/Auth/LoginPages";
 import Dashboard from "./Pages/Dashboard";
 import Casas from "./Pages/Casas";
 import Personal from "./Pages/Personal";
+import DetalleEmpleado from "./Pages/DetalleEmpleado";
 import Calendario from "./Pages/Calendario";
 import Perfil from "./Pages/Perfil";
 import PublicRoute from "./Components/PublicRoute";
@@ -45,6 +46,10 @@ function App() {
             <Route path="perfil" element={<Perfil />} />
             <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
             <Route path="personal" element={<Personal />} />
+            <Route
+              path="detalle-empleado/:employeeId"
+              element={<DetalleEmpleado />}
+            />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
           </Route>
