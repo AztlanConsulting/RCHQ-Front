@@ -1,92 +1,20 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import PasswordForm from "../../Components/Organism/PasswordForm";
-import { getFirstLoginToken, setPre2faToken } from "../../utils/authStorage";
-import { changePasswordFirstLoginService } from "../../Services/PasswordService";
-import useAuth from "../../hooks/useAuth";
-import {
-  firstLoginChangePasswordSchema,
-  getFirstSchemaError,
-} from "../../utils/Schema/Auth/password.schemas";
-import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
+import { useChangePassword } from "../../hooks/Organism/useChangePassowrd";
 
 const ChangePassword = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
-
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  useEffect(() => {
-    const token = getFirstLoginToken();
-    if (!token) {
-      navigate("/iniciar-sesion", { replace: true });
-    }
-  }, [navigate]);
-
-  const toggleNewPassword = () => setShowNewPassword((value) => !value);
-  const toggleConfirmPassword = () =>
-    setShowConfirmPassword((value) => !value);
-
-  const handleSubmit = async ({ newPassword, confirmPassword }) => {
-    setLoading(true);
-    setErrors([]);
-
-    const validation = firstLoginChangePasswordSchema.safeParse({
-      newPassword,
-      confirmPassword,
-    });
-
-    if (!validation.success) {
-      setErrors([
-        getFirstSchemaError(validation) || "Revisa los campos del formulario",
-      ]);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await changePasswordFirstLoginService(
-        newPassword,
-        confirmPassword,
-      );
-
-      if (response?.nextStep === "VERIFY_2FA") {
-        const pre2FAToken = response?.data?.pre2FAToken;
-
-        if (!pre2FAToken) {
-          setErrors(["No se recibió un token válido para continuar con 2FA"]);
-          return;
-        }
-
-        setPre2faToken(pre2FAToken);
-        navigate("/2FA", { replace: true });
-        return;
-      }
-
-      const token = response?.data?.token;
-      const user = response?.data?.user;
-
-      if (!token) {
-        setErrors(["No se recibió un token de sesión válido"]);
-        return;
-      }
-
-      login({ token, user });
-      navigate("/app/dashboard", { replace: true });
-    } catch (err) {
-      console.error(err);
-      setErrors(mapPasswordApiError(err, "first-login"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    loading,
+    errors,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showNewPassword,
+    toggleNewPassword,
+    showConfirmPassword,
+    toggleConfirmPassword,
+    handleSubmit,
+  } = useChangePassword();
 
   return (
     <div className="min-h-screen bg-[#1F3664] px-4 py-12">

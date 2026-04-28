@@ -35,7 +35,7 @@ export const employeeCreateSchema = z.object({
         .length(18, "El CURP debe tener exactamente 18 dígitos")
         .toUpperCase()
         .regex(CURP_REGEX, "Formato del CURP inválido"),
-    role_id: z.string().uuid("Selecciona un puesto"),
+    roleId: z.string().uuid("Selecciona un puesto"),
     rfc: z
         .string()
         .trim()
@@ -53,7 +53,7 @@ export const employeeCreateSchema = z.object({
         .or(z.literal(""))
         .nullable()
         .optional(),
-    bank_account: z
+    bankAccount: z
         .string()
         .trim()
         .length(18, "La CLABE debe tener exactamente 18 dígitos")
@@ -61,7 +61,7 @@ export const employeeCreateSchema = z.object({
         .or(z.literal(""))
         .nullable()
         .optional(),
-    birthdate: z
+    birthDate: z
         .string()
         .trim()
         .optional()
@@ -72,20 +72,20 @@ export const employeeCreateSchema = z.object({
             return birthDate <= today;
         }, "La fecha de nacimiento no puede ser en el futuro")
 
-        .refine((val) => {
-            if (!val) return true;
-            const birthDate = new Date(val + "T00:00:00");
-            const today = new Date();
+    .refine((val) => {
+      if (!val) return true;
+      const birthDate = new Date(val + "T00:00:00");
+      const today = new Date();
 
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
 
-            if (
-                monthDiff < 0 ||
-                (monthDiff === 0 && today.getDate() < birthDate.getDate())
-            ) {
-                age--;
-            }
-            return age >= 18;
-        }, "El usuario debe tener al menos 18 años de edad"),
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+      return age >= 18;
+    }, "El usuario debe tener al menos 18 años de edad"),
 });

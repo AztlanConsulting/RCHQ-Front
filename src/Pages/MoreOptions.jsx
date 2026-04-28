@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OptionCard from "../Components/Molecules/OptionCard";
 import Button from "../Components/Atoms/Button";
@@ -6,145 +5,46 @@ import TextField from "../Components/Atoms/TextField";
 import Alert from "../Components/Atoms/Alerts";
 import TwoFactorAuth from "./Auth/TwoFactorAuth";
 import ChangePasswordModal from "../Components/Organism/ChangePasswordModal";
-import { getStatus2FA, desactivate2FAService } from "../Services/AuthService";
-import { changePasswordService } from "../Services/PasswordService";
-import { selfServiceChangePasswordSchema, getFirstSchemaError, } from "../utils/Schema/Auth/password.schemas";
-import { mapPasswordApiError } from "../utils/password/passwordErrorMapper";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
+import { useTwoFactorAuthOptions } from "../hooks/Organism/useMoreOptions";
 
 const MoreOptions = () => {
   const navigate = useNavigate();
-  const [show2FAModal, setShow2FAModal] = useState(false);
-  const [showDisableModal, setShowDisableModal] = useState(false);
-  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-  const [is2FAActive, setIs2FAActive] = useState(false);
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
-  const [changePasswordErrors, setChangePasswordErrors] = useState([]);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
-  const toggleShowPassword = () => setShowPassword((v) => !v);
-  const toggleCurrentPassword = () => setShowCurrentPassword((value) => !value);
-  const toggleNewPassword = () => setShowNewPassword((value) => !value);
-  const toggleConfirmPassword = () => setShowConfirmPassword((value) => !value);
-
-  useEffect(() => {
-    if (!successMessage) return;
-    const timer = setTimeout(() => setSuccessMessage(""), 4000);
-    return () => clearTimeout(timer);
-  }, [successMessage]);
-
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await getStatus2FA();
-        setIs2FAActive(response.Status2FA ?? false);
-      } catch (err) {
-        console.error("Error al obtener estado de la autentificación en dos pasos:", err);
-      }
-    };
-    fetchStatus();
-  }, []);
-
-  const handleDisable = async () => {
-    if (!password) {
-      setError("Ingresa tu contraseña para continuar");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const response = await desactivate2FAService(password);
-      if (response.nextStep === "2FA_DISABLED") {
-        setIs2FAActive(false);
-        setShowDisableModal(false);
-        setPassword("");
-        setShowPassword(false);
-        setSuccessMessage(
-          "La autenticación en dos pasos ha sido desactivada correctamente.",
-        );
-      }
-    } catch (err) {
-      setError(err.message || "Error al desactivar la autentificación en dos pasos");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCloseChangePasswordModal = () => {
-    if (changePasswordLoading) return;
-
-    setShowChangePasswordModal(false);
-    setChangePasswordErrors([]);
-
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-
-    setShowCurrentPassword(false);
-    setShowNewPassword(false);
-    setShowConfirmPassword(false);
-  };
-
-  const handleSubmitChangePassword = async ({
+  const {
+    showTwoFactorAuthModal,
+    showDisableModal,
+    showPassword,
+    password,
+    isTwoFactorAuthActive,
+    loading,
+    error,
+    setError,
+    successMessage,
+    handleDisable,
+    handleEnableSuccess,
+    handleCancelDisable,
+    showChangePasswordModal,
+    setShowChangePasswordModal,
+    changePasswordLoading,
+    changePasswordErrors,
     currentPassword,
+    setCurrentPassword,
     newPassword,
+    setNewPassword,
     confirmPassword,
-  }) => {
-    setChangePasswordLoading(true);
-    setChangePasswordErrors([]);
-
-    const validation = selfServiceChangePasswordSchema.safeParse({
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    });
-
-    if (!validation.success) {
-      setChangePasswordErrors([
-        getFirstSchemaError(validation) || "Revisa los campos del formulario",
-      ]);
-      setChangePasswordLoading(false);
-      return;
-    }
-
-    try {
-      const response = await changePasswordService(
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      );
-
-      if (!response?.success) {
-        setChangePasswordErrors(["No se pudo cambiar la contraseña"]);
-        return;
-      }
-
-      setSuccessMessage("La contraseña se actualizó correctamente.");
-      handleCloseChangePasswordModal();
-    } catch (err) {
-      console.error(err);
-      setChangePasswordErrors(mapPasswordApiError(err, "self-service"));
-    } finally {
-      setChangePasswordLoading(false);
-    }
-  };
+    setConfirmPassword,
+    showCurrentPassword,
+    showNewPassword,
+    showConfirmPassword,
+    handleCloseChangePasswordModal,
+    handleSubmitChangePassword,
+  } = useTwoFactorAuthOptions();
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras opciones</h1>
 
-      {/* Notificación de éxito */}
       {successMessage && (
         <div className="mb-4">
           <Alert type="success" message={successMessage} />
@@ -167,7 +67,7 @@ const MoreOptions = () => {
               <img
                 src="/certificate.svg"
                 alt="Certificaciones"
-                className="w-9 h-9"
+                className="w-9 h-9 invert opacity-90"
               />
             }
             label="Certificaciones"
@@ -175,25 +75,47 @@ const MoreOptions = () => {
           />
           <OptionCard
             icon={
-              <img src="/document.svg" alt="Documentos" className="w-9 h-9" />
+              <img
+                src="/document.svg"
+                alt="Documentos"
+                className="w-9 h-9 invert opacity-90"
+              />
             }
             label="Documentos"
             onClick={() => navigate("/app/documentos")}
           />
           <OptionCard
-            icon={<img src="/key.svg" alt="2FA" className="w-9 h-9" />}
-            label={is2FAActive ? "Desactivar 2FA" : "Activar 2FA"}
+            icon={
+              <img
+                src="/key.svg"
+                alt="TwoFactorAuth"
+                className="w-9 h-9 invert opacity-90"
+              />
+            }
+            label={
+              <span className="whitespace-pre-line text-center block text-sm">
+                {isTwoFactorAuthActive
+                  ? "Desactivar doble\nverificación"
+                  : "Activar doble\nverificación"}
+              </span>
+            }
             onClick={() => {
               setError("");
-              if (is2FAActive) {
-                setShowDisableModal(true);
+              if (isTwoFactorAuthActive) {
+                showDisableModal.toggle();
               } else {
-                setShow2FAModal(true);
+                showTwoFactorAuthModal.toggle();
               }
             }}
           />
           <OptionCard
-            icon={<img src="/lock.svg" alt="Cambiar contraseña" className="w-9 h-9" />}
+            icon={
+              <img
+                src="/lock.svg"
+                alt="Cambiar contraseña"
+                className="w-9 h-9"
+              />
+            }
             label="Cambiar contraseña"
             onClick={() => {
               setError("");
@@ -203,31 +125,21 @@ const MoreOptions = () => {
         </div>
       </div>
 
-      {/* Modal activar 2FA */}
-      {show2FAModal && (
+      {showTwoFactorAuthModal.value && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="relative">
             <button
-              onClick={() => setShow2FAModal(false)}
+              onClick={() => showTwoFactorAuthModal.toggle()}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 text-xl font-bold z-10"
             >
               ✕
             </button>
-            <TwoFactorAuth
-              onClose={() => {
-                setShow2FAModal(false);
-                setIs2FAActive(true);
-                setSuccessMessage(
-                  "La autenticación en dos pasos ha sido activada correctamente.",
-                ); 
-              }}
-            />
+            <TwoFactorAuth onClose={handleEnableSuccess} />
           </div>
         </div>
       )}
 
-      {/* Modal desactivar 2FA */}
-      {showDisableModal && (
+      {showDisableModal.value && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl space-y-4">
             <h3 className="text-lg font-semibold text-slate-900">
@@ -241,30 +153,25 @@ const MoreOptions = () => {
 
             <TextField
               id="disable-password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              setValue={setPassword}
+              type={showPassword.value ? "text" : "password"}
+              value={password.value}
+              setValue={password.handleValue}
               placeholder="Tu contraseña"
               text=""
               htmlFor="disable-password"
-              iconRight={showPassword ? eye : hideEye}
-              onIconRightClick={toggleShowPassword}
+              iconRight={showPassword.value ? eye : hideEye}
+              onIconRightClick={showPassword.toggle}
               iconRightAlt={
-                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
               }
               iconRightAriaLabel={
-                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                showPassword.value ? "Ocultar contraseña" : "Mostrar contraseña"
               }
             />
 
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => {
-                  setShowDisableModal(false);
-                  setPassword("");
-                  setError("");
-                  setShowPassword(false);
-                }}
+                onClick={handleCancelDisable}
                 className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900"
               >
                 Cancelar
@@ -280,6 +187,7 @@ const MoreOptions = () => {
           </div>
         </div>
       )}
+
       <ChangePasswordModal
         isOpen={showChangePasswordModal}
         onClose={handleCloseChangePasswordModal}
@@ -292,12 +200,12 @@ const MoreOptions = () => {
         setNewPassword={setNewPassword}
         confirmPassword={confirmPassword}
         setConfirmPassword={setConfirmPassword}
-        showCurrentPassword={showCurrentPassword}
-        toggleCurrentPassword={toggleCurrentPassword}
-        showNewPassword={showNewPassword}
-        toggleNewPassword={toggleNewPassword}
-        showConfirmPassword={showConfirmPassword}
-        toggleConfirmPassword={toggleConfirmPassword}
+        showCurrentPassword={showCurrentPassword.value}
+        toggleCurrentPassword={showCurrentPassword.toggle}
+        showNewPassword={showNewPassword.value}
+        toggleNewPassword={showNewPassword.toggle}
+        showConfirmPassword={showConfirmPassword.value}
+        toggleConfirmPassword={showConfirmPassword.toggle}
       />
     </div>
   );
