@@ -62,7 +62,7 @@ export const useChangePassword = () => {
         const preTwoFactorAuthToken = response?.data?.preTwoFactorAuthToken;
 
         if (!preTwoFactorAuthToken) {
-          setErrors(["No se recibió un token válido para continuar con la autentificación de dos pasos"]);
+          setErrors(["No se recibió un token válido para continuar con la autentificación en dos pasos"]);
           return;
         }
 
