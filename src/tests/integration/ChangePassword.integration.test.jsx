@@ -116,7 +116,7 @@ describe("ChangePassword — integración", () => {
   it("navega a /2FA cuando el backend indica VERIFY_2FA", async () => {
     changePasswordFirstLoginService.mockResolvedValue({
       success: true,
-      nextStep: "VERIFY_TwoFactorAuth",
+      nextStep: "VERIFY_TWO_FACTOR_AUTH",
       data: {
         preTwoFactorAuthToken: "pre-2fa-token",
       },

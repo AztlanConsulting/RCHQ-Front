@@ -58,7 +58,7 @@ export const useChangePassword = () => {
         confirmPassword,
       );
 
-      if (response?.nextStep === "VERIFY_TwoFactorAuth") {
+      if (response?.nextStep === "VERIFY_TWO_FACTOR_AUTH") {
         const preTwoFactorAuthToken = response?.data?.preTwoFactorAuthToken;
 
         if (!preTwoFactorAuthToken) {

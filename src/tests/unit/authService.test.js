@@ -210,9 +210,9 @@ describe("verifyTwoFactorAuthService", () => {
 
   it("retorna nextStep=TwoFactorAuth_SETUP_COMPLETE cuando el código es válido", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
+    mockFetch({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
     const result = await verifyTwoFactorAuthService("123456");
-    expect(result).toEqual({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
+    expect(result).toEqual({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
   });
 
   it("lanza error con status 401 cuando el código TwoFactorAuth es inválido", async () => {
