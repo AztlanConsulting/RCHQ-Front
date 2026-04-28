@@ -146,11 +146,8 @@ const DetalleEmpleado = () => {
                 {`${employeeBasicInfo?.name ?? ""} ${employeeBasicInfo?.surname ?? ""}`}
               </Type>
               <Type variant="subtitle" as="p" className="mt-1">
-                {employeeBasicInfo?.role
-                  ? String(employeeBasicInfo.role).toUpperCase() + " - "
-                  : ""}
                 {employeeBasicInfo?.house?.name
-                  ? String(employeeBasicInfo.house.name)
+                  ? "Casa - " + String(employeeBasicInfo.house.name)
                   : ""}
                 {/* `${employeeBasicInfo?.role ?? "Sin role"} - ${employeeBasicInfo?.house?.name}`} */}
               </Type>
@@ -172,12 +169,12 @@ const DetalleEmpleado = () => {
           <div className="flex flex-wrap justify-between gap-x-4 gap-y-3">
             <div>
               <Type variant="metric-label" as="p">
-                ID Empleado
+                Puesto
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employeeBasicInfo?.employeeId
-                  ? String(employeeBasicInfo.employeeId).slice(0, 8)
-                  : "Sin ID"}
+                {employeeBasicInfo?.role
+                  ? String(employeeBasicInfo.role).slice(0, 1).toUpperCase() + String(employeeBasicInfo.role).slice(1)
+                  : "N/A"}
               </Type>
             </div>
             <div>
