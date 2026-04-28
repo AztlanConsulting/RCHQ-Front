@@ -6,6 +6,7 @@ const TextField = ({
   id,
   type = "text",
   placeholder,
+  onKeyDown,
   iconRight = null,
   onIconRightClick,
   iconRightAlt = "icono",
@@ -39,6 +40,7 @@ const TextField = ({
           type={type}
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={onKeyDown}
           placeholder={placeholder}
           autoComplete={autoComplete}
           inputMode={inputMode}
