@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import EmployeeFilters from "../../Components/Molecules/EmployeeFilters";
 
 describe("EmployeeFilters Component", () => {
@@ -13,12 +13,17 @@ describe("EmployeeFilters Component", () => {
         setActiveFilter: mockSetActiveFilter,
     };
 
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it("debe llamar a setSearchQuery cuando el usuario escribe en el campo de búsqueda", () => {
         render(<EmployeeFilters {...defaultProps} />);
 
         const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
 
         fireEvent.change(input, { target: { value: "Juan" } });
+        fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
         expect(mockSetSearchQuery).toHaveBeenCalledWith("Juan");
     });
@@ -26,7 +31,7 @@ describe("EmployeeFilters Component", () => {
     it("debe llamar a setActiveFilter cuando se cambia la opción del select", () => {
         render(<EmployeeFilters {...defaultProps} />);
 
-        const select = screen.getByLabelText(/estado \(activo\/inactivo\)/i);
+        const select = screen.getByRole("combobox");
 
         fireEvent.change(select, { target: { value: "false" } });
 
@@ -43,7 +48,7 @@ describe("EmployeeFilters Component", () => {
         render(<EmployeeFilters {...propsConValores} />);
 
         const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
-        const select = screen.getByLabelText(/estado \(activo\/inactivo\)/i);
+        const select = screen.getByRole("combobox");
 
         expect(input.value).toBe("Admin");
         expect(select.value).toBe("false");
