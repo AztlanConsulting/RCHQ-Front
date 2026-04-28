@@ -8,18 +8,18 @@ import { Navigate, Outlet } from "react-router-dom";
 import { getFirstLoginToken, getToken } from "../utils/authStorage";
 
 const FirstLoginRoute = () => {
-    const firstLoginToken = getFirstLoginToken();
-    const sessionToken = getToken();
+  const firstLoginToken = getFirstLoginToken();
+  const sessionToken = getToken();
 
-    if (sessionToken) {
-        return <Navigate to="/app/dashboard" replace />;
-    }
+  if (sessionToken) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
 
-    return firstLoginToken ? (
-        <Outlet />
-    ) : (
-        <Navigate to="/iniciar-sesion" replace />
-    );
+  return firstLoginToken ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/iniciar-sesion" replace />
+  );
 };
 
 export default FirstLoginRoute;
