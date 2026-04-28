@@ -1,5 +1,6 @@
 import TextField from "../../Components/Atoms/TextField";
 import SelectField from "../../Components/Atoms/SelectField";
+import useSearch from "../../hooks/Molecules/useSearch";
 
 const EmployeeFilters = ({
     searchQuery,
@@ -7,26 +8,26 @@ const EmployeeFilters = ({
     activeFilter,
     setActiveFilter,
 }) => {
+    const { inputValue, handleChange, handleKeyDown } = useSearch(
+        searchQuery,
+        setSearchQuery,
+    );
+
     return (
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <TextField
                     id="search"
-                    text="Buscar por Nombre"
+                    text="Buscar empleado"
                     placeholder="Ingresa nombre o apellido"
-                    value={searchQuery}
-                    setValue={(value) => {
-                        const onlyLetters = value.replace(
-                            /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,
-                            "",
-                        );
-                        setSearchQuery(onlyLetters);
-                    }}
+                    value={inputValue}
+                    setValue={handleChange}
+                    onKeyDown={handleKeyDown}
                     labelClassName="text-sm font-bold text-[#121212]"
                 />
 
                 <SelectField
-                    label="Estado (Activo/Inactivo)"
+                    label="Estado (activo/inactivo)"
                     name="status"
                     value={activeFilter}
                     onChange={(e) => setActiveFilter(e.target.value)}
