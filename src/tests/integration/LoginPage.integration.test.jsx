@@ -73,7 +73,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
     });
   });
 
-  it("guarda PRE_TwoFactorAuth en localStorage y navega a /2FA cuando el usuario tiene TwoFactorAuth activo", async () => {
+  it("guarda preTwoFactorAuth en localStorage y navega a /2FA cuando el usuario tiene TwoFactorAuth activo", async () => {
     // Arrange
     loginService.mockResolvedValue({
       success: true,

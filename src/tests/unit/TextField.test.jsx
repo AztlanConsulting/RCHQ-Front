@@ -84,6 +84,19 @@ describe("TextField — interacción del usuario", () => {
     // Assert
     expect(setValue).toHaveBeenCalledWith("hola");
   });
+
+  it("enfoca el input al hacer click en el contenedor", () => {
+    // Arrange
+    render(<TextField {...makeProps()} />);
+    const input = screen.getByRole("textbox");
+    const container = input.closest("div");
+
+    // Act
+    fireEvent.click(container);
+
+    // Assert
+    expect(document.activeElement).toBe(input);
+  });
 });
 
 describe("TextField — ícono derecho", () => {
@@ -125,7 +138,7 @@ describe("TextField — ícono derecho", () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it("renderiza el ícono como img cuando es un string de ruta", () => {
+  it("renderiza el ícono como img cuando iconRight es un string de ruta", () => {
     // Arrange
     const props = makeProps({
       iconRight: "/eye.svg",
@@ -138,6 +151,19 @@ describe("TextField — ícono derecho", () => {
 
     // Assert
     expect(screen.getByAltText("ojo")).toBeInTheDocument();
+  });
+
+  it("renderiza el ícono sin botón cuando no se proporciona onIconRightClick", () => {
+    // Arrange
+    const icon = <svg data-testid="static-icon" />;
+    const props = makeProps({ iconRight: icon });
+
+    // Act
+    render(<TextField {...props} />);
+
+    // Assert
+    expect(screen.getByTestId("static-icon")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });
 

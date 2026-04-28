@@ -16,6 +16,7 @@ import AltaNuevoUsuarioPage from "./Pages/Personal/AltaPersonal";
 import TwoFactorLogin from "./Pages/Auth/TwoFactorLogin";
 import TwoFactorAuth from "./Pages/Auth/TwoFactorAuth";
 import MoreOptions from "./Pages/MoreOptions";
+import Documents from "./Pages/Documents";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppLayout />}>
+            <Route path=":employeeId/documentos" element={<Documents />} />
             <Route path="opciones" element={<MoreOptions />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="perfil" element={<Perfil />} />

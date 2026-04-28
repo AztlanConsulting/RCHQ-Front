@@ -87,7 +87,7 @@ describe("getPreTwoFactorAuthToken", () => {
   });
 
   it("retorna el token cuando existe en localStorage", () => {
-    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token-xyz" }); 
+    seedLocalStorage({ preTwoFactorAuth: "pre-token-xyz" });
     expect(getPreTwoFactorAuthToken()).toBe("pre-token-xyz");
   });
 });
@@ -98,12 +98,12 @@ describe("logoutService", () => {
   it("elimina token, preTwoFactorToken y user del localStorage al cerrar sesión", () => {
     seedLocalStorage({
       token: "session-abc",
-      PRE_TwoFactorAuth: "pre-token",
+      preTwoFactorAuth: "pre-token",
       user: JSON.stringify({ id: 1 }),
     });
     logoutService();
     expect(localStorage.getItem("token")).toBeNull();
-    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBeNull();
+    expect(localStorage.getItem("preTwoFactorAuth")).toBeNull();
     expect(localStorage.getItem("user")).toBeNull();
   });
 });
@@ -129,7 +129,7 @@ describe("loginService", () => {
     };
     mockFetch(apiResponse);
     await loginService("test@mail.com", "password123");
-    expect(localStorage.getItem("PRE_TwoFactorAuth")).toBe("pre-token-abc"); 
+    expect(localStorage.getItem("preTwoFactorAuth")).toBe("pre-token-abc");
     expect(localStorage.getItem("token")).toBeNull();
   });
 
@@ -210,9 +210,9 @@ describe("verifyTwoFactorAuthService", () => {
 
   it("retorna nextStep=TwoFactorAuth_SETUP_COMPLETE cuando el código es válido", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
+    mockFetch({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
     const result = await verifyTwoFactorAuthService("123456");
-    expect(result).toEqual({ nextStep: "TwoFactorAuth_SETUP_COMPLETE" });
+    expect(result).toEqual({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
   });
 
   it("lanza error con status 401 cuando el código TwoFactorAuth es inválido", async () => {
@@ -235,7 +235,7 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("retorna LOGIN_COMPLETE y el token final cuando el código es correcto", async () => {
-    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token" }); // ← clave real
+    seedLocalStorage({ preTwoFactorAuth: "pre-token" }); // ← clave real
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
       token: "final-token",
@@ -247,7 +247,7 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("lanza error con status 423 cuando la cuenta está bloqueada", async () => {
-    seedLocalStorage({ PRE_TwoFactorAuth: "pre-token" });
+    seedLocalStorage({ preTwoFactorAuth: "pre-token" });
     mockFetch({ message: "Bloqueado temporalmente" }, false, 423);
     await expect(
       validateLoginTwoFactorAuthService("123456"),
