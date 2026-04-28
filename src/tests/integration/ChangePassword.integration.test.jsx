@@ -6,7 +6,7 @@ import ChangePassword from "../../../src/Pages/Auth/ChangePassword";
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
 const mockSetPreTwoFactorAuthToken = vi.fn((token) => {
-  localStorage.setItem("PRE_TwoFactorAuth", token);
+  localStorage.setItem("preTwoFactorAuth", token);
 });
 
 vi.mock("react-router-dom", async (importOriginal) => {
@@ -21,7 +21,7 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 vi.mock("../../../src/utils/authStorage", () => ({
   getFirstLoginToken: vi.fn(),
   setPreTwoFactorAuthToken: vi.fn((token) => {
-    localStorage.setItem("PRE_TwoFactorAuth", token);
+    localStorage.setItem("preTwoFactorAuth", token);
   }),
 }));
 
@@ -127,7 +127,7 @@ describe("ChangePassword — integración", () => {
 
     await waitFor(() => {
       expect(setPreTwoFactorAuthToken).toHaveBeenCalledWith("pre-2fa-token");
-      expect(localStorage.getItem("PRE_TwoFactorAuth")).toBe("pre-2fa-token");
+      expect(localStorage.getItem("preTwoFactorAuth")).toBe("pre-2fa-token");
       expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
     });
   });
