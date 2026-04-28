@@ -34,10 +34,6 @@ const UserInfoSection = ({
 }) => {
     const roleOptions = roles.map((r) => ({ value: r.roleId, label: r.name }));
 
-  // Adaptador: SelectField espera setValue(value), pero handleChange espera e.target
-  const handleRoleChange = (value) =>
-    handleChange({ target: { name: "role_id", value } });
-
   return (
     <section className="bg-white rounded-xl p-8 flex flex-col gap-6 shadow-sm border border-[#e0e0e0]">
       <div className="flex items-center gap-3">
