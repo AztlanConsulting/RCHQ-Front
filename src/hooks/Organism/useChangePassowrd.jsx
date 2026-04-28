@@ -58,11 +58,11 @@ export const useChangePassword = () => {
         confirmPassword,
       );
 
-      if (response?.nextStep === "VERIFY_TwoFactorAuth") {
+      if (response?.nextStep === "VERIFY_TWO_FACTOR_AUTH") {
         const preTwoFactorAuthToken = response?.data?.preTwoFactorAuthToken;
 
         if (!preTwoFactorAuthToken) {
-          setErrors(["No se recibió un token válido para continuar con 2FA"]);
+          setErrors(["No se recibió un token válido para continuar con la autentificación en dos pasos"]);
           return;
         }
 

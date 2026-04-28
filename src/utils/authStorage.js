@@ -1,7 +1,7 @@
 const TOKEN_KEYS = {
   session: "token",
   firstLogin: "FIRST_LOGIN",
-  preTwoFactorAuth: "PRE_TwoFactorAuth",
+  preTwoFactorAuth: "preTwoFactorAuth",
 };
 
 const USER_KEY = "user";

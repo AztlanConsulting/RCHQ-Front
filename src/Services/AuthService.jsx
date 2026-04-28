@@ -148,7 +148,7 @@ export const getTwoFactorAuthStatus = async () => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/auth/status/2FA`, {
+  const response = await fetch(`${API_URL}/auth/2fa/status`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
