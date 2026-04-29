@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Loader from "../Components/Atoms/Loader";
-import { secureFetch } from "@/utils/secureFetchWrapper";
-import { Tabs } from "../Components/untitled/tabs/tabs";
+import { Tabs } from "../Components/untitled/application/tabs/tabs";
 import { NativeSelect } from "../Components/untitled/base/select/select-native";
 import Chip from "../Components/Atoms/Chip";
 import Alert from "../Components/Atoms/Alerts";
@@ -10,7 +8,6 @@ import Type from "../Components/Atoms/Type";
 import { totalWorkDaysFromApprovedVacationRequests } from "@/utils/detalle-empleado.utils";
 import { useEmployeeDetail } from "@/hooks/Pages/useEmployeeDetail";
 
-const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
 
 const tabs = [
