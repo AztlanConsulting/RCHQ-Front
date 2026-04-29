@@ -5,7 +5,10 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SideBar />
-      <main className="md:pl-24 pt-20 md:pt-6 p-6">
+      <main
+        className="px-6 pt-20 md:pt-6 pb-6"
+        style={{ paddingLeft: "104px", paddingRight: "104px" }}
+      >
         <Outlet />
       </main>
     </div>
