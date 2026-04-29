@@ -78,6 +78,7 @@ describe("Integración: Componente Personal", () => {
         const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
 
         fireEvent.change(input, { target: { value: "Carlos" } });
+        fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
         expect(mockData.setSearchQuery).toHaveBeenCalledWith("Carlos");
     });
