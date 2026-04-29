@@ -20,23 +20,18 @@ const NAV_ITEMS = [
   { to: "/app/donaciones", label: "Donaciones", Icon: DonationsIcon },
 ];
 
-// Ancho fijo del área del ícono — igual en todos los items
-const ICON_W = "w-16";
-
 const NavItem = ({ to, label, Icon, expanded }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
       `flex items-center rounded-lg h-12 transition-colors overflow-hidden
-      ${isActive
-        ? "bg-[#1F5ACD]"
-        : "hover:bg-[#FAFAFA]/10"
-      }`
+      ${isActive ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}
+      ${expanded ? "w-full" : "w-10 mx-auto"}`
     }
   >
     {({ isActive }) => (
       <>
-        <span className={`flex items-center justify-center ${ICON_W} shrink-0`}>
+        <span className={`flex items-center justify-center shrink-0 ${expanded ? "w-12" : "w-10"}`}>
           <Icon className={`h-5 w-5 ${isActive ? "text-[#FAFAFA]" : "text-[#FAFAFA]/70"}`} />
         </span>
         <span
@@ -44,7 +39,7 @@ const NavItem = ({ to, label, Icon, expanded }) => (
             flex-1 text-center pr-4
             overflow-hidden whitespace-nowrap transition-all duration-300
             font-['Public_Sans'] font-bold text-xl text-[#FAFAFA]
-            ${expanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0"}
+            ${expanded ? "opacity-100 max-w-xs" : "opacity-0 max-w-0 pr-0"}
           `}
         >
           {label}
@@ -55,11 +50,12 @@ const NavItem = ({ to, label, Icon, expanded }) => (
 );
 
 const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClick }) => {
-  const baseClass = `flex items-center rounded-lg h-12 transition-colors overflow-hidden hover:bg-[#FAFAFA]/10`;
+  const baseClass = `flex items-center rounded-lg h-12 transition-colors overflow-hidden hover:bg-[#FAFAFA]/10
+    ${expanded ? "w-full" : "w-10 mx-auto"}`;
 
   const content = (isActive = false) => (
     <>
-      <span className={`flex items-center justify-center ${ICON_W} shrink-0`}>
+      <span className={`flex items-center justify-center shrink-0 ${expanded ? "w-12" : "w-10"}`}>
         <Icon className={`h-5 w-5 ${isActive ? "text-[#FAFAFA]" : "text-[#FAFAFA]/70"}`} />
       </span>
       <span
@@ -67,7 +63,7 @@ const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClic
           flex-1 text-center pr-4
           overflow-hidden whitespace-nowrap transition-all duration-300
           font-['Public_Sans'] font-bold text-xl text-[#FAFAFA]
-          ${expanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0"}
+          ${expanded ? "opacity-100 max-w-xs" : "opacity-0 max-w-0 pr-0"}
         `}
       >
         {label}
@@ -77,7 +73,7 @@ const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClic
 
   if (isButton) {
     return (
-      <button onClick={onButtonClick} className={`w-full ${baseClass}`}>
+      <button onClick={onButtonClick} className={baseClass}>
         {content(false)}
       </button>
     );
@@ -117,11 +113,11 @@ const SidebarContent = ({ expanded, toggle, onClose, isMobile }) => {
       `}
       style={{ height: "calc(100vh - 32px)" }}
     >
-      {/* Header */}
       <div className="flex items-center h-16 shrink-0">
         <button
           onClick={isMobile ? onClose : toggle}
-          className={`flex items-center justify-center ${ICON_W} h-16 shrink-0 hover:bg-[#FAFAFA]/10 transition-colors rounded-lg`}
+          className={`flex items-center justify-center h-16 shrink-0 hover:bg-[#FAFAFA]/10 transition-colors rounded-lg
+            ${isExpanded ? "w-12 ml-2" : "w-10 mx-auto"}`}
         >
           <ExpandIcon
             className={`h-5 w-5 text-[#FAFAFA] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
@@ -139,20 +135,16 @@ const SidebarContent = ({ expanded, toggle, onClose, isMobile }) => {
         </span>
       </div>
 
-      {/* Divider */}
       <div className="h-px bg-[#FAFAFA]/25 mx-3 shrink-0" />
 
-      {/* Nav items */}
       <nav className="flex flex-col gap-1 flex-1 px-3 py-4">
         {NAV_ITEMS.map((item) => (
           <NavItem key={item.to} {...item} expanded={isExpanded} />
         ))}
       </nav>
 
-      {/* Divider */}
       <div className="h-px bg-[#FAFAFA]/25 mx-3 shrink-0" />
 
-      {/* Bottom */}
       <div className="flex flex-col px-3 py-3 gap-1 shrink-0">
         <BottomItem
           to="/app/perfil"
@@ -181,12 +173,10 @@ const SideBar = () => {
 
   return (
     <>
-      {/* Desktop */}
       <div className="hidden md:flex ml-5 my-4 sticky top-4 self-start shrink-0">
         <SidebarContent expanded={expanded} toggle={toggle} isMobile={false} />
       </div>
 
-      {/* Mobile hamburger */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={openMobile}
@@ -196,7 +186,6 @@ const SideBar = () => {
         </button>
       </div>
 
-      {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex">
           <div className="absolute inset-0 bg-black/50" onClick={closeMobile} />
