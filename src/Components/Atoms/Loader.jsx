@@ -1,4 +1,3 @@
-import React from "react";
 import { LoadingIndicator } from "../untitled/loading-indicator/loading-indicator";
 
 const Loader = ({ size = "md" }) => {

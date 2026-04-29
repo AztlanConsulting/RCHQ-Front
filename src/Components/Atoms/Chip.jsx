@@ -1,5 +1,3 @@
-import React from "react";
-
 const Chip = ({ active = true, className = "" }) => {
   return (
     <span
