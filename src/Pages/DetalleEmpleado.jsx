@@ -8,6 +8,7 @@ import Chip from "../Components/Atoms/Chip";
 import Alert from "../Components/Atoms/Alerts";
 import Type from "../Components/Atoms/Type";
 import { totalWorkDaysFromApprovedVacationRequests } from "@/utils/detalle-empleado.utils";
+import { useEmployeeDetail } from "@/hooks/Pages/useEmployeeDetail";
 
 const API_URL = import.meta.env.API_URL || "http://localhost:3000";
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -20,61 +21,16 @@ const tabs = [
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
 
-  const [employeeBasicInfo, setEmployeeBasicInfo] = useState(null);
-  const [employeeAdminInfo, setEmployeeAdminInfo] = useState(null);
-  const [employeeRecord, setEmployeeRecord] = useState(null);
-  const [currentTab, setCurrentTab] = useState("overview");
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [alert, setAlert] = useState({});
-
-  useEffect(() => {
-    if (!alert) return;
-    const timer = setTimeout(() => setAlert({}), 4000);
-    return () => clearTimeout(timer);
-  }, [alert]);
-
-  useEffect(() => {
-    const getEmployeeDetail = async () => {
-      console.log("Is it even firig?");
-      try {
-        const response = await secureFetch(
-          `${API_URL}/employee/employee-detail/${employeeId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        console.log("Response: ", response);
-        const data = await response.json();
-        console.log("data: ", data);
-
-        if (!response.ok) {
-          setAlert({ type: "error", message: `${data?.message}` });
-          throw new Error(
-            data?.message || `Solicitud fallida (${response.status})`,
-          );
-        }
-        const basicInfo = data?.data?.employee?.basicInfo ?? null;
-        const adminInfo = data?.data?.employee?.adminInfo ?? null;
-        const record = data?.data?.employee?.record ?? null;
-
-        setEmployeeBasicInfo(basicInfo);
-        setEmployeeAdminInfo(adminInfo);
-        setEmployeeRecord(record);
-      } catch (err) {
-        console.log("Error getting employee detail: ", err);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getEmployeeDetail();
-  }, [employeeId]);
+  const {
+    employeeBasicInfo,
+    employeeAdminInfo,
+    employeeRecord,
+    isLoading,
+    currentTab,
+    setCurrentTab,
+    error,
+    alert,
+  } = useEmployeeDetail(employeeId);
 
   if (isLoading) return <Loader />;
 
@@ -216,7 +172,7 @@ const DetalleEmpleado = () => {
           <div className="basis-1/3 p-2 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
             <div className="flex justify-between">
               <Type variant="section-title" as="h3">
-                Información Básica
+                Contacto
               </Type>
               <div>
                 <button
@@ -259,7 +215,7 @@ const DetalleEmpleado = () => {
                   Código Postal
                 </Type>
                 <Type variant="metric-value" as="p">
-                  {employeeBasicInfo?.address?.postal_code ?? "N/A"}
+                  {employeeBasicInfo?.address?.postalCode ?? "N/A"}
                 </Type>
               </div>
             </div>
@@ -315,7 +271,7 @@ const DetalleEmpleado = () => {
                     Horario
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.workdays[0]?.name ?? "Sin fecha de I"}
+                    {employeeAdminInfo?.workdays?.[0]?.name ?? "Sin horario definido"}
                   </Type>
                 </div>
                 <div className="text-right">
@@ -323,13 +279,13 @@ const DetalleEmpleado = () => {
                     Horas
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.workdays[0]?.start
+                    {employeeAdminInfo?.workdays?.[0]?.start
                       ? String(employeeAdminInfo.workdays[0].start).slice(
                           12,
                           16,
                         ) + " - "
                       : "N/A - "}
-                    {employeeAdminInfo?.workdays[0]?.end
+                    {employeeAdminInfo?.workdays?.[0]?.end
                       ? String(employeeAdminInfo.workdays[0].start).slice(
                           12,
                           16,
