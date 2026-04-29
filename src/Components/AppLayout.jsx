@@ -3,9 +3,9 @@ import SideBar from "./Organism/SideBar";
 
 export default function AppLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <SideBar />
-      <main className="min-w-0 flex-1 p-6 md:pt-6 pt-20">
+      <main className="md:pl-24 pt-20 md:pt-6 p-6">
         <Outlet />
       </main>
     </div>

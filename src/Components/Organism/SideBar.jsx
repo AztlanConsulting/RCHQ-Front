@@ -155,9 +155,7 @@ const SidebarContent = ({ expanded, toggle, onClose, isMobile }) => {
           expanded={isExpanded}
           onClick={isMobile ? onClose : undefined}
         />
-
         <div className="h-px bg-[#FAFAFA]/25 my-1 shrink-0" />
-
         <BottomItem
           label="Cerrar Sesión"
           Icon={LogoutIcon}
@@ -175,10 +173,12 @@ const SideBar = () => {
 
   return (
     <>
-      <div className="hidden md:flex ml-5 my-4 sticky top-4 self-start shrink-0">
+      {/* Desktop: fixed, floats over content */}
+      <div className="hidden md:block fixed top-0 left-0 z-40 ml-5 my-4">
         <SidebarContent expanded={expanded} toggle={toggle} isMobile={false} />
       </div>
 
+      {/* Mobile hamburger */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={openMobile}
@@ -188,6 +188,7 @@ const SideBar = () => {
         </button>
       </div>
 
+      {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex">
           <div className="absolute inset-0 bg-black/50" onClick={closeMobile} />
