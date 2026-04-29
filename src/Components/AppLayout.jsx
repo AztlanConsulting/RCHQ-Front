@@ -7,7 +7,7 @@ export default function AppLayout() {
       <SideBar />
       <main
         className="px-6 pt-20 md:pt-6 pb-6"
-        style={{ paddingLeft: "104px", paddingRight: "104px" }}
+        style={{ paddingLeft: "104px" }}
       >
         <Outlet />
       </main>
