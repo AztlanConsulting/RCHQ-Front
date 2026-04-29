@@ -25,7 +25,7 @@ const NavItem = ({ to, label, Icon, expanded }) => (
     to={to}
     className={({ isActive }) =>
       `flex items-center rounded-lg h-10 transition-colors overflow-hidden
-      ${isActive ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}
+      ${isActive ? "bg-[#1F5ACD] hover:bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}
       ${expanded ? "w-full" : "w-10 mx-auto"}`
     }
   >
@@ -50,9 +50,6 @@ const NavItem = ({ to, label, Icon, expanded }) => (
 );
 
 const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClick }) => {
-  const baseClass = `flex items-center rounded-lg h-10 transition-colors overflow-hidden hover:bg-[#FAFAFA]/10
-    ${expanded ? "w-full" : "w-10 mx-auto"}`;
-
   const content = (isActive = false) => (
     <>
       <span className={`flex items-center justify-center shrink-0 ${expanded ? "w-12" : "w-10"}`}>
@@ -73,7 +70,10 @@ const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClic
 
   if (isButton) {
     return (
-      <button onClick={onButtonClick} className={baseClass}>
+      <button
+        onClick={onButtonClick}
+        className={`flex items-center rounded-lg h-10 transition-colors overflow-hidden hover:bg-[#FAFAFA]/10 ${expanded ? "w-full" : "w-10 mx-auto"}`}
+      >
         {content(false)}
       </button>
     );
@@ -84,7 +84,9 @@ const BottomItem = ({ to, label, Icon, expanded, onClick, isButton, onButtonClic
       to={to}
       onClick={onClick}
       className={({ isActive }) =>
-        `${baseClass} ${isActive ? "bg-[#1F5ACD]" : ""}`
+        `flex items-center rounded-lg h-10 transition-colors overflow-hidden
+        ${isActive ? "bg-[#1F5ACD] hover:bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}
+        ${expanded ? "w-full" : "w-10 mx-auto"}`
       }
     >
       {({ isActive }) => content(isActive)}
@@ -113,12 +115,11 @@ const SidebarContent = ({ expanded, toggle, onClose, isMobile }) => {
       `}
       style={{ height: "calc(100vh - 32px)" }}
     >
-      {/* Header */}
-      <div className={`flex items-center h-16 shrink-0 ${isExpanded ? "" : "justify-center"}`}>
+      <div className="flex items-center h-16 shrink-0 px-3">
         <button
           onClick={isMobile ? onClose : toggle}
           className={`flex items-center justify-center w-10 h-10 hover:bg-[#FAFAFA]/10 transition-colors rounded-lg shrink-0
-            ${isExpanded ? "ml-2" : ""}`}
+            ${isExpanded ? "" : "mx-auto"}`}
         >
           <ExpandIcon
             className={`h-5 w-5 text-[#FAFAFA] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
@@ -126,7 +127,7 @@ const SidebarContent = ({ expanded, toggle, onClose, isMobile }) => {
         </button>
         <span
           className={`
-            flex-1 text-center pr-4
+            flex-1 text-center
             overflow-hidden whitespace-nowrap transition-all duration-300
             font-['Public_Sans'] font-bold text-xl text-[#FAFAFA]
             ${isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0"}
