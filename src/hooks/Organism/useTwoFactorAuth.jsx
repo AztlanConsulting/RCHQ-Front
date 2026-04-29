@@ -57,7 +57,7 @@ const useVerification = (onSuccess) => {
     try {
       const response = await verifyTwoFactorAuthService(code);
       if (!response) throw new Error("No se pudo validar el código");
-      if (response.nextStep === "TwoFactorAuth_SETUP_COMPLETE") {
+      if (response.nextStep === "TWO_FACTOR_AUTH_SETUP_COMPLETE") {
         onSuccess();
       } else {
         throw new Error("El servidor devolvió un flujo no conocido");
