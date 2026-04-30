@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import Loader from "../Components/Atoms/Loader";
 import { Tabs } from "../Components/Molecules/Tabs";
 import NativeSelect from "../Components/Atoms/NativeSelect";
@@ -17,6 +18,7 @@ const tabs = [
 
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
     employeeBasicInfo,
@@ -66,7 +68,7 @@ const DetalleEmpleado = () => {
       </div>
 
       {/* Box/Section for Basic Employee Info, Persistent across tabs */}
-      <div className="w-full flex p-3 items-center rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative w-full flex p-3 items-center rounded-xl border border-slate-200 bg-white shadow-sm">
         {/* First column: avatar + status chip; second: text metrics */}
         <div className="flex shrink-0 mr-8">
           <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
@@ -132,10 +134,12 @@ const DetalleEmpleado = () => {
             </div>
             <div>
               <Type variant="metric-label" as="p">
-                NSS
+                Fecha de Nacimiento
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employeeBasicInfo?.nss ?? "N/A"}
+                {employeeBasicInfo?.birthDate
+                  ? String(employeeBasicInfo.birthDate).slice(0, 10)
+                  : "N/A"}
               </Type>
             </div>
             <div>
@@ -158,7 +162,75 @@ const DetalleEmpleado = () => {
               </Type>
             </div>
           </div>
+
+          {/* Collapsible Drawer */}
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isDrawerOpen ? "max-h-32 opacity-100 mt-4" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="pt-4 border-t border-slate-200">
+              <div className="flex flex-wrap justify-between gap-x-4 gap-y-3">
+                <div>
+                  <Type variant="metric-label" as="p">
+                    NSS
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employeeBasicInfo?.nss ?? "N/A"}
+                  </Type>
+                </div>
+                <div>
+                  <Type variant="metric-label" as="p">
+                    RFC
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employeeBasicInfo?.rfc ?? "N/A"}
+                  </Type>
+                </div>
+                <div>
+                  <Type variant="metric-label" as="p">
+                    CURP
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employeeBasicInfo?.curp ?? "N/A"}
+                  </Type>
+                </div>
+                <div>
+                  <Type variant="metric-label" as="p">
+                    Cuenta Bancaria
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employeeBasicInfo?.bankAccount ?? "N/A"}
+                  </Type>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Toggle Button */}
+        <button
+          type="button"
+          onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+          className="absolute bottom-2 right-2 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+          aria-label={isDrawerOpen ? "Cerrar información adicional" : "Ver más información"}
+        >
+          <svg
+            className={`w-5 h-5 text-slate-600 transition-transform duration-300 ${
+              isDrawerOpen ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* Final row, box depends on currentTab */}
