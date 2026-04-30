@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import Loader from "../Components/Atoms/Loader";
-import { Tabs } from "../Components/untitled/application/tabs/tabs";
-import { NativeSelect } from "../Components/untitled/base/select/select-native";
+import { Tabs } from "../Components/Molecules/Tabs";
+import NativeSelect from "../Components/Atoms/NativeSelect";
 import Chip from "../Components/Atoms/Chip";
 import Alert from "../Components/Atoms/Alerts";
 import Type from "../Components/Atoms/Type";
@@ -41,7 +41,7 @@ const DetalleEmpleado = () => {
       )}
 
       {/* Row for Page Title and Tabs */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-end gap-4">
         <Type variant="page-title" as="h2">
           Gestión de Empleados
         </Type>
