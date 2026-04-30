@@ -43,7 +43,7 @@ const DetalleEmpleado = () => {
       )}
 
       {/* Row for Page Title and Tabs */}
-      <div className="flex items-end gap-4">
+      <div className="flex items-baseline gap-6">
         <Type variant="page-title" as="h2">
           Gestión de Empleados
         </Type>

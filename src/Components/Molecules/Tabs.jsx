@@ -34,7 +34,7 @@ const TabList = ({ type = "underline", items, children, className }) => {
 
 const tabItemStyles = {
   underline: {
-    base: "relative z-10 whitespace-nowrap px-0.5 pb-2.5 pt-0 text-sm font-semibold border-b-2 transition duration-100 cursor-pointer",
+    base: "relative z-10 whitespace-nowrap px-0.5 pb-2.5 pt-0 text-xl sm:text-3xl font-normal tracking-tight border-b-2 transition duration-100 cursor-pointer",
     selected: "border-slate-800 text-slate-800",
     idle: "border-transparent text-slate-400 hover:text-slate-600",
   },
