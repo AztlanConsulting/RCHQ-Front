@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Loader from "../Components/Atoms/Loader";
 import { Tabs } from "../Components/Molecules/Tabs";
@@ -18,6 +18,8 @@ const tabs = [
 
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
+  const navigate = useNavigate();
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
@@ -43,7 +45,30 @@ const DetalleEmpleado = () => {
       )}
 
       {/* Row for Page Title and Tabs */}
-      <div className="flex items-baseline gap-6">
+      <div className="flex items-baseline gap-2">
+        <div>
+          <button
+            type="button"
+            onClick={() => navigate("/app/personal")}
+            className="rounded-lg p-2 hover:bg-slate-100 transition-colors"
+            // aria-label={isDrawerOpen ? "Cerrar información adicional" : "Ver más información"}
+          >
+            <svg
+              className={`w-5 h-5 text-slate-600 transition-transform duration-300 rotate-90`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
+
         <Type variant="page-title" as="h2">
           Gestión de Empleados
         </Type>
@@ -59,7 +84,7 @@ const DetalleEmpleado = () => {
         <Tabs
           selectedKey={currentTab}
           onSelectionChange={setCurrentTab}
-          className="w-max max-md:hidden"
+          className="w-max max-md:hidden ml-6"
         >
           <Tabs.List type="underline" items={tabs}>
             {(tab) => <Tabs.Item {...tab} />}
