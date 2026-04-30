@@ -255,37 +255,45 @@ const DetalleEmpleado = () => {
             </div>
 
             <div className="mt-4 flex flex-col gap-4">
-              <div className="min-w-[12rem flex-1">
-                <Type variant="metric-label" as="p">
+              <div className="min-w-[12rem] flex-1">
+                <Type variant="metric-label" as="p" className="mb-1.5">
                   Correo Electronico
                 </Type>
-                <Type variant="metric-value" as="p">
-                  {employeeBasicInfo?.email ?? "N/A"}
-                </Type>
+                <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
+                  <Type variant="metric-value" as="p">
+                    {employeeBasicInfo?.email ?? "N/A"}
+                  </Type>
+                </div>
               </div>
-              <div className="min-w-[12rem flex-1">
-                <Type variant="metric-label" as="p">
+              <div className="min-w-[12rem] flex-1">
+                <Type variant="metric-label" as="p" className="mb-1.5">
                   Número de Telefono
                 </Type>
-                <Type variant="metric-value" as="p">
-                  {employeeBasicInfo?.phoneNumber ?? "N/A"}
-                </Type>
+                <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
+                  <Type variant="metric-value" as="p">
+                    {employeeBasicInfo?.phoneNumber ?? "N/A"}
+                  </Type>
+                </div>
               </div>
-              <div className="min-w-[12rem flex-1">
-                <Type variant="metric-label" as="p">
+              <div className="min-w-[12rem] flex-1">
+                <Type variant="metric-label" as="p" className="mb-1.5">
                   Dirección
                 </Type>
-                <Type variant="metric-value" as="p">
-                  {employeeBasicInfo?.address?.street ?? "N/A"}
-                </Type>
+                <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
+                  <Type variant="metric-value" as="p">
+                    {employeeBasicInfo?.address?.street ?? "N/A"}
+                  </Type>
+                </div>
               </div>
-              <div className="min-w-[12rem flex-1">
-                <Type variant="metric-label" as="p">
+              <div className="min-w-[12rem] flex-1">
+                <Type variant="metric-label" as="p" className="mb-1.5">
                   Código Postal
                 </Type>
-                <Type variant="metric-value" as="p">
-                  {employeeBasicInfo?.address?.postalCode ?? "N/A"}
-                </Type>
+                <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
+                  <Type variant="metric-value" as="p">
+                    {employeeBasicInfo?.address?.postalCode ?? "N/A"}
+                  </Type>
+                </div>
               </div>
             </div>
           </div>
