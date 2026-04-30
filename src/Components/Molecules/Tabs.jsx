@@ -16,10 +16,7 @@ const tabListStyles = {
 };
 
 const TabList = ({ type = "underline", items, children, className }) => {
-  const listClass = [
-    tabListStyles[type] ?? tabListStyles.underline,
-    className,
-  ]
+  const listClass = [tabListStyles[type] ?? tabListStyles.underline, className]
     .filter(Boolean)
     .join(" ");
 

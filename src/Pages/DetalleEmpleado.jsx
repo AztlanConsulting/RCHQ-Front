@@ -153,7 +153,8 @@ const DetalleEmpleado = () => {
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employeeBasicInfo?.role
-                  ? String(employeeBasicInfo.role).slice(0, 1).toUpperCase() + String(employeeBasicInfo.role).slice(1)
+                  ? String(employeeBasicInfo.role).slice(0, 1).toUpperCase() +
+                    String(employeeBasicInfo.role).slice(1)
                   : "N/A"}
               </Type>
             </div>
@@ -238,7 +239,11 @@ const DetalleEmpleado = () => {
           type="button"
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
           className="absolute bottom-2 right-2 p-2 rounded-lg hover:bg-slate-100 transition-colors"
-          aria-label={isDrawerOpen ? "Cerrar información adicional" : "Ver más información"}
+          aria-label={
+            isDrawerOpen
+              ? "Cerrar información adicional"
+              : "Ver más información"
+          }
         >
           <svg
             className={`w-5 h-5 text-slate-600 transition-transform duration-300 ${
@@ -373,7 +378,8 @@ const DetalleEmpleado = () => {
                     Horario
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.workdays?.[0]?.name ?? "Sin horario definido"}
+                    {employeeAdminInfo?.workdays?.[0]?.name ??
+                      "Sin horario definido"}
                   </Type>
                 </div>
                 <div className="text-right">

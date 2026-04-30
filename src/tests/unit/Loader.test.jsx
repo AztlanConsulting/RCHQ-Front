@@ -2,11 +2,14 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Loader from "../../Components/Atoms/Loader";
 
-vi.mock("../../Components/untitled/loading-indicator/loading-indicator", () => ({
-  LoadingIndicator: ({ type, size }) => (
-    <div data-testid="loading-indicator" data-type={type} data-size={size} />
-  ),
-}));
+vi.mock(
+  "../../Components/untitled/loading-indicator/loading-indicator",
+  () => ({
+    LoadingIndicator: ({ type, size }) => (
+      <div data-testid="loading-indicator" data-type={type} data-size={size} />
+    ),
+  }),
+);
 
 describe("Loader", () => {
   it("renderiza LoadingIndicator con type dot-circle y size md por defecto", () => {

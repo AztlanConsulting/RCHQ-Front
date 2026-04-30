@@ -20,9 +20,7 @@ describe("Chip", () => {
   });
 
   it("añade className al contenedor", () => {
-    const { container } = render(
-      <Chip className="ml-1 focus:outline-none" />,
-    );
+    const { container } = render(<Chip className="ml-1 focus:outline-none" />);
     expect(container.firstChild).toHaveClass("ml-1");
     expect(container.firstChild).toHaveClass("focus:outline-none");
   });

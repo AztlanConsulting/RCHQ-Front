@@ -8,7 +8,10 @@ describe("detalle-empleado.utils", () => {
   describe("countMonFriInRange", () => {
     it("retorna 0 si start es posterior a end", () => {
       expect(
-        countMonFriInRange("2024-01-10T00:00:00.000Z", "2024-01-01T00:00:00.000Z"),
+        countMonFriInRange(
+          "2024-01-10T00:00:00.000Z",
+          "2024-01-01T00:00:00.000Z",
+        ),
       ).toBe(0);
     });
 
@@ -30,15 +33,27 @@ describe("detalle-empleado.utils", () => {
 
     it("ignora solicitudes con status distinto de 1", () => {
       const sum = totalWorkDaysFromApprovedVacationRequests([
-        { status: 0, start: "2024-01-01T00:00:00.000Z", end: "2024-01-05T00:00:00.000Z" },
+        {
+          status: 0,
+          start: "2024-01-01T00:00:00.000Z",
+          end: "2024-01-05T00:00:00.000Z",
+        },
       ]);
       expect(sum).toBe(0);
     });
 
     it("suma días laborables de solicitudes aprobadas", () => {
       const sum = totalWorkDaysFromApprovedVacationRequests([
-        { status: 1, start: "2024-01-01T00:00:00.000Z", end: "2024-01-02T00:00:00.000Z" },
-        { status: 1, start: "2024-01-08T00:00:00.000Z", end: "2024-01-08T00:00:00.000Z" },
+        {
+          status: 1,
+          start: "2024-01-01T00:00:00.000Z",
+          end: "2024-01-02T00:00:00.000Z",
+        },
+        {
+          status: 1,
+          start: "2024-01-08T00:00:00.000Z",
+          end: "2024-01-08T00:00:00.000Z",
+        },
       ]);
       expect(sum).toBe(3);
     });

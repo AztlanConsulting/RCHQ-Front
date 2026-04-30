@@ -1,35 +1,37 @@
 import {
-    clearAuthStorage,
-    getToken,
-    getPreTwoFactorAuthToken,
-    getFirstLoginToken,
-    setToken,
-    setStoredUser,
-    setPreTwoFactorAuthToken,
-    setFirstLoginToken,
-    removePreTwoFactorAuthToken,
-  } from "../utils/authStorage";
-  import { buildApiError, getReadableErrors } from "../utils/apiErrors";
-  import { secureFetch } from "@/utils/secureFetchWrapper";
-  
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  clearAuthStorage,
+  getToken,
+  getPreTwoFactorAuthToken,
+  getFirstLoginToken,
+  setToken,
+  setStoredUser,
+  setPreTwoFactorAuthToken,
+  setFirstLoginToken,
+  removePreTwoFactorAuthToken,
+} from "../utils/authStorage";
+import { buildApiError, getReadableErrors } from "../utils/apiErrors";
+import { secureFetch } from "@/utils/secureFetchWrapper";
 
-  export const getEmployeeDetailService = async (employeeId) => {
-    const token = getToken();
-    
-    if (!token) throw new Error("No se encontró token de sesión");
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-        const response = await secureFetch(`${API_URL}/employee/employee-detail/${employeeId}`, {
-            method: "GET",
-            headers: {
-            Authorization: `Bearer ${token}`,
-            },
-        });
+export const getEmployeeDetailService = async (employeeId) => {
+  const token = getToken();
 
-        const data = await response.json();
-        if (!response.ok) {
-            throw buildApiError(response, data, "Error al obtener los documentos");
-        }
-        return data;
+  if (!token) throw new Error("No se encontró token de sesión");
 
+  const response = await secureFetch(
+    `${API_URL}/employee/employee-detail/${employeeId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al obtener los documentos");
+  }
+  return data;
 };
