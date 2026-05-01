@@ -1,5 +1,5 @@
 import UserInfoSection from "../../components/organism/userInfoSection";
-import Alert from "../../components/atoms/Alerts";
+import Alert from "../../components/atoms/alerts";
 import useEmployeeCreateForm from "../../hooks/pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
