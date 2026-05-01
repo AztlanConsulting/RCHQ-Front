@@ -10,7 +10,7 @@ import {
   validateLoginTwoFactorAuthService,
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
-} from "../../Services/AuthService";
+} from "../../services/authService";
 
 // ─── Factories ────────────────────────────────────────────────────────────────
 

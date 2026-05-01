@@ -1,4 +1,4 @@
-import { DOCUMENT_TYPES } from "../Services/DocumentService";
+import { DOCUMENT_TYPES } from "../services/documentService";
 
 export const getDocumentLabel = (typeValue) => {
   const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
