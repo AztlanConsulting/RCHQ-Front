@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/landing";
-import LoginPage from "./pages/auth/LoginPages";
+import LoginPage from "./pages/auth/loginPages";
 import Dashboard from "./pages/dashboard";
 import Casas from "./pages/casas";
 import Personal from "./pages/personal";
@@ -9,7 +9,7 @@ import Perfil from "./pages/perfil";
 import PublicRoute from "./components/publicRoute";
 import ProtectedRoute from "./components/protectedRoute";
 import FirstLoginRoute from "./components/firstLoginRoute";
-import Pre2FARoute from "./components/pre2FARoute";
+import Pre2FARoute from "./components/pre2faRoute";
 import AppLayout from "./components/appLayout";
 import ChangePassword from "./pages/auth/changePassword";
 import AltaNuevoUsuarioPage from "./pages/personal/altaPersonal";
