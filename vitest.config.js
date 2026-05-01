@@ -23,6 +23,12 @@ export default mergeConfig(
       },
 
       testTimeout: 10000,
+
+      server: {
+        deps: {
+          inline: ["react-router", "react-router-dom"],
+        },
+      },
     },
   }),
 );
