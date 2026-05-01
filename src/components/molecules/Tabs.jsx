@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import Type from "../atoms/type";
 
 const TabsContext = createContext({
   selectedKey: null,
@@ -63,7 +64,9 @@ const TabItem = ({ id, label }) => {
         " ",
       )}
     >
-      {label}
+      <Type variant="display-name" as="span">
+        {label}
+      </Type>
     </button>
   );
 };

@@ -22,7 +22,6 @@ export const useEmployeeDetail = (employeeId) => {
     setIsLoading(true);
     try {
       const data = await getEmployeeDetailService(employeeId);
-
       const basicInfo = data?.data?.employee?.basicInfo ?? null;
       const adminInfo = data?.data?.employee?.adminInfo ?? null;
 
