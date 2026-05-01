@@ -391,8 +391,6 @@ const DetalleEmpleado = () => {
                     Días Trabajados
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {/* {employeeWorkdays?.[0]?.name ??
-                      "Sin horario definido"} */}
                       {employeeWorkdays ? countWorkdayDays(employeeWorkdays) : 0}
                   </Type>
                 </div>
@@ -402,32 +400,28 @@ const DetalleEmpleado = () => {
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
                     {employeeWorkdays ? countWorkdaysHours(employeeWorkdays) : 0}
-                    {/* {employeeWorkdays?.[0]?.start
-                      ? String(employeeWorkdays[0].start).slice(
-                          12,
-                          16,
-                        ) + " - "
-                      : "N/A - "}
-                    {employeeWorkdays?.[0]?.end
-                      ? String(employeeWorkdays[0].start).slice(
-                          12,
-                          16,
-                        )
-                      : "N/A"} */}
                   </Type>
                 </div>
 
-                <Drawer isOpen={workdaysDrawer.isOpen} className={workdaysDrawer.isOpen ? "mt-4" : ""}>
+                <Drawer.Toggle
+                  isOpen={workdaysDrawer.isOpen}
+                  onToggle={workdaysDrawer.toggle}
+                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar información adicional" : "Ver más información"}
+                  className="absolute bottom-2 right-2"
+                 />
+              </div>
+
+              <Drawer isOpen={workdaysDrawer.isOpen} className={workdaysDrawer.isOpen ? "mt-4" : ""}>
                     <ul>
-                      {employeeWorkdays.length > 0 && (
-                        employeeWorkdays.map((workday, idx) => (
+                      {employeeWorkdays?.length > 0 && (
+                        employeeWorkdays.map(workday => (
                            (
-                            <div className="w-full flex">
+                            <div className="w-full flex justify-between">
                               <Type variant="metric-label">
                                 {workday.name}  
                               </Type>
                               <Type variant="metric-label">
-                                {parseUTCDateToHours(workday)}
+                                {`${parseUTCDateToHours(workday.start)} - ${parseUTCDateToHours(workday.end)}`}
                               </Type>
                             </div>
                           )
@@ -438,14 +432,6 @@ const DetalleEmpleado = () => {
                       </div>
                     </ul>
                 </Drawer>
-
-                <Drawer.Toggle
-                  isOpen={workdaysDrawer.isOpen}
-                  onToggle={workdaysDrawer.toggle}
-                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar información adicional" : "Ver más información"}
-                  className="absolute bottom-2 right-2"
-                 />
-              </div>
 
               <div className="w-full flex justify-between">
                 <div>

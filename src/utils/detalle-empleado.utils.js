@@ -28,14 +28,18 @@ export function totalWorkDaysFromApprovedVacationRequests(vacationRequests) {
 function countWorkdayHours(workday) {
   if (!workday.start || !workday.end) return 0;
 
-  return Date(workday.end).getHours() - Date(workday.end).getHours();
+  return new Date(workday.end).getHours() - new Date(workday.start).getHours();
   // start/end format: 1970-01-01T08:00:00.000Z
 }
 
-// input: 1970-01-01T08:00:00.000Z
-// output: 8:00
-export function parseUTCDateToHours(workday) {
-  
+// input: "1970-01-01T08:00:00.000Z"
+// output: "08:00"
+export function parseUTCDateToHours(isoString) {
+  if (!isoString) return "N/A";
+  const d = new Date(isoString);
+  const h = String(d.getUTCHours()).padStart(2, "0");
+  const m = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
 }
 
 export function countWorkdayDays(workdays) {
@@ -47,5 +51,5 @@ export function countWorkdayDays(workdays) {
 export function countWorkdaysHours(workdays) {
   if (!Array.isArray(workdays)) return 0;
 
-  return workdays.reduce((prev, curr) => prev + countWorkdayDays(curr), 0);
+  return workdays.reduce((prev, curr) => prev + countWorkdayHours(curr), 0);
 }
