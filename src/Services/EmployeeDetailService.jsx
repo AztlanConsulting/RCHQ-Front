@@ -1,15 +1,7 @@
 import {
-  clearAuthStorage,
   getToken,
-  getPreTwoFactorAuthToken,
-  getFirstLoginToken,
-  setToken,
-  setStoredUser,
-  setPreTwoFactorAuthToken,
-  setFirstLoginToken,
-  removePreTwoFactorAuthToken,
 } from "../utils/authStorage";
-import { buildApiError, getReadableErrors } from "../utils/apiErrors";
+import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
