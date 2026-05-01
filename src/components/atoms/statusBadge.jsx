@@ -1,5 +1,7 @@
 const StatusBadge = ({ isActive, className = "" }) => {
-  const bgColor = isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+  const bgColor = isActive
+    ? "bg-green-100 text-green-800"
+    : "bg-red-100 text-red-800";
   const statusText = isActive ? "Activo" : "Inactivo";
 
   return (

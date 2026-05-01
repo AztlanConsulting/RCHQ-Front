@@ -1,30 +1,29 @@
 import { useState } from "react";
 
 const useSearch = (initialValue = "", onSearch) => {
-    const [inputValue, setInputValue] = useState(initialValue);
+  const [inputValue, setInputValue] = useState(initialValue);
 
-    const handleChange = (value) => {
-        const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+  const handleChange = (value) => {
+    const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
 
-        setInputValue(onlyLetters);
+    setInputValue(onlyLetters);
 
-        if (onlyLetters.trim() === "") {
-        onSearch("");
-
+    if (onlyLetters.trim() === "") {
+      onSearch("");
     }
-    };
+  };
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            onSearch(inputValue);
-        }
-    };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      onSearch(inputValue);
+    }
+  };
 
-    return {
-        inputValue,
-        handleChange,
-        handleKeyDown,
-    };
+  return {
+    inputValue,
+    handleChange,
+    handleKeyDown,
+  };
 };
 
 export default useSearch;

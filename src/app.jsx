@@ -17,6 +17,7 @@ import TwoFactorLogin from "./pages/auth/twoFactorLogin";
 import TwoFactorAuth from "./pages/auth/twoFactorAuth";
 import MoreOptions from "./pages/moreOptions";
 import Documents from "./pages/documents";
+import DetalleEmpleado from "./pages/detalleEmpleado";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="perfil" element={<Perfil />} />
             <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
             <Route path="personal" element={<Personal />} />
+            <Route path="personal/ver/:employeeId" element={<DetalleEmpleado />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
           </Route>

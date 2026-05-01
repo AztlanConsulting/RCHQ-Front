@@ -8,7 +8,7 @@ import {
 
 import { buildApiError } from "../utils/apiErrors";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const changePasswordFirstLoginService = async (
   newPassword,
@@ -20,7 +20,7 @@ const changePasswordFirstLoginService = async (
     throw new Error("No se encontró token de primer inicio de sesión");
   }
 
-  const response = await fetch(`${API_URL}/auth/first-login/change-password`, {
+  const response = await fetch(`${API_URL}/users/first-login/change-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
