@@ -182,7 +182,7 @@ const DetalleEmpleado = () => {
           </div>
 
           {/* Bottom Row for text-like metrics */}
-          <div className="flex flex-wrap justify-between">
+          <div className="w-[97%] mr-auto flex flex-wrap justify-between">
             <div className="basis-1/4">
               <Type variant="metric-label" as="p">
                 Puesto
@@ -228,7 +228,7 @@ const DetalleEmpleado = () => {
           {/* Collapsible Drawer */}
           <Drawer isOpen={infoDrawer.isOpen} className={infoDrawer.isOpen ? "mt-4" : ""}>
             <div className="pt-4 border-t border-slate-200">
-              <div className="flex flex-wrap justify-between">
+              <div className="w-[97%] mr-auto flex flex-wrap justify-between">
               {/* gap-x-4 gap-y-3 */}
                 <div className="basis-1/4">
                   <Type variant="metric-label" as="p">
@@ -394,24 +394,24 @@ const DetalleEmpleado = () => {
                       {employeeWorkdays ? countWorkdayDays(employeeWorkdays) : 0}
                   </Type>
                 </div>
-                <div className="text-right">
-                  <Type variant="metric-label" as="p">
-                    Horas Semanales
-                  </Type>
-                  <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeWorkdays ? countWorkdaysHours(employeeWorkdays) : 0}
-                  </Type>
+                <div className="flex items-start gap-2 text-right">
+                  <Drawer.Toggle
+                    isOpen={workdaysDrawer.isOpen}
+                    onToggle={workdaysDrawer.toggle}
+                    ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
+                  />
+                  <div>
+                    <Type variant="metric-label" as="p">
+                      Horas Semanales
+                    </Type>
+                    <Type variant="metric-value" as="p" className="mt-0.5">
+                      {employeeWorkdays ? countWorkdaysHours(employeeWorkdays) : 0}
+                    </Type>
+                  </div>
                 </div>
-
-                <Drawer.Toggle
-                  isOpen={workdaysDrawer.isOpen}
-                  onToggle={workdaysDrawer.toggle}
-                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar información adicional" : "Ver más información"}
-                  className="absolute bottom-2 right-2"
-                 />
               </div>
 
-              <Drawer isOpen={workdaysDrawer.isOpen} className={workdaysDrawer.isOpen ? "mt-4" : ""}>
+              <Drawer isOpen={workdaysDrawer.isOpen} className={workdaysDrawer.isOpen ? "mt-1" : ""}>
                     <ul>
                       {employeeWorkdays?.length > 0 && (
                         employeeWorkdays.map(workday => (
