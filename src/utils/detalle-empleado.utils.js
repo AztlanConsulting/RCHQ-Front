@@ -1,7 +1,7 @@
 /**
  * Inclusive. Uses UTC date parts to match API ISO strings (e.g. ...Z).
  */
-export function countMonFriInRange(start, end) {
+export function countMondayFridayInRange(start, end) {
   const t0 = new Date(start);
   const t1 = new Date(end);
   const a = Date.UTC(t0.getUTCFullYear(), t0.getUTCMonth(), t0.getUTCDate());
@@ -22,5 +22,5 @@ export function totalWorkDaysFromApprovedVacationRequests(vacationRequests) {
   if (!Array.isArray(vacationRequests)) return 0;
   return vacationRequests
     .filter((r) => r.status === 1)
-    .reduce((sum, r) => sum + countMonFriInRange(r.start, r.end), 0);
+    .reduce((sum, r) => sum + countMondayFridayInRange(r.start, r.end), 0);
 }

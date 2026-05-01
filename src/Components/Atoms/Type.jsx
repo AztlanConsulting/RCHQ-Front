@@ -1,5 +1,3 @@
-import { cx } from "@/utils/cx";
-
 const variantStyles = {
   /** Main page heading (e.g. "Gestión de Empleados") */
   "page-title": "text-2xl font-semibold tracking-tight text-black sm:text-3xl",
@@ -62,8 +60,12 @@ const Type = ({
   const w = weight ? weightMap[weight] : "";
   const c = color ? colorMap[color] : "";
 
+  const classes = [base, sizeExtra, w, c, className]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <Component className={cx(base, sizeExtra, w, c, className)} {...rest}>
+    <Component className={classes} {...rest}>
       {children}
     </Component>
   );

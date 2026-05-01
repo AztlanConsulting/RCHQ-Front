@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
 import {
-  countMonFriInRange,
+  countMondayFridayInRange,
   totalWorkDaysFromApprovedVacationRequests,
 } from "../../utils/detalle-empleado.utils";
 
 describe("detalle-empleado.utils", () => {
-  describe("countMonFriInRange", () => {
+  describe("countMondayFridayInRange", () => {
     it("retorna 0 si start es posterior a end", () => {
       expect(
-        countMonFriInRange(
+        countMondayFridayInRange(
           "2024-01-10T00:00:00.000Z",
           "2024-01-01T00:00:00.000Z",
         ),
@@ -17,7 +17,7 @@ describe("detalle-empleado.utils", () => {
 
     it("cuenta días de lunes a viernes en un rango (UTC)", () => {
       // 2024-01-01 lun .. 2024-01-07 dom → 5 días laborables
-      const n = countMonFriInRange(
+      const n = countMondayFridayInRange(
         "2024-01-01T00:00:00.000Z",
         "2024-01-07T00:00:00.000Z",
       );
