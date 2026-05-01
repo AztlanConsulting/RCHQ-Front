@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Loader from "../components/atoms/loader";
+import Drawer from "../components/atoms/drawer";
+import { useDrawer } from "@/hooks/atoms/useDrawer";
 import { Tabs } from "../components/molecules/tabs";
 import NativeSelect from "../components/atoms/nativeSelect";
 import Chip from "../components/atoms/chip";
@@ -21,9 +22,6 @@ const tabs = [
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
   const {
     employee,
     employeeAddress,
@@ -37,7 +35,6 @@ const DetalleEmpleado = () => {
     error,
     alert,
   } = useEmployeeDetail(employeeId);
-
   const {
     documents,
     loadingDocs,
@@ -64,6 +61,8 @@ const DetalleEmpleado = () => {
     displayError,
     handleModalSubmit,
   } = useDocuments(employeeId);
+  const infoDrawer = useDrawer();
+  const workdaysDrawer = useDrawer();
 
   if (isLoading) return <Loader />;
 
@@ -110,24 +109,12 @@ const DetalleEmpleado = () => {
           aria-label="Tabs"
           value={currentTab}
           onChange={(event) => setCurrentTab(event.target.value)}
-          //   if (event.target.value === "expediente") {
-          //     navigate(`/app/${employeeId}/documentos`);
-          //   } else {
-          //     setCurrentTab(event.target.value);
-          //   }
-          // }}
           options={tabs.map((tab) => ({ label: tab.label, value: tab.id }))}
           className="w-80 md:hidden"
         />
         <Tabs
           selectedKey={currentTab}
           onSelectionChange={(key) => setCurrentTab(key)}
-            // if (key === "expediente") {
-            //   navigate(`/app/${employeeId}/documentos`);
-            // } else {
-            //   setCurrentTab(key);
-            // }
-          // }}
           className="w-max max-md:hidden ml-6"
         >
           <Tabs.List type="underline" items={tabs}>
@@ -166,7 +153,7 @@ const DetalleEmpleado = () => {
           <div className="h-full flex justify-between">
             {/* Name/House */}
             <div className="w-full min-w-0">
-              <Type variant="display-name" as="h3">
+              <Type variant="page-title" as="h2">
                 {`${employee?.name ?? ""} ${employee?.surname ?? ""}`}
               </Type>
               <Type variant="subtitle" as="p" className="mt-1">
@@ -190,8 +177,8 @@ const DetalleEmpleado = () => {
           </div>
 
           {/* Bottom Row for text-like metrics */}
-          <div className="flex flex-wrap justify-between gap-x-4 gap-y-3">
-            <div>
+          <div className="flex flex-wrap justify-between">
+            <div className="basis-1/4">
               <Type variant="metric-label" as="p">
                 Puesto
               </Type>
@@ -202,7 +189,7 @@ const DetalleEmpleado = () => {
                   : "N/A"}
               </Type>
             </div>
-            <div>
+            <div className="basis-1/4">
               <Type variant="metric-label" as="p">
                 Fecha de Nacimiento
               </Type>
@@ -212,7 +199,7 @@ const DetalleEmpleado = () => {
                   : "N/A"}
               </Type>
             </div>
-            <div>
+            <div className="basis-1/4">
               <Type variant="metric-label" as="p">
                 Fecha de Inicio
               </Type>
@@ -223,7 +210,7 @@ const DetalleEmpleado = () => {
                   : "Sin fecha de Inicio"}
               </Type>
             </div>
-            <div>
+            <div className="basis-1/4">
               <Type variant="metric-label" as="p">
                 Fecha de Terminación
               </Type>
@@ -234,30 +221,11 @@ const DetalleEmpleado = () => {
           </div>
 
           {/* Collapsible Drawer */}
-          <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              isDrawerOpen ? "max-h-32 opacity-100 mt-4" : "max-h-0 opacity-0"
-            }`}
-          >
+          <Drawer isOpen={infoDrawer.isOpen} className={infoDrawer.isOpen ? "mt-4" : ""}>
             <div className="pt-4 border-t border-slate-200">
-              <div className="flex flex-wrap justify-between gap-x-4 gap-y-3">
-                <div>
-                  <Type variant="metric-label" as="p">
-                    NSS
-                  </Type>
-                  <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employee?.nss ?? "N/A"}
-                  </Type>
-                </div>
-                <div>
-                  <Type variant="metric-label" as="p">
-                    RFC
-                  </Type>
-                  <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employee?.rfc ?? "N/A"}
-                  </Type>
-                </div>
-                <div>
+              <div className="flex flex-wrap justify-between">
+              {/* gap-x-4 gap-y-3 */}
+                <div className="basis-1/4">
                   <Type variant="metric-label" as="p">
                     CURP
                   </Type>
@@ -265,7 +233,23 @@ const DetalleEmpleado = () => {
                     {employee?.curp ?? "N/A"}
                   </Type>
                 </div>
-                <div>
+                <div className="basis-1/4">
+                  <Type variant="metric-label" as="p">
+                    NSS
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employee?.nss ?? "N/A"}
+                  </Type>
+                </div>
+                <div className="basis-1/4">
+                  <Type variant="metric-label" as="p">
+                    RFC
+                  </Type>
+                  <Type variant="metric-value" as="p" className="mt-0.5">
+                    {employee?.rfc ?? "N/A"}
+                  </Type>
+                </div>
+                <div className="basis-1/4">
                   <Type variant="metric-label" as="p">
                     Cuenta Bancaria
                   </Type>
@@ -275,36 +259,16 @@ const DetalleEmpleado = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </Drawer>
         </div>
 
         {/* Toggle Button */}
-        <button
-          type="button"
-          onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-          className="absolute bottom-2 right-2 p-2 rounded-lg hover:bg-slate-100 transition-colors"
-          aria-label={
-            isDrawerOpen
-              ? "Cerrar información adicional"
-              : "Ver más información"
-          }
-        >
-          <svg
-            className={`w-5 h-5 text-slate-600 transition-transform duration-300 ${
-              isDrawerOpen ? "rotate-180" : ""
-            }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
+        <Drawer.Toggle
+          isOpen={infoDrawer.isOpen}
+          onToggle={infoDrawer.toggle}
+          ariaLabel={infoDrawer.isOpen ? "Cerrar información adicional" : "Ver más información"}
+          className="absolute bottom-2 right-2"
+        />
       </div>
 
       {/* Final row, box depends on currentTab */}
