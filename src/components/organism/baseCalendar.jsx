@@ -4,19 +4,24 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
+import { useEffect } from "react";
 
 const BaseCalendar = ({
-        calendarRef,
-        initialDate,
-        events,
-        toggleList,
-        setMonthView,
-        setWeekView,
-        setDayView,
-        generateTitle,
-        getWeekDayName,
-        resizeHandler
-    }) => {
+    loadButtonsAtStart,
+    calendarRef,
+    toggleList,
+    setMonthView,
+    setWeekView,
+    setDayView,
+    generateTitle,
+    getWeekDayName,
+    resizeHandler,
+    fetchEventsInRange,
+}) => {
+    useEffect(() => { 
+        loadButtonsAtStart();
+        resizeHandler(calendarRef);
+    });
 
     return (
         <FullCalendar
@@ -39,18 +44,16 @@ const BaseCalendar = ({
             titleFormat={(arg) => generateTitle(arg)}
             views={{
                 timeGridDay: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg)
+                    dayHeaderContent: (arg) => getWeekDayName(arg),
                 },
                 timeGridWeek: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg)
+                    dayHeaderContent: (arg) => getWeekDayName(arg),
                 },
                 dayGridMonth: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg)
-                }
+                    dayHeaderContent: (arg) => getWeekDayName(arg),
+                },
             }}
             windowResize={() => resizeHandler(calendarRef)}
-            initialDate={initialDate}
-            events={events}
             customButtons={{
                 toggleListButton: {
                     text: "Lista",
@@ -69,6 +72,9 @@ const BaseCalendar = ({
                     click: () => setDayView(calendarRef),
                 },
             }}
+            events={(info, successCallback, failureCallback) =>
+                fetchEventsInRange(info, successCallback, failureCallback)
+            }
         />
     );
 };

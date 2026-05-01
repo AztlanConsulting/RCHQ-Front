@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
+import { getReadableErrors } from "../../services/authService";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
     const [viewType, setViewType] = useState("Month");
+    const [viewEmployeeId, setViewEmployeeId] = useState("");
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -23,6 +26,11 @@ export const useBaseCalendar = () => {
         calendarApi.changeView(newView);
         updateButtons(newView);
     };
+
+    const loadButtonsAtStart = () => {
+        const currentView = getCorrespondingView(isList, viewType);
+        updateButtons(currentView);
+    }
 
     const updateButtons = (currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
@@ -158,13 +166,56 @@ export const useBaseCalendar = () => {
         calendarApi.render();
     }
 
+    const fetchEventsInRange = async (dates, successCallback, failureCallback) => {
+        if (viewEmployeeId == "") {
+            successCallback([]);
+            return;
+        }
+
+        const startDate = dates.startStr.split("T")[0];
+        const endDate = dates.endStr.split("T")[0];
+
+        try {
+            const rawEvents = await getEventsInRange(viewEmployeeId, startDate, endDate);
+            console.log(rawEvents);
+
+            const events = [];
+            rawEvents.forEach(rawEvent => {
+                const color = (rawEvent.color).slice(1);
+                console.log(color);
+                const event = {
+                    title: rawEvent.name,
+                    start: rawEvent.start,
+                    end: rawEvent.end,
+                    backgroundColor: rawEvent.color,
+                    borderColor: rawEvent.color,
+                }
+                events.push(event);
+            });
+
+            successCallback(events);
+        } catch (err) {
+            failureCallback(err);
+            console.log(err);
+        }
+    }
+
+    const setOwnCalendar = () => {
+        const ownId = getOwnEmployeeId();
+        setViewEmployeeId(ownId);
+    }
+
     return {
+        setViewEmployeeId,
+        loadButtonsAtStart,
         toggleList,
         setMonthView,
         setWeekView,
         setDayView,
         generateTitle,
         getWeekDayName,
-        resizeHandler
+        resizeHandler,
+        fetchEventsInRange,
+        setOwnCalendar
     }
 }
