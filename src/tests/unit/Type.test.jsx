@@ -33,8 +33,8 @@ describe("Type", () => {
     const pageTitle = c1.querySelector("h2");
     const displayName = c2.querySelector("h2");
     expect(pageTitle).toHaveClass("text-2xl");
-    expect(pageTitle).toHaveClass("sm:text-3xl");
-    expect(displayName).toHaveClass("text-xl");
+    expect(pageTitle).toHaveClass("font-bold");
+    expect(displayName).toHaveClass("text-2xl");
   });
 
   it("combina className con las clases de variante", () => {
