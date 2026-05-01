@@ -1,6 +1,6 @@
 const variantStyles = {
   /** Main page heading (e.g. "Gestión de Empleados") */
-  "page-title": "text-2xl font-semibold tracking-tight text-black sm:text-3xl",
+  "page-title": "text-xl font-semibold tracking-tight text-black sm:text-3xl",
   /** Same scale as page title — employee name, etc. */
   "display-name": "text-xl font-semibold tracking-tight text-black sm:text-3xl",
   /** Role, secondary line — gray, bold */

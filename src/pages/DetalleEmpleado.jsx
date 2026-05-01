@@ -8,6 +8,8 @@ import Alert from "../components/atoms/alerts";
 import Type from "../components/atoms/type";
 import { totalWorkDaysFromApprovedVacationRequests } from "@/utils/detalle-empleado.utils";
 import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
+import DocumentsSection from "../components/organism/documentsSection";
+import { useDocuments } from "../hooks/organism/useDocuments";
 
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
 
@@ -35,6 +37,33 @@ const DetalleEmpleado = () => {
     error,
     alert,
   } = useEmployeeDetail(employeeId);
+
+  const {
+    documents,
+    loadingDocs,
+    fetchError,
+    showUploadModal,
+    modalLoading,
+    modalError,
+    docToDelete,
+    deletingId,
+    successMessage,
+    canModify,
+    conflictDocument,
+    setDocToDelete,
+    handleDeleteConfirm,
+    handleOpenEdit,
+    handleOpenUpload,
+    handleCloseModal,
+    handleConflictConfirm,
+    handleConflictCancel,
+    isEditing,
+    documentType,
+    fileName,
+    handleFileChange,
+    displayError,
+    handleModalSubmit,
+  } = useDocuments(employeeId);
 
   if (isLoading) return <Loader />;
 
@@ -81,12 +110,24 @@ const DetalleEmpleado = () => {
           aria-label="Tabs"
           value={currentTab}
           onChange={(event) => setCurrentTab(event.target.value)}
+          //   if (event.target.value === "expediente") {
+          //     navigate(`/app/${employeeId}/documentos`);
+          //   } else {
+          //     setCurrentTab(event.target.value);
+          //   }
+          // }}
           options={tabs.map((tab) => ({ label: tab.label, value: tab.id }))}
           className="w-80 md:hidden"
         />
         <Tabs
           selectedKey={currentTab}
-          onSelectionChange={setCurrentTab}
+          onSelectionChange={(key) => setCurrentTab(key)}
+            // if (key === "expediente") {
+            //   navigate(`/app/${employeeId}/documentos`);
+            // } else {
+            //   setCurrentTab(key);
+            // }
+          // }}
           className="w-max max-md:hidden ml-6"
         >
           <Tabs.List type="underline" items={tabs}>
@@ -446,7 +487,34 @@ const DetalleEmpleado = () => {
           </div>
         </div>
       )}
-      {currentTab == "expediente" && <div>Expediente</div>}
+      {currentTab == "expediente" && (
+        <DocumentsSection
+          documents={documents}
+          loadingDocs={loadingDocs}
+          fetchError={fetchError}
+          successMessage={successMessage}
+          canModify={canModify}
+          deletingId={deletingId}
+          docToDelete={docToDelete}
+          conflictDocument={conflictDocument}
+          showUploadModal={showUploadModal}
+          isEditing={isEditing}
+          documentType={documentType}
+          fileName={fileName}
+          displayError={displayError}
+          modalError={modalError}
+          modalLoading={modalLoading}
+          handleOpenUpload={handleOpenUpload}
+          handleCloseModal={handleCloseModal}
+          handleFileChange={handleFileChange}
+          handleSubmit={handleModalSubmit}
+          handleOpenEdit={handleOpenEdit}
+          setDocToDelete={setDocToDelete}
+          handleDeleteConfirm={handleDeleteConfirm}
+          handleConflictConfirm={handleConflictConfirm}
+          handleConflictCancel={handleConflictCancel}
+        />
+      )}
     </div>
   );
 };
