@@ -24,3 +24,28 @@ export function totalWorkDaysFromApprovedVacationRequests(vacationRequests) {
     .filter((r) => r.status === 1)
     .reduce((sum, r) => sum + countMondayFridayInRange(r.start, r.end), 0);
 }
+
+function countWorkdayHours(workday) {
+  if (!workday.start || !workday.end) return 0;
+
+  return Date(workday.end).getHours() - Date(workday.end).getHours();
+  // start/end format: 1970-01-01T08:00:00.000Z
+}
+
+// input: 1970-01-01T08:00:00.000Z
+// output: 8:00
+export function parseUTCDateToHours(workday) {
+  
+}
+
+export function countWorkdayDays(workdays) {
+  if (!Array.isArray(workdays)) return 0;
+
+  return workdays.length;
+}
+
+export function countWorkdaysHours(workdays) {
+  if (!Array.isArray(workdays)) return 0;
+
+  return workdays.reduce((prev, curr) => prev + countWorkdayDays(curr), 0);
+}

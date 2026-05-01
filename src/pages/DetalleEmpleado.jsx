@@ -7,7 +7,12 @@ import NativeSelect from "../components/atoms/nativeSelect";
 import Chip from "../components/atoms/chip";
 import Alert from "../components/atoms/alerts";
 import Type from "../components/atoms/type";
-import { totalWorkDaysFromApprovedVacationRequests } from "@/utils/detalle-empleado.utils";
+import { 
+  totalWorkDaysFromApprovedVacationRequests,
+  countWorkdayDays,
+  countWorkdaysHours,
+  parseUTCDateToHours,
+} from "@/utils/detalle-empleado.utils";
 import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import DocumentsSection from "../components/organism/documentsSection";
 import { useDocuments } from "../hooks/organism/useDocuments";
@@ -383,19 +388,21 @@ const DetalleEmpleado = () => {
               <div className="w-full flex justify-between">
                 <div>
                   <Type variant="metric-label" as="p">
-                    Horario
+                    Días Trabajados
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeWorkdays?.[0]?.name ??
-                      "Sin horario definido"}
+                    {/* {employeeWorkdays?.[0]?.name ??
+                      "Sin horario definido"} */}
+                      {employeeWorkdays ? countWorkdayDays(employeeWorkdays) : 0}
                   </Type>
                 </div>
                 <div className="text-right">
                   <Type variant="metric-label" as="p">
-                    Horas
+                    Horas Semanales
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeWorkdays?.[0]?.start
+                    {employeeWorkdays ? countWorkdaysHours(employeeWorkdays) : 0}
+                    {/* {employeeWorkdays?.[0]?.start
                       ? String(employeeWorkdays[0].start).slice(
                           12,
                           16,
@@ -406,9 +413,38 @@ const DetalleEmpleado = () => {
                           12,
                           16,
                         )
-                      : "N/A"}
+                      : "N/A"} */}
                   </Type>
                 </div>
+
+                <Drawer isOpen={workdaysDrawer.isOpen} className={workdaysDrawer.isOpen ? "mt-4" : ""}>
+                    <ul>
+                      {employeeWorkdays.length > 0 && (
+                        employeeWorkdays.map((workday, idx) => (
+                           (
+                            <div className="w-full flex">
+                              <Type variant="metric-label">
+                                {workday.name}  
+                              </Type>
+                              <Type variant="metric-label">
+                                {parseUTCDateToHours(workday)}
+                              </Type>
+                            </div>
+                          )
+                        ))
+                      )}
+                      <div className="w-full flex">
+
+                      </div>
+                    </ul>
+                </Drawer>
+
+                <Drawer.Toggle
+                  isOpen={workdaysDrawer.isOpen}
+                  onToggle={workdaysDrawer.toggle}
+                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar información adicional" : "Ver más información"}
+                  className="absolute bottom-2 right-2"
+                 />
               </div>
 
               <div className="w-full flex justify-between">
