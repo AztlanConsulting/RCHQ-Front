@@ -451,6 +451,7 @@ const DetalleEmpleado = () => {
                       employeeVacationRequests
                         ? totalWorkDaysFromApprovedVacationRequests(
                             employeeVacationRequests,
+                            employeeWorkdays,
                           )
                         : "0"
                     } / 12 Usados`}

@@ -1,28 +1,46 @@
+const DAY_NAME_TO_UTC = {
+  Domingo: 0,
+  Lunes: 1,
+  Martes: 2,
+  "Miércoles": 3,
+  Jueves: 4,
+  Viernes: 5,
+  "Sábado": 6,
+};
+
 /**
+ * Counts days in [start, end] whose UTC weekday is in scheduledDays.
  * Inclusive. Uses UTC date parts to match API ISO strings (e.g. ...Z).
  */
-export function countMondayFridayInRange(start, end) {
+function countScheduledDaysInRange(start, end, scheduledDays) {
   const t0 = new Date(start);
   const t1 = new Date(end);
   const a = Date.UTC(t0.getUTCFullYear(), t0.getUTCMonth(), t0.getUTCDate());
   const b = Date.UTC(t1.getUTCFullYear(), t1.getUTCMonth(), t1.getUTCDate());
   if (a > b) return 0;
+  const daySet = new Set(scheduledDays);
   let count = 0;
   for (let ms = a; ms <= b; ms += 864e5) {
-    const d = new Date(ms).getUTCDay(); // 0=Sun .. 5=Fri, 6=Sat
-    if (d >= 1 && d <= 5) count += 1;
+    if (daySet.has(new Date(ms).getUTCDay())) count++;
   }
   return count;
 }
 
 /**
- * Sum of Mon–Fri days across all requests with status === 1.
+ * Sum of scheduled workdays used across all approved vacation requests.
+ * Falls back to Mon–Fri if employeeWorkdays is not provided.
  */
-export function totalWorkDaysFromApprovedVacationRequests(vacationRequests) {
+export function totalWorkDaysFromApprovedVacationRequests(vacationRequests, employeeWorkdays) {
   if (!Array.isArray(vacationRequests)) return 0;
+
+  const scheduledDays =
+    Array.isArray(employeeWorkdays) && employeeWorkdays.length > 0
+      ? employeeWorkdays.map((w) => DAY_NAME_TO_UTC[w.name]).filter((d) => d !== undefined)
+      : [1, 2, 3, 4, 5];
+
   return vacationRequests
     .filter((r) => r.status === 1)
-    .reduce((sum, r) => sum + countMondayFridayInRange(r.start, r.end), 0);
+    .reduce((sum, r) => sum + countScheduledDaysInRange(r.start, r.end, scheduledDays), 0);
 }
 
 function countWorkdayHours(workday) {
