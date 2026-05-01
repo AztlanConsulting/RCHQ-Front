@@ -23,9 +23,12 @@ const DetalleEmpleado = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
-    employeeBasicInfo,
-    employeeAdminInfo,
-    employeeRecord,
+    employee,
+    employeeAddress,
+    employeeHouse,
+    employeeFaults,
+    employeeWorkdays,
+    employeeVacationRequests,
     isLoading,
     currentTab,
     setCurrentTab,
@@ -99,8 +102,8 @@ const DetalleEmpleado = () => {
           <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
             <img
               src={
-                employeeBasicInfo?.picture?.trim()
-                  ? employeeBasicInfo.picture
+                employee?.picture?.trim()
+                  ? employee.picture
                   : AVATAR_PLACEHOLDER
               }
               alt=""
@@ -111,7 +114,7 @@ const DetalleEmpleado = () => {
               }}
             />
             <div className="absolute bottom-1 right-1 z-10">
-              <Chip active={employeeBasicInfo?.isActive ?? false} />
+              <Chip active={employee?.isActive ?? false} />
             </div>
           </div>
         </div>
@@ -123,13 +126,13 @@ const DetalleEmpleado = () => {
             {/* Name/House */}
             <div className="w-full min-w-0">
               <Type variant="display-name" as="h3">
-                {`${employeeBasicInfo?.name ?? ""} ${employeeBasicInfo?.surname ?? ""}`}
+                {`${employee?.name ?? ""} ${employee?.surname ?? ""}`}
               </Type>
               <Type variant="subtitle" as="p" className="mt-1">
-                {employeeBasicInfo?.house?.name
-                  ? "Casa - " + String(employeeBasicInfo.house.name)
+                {employeeHouse?.name
+                  ? "Casa - " + String(employeeHouse.name)
                   : ""}
-                {/* `${employeeBasicInfo?.role ?? "Sin role"} - ${employeeBasicInfo?.house?.name}`} */}
+                {/* `${employee?.role ?? "Sin role"} - ${employeeHouse?.name}`} */}
               </Type>
             </div>
 
@@ -152,9 +155,9 @@ const DetalleEmpleado = () => {
                 Puesto
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employeeBasicInfo?.role
-                  ? String(employeeBasicInfo.role).slice(0, 1).toUpperCase() +
-                    String(employeeBasicInfo.role).slice(1)
+                {employee?.role
+                  ? String(employee.role).slice(0, 1).toUpperCase() +
+                    String(employee.role).slice(1)
                   : "N/A"}
               </Type>
             </div>
@@ -163,8 +166,8 @@ const DetalleEmpleado = () => {
                 Fecha de Nacimiento
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employeeBasicInfo?.birthDate
-                  ? String(employeeBasicInfo.birthDate).slice(0, 10)
+                {employee?.birthDate
+                  ? String(employee.birthDate).slice(0, 10)
                   : "N/A"}
               </Type>
             </div>
@@ -173,9 +176,9 @@ const DetalleEmpleado = () => {
                 Fecha de Inicio
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {/* {employeeBasicInfo?.startDate ?? "Sin fecha de I"} */}
-                {employeeBasicInfo?.startDate
-                  ? String(employeeBasicInfo.startDate).slice(0, 10)
+                {/* {employee?.startDate ?? "Sin fecha de I"} */}
+                {employee?.startDate
+                  ? String(employee.startDate).slice(0, 10)
                   : "Sin fecha de Inicio"}
               </Type>
             </div>
@@ -184,7 +187,7 @@ const DetalleEmpleado = () => {
                 Fecha de Terminación
               </Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employeeBasicInfo?.end ?? "N/A"}
+                {employee?.endDate ?? "N/A"}
               </Type>
             </div>
           </div>
@@ -202,7 +205,7 @@ const DetalleEmpleado = () => {
                     NSS
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.nss ?? "N/A"}
+                    {employee?.nss ?? "N/A"}
                   </Type>
                 </div>
                 <div>
@@ -210,7 +213,7 @@ const DetalleEmpleado = () => {
                     RFC
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.rfc ?? "N/A"}
+                    {employee?.rfc ?? "N/A"}
                   </Type>
                 </div>
                 <div>
@@ -218,7 +221,7 @@ const DetalleEmpleado = () => {
                     CURP
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.curp ?? "N/A"}
+                    {employee?.curp ?? "N/A"}
                   </Type>
                 </div>
                 <div>
@@ -226,7 +229,7 @@ const DetalleEmpleado = () => {
                     Cuenta Bancaria
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.bankAccount ?? "N/A"}
+                    {employee?.bankAccount ?? "N/A"}
                   </Type>
                 </div>
               </div>
@@ -291,7 +294,7 @@ const DetalleEmpleado = () => {
                 </Type>
                 <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
                   <Type variant="metric-value" as="p">
-                    {employeeBasicInfo?.email ?? "N/A"}
+                    {employee?.email ?? "N/A"}
                   </Type>
                 </div>
               </div>
@@ -301,7 +304,7 @@ const DetalleEmpleado = () => {
                 </Type>
                 <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
                   <Type variant="metric-value" as="p">
-                    {employeeBasicInfo?.phoneNumber ?? "N/A"}
+                    {employee?.phoneNumber ?? "N/A"}
                   </Type>
                 </div>
               </div>
@@ -311,7 +314,7 @@ const DetalleEmpleado = () => {
                 </Type>
                 <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
                   <Type variant="metric-value" as="p">
-                    {employeeBasicInfo?.address?.street ?? "N/A"}
+                    {employeeAddress?.street ?? "N/A"}
                   </Type>
                 </div>
               </div>
@@ -321,7 +324,7 @@ const DetalleEmpleado = () => {
                 </Type>
                 <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
                   <Type variant="metric-value" as="p">
-                    {employeeBasicInfo?.address?.postalCode ?? "N/A"}
+                    {employeeAddress?.postalCode ?? "N/A"}
                   </Type>
                 </div>
               </div>
@@ -352,11 +355,11 @@ const DetalleEmpleado = () => {
                     Tipo
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.type
-                      ? String(employeeBasicInfo.type)
+                    {employee?.type
+                      ? String(employee.type)
                           .slice(0, 1)
                           .toUpperCase() +
-                        String(employeeBasicInfo.type).slice(1)
+                        String(employee.type).slice(1)
                       : "N/A"}
                   </Type>
                 </div>
@@ -365,8 +368,8 @@ const DetalleEmpleado = () => {
                     Salario
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeBasicInfo?.salary
-                      ? "$" + employeeBasicInfo.salary
+                    {employee?.salary
+                      ? "$" + employee.salary
                       : "N/A"}
                   </Type>
                 </div>
@@ -378,7 +381,7 @@ const DetalleEmpleado = () => {
                     Horario
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.workdays?.[0]?.name ??
+                    {employeeWorkdays?.[0]?.name ??
                       "Sin horario definido"}
                   </Type>
                 </div>
@@ -387,14 +390,14 @@ const DetalleEmpleado = () => {
                     Horas
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.workdays?.[0]?.start
-                      ? String(employeeAdminInfo.workdays[0].start).slice(
+                    {employeeWorkdays?.[0]?.start
+                      ? String(employeeWorkdays[0].start).slice(
                           12,
                           16,
                         ) + " - "
                       : "N/A - "}
-                    {employeeAdminInfo?.workdays?.[0]?.end
-                      ? String(employeeAdminInfo.workdays[0].start).slice(
+                    {employeeWorkdays?.[0]?.end
+                      ? String(employeeWorkdays[0].start).slice(
                           12,
                           16,
                         )
@@ -403,32 +406,13 @@ const DetalleEmpleado = () => {
                 </div>
               </div>
 
-              {/* <div className="w-full flex justify-between">
-                                    <div>
-                                        <Type variant="metric-label" as="p">
-                                            Ausencias
-                                        </Type>
-                                        <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
-                                        </Type>
-                                    </div>
-                                    <div>
-                                        <Type variant="metric-label" as="p">
-                                            Numero
-                                        </Type>
-                                        <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
-                                        </Type>
-                                    </div>
-                                </div> */}
-
               <div className="w-full flex justify-between">
                 <div>
                   <Type variant="metric-label" as="p">
                     Vacaciones
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {`${employeeAdminInfo?.vacationRequests?.length ?? 0} Solicitudes`}
+                    {`${employeeVacationRequests?.length ?? 0} Solicitudes`}
                   </Type>
                 </div>
                 <div className="text-right">
@@ -437,9 +421,9 @@ const DetalleEmpleado = () => {
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
                     {`${
-                      employeeAdminInfo?.vacationRequests
+                      employeeVacationRequests
                         ? totalWorkDaysFromApprovedVacationRequests(
-                            employeeAdminInfo.vacationRequests,
+                            employeeVacationRequests,
                           )
                         : "0"
                     } / 12 Usados`}
@@ -453,17 +437,10 @@ const DetalleEmpleado = () => {
                     Faltas
                   </Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">
-                    {employeeAdminInfo?.faults?.length ?? 0}
+                    {employeeFaults?.length ?? 0}
                   </Type>
                 </div>
-                {/* <div>
-                                        <Type variant="metric-label" as="p">
-                                            Numero
-                                        </Type>
-                                        <Type variant="metric-value" as="p" className="mt-0.5">
-                                            {employeeAdminInfo?.start ?? "Sin fecha de I"}
-                                        </Type>
-                                    </div> */}
+                
               </div>
             </div>
           </div>

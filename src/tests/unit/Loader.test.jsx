@@ -1,29 +1,23 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Loader from "../../Components/Atoms/Loader";
 
-vi.mock(
-  "../../Components/untitled/loading-indicator/loading-indicator",
-  () => ({
-    LoadingIndicator: ({ type, size }) => (
-      <div data-testid="loading-indicator" data-type={type} data-size={size} />
-    ),
-  }),
-);
-
 describe("Loader", () => {
-  it("renderiza LoadingIndicator con type dot-circle y size md por defecto", () => {
+  it("renderiza un spinner con size md por defecto", () => {
     render(<Loader />);
-    const el = screen.getByTestId("loading-indicator");
-    expect(el).toHaveAttribute("data-type", "dot-circle");
-    expect(el).toHaveAttribute("data-size", "md");
+    const spinner = screen.getByRole("status");
+    expect(spinner).toHaveClass("h-6", "w-6", "border-2");
   });
 
-  it("pasa el size al indicador", () => {
+  it("aplica el size correcto al spinner", () => {
     render(<Loader size="lg" />);
-    expect(screen.getByTestId("loading-indicator")).toHaveAttribute(
-      "data-size",
-      "lg",
-    );
+    const spinner = screen.getByRole("status");
+    expect(spinner).toHaveClass("h-8", "w-8", "border-[3px]");
+  });
+
+  it("aplica el size sm al spinner", () => {
+    render(<Loader size="sm" />);
+    const spinner = screen.getByRole("status");
+    expect(spinner).toHaveClass("h-4", "w-4", "border-2");
   });
 });
