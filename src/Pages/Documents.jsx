@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import DocumentsSection from "../Components/Organism/DocumentsSection";
-import { useDocuments } from "../hooks/Organism/useDocuments";
-import { DOCUMENT_TYPES } from "../Services/DocumentService";
+import DocumentsSection from "../components/organism/documentsSection";
+import { useDocuments } from "../hooks/organism/useDocuments";
+import { DOCUMENT_TYPES } from "../services/documentService";
 
 const Documents = () => {
   const { employeeId } = useParams();

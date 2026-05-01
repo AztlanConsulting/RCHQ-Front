@@ -1,7 +1,7 @@
 // tests/unit/PhotoUploader.test.jsx
 import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import PhotoUploader from "../../Components/Atoms/PhotoUploader";
+import PhotoUploader from "../../components/atoms/photoUploader";
 
 beforeAll(() => {
   globalThis.URL.createObjectURL = vi.fn(

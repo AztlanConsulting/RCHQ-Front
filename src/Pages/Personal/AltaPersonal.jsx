@@ -1,6 +1,6 @@
-import UserInfoSection from "../../Components/Organism/UserInfoSection";
-import Alert from "../../Components/Atoms/Alerts";
-import useEmployeeCreateForm from "../../hooks/Pages/useEmployeeCreateForm";
+import UserInfoSection from "../../components/organism/userInfoSection";
+import Alert from "../../components/atoms/Alerts";
+import useEmployeeCreateForm from "../../hooks/pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
     const {

@@ -8,10 +8,10 @@ import {
   within,
 } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import Documents from "../../Pages/Documents";
+import Documents from "../../pages/documents";
 
 // ─── Mocks ────────────────────────────────────────────────
-vi.mock("../../Services/DocumentService", () => ({
+vi.mock("../../services/documentService", () => ({
   getDocumentsService: vi.fn(),
   uploadDocumentService: vi.fn(),
   updateDocumentService: vi.fn(),
@@ -28,7 +28,7 @@ import {
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
-} from "../../Services/DocumentService";
+} from "../../services/documentService";
 
 // ─── Token con rol Administrador ──────────────────────────
 const makeToken = (role = "Administrador") => {

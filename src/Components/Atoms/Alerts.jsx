@@ -1,6 +1,6 @@
 import error from "/error.svg";
 import check from "/check.svg";
-import useAlertAnimation from "../../hooks/Atoms/useAlertAnimation";
+import useAlertAnimation from "../../hooks/atoms/useAlertAnimation";
 
 const Alert = ({ icon = "", type = "success", message, onClose }) => {
     const status = useAlertAnimation(message, onClose);

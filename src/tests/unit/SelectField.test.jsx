@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import SelectField from "../../Components/Atoms/SelectField";
+import SelectField from "../../components/atoms/selectField";
 
-import { DOCUMENT_TYPES } from "../../Services/DocumentService";
+import { DOCUMENT_TYPES } from "../../services/documentService";
 
 const makeProps = (overrides = {}) => ({
   label: "Tipo de documento",

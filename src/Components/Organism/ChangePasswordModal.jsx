@@ -1,5 +1,5 @@
-import ModalShell from "./ModalShell";
-import PasswordForm from "./PasswordForm";
+import ModalShell from "./modalShell";
+import PasswordForm from "./passwordForm";
 
 const ChangePasswordModal = ({
   isOpen,

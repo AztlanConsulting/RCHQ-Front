@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
     getEmployeeFormData,
     createEmployee,
-} from "../../Services/PersonalService";
-import { employeeCreateSchema } from "../../utils/Schema/Employee/employeeAdd.schema";
+} from "../../services/personalService";
+import { employeeCreateSchema } from "../../utils/schema/employee/employeeAdd.schema";
 
 const INITIAL_FORM = {
     roleId: "",

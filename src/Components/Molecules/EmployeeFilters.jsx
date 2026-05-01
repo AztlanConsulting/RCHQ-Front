@@ -1,6 +1,6 @@
-import TextField from "../../Components/Atoms/TextField";
-import SelectField from "../../Components/Atoms/SelectField";
-import useSearch from "../../hooks/Molecules/useSearch";
+import TextField from "../atoms/textField";
+import SelectField from "../atoms/selectField";
+import useSearch from "../../hooks/molecules/useSearch";
 
 const EmployeeFilters = ({
     searchQuery,

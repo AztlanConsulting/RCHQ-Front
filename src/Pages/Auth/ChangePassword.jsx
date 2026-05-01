@@ -1,5 +1,5 @@
-import PasswordForm from "../../Components/Organism/PasswordForm";
-import { useChangePassword } from "../../hooks/Organism/useChangePassowrd";
+import PasswordForm from "../../components/organism/passwordForm";
+import { useChangePassword } from "../../hooks/organism/useChangePassowrd";
 
 const ChangePassword = () => {
   const {

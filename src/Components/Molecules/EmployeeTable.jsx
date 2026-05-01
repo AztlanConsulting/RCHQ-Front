@@ -1,4 +1,4 @@
-import EmployeeRow from "./EmployeeRow";
+import EmployeeRow from "./employeeRow";
 
 const EmployeeTable = ({ employees, loading, error }) => {
     if (loading) {

@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useField } from "../Atoms/useField";
-import { useToggle } from "../Atoms/useToggle";
+import { useField } from "../atoms/useField";
+import { useToggle } from "../atoms/useToggle";
 import {
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
-} from "../../Services/AuthService";
-import { changePasswordService } from "../../Services/PasswordService";
+} from "../../services/authService";
+import { changePasswordService } from "../../services/passwordService";
 import {
   selfServiceChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/Schema/Auth/password.schemas";
+} from "../../utils/schema/auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 export const useTwoFactorAuthOptions = () => {

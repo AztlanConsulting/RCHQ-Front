@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import EmployeeFilters from "../../Components/Molecules/EmployeeFilters";
+import EmployeeFilters from "../../components/molecules/employeeFilters";
 
 describe("EmployeeFilters Component", () => {
     const mockSetSearchQuery = vi.fn();

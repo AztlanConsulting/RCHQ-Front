@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import TwoFactorLogin from "../../Pages/Auth/TwoFactorLogin";
+import TwoFactorLogin from "../../pages/auth/twoFactorLogin";
 import {
   validateLoginTwoFactorAuthService,
   getToken,
-} from "../../Services/AuthService";
+} from "../../services/authService";
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -15,11 +15,11 @@ vi.mock("react-router-dom", async (importOriginal) => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-vi.mock("../../context/AuthContext", () => ({
+vi.mock("../../context/authContext", () => ({
   useAuthContext: () => ({ login: mockLogin }),
 }));
 
-vi.mock("../../Services/AuthService", () => ({
+vi.mock("../../services/authService", () => ({
   validateLoginTwoFactorAuthService: vi.fn(),
   getToken: vi.fn(),
 }));

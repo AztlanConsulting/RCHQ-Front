@@ -1,4 +1,4 @@
-import Button from "../../Components/Atoms/Button";
+import Button from "../atoms/button";
 
 const Pagination = ({
     page,

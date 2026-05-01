@@ -1,5 +1,5 @@
-import TextField from "../Atoms/TextField";
-import Button from "../Atoms/Button";
+import TextField from "../atoms/textField";
+import Button from "../atoms/button";
 
 const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   const handleChange = (value) => {

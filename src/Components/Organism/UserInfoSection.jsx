@@ -1,7 +1,7 @@
-import FormField from "./FormField";
-import SelectField from "../Atoms/SelectField";
-import PhotoUploader from "../Atoms/PhotoUploader";
-import Button from "../Atoms/Button";
+import FormField from "./formField";
+import SelectField from "../atoms/selectField";
+import PhotoUploader from "../atoms/photoUploader";
+import Button from "../atoms/button";
 
 const UserIcon = () => (
   <svg

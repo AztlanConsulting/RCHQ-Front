@@ -1,5 +1,5 @@
-import Forms from "./Forms";
-import Alert from "../Atoms/Alerts";
+import Forms from "./forms";
+import Alert from "../atoms/alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 

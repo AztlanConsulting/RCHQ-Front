@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import ChangePasswordModal from "../../../src/Components/Organism/ChangePasswordModal";
+import ChangePasswordModal from "../../components/organism/changePasswordModal";
 
 const ChangePasswordModalHarness = ({
   isOpen = true,

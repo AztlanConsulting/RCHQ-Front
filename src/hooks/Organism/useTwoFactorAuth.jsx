@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useField } from "../Atoms/useField";
+import { useField } from "../atoms/useField";
 import {
   activateTwoFactorAuthService,
   verifyTwoFactorAuthService,
-} from "../../Services/AuthService";
+} from "../../services/authService";
 
 const useGeneration = () => {
   const [qr, setQr] = useState("");

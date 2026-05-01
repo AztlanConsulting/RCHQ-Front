@@ -1,4 +1,4 @@
-import Button from "../Atoms/Button"; 
+import Button from "../atoms/button"; 
 
 const OptionCard = ({ icon, label, onClick }) => {
   return (

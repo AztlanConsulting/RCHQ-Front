@@ -8,7 +8,7 @@ import {
   act,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import AltaPersonal from "../../Pages/Personal/AltaPersonal";
+import AltaPersonal from "../../pages/personal/altaPersonal";
 
 const mockNavigate = vi.fn();
 const mockOnSuccess = vi.fn();
@@ -20,7 +20,7 @@ vi.mock("react-router-dom", async (importOriginal) => {
 });
 
 // Mock Services
-vi.mock("../../Services/PersonalService", () => ({
+vi.mock("../../services/personalService", () => ({
   getEmployeeFormData: vi.fn(),
   createEmployee: vi.fn(),
 }));
@@ -28,7 +28,7 @@ vi.mock("../../Services/PersonalService", () => ({
 import {
   getEmployeeFormData,
   createEmployee,
-} from "../../Services/PersonalService";
+} from "../../services/personalService";
 
 const renderPage = () =>
   render(

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Forms from "../../Components/Organism/Forms";
+import Forms from "../../components/organism/forms";
 
 const mockFields = [
   {

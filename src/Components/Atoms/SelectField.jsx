@@ -1,5 +1,3 @@
-// En: src/Components/Atoms/SelectField.jsx
-
 const SelectField = ({
   label,
   id,

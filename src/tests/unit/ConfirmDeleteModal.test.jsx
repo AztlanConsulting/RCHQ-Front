@@ -1,7 +1,7 @@
 // tests/unit/ConfirmDeleteModal.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConfirmDeleteModal from "../../Components/Molecules/ConfirmDeleteModal";
+import ConfirmDeleteModal from "../../components/molecules/confirmDeleteModal";
 
 const makeProps = (overrides = {}) => ({
   label: "CV",

@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import OptionCard from "../Components/Molecules/OptionCard";
-import Button from "../Components/Atoms/Button";
-import TextField from "../Components/Atoms/TextField";
-import Alert from "../Components/Atoms/Alerts";
-import TwoFactorAuth from "./Auth/TwoFactorAuth";
-import ChangePasswordModal from "../Components/Organism/ChangePasswordModal";
+import OptionCard from "../components/molecules/optionCard";
+import Button from "../components/atoms/button";
+import TextField from "../components/atoms/textField";
+import Alert from "../components/atoms/alerts";
+import TwoFactorAuth from "./auth/twoFactorAuth";
+import ChangePasswordModal from "../components/organism/changePasswordModal";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
-import { useTwoFactorAuthOptions } from "../hooks/Organism/useMoreOptions";
+import { useTwoFactorAuthOptions } from "../hooks/organism/useMoreOptions";
 
 const MoreOptions = () => {
   const navigate = useNavigate();

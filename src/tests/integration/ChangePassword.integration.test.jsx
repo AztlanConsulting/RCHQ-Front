@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import ChangePassword from "../../../src/Pages/Auth/ChangePassword";
+import ChangePassword from "../../pages/auth/changePassword";
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -25,7 +25,7 @@ vi.mock("../../../src/utils/authStorage", () => ({
   }),
 }));
 
-vi.mock("../../../src/Services/PasswordService", () => ({
+vi.mock("../../../src/services/passwordService", () => ({
   changePasswordFirstLoginService: vi.fn(),
 }));
 
@@ -38,8 +38,8 @@ vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
 import {
   getFirstLoginToken,
   setPreTwoFactorAuthToken,
-} from "../../../src/utils/authStorage";
-import { changePasswordFirstLoginService } from "../../../src/Services/PasswordService";
+} from "../../utils/authStorage";
+import { changePasswordFirstLoginService } from "../../services/passwordService";
 
 const renderPage = () =>
   render(

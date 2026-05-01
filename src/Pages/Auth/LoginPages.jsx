@@ -1,8 +1,8 @@
-import Forms from "../../Components/Organism/Forms";
-import Alert from "../../Components/Atoms/Alerts";
+import Forms from "../../components/organism/forms";
+import Alert from "../../components/atoms/alerts";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
-import { useLogin } from "../../hooks/Organism/useLogin";
+import { useLogin } from "../../hooks/organism/useLogin";
 
 const LoginPage = () => {
   const { email, password, showPassword, errors, loading, handleSubmit } =

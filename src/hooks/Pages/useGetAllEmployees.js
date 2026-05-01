@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getEmployees } from "../../Services/PersonalService";
+import { getEmployees } from "../../services/personalService";
 
 export const useEmployees = () => {
     const [employees, setEmployees] = useState([]);

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import Button from "../Components/Atoms/Button";
+import Button from "./atoms/button";
 import useAuth from "../hooks/useAuth";
 
 const navLinkClass = ({ isActive }) =>

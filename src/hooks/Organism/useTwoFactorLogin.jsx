@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   validateLoginTwoFactorAuthService,
   getToken,
-} from "../../Services/AuthService";
-import { useAuthContext } from "../../context/AuthContext";
-import { useField } from "../Atoms/useField";
-import { useToggle } from "../Atoms/useToggle";
+} from "../../services/authService";
+import { useAuthContext } from "../../context/authContext";
+import { useField } from "../atoms/useField";
+import { useToggle } from "../atoms/useToggle";
 
 export const useTwoFactorLogin = () => {
   const navigate = useNavigate();

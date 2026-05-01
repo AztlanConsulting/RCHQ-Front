@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../Components/Atoms/Button";
-import EmployeeFilters from "../Components/Molecules/EmployeeFilters";
-import EmployeeTable from "../Components/Molecules/EmployeeTable";
-import Pagination from "../Components/Molecules/Pagination";
-import { useEmployees } from "../hooks/Pages/useGetAllEmployees";
+import Button from "../components/atoms/button";
+import EmployeeFilters from "../components/molecules/employeeFilters";
+import EmployeeTable from "../components/molecules/employeeTable";
+import Pagination from "../components/molecules/pagination";
+import { useEmployees } from "../hooks/pages/useGetAllEmployees";
 
 const Personal = () => {
     const navigate = useNavigate();

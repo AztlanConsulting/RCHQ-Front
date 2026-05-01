@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import FormField from "../../Components/Organism/FormField";
+import FormField from "../../components/organism/formField";
 
 describe("FormField — renderizado", () => {
   it("muestra el label cuando se proporciona", () => {

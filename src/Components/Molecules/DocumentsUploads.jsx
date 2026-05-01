@@ -1,6 +1,6 @@
-import Alert from "../Atoms/Alerts";
-import Button from "../Atoms/Button";
-import SelectField from "../Atoms/SelectField";
+import Alert from "../atoms/alerts";
+import Button from "../atoms/button";
+import SelectField from "../atoms/selectField";
 
 const DocumentUploadModal = ({
   isOpen,

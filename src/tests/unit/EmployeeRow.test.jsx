@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import EmployeeRow from "../../Components/Molecules/EmployeeRow";
+import EmployeeRow from "../../components/molecules/employeeRow";
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {

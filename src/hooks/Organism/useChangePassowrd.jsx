@@ -4,12 +4,12 @@ import {
   getFirstLoginToken,
   setPreTwoFactorAuthToken,
 } from "../../utils/authStorage";
-import { changePasswordFirstLoginService } from "../../Services/PasswordService";
+import { changePasswordFirstLoginService } from "../../services/passwordService";
 import useAuth from "../useAuth";
 import {
   firstLoginChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/Schema/Auth/password.schemas";
+} from "../../utils/schema/auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 export const useChangePassword = () => {

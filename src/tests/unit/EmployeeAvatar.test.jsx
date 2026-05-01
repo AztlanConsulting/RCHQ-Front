@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import EmployeeAvatar from "../../Components/Atoms/EmployeeAvatar";
+import EmployeeAvatar from "../../components/atoms/employeeAvatar";
 
 vi.stubEnv("VITE_API_URL");
 

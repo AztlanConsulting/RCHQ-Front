@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import EmployeeAvatar from "../Atoms/EmployeeAvatar";
-import StatusBadge from "../Atoms/StatusBadge";
+import EmployeeAvatar from "../atoms/employeeAvatar";
+import StatusBadge from "../atoms/statusBadge";
 import showEyeIcon from "/showEye.svg";
 
 const EmployeeRow = ({ employee }) => {

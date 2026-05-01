@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import StatusBadge from "../../Components/Atoms/StatusBadge";
+import StatusBadge from "../../components/atoms/statusBadge";
 
 describe("StatusBadge Component", () => {
     it('debe mostrar "Activo" y clases verdes cuando isActive es true', () => {

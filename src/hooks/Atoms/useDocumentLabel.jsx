@@ -1,5 +1,5 @@
 // hooks/Atoms/useDocumentLabel.js
-import { DOCUMENT_TYPES } from "../../Services/DocumentService";
+import { DOCUMENT_TYPES } from "../../services/documentService";
 
 export const useDocumentLabel = () => {
   const getLabel = (typeValue) => {

@@ -6,7 +6,7 @@ import {
   updateDocumentService,
   deleteDocumentService,
   DOCUMENT_TYPES,
-} from "../../Services/DocumentService";
+} from "../../services/documentService";
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({

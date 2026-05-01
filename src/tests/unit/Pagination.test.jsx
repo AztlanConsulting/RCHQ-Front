@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import Pagination from "../../Components/Molecules/Pagination";
+import Pagination from "../../components/molecules/pagination";
 
 describe("Pagination Component", () => {
     const mockOnPrev = vi.fn();

@@ -1,6 +1,6 @@
-import TwoFactorCode from "../../Components/Organism/TwoFactorCode";
-import Alert from "../../Components/Atoms/Alerts";
-import { useTwoFactorLogin } from "../../hooks/Organism/useTwoFactorLogin";
+import TwoFactorCode from "../../components/organism/twoFactorCode";
+import Alert from "../../components/atoms/alerts";
+import { useTwoFactorLogin } from "../../hooks/organism/useTwoFactorLogin";
 
 const TwoFactorLogin = () => {
   const { code, setCode, error, loading, isBlocked, handleSubmit } =

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { useField } from "../Atoms/useField";
-import { useDocumentFile } from "../Atoms/useDocumentFile";
+import { useField } from "../atoms/useField";
+import { useDocumentFile } from "../atoms/useDocumentFile";
 import {
   getDocumentsService,
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
-} from "../../Services/DocumentService";
+} from "../../services/documentService";
 
 const getUserInfoFromToken = () => {
   try {

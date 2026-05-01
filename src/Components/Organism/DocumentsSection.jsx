@@ -1,10 +1,10 @@
 // src/Components/Organism/DocumentsSection.jsx
-import Alert from "../Atoms/Alerts";
-import Button from "../Atoms/Button";
-import DocumentCard from "../Molecules/DocumentCard";
-import DocumentUploadModal from "../Molecules/DocumentsUploads";
-import ConfirmDeleteModal from "../Molecules/ConfirmDeleteModal";
-import { DOCUMENT_TYPES } from "../../Services/DocumentService";
+import Alert from "../atoms/alerts";
+import Button from "../atoms/button";
+import DocumentCard from "../molecules/documentCard";
+import DocumentUploadModal from "../molecules/documentsUploads";
+import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
+import { DOCUMENT_TYPES } from "../../services/documentService";
 
 const getDocumentLabel = (typeValue) => {
   const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);

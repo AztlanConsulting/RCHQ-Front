@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import EmployeeTable from "../../Components/Molecules/EmployeeTable";
+import EmployeeTable from "../../components/molecules/employeeTable";
 
 vi.mock("react-router-dom", async () => {
     const actual = await vi.importActual("react-router-dom");
