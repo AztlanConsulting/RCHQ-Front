@@ -74,7 +74,6 @@ const BaseCalendar = ({
         }
     };
 
-    // Component
     const toggleList = (calendarRef) => {
         const newState = !isList;
         setIsList(newState);
@@ -109,70 +108,14 @@ const BaseCalendar = ({
     };
 
     const getMonth = (monthNumber, isComplete) => {
-        if (isComplete) {
-            switch (monthNumber) {
-                case 0:
-                    return "Enero";
-                case 1:
-                    return "Febrero";
-                case 2:
-                    return "Marzo";
-                case 3:
-                    return "Abril";
-                case 4:
-                    return "Mayo";
-                case 5:
-                    return "Junio";
-                case 6:
-                    return "Julio";
-                case 7:
-                    return "Agosto";
-                case 8:
-                    return "Septiembre";
-                case 9:
-                    return "Octubre";
-                case 10:
-                    return "Noviembre";
-                case 11:
-                    return "Diciembre";
-                default:
-                    return "Mes inválido";
-            }
-        }
+        const shortenedMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+        const fullMonths = ["Enero", "Fererob", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const monthText = isComplete ? fullMonths[monthNumber] : shortenedMonths[monthNumber];
 
-        switch (monthNumber) {
-            case 0:
-                return "Ene";
-            case 1:
-                return "Feb";
-            case 2:
-                return "Mar";
-            case 3:
-                return "Abr";
-            case 4:
-                return "May";
-            case 5:
-                return "Jun";
-            case 6:
-                return "Jul";
-            case 7:
-                return "Ago";
-            case 8:
-                return "Sept";
-            case 9:
-                return "Oct";
-            case 10:
-                return "Nov";
-            case 11:
-                return "Dic";
-            default:
-                return "Mes inválido";
-        }
+        return monthText;
     };
 
     const generateTitle = (currentStatus) => {
-        console.log(currentStatus);
-
         if (viewType == "Month") {
             const monthNumber = currentStatus.date.array[1];
             const isFullMonthName = true;
@@ -206,6 +149,38 @@ const BaseCalendar = ({
         return title;
     };
 
+    const getDayWidth = () => {
+        const tableCell = document.querySelector(".fc-day");
+        if (!tableCell) return 0;
+
+        const cellWidth = tableCell.clientWidth || 0;
+
+        return cellWidth;
+    }
+
+    const validateShortenedSize = () => {
+        if (viewType == "Day") return false;
+
+        const currentDayWidth = getDayWidth();
+
+        if (currentDayWidth < 96) return true;
+
+        return false;
+    }
+
+    const getWeekDayName = (currentDay) => {
+        const weekDayIndex = currentDay.dow;
+        const shortenedDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const fullDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const weekDay = validateShortenedSize() ? shortenedDays[weekDayIndex] : fullDays[weekDayIndex];
+        return weekDay;
+    }
+
+    const resizeHandler = (calendarRef) => {
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.render();
+    }
+
     return (
         <FullCalendar
             ref={calendarRef}
@@ -220,11 +195,23 @@ const BaseCalendar = ({
             windowResizeDelay="10"
             height="calc(100vh - 80px)"
             headerToolbar={{
-                left: "prev next today",
+                left: "prev,next today",
                 center: "title",
-                right: "toggleListButton monthButton weekButton dayButton",
+                right: "toggleListButton monthButton,weekButton,dayButton",
             }}
             titleFormat={(arg) => generateTitle(arg)}
+            views={{
+                timeGridDay: {
+                    dayHeaderContent: (arg) => getWeekDayName(arg)
+                },
+                timeGridWeek: {
+                    dayHeaderContent: (arg) => getWeekDayName(arg)
+                },
+                dayGridMonth: {
+                    dayHeaderContent: (arg) => getWeekDayName(arg)
+                }
+            }}
+            windowResize={() => resizeHandler(calendarRef)}
             initialDate={initialDate}
             events={events}
             customButtons={{
