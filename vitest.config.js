@@ -6,8 +6,6 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      // Avoid Vitest 4 `forks` pool worker start timeouts on Windows (see vitest#8861).
-      pool: "vmThreads",
       environment: "jsdom",
       globals: true,
       setupFiles: "./vitest.setup.js",
@@ -24,11 +22,9 @@ export default mergeConfig(
 
       testTimeout: 10000,
 
-      deps: {
-        optimizer: {
-          web: {
-            include: ["react-router", "react-router-dom"],
-          },
+      server: {
+        deps: {
+          inline: ["react-router", "react-router-dom", "react-router/dom"],
         },
       },
     },
