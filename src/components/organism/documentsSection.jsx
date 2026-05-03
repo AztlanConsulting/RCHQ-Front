@@ -1,35 +1,24 @@
-// src/Components/Organism/DocumentsSection.jsx
 import Alert from "../atoms/alerts";
 import Button from "../atoms/button";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
-import { DOCUMENT_TYPES } from "../../services/documentService";
-
-const getDocumentLabel = (typeValue) => {
-  const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
-  return found ? found.label : typeValue;
-};
 
 const formatDocumentDate = (dateString) => {
   if (!dateString) return "";
   return new Date(dateString).toLocaleDateString("es-MX", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
+    day: "numeric", month: "numeric", year: "numeric",
   });
 };
 
-const getDocumentFileUrl = (doc) => doc.fileUrl || doc.url || null;
-
 const isDocumentPdf = (doc) => {
-  const url = doc?.fileUrl || doc?.url || "";
-  const mime = doc?.mimeType || doc?.fileType || "";
-  return url.toLowerCase().endsWith(".pdf") || mime.includes("pdf");
+  const url = doc?.url || "";
+  return url.toLowerCase().endsWith(".pdf");
 };
 
 const DocumentsSection = ({
   documents,
+  documentTypes,
   loadingDocs,
   fetchError,
   successMessage,
@@ -47,7 +36,7 @@ const DocumentsSection = ({
   handleOpenUpload,
   handleCloseModal,
   handleFileChange,
-  handleSubmit,
+  handleModalSubmit,
   handleOpenEdit,
   setDocToDelete,
   handleDeleteConfirm,
@@ -80,24 +69,20 @@ const DocumentsSection = ({
       {loadingDocs ? (
         <p className="text-slate-500 text-sm">Cargando documentos...</p>
       ) : documents.length === 0 ? (
-        <p className="text-slate-400 text-sm">
-          Este empleado aún no tiene documentos.
-        </p>
+        <p className="text-slate-400 text-sm">Este empleado aún no tiene documentos.</p>
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
           {documents.map((doc) => (
             <DocumentCard
-              key={doc.type}
+              key={doc.documentId}
               doc={doc}
-              label={getDocumentLabel(doc.type || doc.documentType)}
-              date={formatDocumentDate(
-                doc.createdAt || doc.date || doc.uploadedAt,
-              )}
-              fileUrl={getDocumentFileUrl(doc)}
+              label={doc.name}
+              date={formatDocumentDate(doc.uploadedAt)}
+              fileUrl={doc.url}
               isPdf={isDocumentPdf(doc)}
               onEdit={handleOpenEdit}
               onDelete={setDocToDelete}
-              isBeingDeleted={deletingId === doc.type}
+              isBeingDeleted={deletingId === doc.documentId}
               canModify={canModify}
             />
           ))}
@@ -110,34 +95,32 @@ const DocumentsSection = ({
         isEditing={isEditing}
         documentTypeValue={documentType.value}
         setDocumentType={documentType.handleValue}
-        documentOptions={DOCUMENT_TYPES}
+        documentOptions={documentTypes}
         fileName={fileName}
         handleFileChange={handleFileChange}
-        handleSubmit={handleSubmit}
+        handleSubmit={handleModalSubmit}
         displayError={displayError || modalError}
         loading={modalLoading}
       />
 
       <ConfirmDeleteModal
-        label={
-          docToDelete
-            ? getDocumentLabel(docToDelete.type || docToDelete.documentType)
-            : null
-        }
+        label={docToDelete?.name ?? null}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDocToDelete(null)}
         loading={!!deletingId}
+        mode="delete"
       />
 
       <ConfirmDeleteModal
         label={
           conflictDocument
-            ? `"${getDocumentLabel(conflictDocument.field)}" ya existe. ¿Deseas reemplazarlo?`
+            ? documentTypes.find((d) => d.value === conflictDocument.field)?.label ?? null
             : null
         }
         onConfirm={handleConflictConfirm}
         onCancel={handleConflictCancel}
         loading={modalLoading}
+        mode="replace"
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { useField } from "../atoms/useField";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import {
   getDocumentsService,
+  getDocumentTypesService,
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
@@ -21,6 +22,7 @@ const getUserInfoFromToken = () => {
 
 export const useDocuments = (employeeId) => {
   const [documents, setDocuments] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(true);
   const [fetchError, setFetchError] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -32,32 +34,31 @@ export const useDocuments = (employeeId) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [canModify, setCanModify] = useState(false);
   const [conflictDocument, setConflictDocument] = useState(null);
+  const [localError, setLocalError] = useState("");
 
   const documentType = useField();
-  const {
-    file,
-    fileName,
-    error: fileError,
-    handleFileChange,
-    reset: resetFile,
-  } = useDocumentFile();
-  const [localError, setLocalError] = useState("");
+  const { file, fileName, error: fileError, handleFileChange, reset: resetFile } = useDocumentFile();
 
   const isEditing = Boolean(editingDocument);
   const { handleValue: setDocumentType } = documentType;
+  const displayError = localError || fileError;
 
   useEffect(() => {
-    setDocumentType(editingDocument?.type || "");
+    getDocumentTypesService()
+      .then(setDocumentTypes)
+      .catch(() => setFetchError("Error al cargar tipos de documento"));
+  }, []);
+
+  useEffect(() => {
+    setDocumentType(editingDocument?.documentId || "");
     resetFile();
   }, [editingDocument, showUploadModal, setDocumentType, resetFile]);
-
-  const displayError = localError || fileError;
 
   useEffect(() => {
     const userInfo = getUserInfoFromToken();
     if (!userInfo) return;
     const userRole = userInfo.role?.toLowerCase();
-    setCanModify(userRole === "administrador" || userRole === "coordinador");
+    setCanModify(userRole === "admin" || userRole === "coordinador");
   }, [employeeId]);
 
   useEffect(() => {
@@ -71,22 +72,7 @@ export const useDocuments = (employeeId) => {
     setFetchError("");
     try {
       const response = await getDocumentsService(employeeId);
-      const docRow = response?.body;
-
-      if (!docRow || !docRow.documents) {
-        setDocuments([]);
-        return;
-      }
-
-      const BASEURL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
-      const docsArray = Object.entries(docRow.documents)
-        .filter(
-          ([key, value]) =>
-            key !== "document_id" && value !== null && value !== "",
-        )
-        .map(([type, url]) => ({ type, url: `${BASEURL}/${url}` }));
-
-      setDocuments(docsArray);
+      setDocuments(response.data || []);
     } catch (err) {
       setFetchError(err.message || "Error al cargar los documentos");
     } finally {
@@ -99,20 +85,11 @@ export const useDocuments = (employeeId) => {
   }, [fetchDocuments]);
 
   const handleModalSubmit = useCallback(async () => {
-    if (!canModify) {
-      setModalError("Operación denegada. No tienes permisos para modificar.");
-      return;
-    }
-
+    if (!canModify) { setModalError("No tienes permisos."); return; }
     setLocalError("");
-    if (!documentType.value) {
-      setLocalError("Selecciona el tipo de documento.");
-      return;
-    }
-    if (!isEditing && !file) {
-      setLocalError("Selecciona un archivo para subir.");
-      return;
-    }
+
+    if (!documentType.value) { setLocalError("Selecciona el tipo de documento."); return; }
+    if (!isEditing && !file) { setLocalError("Selecciona un archivo."); return; }
 
     const formData = new FormData();
     formData.append("documentField", documentType.value);
@@ -122,7 +99,7 @@ export const useDocuments = (employeeId) => {
     setModalError("");
     try {
       if (isEditing) {
-        await updateDocumentService(employeeId, editingDocument.type, formData);
+        await updateDocumentService(employeeId, editingDocument.documentId, formData);
         setSuccessMessage("Documento actualizado correctamente.");
       } else {
         await uploadDocumentService(employeeId, formData);
@@ -136,33 +113,19 @@ export const useDocuments = (employeeId) => {
         const field = err.field || formData.get("documentField");
         setConflictDocument({ field, formData });
         setShowUploadModal(false);
-      } else if (err.status === 403) {
-        setModalError("No tienes permisos para realizar esta acción.");
       } else {
         setModalError(err.message || "Error al guardar el documento");
       }
     } finally {
       setModalLoading(false);
     }
-  }, [
-    canModify,
-    documentType.value,
-    isEditing,
-    file,
-    employeeId,
-    editingDocument,
-    fetchDocuments,
-  ]);
+  }, [canModify, documentType.value, isEditing, file, employeeId, editingDocument, fetchDocuments]);
 
   const handleConflictConfirm = useCallback(async () => {
     if (!conflictDocument) return;
     setModalLoading(true);
     try {
-      await updateDocumentService(
-        employeeId,
-        conflictDocument.field,
-        conflictDocument.formData,
-      );
+      await updateDocumentService(employeeId, conflictDocument.field, conflictDocument.formData);
       setSuccessMessage("Documento reemplazado correctamente.");
       fetchDocuments();
     } catch (err) {
@@ -173,16 +136,14 @@ export const useDocuments = (employeeId) => {
     }
   }, [employeeId, conflictDocument, fetchDocuments]);
 
-  const handleConflictCancel = useCallback(() => {
-    setConflictDocument(null);
-  }, []);
+  const handleConflictCancel = useCallback(() => setConflictDocument(null), []);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!canModify || !docToDelete) return;
-    setDeletingId(docToDelete.type);
+    setDeletingId(docToDelete.documentId);
     try {
-      await deleteDocumentService(employeeId, docToDelete.type);
-      setDocuments((prev) => prev.filter((d) => d.type !== docToDelete.type));
+      await deleteDocumentService(employeeId, docToDelete.documentId);
+      setDocuments((prev) => prev.filter((d) => d.documentId !== docToDelete.documentId));
       setSuccessMessage("Documento eliminado correctamente.");
     } catch (err) {
       setFetchError(err.message || "Error al eliminar el documento");
@@ -192,15 +153,12 @@ export const useDocuments = (employeeId) => {
     }
   }, [employeeId, docToDelete, canModify]);
 
-  const handleOpenEdit = useCallback(
-    (doc) => {
-      if (!canModify) return;
-      setEditingDocument(doc);
-      setModalError("");
-      setShowUploadModal(true);
-    },
-    [canModify],
-  );
+  const handleOpenEdit = useCallback((doc) => {
+    if (!canModify) return;
+    setEditingDocument(doc);
+    setModalError("");
+    setShowUploadModal(true);
+  }, [canModify]);
 
   const handleOpenUpload = useCallback(() => {
     if (!canModify) return;
@@ -217,6 +175,7 @@ export const useDocuments = (employeeId) => {
 
   return {
     documents,
+    documentTypes,
     loadingDocs,
     fetchError,
     showUploadModal,
