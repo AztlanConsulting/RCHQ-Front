@@ -114,7 +114,7 @@ const DocumentCard = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col w-full h-full shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white border border-slate-200 rounded-[8px] overflow-hidden flex flex-col w-full h-full shadow-sm hover:shadow-md transition-shadow">
       <Button
         onClick={handlePreview}
         disabled={!fileUrl}
