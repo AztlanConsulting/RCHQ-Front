@@ -171,7 +171,7 @@ const DetalleEmpleado = () => {
           handleOpenUpload={handleOpenUpload}
           handleCloseModal={handleCloseModal}
           handleFileChange={handleFileChange}
-          handleSubmit={handleModalSubmit}
+          handleModalSubmit={handleModalSubmit}
           handleOpenEdit={handleOpenEdit}
           setDocToDelete={setDocToDelete}
           handleDeleteConfirm={handleDeleteConfirm}
