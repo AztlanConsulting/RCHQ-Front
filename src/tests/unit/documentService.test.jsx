@@ -1,11 +1,11 @@
-// tests/unit/DocumentService.test.js
+// tests/unit/documentService.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
+  getDocumentTypesService,
   getDocumentsService,
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
-  DOCUMENT_TYPES,
 } from "../../services/documentService";
 
 const mockFetch = (body, ok = true, status = 200) => {
@@ -21,42 +21,81 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("DOCUMENT_TYPES", () => {
-  it("contiene al menos el tipo 'cv'", () => {
-    expect(DOCUMENT_TYPES.find((d) => d.value === "cv")).toBeDefined();
-  });
+// ══════════════════════════════════════════════════════════════════════════════
+// getDocumentTypesService
+// ══════════════════════════════════════════════════════════════════════════════
 
-  it("cada tipo tiene value y label", () => {
-    DOCUMENT_TYPES.forEach((dt) => {
-      expect(dt).toHaveProperty("value");
-      expect(dt).toHaveProperty("label");
-    });
-  });
-});
-
-describe("getDocumentsService", () => {
-  it("lanza error si no hay token en localStorage", async () => {
-    await expect(getDocumentsService("emp-123")).rejects.toThrow(
-      "No se encontró token de sesión",
-    );
-  });
-
-  it("retorna los documentos cuando la respuesta es exitosa", async () => {
+describe("getDocumentTypesService", () => {
+  it("retorna los tipos de documento mapeados cuando la respuesta es exitosa", async () => {
     localStorage.setItem("token", "valid-token");
-    const apiResponse = { body: { documents: { cv: "uploads/cv.pdf" } } };
-    mockFetch(apiResponse);
-    const result = await getDocumentsService("emp-123");
-    expect(result).toEqual(apiResponse);
+    mockFetch({
+      data: [
+        { document_id: "uuid-1", name: "Curriculum Vitae" },
+        { document_id: "uuid-2", name: "NSS" },
+      ],
+    });
+    const result = await getDocumentTypesService();
+    expect(result).toEqual([
+      { value: "uuid-1", label: "Curriculum Vitae" },
+      { value: "uuid-2", label: "NSS" },
+    ]);
   });
 
   it("hace GET al endpoint correcto con Authorization header", async () => {
     localStorage.setItem("token", "my-token");
-    mockFetch({ body: {} });
+    mockFetch({ data: [] });
+    await getDocumentTypesService();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/employee/document-types"),
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: "Bearer my-token" }),
+      }),
+    );
+  });
+
+  it("lanza error cuando la respuesta no es ok", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({ message: "No autorizado" }, false, 401);
+    await expect(getDocumentTypesService()).rejects.toMatchObject({
+      message: "No autorizado",
+      status: 401,
+    });
+  });
+
+  it("envía token null si no hay token en localStorage (sin validación previa)", async () => {
+    mockFetch({ data: [] });
+    await getDocumentTypesService();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/employee/document-types"),
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: "Bearer null" }),
+      }),
+    );
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// getDocumentsService
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe("getDocumentsService", () => {
+  it("retorna los documentos con URL completa cuando la respuesta es exitosa", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({
+      success: true,
+      data: [{ document_id: "doc-1", url: "uploads/documents/cv.pdf" }],
+    });
+    const result = await getDocumentsService("emp-123");
+    expect(result.data[0].url).toContain("uploads/documents/cv.pdf");
+  });
+
+  it("hace GET al endpoint correcto con Authorization header", async () => {
+    localStorage.setItem("token", "my-token");
+    mockFetch({ data: [] });
     await getDocumentsService("emp-456");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-456/documents"),
       expect.objectContaining({
-        method: "GET",
         headers: expect.objectContaining({ Authorization: "Bearer my-token" }),
       }),
     );
@@ -70,23 +109,32 @@ describe("getDocumentsService", () => {
       status: 401,
     });
   });
+
+  it("maneja data undefined en la respuesta sin romper", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({ success: true, data: undefined });
+    const result = await getDocumentsService("emp-123");
+    expect(result.data).toBeUndefined();
+  });
 });
 
-describe("uploadDocumentService", () => {
-  it("lanza error si no hay token", async () => {
-    await expect(
-      uploadDocumentService("emp-123", new FormData()),
-    ).rejects.toThrow("No se encontró token de sesión");
-  });
+// ══════════════════════════════════════════════════════════════════════════════
+// uploadDocumentService
+// ══════════════════════════════════════════════════════════════════════════════
 
-  it("hace POST al endpoint correcto", async () => {
+describe("uploadDocumentService", () => {
+  it("hace POST al endpoint correcto con el token", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     const formData = new FormData();
     await uploadDocumentService("emp-123", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents"),
-      expect.objectContaining({ method: "POST", body: formData }),
+      expect.objectContaining({
+        method: "POST",
+        body: formData,
+        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
+      }),
     );
   });
 
@@ -103,19 +151,23 @@ describe("uploadDocumentService", () => {
     mockFetch({ message: "Faltan campos requeridos" }, false, 400);
     await expect(
       uploadDocumentService("emp-123", new FormData()),
-    ).rejects.toMatchObject({
-      status: 400,
-    });
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("lanza error con status 409 cuando el documento ya existe", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({ message: "Ya existe un documento para ese campo", field: "cv" }, false, 409);
+    const error = await uploadDocumentService("emp-123", new FormData()).catch((e) => e);
+    expect(error.status).toBe(409);
+    expect(error.field).toBe("cv");
   });
 });
 
-describe("updateDocumentService", () => {
-  it("lanza error si no hay token", async () => {
-    await expect(
-      updateDocumentService("emp-123", "cv", new FormData()),
-    ).rejects.toThrow("No se encontró token de sesión");
-  });
+// ══════════════════════════════════════════════════════════════════════════════
+// updateDocumentService
+// ══════════════════════════════════════════════════════════════════════════════
 
+describe("updateDocumentService", () => {
   it("hace PUT al endpoint con el field correcto", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
@@ -123,7 +175,11 @@ describe("updateDocumentService", () => {
     await updateDocumentService("emp-123", "cv", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
-      expect.objectContaining({ method: "PUT", body: formData }),
+      expect.objectContaining({
+        method: "PUT",
+        body: formData,
+        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
+      }),
     );
   });
 
@@ -133,23 +189,39 @@ describe("updateDocumentService", () => {
     const result = await updateDocumentService("emp-123", "cv", new FormData());
     expect(result.success).toBe(true);
   });
+
+  it("lanza error cuando la respuesta no es ok", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({ message: "Documento no encontrado" }, false, 404);
+    await expect(
+      updateDocumentService("emp-123", "cv", new FormData()),
+    ).rejects.toMatchObject({ status: 404 });
+  });
 });
 
-describe("deleteDocumentService", () => {
-  it("lanza error si no hay token", async () => {
-    await expect(deleteDocumentService("emp-123", "cv")).rejects.toThrow(
-      "No se encontró token de sesión",
-    );
-  });
+// ══════════════════════════════════════════════════════════════════════════════
+// deleteDocumentService
+// ══════════════════════════════════════════════════════════════════════════════
 
+describe("deleteDocumentService", () => {
   it("hace DELETE al endpoint con el field correcto", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     await deleteDocumentService("emp-123", "cv");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
-      expect.objectContaining({ method: "DELETE" }),
+      expect.objectContaining({
+        method: "DELETE",
+        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
+      }),
     );
+  });
+
+  it("retorna la respuesta exitosa al eliminar", async () => {
+    localStorage.setItem("token", "valid-token");
+    mockFetch({ success: true, message: "Documento eliminado" });
+    const result = await deleteDocumentService("emp-123", "cv");
+    expect(result.success).toBe(true);
   });
 
   it("lanza error con status 404 cuando el documento no existe", async () => {

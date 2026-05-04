@@ -2,7 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SelectField from "../../components/atoms/selectField";
 
-import { DOCUMENT_TYPES } from "../../services/documentService";
+const DOCUMENT_TYPES = [
+  { value: "cv",  label: "CV" },
+  { value: "nss", label: "NSS" },
+  { value: "ine", label: "INE" },
+];
 
 const makeProps = (overrides = {}) => ({
   label: "Tipo de documento",
@@ -28,8 +32,7 @@ describe("SelectField — renderizado base", () => {
 
   it("no renderiza label cuando no se pasa la prop", () => {
     // Arrange
-    const { label, ...props } = makeProps();
-
+    const props = makeProps({ label: undefined });
     // Act
     const { container } = render(<SelectField {...props} />);
 

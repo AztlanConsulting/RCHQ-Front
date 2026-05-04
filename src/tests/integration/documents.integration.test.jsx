@@ -12,14 +12,17 @@ import Documents from "../../pages/documents";
 
 // ─── Mocks ────────────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
-  getDocumentsService: vi.fn(),
-  uploadDocumentService: vi.fn(),
-  updateDocumentService: vi.fn(),
-  deleteDocumentService: vi.fn(),
+  getDocumentsService:     vi.fn(),
+  uploadDocumentService:   vi.fn(),
+  updateDocumentService:   vi.fn(),
+  deleteDocumentService:   vi.fn(),
+  getDocumentTypesService: vi.fn(() => Promise.resolve([
+    { value: "cv", label: "CV" },
+    { value: "nss", label: "NSS" }
+  ])),
   DOCUMENT_TYPES: [
     { value: "cv", label: "CV" },
-    { value: "nss", label: "NSS" },
-    { value: "birth_certificate", label: "Acta de Nacimiento" },
+    { value: "nss", label: "NSS" }
   ],
 }));
 
@@ -28,9 +31,10 @@ import {
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
+  getDocumentTypesService,
 } from "../../services/documentService";
 
-// ─── Token con rol Administrador ──────────────────────────
+// ─── Helpers ──────────────────────────────────────────────
 const makeToken = (role = "Administrador") => {
   const payload = btoa(JSON.stringify({ id: "emp-123", role }));
   return `header.${payload}.signature`;
@@ -49,13 +53,13 @@ const renderPage = (role = "Administrador") => {
   );
 };
 
-// ─── Respuesta con documentos ─────────────────────────────
+// ─── Respuestas mock ──────────────────────────────────────
 const mockDocumentsResponse = {
   success: true,
   body: {
     documents: {
-      cv: "uploads/documents/cv.pdf",
-      nss: null,
+      cv:                "uploads/documents/cv.pdf",
+      nss:               null,
       birth_certificate: null,
     },
   },
@@ -64,15 +68,23 @@ const mockDocumentsResponse = {
 const mockEmptyResponse = {
   success: true,
   message: "El empleado no tiene documentos",
-  body: null,
+  body:    null,
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
+  getDocumentsService.mockResolvedValue({ success: true, body: { documents: {} } });
+  getDocumentTypesService.mockResolvedValue([
+    { value: "cv", label: "CV" },
+    { value: "nss", label: "NSS" }
+  ]);
 });
 
-// ─── Carga inicial ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Carga inicial
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — carga inicial", () => {
   it("muestra los documentos del empleado cuando la carga es exitosa", async () => {
     getDocumentsService.mockResolvedValue(mockDocumentsResponse);
@@ -100,7 +112,10 @@ describe("Documents — carga inicial", () => {
   });
 });
 
-// ─── Permisos ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Permisos por rol
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — permisos por rol", () => {
   it("muestra el botón 'Subir documento' cuando el rol es Administrador", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
@@ -133,7 +148,10 @@ describe("Documents — permisos por rol", () => {
   });
 });
 
-// ─── Subir documento ──────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Subir documento
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — subir documento", () => {
   it("abre el modal al hacer click en 'Subir documento'", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
@@ -194,7 +212,7 @@ describe("Documents — subir documento", () => {
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     const select = document.querySelector("select");
     fireEvent.change(select, { target: { value: "cv" } });
-    const file = new File(["contenido"], "cv.pdf", { type: "application/pdf" });
+    const file      = new File(["contenido"], "cv.pdf", { type: "application/pdf" });
     const fileInput = document.querySelector("input[type='file']");
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
@@ -214,7 +232,10 @@ describe("Documents — subir documento", () => {
   });
 });
 
-// ─── Editar documento ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Editar documento
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — editar documento", () => {
   it("abre el modal en modo edición al hacer click en el botón editar", async () => {
     getDocumentsService.mockResolvedValue(mockDocumentsResponse);
@@ -238,9 +259,7 @@ describe("Documents — editar documento", () => {
     await waitFor(() =>
       expect(screen.getByText("Editar documento")).toBeInTheDocument(),
     );
-    const file = new File(["nuevo"], "cv_nuevo.pdf", {
-      type: "application/pdf",
-    });
+    const file      = new File(["nuevo"], "cv_nuevo.pdf", { type: "application/pdf" });
     const fileInput = document.querySelector("input[type='file']");
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
@@ -261,9 +280,11 @@ describe("Documents — editar documento", () => {
   });
 });
 
-// ─── Eliminar documento ───────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Eliminar documento
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — eliminar documento", () => {
-  // Helper para obtener el botón de confirmar dentro del modal
   const getConfirmButton = () => {
     const modal = screen
       .getByText(/esta acción no se puede deshacer/i)
