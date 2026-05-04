@@ -1,4 +1,9 @@
 import { useState, useCallback } from "react";
+import { 
+  employeeBasicUpdateSchema, 
+  employeeContactUpdateSchema, 
+  employeeAdminUpdateSchema 
+} from "../../utils/schema/employee/update.schema";
 import {
   getUpdateFormService,
   updateBasicInfoService,
@@ -7,7 +12,7 @@ import {
 } from "../../services/employeeUpdateService";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
-  const [editSection, setEditSection] = useState(null); // "basic" | "contact" | "admin" | null
+  const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
   const [loadingCatalogues, setLoadingCatalogues] = useState(false);
@@ -31,75 +36,60 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     selectedWorkdays: [],
   });
 
-  // ── Abrir sección básica ─────────────────────────────────────────────────────
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
     setBasicFormState({
-      name:        employee?.name        ?? "",
-      surname:     employee?.surname     ?? "",
-      curp:        employee?.curp        ?? "",
-      rfc:         employee?.rfc         ?? "",
-      nss:         employee?.nss         ?? "",
-      bankAccount: employee?.bankAccount ?? "",
-      birthDate:   employee?.birthDate
-        ? String(employee.birthDate).slice(0, 10)
-        : "",
+      name:        employee?.name ?? "",
+      surname:     employee?.surname ?? "",
+      curp:        employee?.curp ?? "",
+      rfc:         employee?.rfc ?? "",
+      nss:         employee?.nss ?? "",
+      bankAccount: employee?.bankAccount && !isNaN(employee.bankAccount) ? String(employee.bankAccount) : "",
+      birthDate:   employee?.birthDate ? String(employee.birthDate).slice(0, 10) : "",
     });
     setEditSection("basic");
   }, []);
 
-  // ── Abrir sección contacto ───────────────────────────────────────────────────
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
     setContactFormState({
-      email:       employee?.email       ?? "",
+      email:       employee?.email ?? "",
       phoneNumber: employee?.phoneNumber ?? "",
-      street:      address?.street       ?? "",
-      municipio:   address?.municipio    ?? "",
-      city:        address?.city         ?? "",
-      postalCode:  address?.postalCode   ?? "",
+      street:      address?.street ?? "",
+      municipio:   address?.municipio ?? "",
+      city:        address?.city ?? "",
+      postalCode:  address?.postalCode ?? "",
     });
     setEditSection("contact");
   }, []);
 
-  // ── Abrir sección admin ──────────────────────────────────────────────────────
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
     setEditSection("admin");
     setLoadingCatalogues(true);
     try {
       const formData     = await getUpdateFormService();
-      const rolesData    = formData?.roles    ?? [];
-      const housesData   = formData?.houses   ?? [];
-      const workdaysData = formData?.workdays ?? [];
+      setRoles(formData?.roles ?? []);
+      setHouses(formData?.houses ?? []);
+      setAllWorkdays(formData?.workdays ?? []);
 
-      setRoles(rolesData);
-      setHouses(housesData);
-      setAllWorkdays(workdaysData);
-
-      const preselected = workdaysData.map((wd) => {
+      const preselected = (formData?.workdays ?? []).map((wd) => {
         const wdId    = wd.workdayId ?? wd.workday_id;
-        const existing = currentWorkdays?.find(
-          (cw) => (cw.workdayId ?? cw.workday_id) === wdId
-        );
+        const existing = currentWorkdays?.find((cw) => (cw.workdayId ?? cw.workday_id) === wdId);
         return {
           workdayId: wdId,
           name:      wd.name,
           selected:  !!existing,
-          start:     existing
-            ? String(existing.start).slice(11, 16)
-            : "08:00",
-          end: existing
-            ? String(existing.end).slice(11, 16)
-            : "17:00",
+          start:     existing ? String(existing.start).slice(11, 16) : "08:00",
+          end:       existing ? String(existing.end).slice(11, 16) : "17:00",
         };
       });
 
       setAdminFormState({
-        houseId:          employee?.houseId ?? "",
-        roleId:           employee?.roleId  ?? "",
-        type:             employee?.type    ?? "",
-        salary:           employee?.salary  ?? "",
+        houseId: employee?.houseId ?? "",
+        roleId:  employee?.roleId ?? "",
+        type:    employee?.type ?? "",
+        salary:  employee?.salary ?? "",
         selectedWorkdays: preselected,
       });
     } catch (err) {
@@ -115,17 +105,56 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaveError(null);
   }, []);
 
-  // ── Setters de campos ────────────────────────────────────────────────────────
+  // ── Setters Interceptados (Validación en tiempo real) ────────────
   const setBasicField = useCallback((field, value) => {
-    setBasicFormState((prev) => ({ ...prev, [field]: value }));
+    let finalValue = value;
+    
+    // 1. Campos que NO aceptan números ni emojis (solo letras y espacios)
+    if (field === "name" || field === "surname") {
+      finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    }
+    
+    // 2. Campos que NO aceptan emojis (se mantienen mayúsculas para UX)
+    if (field === "curp" || field === "rfc") {
+      finalValue = value.replace(/\p{Extended_Pictographic}/gu, "").toUpperCase();
+    }
+    
+    // 3. Campos que SOLO aceptan números
+    if (field === "bankAccount" || field === "nss") {
+      finalValue = value.replace(/\D/g, ""); 
+    }
+
+    setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
   const setContactField = useCallback((field, value) => {
-    setContactFormState((prev) => ({ ...prev, [field]: value }));
+    let finalValue = value;
+    
+    // 1. Campos que NO aceptan números ni emojis (solo letras y espacios)
+    if (field === "municipio" || field === "city") {
+      finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    }
+
+    // 2. Campos que NO aceptan emojis
+    if (field === "email" || field === "street") {
+      finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
+    }
+
+    // 3. Campos que SOLO aceptan números
+    if (field === "phoneNumber") {
+      finalValue = value.replace(/\D/g, "");
+    }
+    
+    setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
   const setAdminField = useCallback((field, value) => {
-    setAdminFormState((prev) => ({ ...prev, [field]: value }));
+    let finalValue = value;
+    // Evitar letras y emojis en salario, permitiendo solo puntos y números
+    if (field === "salary") {
+      finalValue = value.replace(/[^\d.]/g, ""); 
+    }
+    setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
   const toggleWorkday = useCallback((workdayId) => {
@@ -146,7 +175,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     }));
   }, []);
 
-  // ── Submits ──────────────────────────────────────────────────────────────────
+  // ── Submits ────────────────────────────────────────────────────────
   const submitBasic = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
@@ -154,7 +183,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const payload = Object.fromEntries(
         Object.entries(basicForm).filter(([, v]) => v !== "")
       );
-      await updateBasicInfoService(employeeId, payload);
+
+      const validation = employeeBasicUpdateSchema.safeParse(payload);
+      if (!validation.success) {
+        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
+        throw new Error(firstIssue?.message || "Revisa los campos, hay errores de validación.");
+      }
+
+      await updateBasicInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
     } catch (err) {
@@ -171,7 +207,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const payload = Object.fromEntries(
         Object.entries(contactForm).filter(([, v]) => v !== "")
       );
-      await updateContactInfoService(employeeId, payload);
+
+      const validation = employeeContactUpdateSchema.safeParse(payload);
+      if (!validation.success) {
+        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
+        throw new Error(firstIssue?.message || "Revisa los campos de contacto.");
+      }
+
+      await updateContactInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información de contacto actualizada con éxito");
     } catch (err) {
@@ -197,7 +240,13 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
       if (workdaysToSend.length > 0) payload.workdays = workdaysToSend;
 
-      await updateAdminInfoService(employeeId, payload);
+      const validation = employeeAdminUpdateSchema.safeParse(payload);
+      if (!validation.success) {
+        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
+        throw new Error(firstIssue?.message || "Revisa los campos administrativos.");
+      }
+
+      await updateAdminInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {

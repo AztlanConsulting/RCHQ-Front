@@ -77,7 +77,9 @@ const EmployeeBasicCard = ({
         </div>
 
         {saveError && isEditing && (
-          <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
+          <p className="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+            {saveError}
+          </p>
         )}
 
         {/* Modo lectura */}
@@ -122,18 +124,20 @@ const EmployeeBasicCard = ({
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: "Nombre",   field: "name" },
-                { label: "Apellido", field: "surname" },
-                { label: "CURP",     field: "curp" },
-                { label: "RFC",      field: "rfc" },
-                { label: "NSS",      field: "nss" },
-                { label: "Cuenta Bancaria (CLABE)", field: "bankAccount" },
-                { label: "Fecha de Nacimiento (YYYY-MM-DD)", field: "birthDate" },
-              ].map(({ label, field }) => (
+                { label: "Nombre",   field: "name", type: "text" },
+                { label: "Apellido", field: "surname", type: "text" },
+                { label: "CURP",     field: "curp", type: "text" },
+                { label: "RFC",      field: "rfc", type: "text" },
+                { label: "NSS",      field: "nss", type: "text" },
+                { label: "Cuenta Bancaria (CLABE)", field: "bankAccount", type: "text" },
+                // 👇 Definimos el type como date para invocar el calendario nativo
+                { label: "Fecha de Nacimiento", field: "birthDate", type: "date" },
+              ].map(({ label, field, type }) => (
                 <div key={field} className="flex flex-col gap-1">
                   <Type variant="metric-label" as="p">{label}</Type>
                   <TextField
                     id={field}
+                    type={type} /* <-- Aquí inyectamos el type "date" o "text" */
                     value={basicForm[field]}
                     setValue={(v) => setBasicField(field, v)}
                     labelClassName="hidden"
