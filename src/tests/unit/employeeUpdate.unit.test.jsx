@@ -5,7 +5,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // ── Mocks globales ─────────────────────────────────────────────────────────────
 
-vi.mock("../utils/authStorage", () => ({
+vi.mock("../../utils/authStorage", () => ({
   getToken: vi.fn(() => "mock-token"),
 }));
 
@@ -19,18 +19,18 @@ vi.mock("../utils/apiErrors", () => ({
 
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
-import { getToken } from "../utils/authStorage";
+import { getToken } from "../../utils/authStorage";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 import {
   getUpdateFormService,
   updateBasicInfoService,
   updateContactInfoService,
   updateAdminInfoService,
-} from "../services/employeeUpdateService";
+} from "../../services/employeeUpdateService";
 
-import EmployeeContactCard from "../components/organism/employeeContactCard";
-import EmployeeBasicCard   from "../components/organism/employeeBasicCard";
-import EmployeeAdminCard   from "../components/organism/employeeAdminCard";
+import EmployeeContactCard from "../../components/organism/employeeContactCard";
+import EmployeeBasicCard   from "../../components/organism/employeeBasicCard";
+import EmployeeAdminCard   from "../../components/organism/employeeAdminCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

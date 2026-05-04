@@ -105,7 +105,7 @@ const setupEmployeeDetail = (overrides = {}) => {
   });
 };
 
-const renderPage = (tab = "overview") => {
+const renderPage = () => {
   localStorage.setItem("token", makeToken());
 
   // Si el tab no es "overview" necesitamos que setCurrentTab actualice el estado
