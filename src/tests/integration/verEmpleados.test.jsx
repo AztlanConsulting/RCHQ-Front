@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import Personal from "../../Pages/Personal";
+import Personal from "../../Pages/personal";
 import { useEmployees } from "../../hooks/pages/useGetAllEmployees";
 
 vi.mock("../../hooks/pages/useGetAllEmployees", () => ({

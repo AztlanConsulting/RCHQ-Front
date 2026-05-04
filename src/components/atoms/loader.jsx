@@ -19,4 +19,5 @@ const Loader = ({ size = "md" }) => {
   );
 };
 
+
 export default Loader;

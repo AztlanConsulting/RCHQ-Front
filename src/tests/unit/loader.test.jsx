@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Loader from "../../Components/Atoms/Loader";
+import Loader from "../../Components/Atoms/loader";
 
 describe("Loader", () => {
   it("renderiza un spinner con size md por defecto", () => {

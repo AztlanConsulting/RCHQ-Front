@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Chip from "../../Components/Atoms/Chip";
+import Chip from "../../Components/Atoms/chip";
+
 
 describe("Chip", () => {
   it("muestra Activo y aria-label adecuado cuando active es true", () => {

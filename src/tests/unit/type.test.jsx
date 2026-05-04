@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Type from "../../Components/Atoms/Type";
+import Type from "../../Components/Atoms/type";
+
 
 describe("Type", () => {
   it("renderiza el texto con variante body por defecto", () => {
