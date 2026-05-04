@@ -17,6 +17,7 @@ import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import DocumentsSection from "../components/organism/documentsSection";
 import { useDocuments } from "../hooks/organism/useDocuments";
 
+
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
 
 const tabs = [

@@ -1,18 +1,10 @@
 const variantStyles = {
-  /** Main page heading (e.g. "Gestión de Empleados") */
-  // "page-title": "text-xl font-semibold tracking-tight text-black sm:text-3xl",
   "page-title": "text-2xl font-bold text-slate-900",
-  /** Same scale as page title — employee name, etc. */
   "display-name": "text-2xl font-base tracking-tight text-slate-900 ",
-  /** Role, secondary line — gray, bold */
   subtitle: "text-sm font-semibold text-slate-500 sm:text-base",
-  /** Small caps-style labels (metrics, form labels) — gray, bold */
   "metric-label": "text-xs font-semibold text-slate-500 sm:text-sm",
-  /** Emphasized values under labels — black, regular weight, larger */
   "metric-value": "text-base font-normal text-black sm:text-lg",
-  /** Card / section titles */
   "section-title": "text-lg font-semibold text-black sm:text-xl",
-  /** Default paragraph */
   body: "text-base font-normal text-black",
 };
 
@@ -37,15 +29,6 @@ const colorMap = {
   brand: "text-slate-900",
 };
 
-/**
- * @param {object} props
- * @param {'page-title'|'display-name'|'subtitle'|'metric-label'|'metric-value'|'section-title'|'body'} [props.variant='body']
- * @param {keyof typeof sizeModifiers} [props.size]
- * @param {keyof typeof weightMap} [props.weight]
- * @param {keyof typeof colorMap} [props.color]
- * @param {string} [props.className]
- * @param {keyof JSX.IntrinsicElements} [props.as]
- */
 const Type = ({
   variant = "body",
   size,
