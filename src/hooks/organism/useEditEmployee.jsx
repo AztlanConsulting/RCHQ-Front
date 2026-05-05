@@ -120,6 +120,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       finalValue = value.replace(/\D/g, ""); 
     }
 
+    if (field === "name" || field === "surname") finalValue = finalValue.slice(0, 50);
+    if (field === "curp") finalValue = finalValue.slice(0, 18);
+    if (field === "rfc")  finalValue = finalValue.slice(0, 13); 
+    if (field === "nss")  finalValue = finalValue.slice(0, 11);
+    if (field === "bankAccount") finalValue = finalValue.slice(0, 18);
+
     setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
@@ -137,7 +143,18 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "phoneNumber") {
       finalValue = value.replace(/\D/g, "");
     }
+
+    if (field === "postalCode") {
+      finalValue = value.replace(/\D/g, "");
+    }
     
+    if (field === "email") finalValue = finalValue.slice(0, 60);
+    if (field === "phoneNumber") finalValue = finalValue.slice(0, 20);
+    if (field === "street") finalValue = finalValue.slice(0, 200);
+    if (field === "municipio") finalValue = finalValue.slice(0, 120);
+    if (field === "city") finalValue = finalValue.slice(0, 100);
+    if (field === "postalCode") finalValue = finalValue.slice(0, 10);
+
     setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
@@ -171,14 +188,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaving(true);
     setSaveError(null);
     try {
-      const payload = Object.fromEntries(
-        Object.entries(basicForm).filter(([, v]) => v !== "")
-      );
-
-      const validation = employeeBasicUpdateSchema.safeParse(payload);
+      const validation = employeeBasicUpdateSchema.safeParse(basicForm);
       if (!validation.success) {
         const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Revisa los campos, hay errores de validación.");
+        throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
       }
 
       await updateBasicInfoService(employeeId, validation.data);
@@ -195,14 +208,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaving(true);
     setSaveError(null);
     try {
-      const payload = Object.fromEntries(
-        Object.entries(contactForm).filter(([, v]) => v !== "")
-      );
-
-      const validation = employeeContactUpdateSchema.safeParse(payload);
+      const validation = employeeContactUpdateSchema.safeParse(contactForm);
       if (!validation.success) {
         const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Revisa los campos de contacto.");
+        throw new Error(firstIssue?.message || "Es necesario completar todos los campos de contacto.");
       }
 
       await updateContactInfoService(employeeId, validation.data);
@@ -219,17 +228,42 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaving(true);
     setSaveError(null);
     try {
-      const payload = {};
-      if (adminForm.houseId) payload.houseId = adminForm.houseId;
-      if (adminForm.roleId)  payload.roleId  = adminForm.roleId;
-      if (adminForm.type)    payload.type    = adminForm.type;
-      if (adminForm.salary)  payload.salary  = Number(adminForm.salary);
+      if (!adminForm.houseId || !adminForm.roleId || !adminForm.type || !adminForm.salary) {
+        throw new Error("Debes llenar todos los campos administrativos (Casa, Puesto, Tipo y Salario).");
+      }
 
-      const workdaysToSend = adminForm.selectedWorkdays
-        .filter((w) => w.selected)
-        .map(({ workdayId, start, end }) => ({ workdayId, start, end }));
+      const payload = {
+        houseId: adminForm.houseId,
+        roleId:  adminForm.roleId,
+        type:    adminForm.type,
+        salary:  Number(adminForm.salary),
+      };
 
-      if (workdaysToSend.length > 0) payload.workdays = workdaysToSend;
+      const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
+      
+      if (selectedWorkdays.length === 0) {
+        throw new Error("Debes seleccionar al menos un día de trabajo.");
+      }
+
+      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
+        if (!start || !end) {
+          throw new Error(`Debes asignar un horario completo para el día ${name}.`);
+        }
+
+        const isStartInWindow = start >= "07:00" && start <= "22:00";
+        if (!isStartInWindow) {
+          throw new Error(`La entrada para el ${name} debe ser entre las 07:00 y las 22:00.`);
+        }
+
+        const isOvernight = end <= start;
+        if (isOvernight && end > "07:00") {
+          throw new Error(`El turno nocturno del ${name} no puede terminar después de las 07:00 AM.`);
+        }
+
+        return { workdayId, start, end };
+      });
+
+      payload.workdays = workdaysToSend;
 
       const validation = employeeAdminUpdateSchema.safeParse(payload);
       if (!validation.success) {

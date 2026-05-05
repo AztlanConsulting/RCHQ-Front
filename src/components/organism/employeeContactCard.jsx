@@ -55,7 +55,12 @@ const EmployeeContactCard = ({
           {[
             { label: "Correo Electrónico",  value: employee?.email },
             { label: "Número de Teléfono",  value: employee?.phoneNumber },
-            { label: "Dirección",           value: employeeAddress?.street },
+            { 
+              label: "Dirección",           
+              value: [employeeAddress?.street, employeeAddress?.municipio, employeeAddress?.city]
+                       .filter(Boolean)
+                       .join(", ") 
+            },
             { label: "Código Postal",       value: employeeAddress?.postalCode },
           ].map(({ label, value }) => (
             <div key={label} className="min-w-[12rem] flex-1">

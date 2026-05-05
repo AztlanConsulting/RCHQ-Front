@@ -43,7 +43,7 @@ const DetalleEmpleado = () => {
   });
 
   const {
-    documents, loadingDocs, fetchError, showUploadModal,
+    documents, documentTypes, loadingDocs, fetchError, showUploadModal,
     modalLoading, modalError, docToDelete, deletingId,
     successMessage, canModify, conflictDocument,
     setDocToDelete, handleDeleteConfirm, handleOpenEdit,
@@ -163,6 +163,7 @@ const DetalleEmpleado = () => {
           conflictDocument={conflictDocument}
           showUploadModal={showUploadModal}
           isEditing={isEditing}
+          documentTypes={documentTypes}
           documentType={documentType}
           fileName={fileName}
           displayError={displayError}

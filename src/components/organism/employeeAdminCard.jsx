@@ -11,10 +11,9 @@ import {
 } from "@/utils/detalle-empleado.utils";
 
 const TIPOS = [
-  { value: "tiempo_completo", label: "Tiempo completo" },
-  { value: "medio_tiempo",    label: "Medio tiempo" },
-  { value: "voluntario",      label: "Voluntario" },
-  { value: "practicante",     label: "Practicante" },
+  { value: "nomina", label: "Nómina" },
+  { value: "Asalariado",    label: "Asalariado" },
+  { value: "Honorarios",      label: "Honorarios" },
 ];
 
 const EmployeeAdminCard = ({
