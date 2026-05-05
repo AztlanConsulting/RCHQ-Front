@@ -50,7 +50,6 @@ const EmployeeContactCard = ({
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
-      {/* Modo lectura */}
       {!isEditing && (
         <div className="mt-4 flex flex-col gap-4">
           {[
@@ -69,7 +68,6 @@ const EmployeeContactCard = ({
         </div>
       )}
 
-      {/* Modo edición */}
       {isEditing && (
         <div className="mt-4 flex flex-col gap-4">
           {[

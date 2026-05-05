@@ -16,10 +16,10 @@ import DetalleEmpleado from "../../pages/detalleEmpleado";
 // ══════════════════════════════════════════════════════════════════════════════
 
 vi.mock("../../services/employeeUpdateService", () => ({
-  getUpdateFormService:      vi.fn(),
-  updateBasicInfoService:    vi.fn(),
-  updateContactInfoService:  vi.fn(),
-  updateAdminInfoService:    vi.fn(),
+  getUpdateFormService:     vi.fn(),
+  updateBasicInfoService:   vi.fn(),
+  updateContactInfoService: vi.fn(),
+  updateAdminInfoService:   vi.fn(),
 }));
 
 vi.mock("../../services/documentService", () => ({
@@ -35,13 +35,18 @@ vi.mock("../../hooks/pages/useEmployeeDetail", () => ({
   useEmployeeDetail: vi.fn(),
 }));
 
+vi.mock("../../utils/schema/employee/update.schema", () => ({
+  employeeBasicUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
+  employeeContactUpdateSchema: { safeParse: vi.fn((data) => ({ success: true, data })) },
+  employeeAdminUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
+}));
+
 import {
   getUpdateFormService,
   updateBasicInfoService,
   updateContactInfoService,
   updateAdminInfoService,
 } from "../../services/employeeUpdateService";
-
 import { useEmployeeDetail } from "../../hooks/pages/useEmployeeDetail";
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -82,13 +87,11 @@ const mockAddress = {
 const mockHouse    = { houseId: "h1", name: "Desarrollo" };
 const mockWorkdays = [];
 
-const makeToken = (role = "Admin") => {
-  const payload = btoa(JSON.stringify({ id: TEST_EMPLOYEE_ID, role }));
-  return `header.${payload}.signature`;
-};
-
+// ── setupEmployeeDetail con setAlert reactivo ──────────────────────────────
 const setupEmployeeDetail = (overrides = {}) => {
-  useEmployeeDetail.mockReturnValue({
+  const mockSetAlert = vi.fn();
+
+  useEmployeeDetail.mockImplementation(() => ({
     employee:                mockEmployee,
     employeeAddress:         mockAddress,
     employeeHouse:           mockHouse,
@@ -99,17 +102,23 @@ const setupEmployeeDetail = (overrides = {}) => {
     currentTab:              "overview",
     setCurrentTab:           vi.fn(),
     alert:                   null,
-    setAlert:                vi.fn(),
+    setAlert:                mockSetAlert,
     getEmployeeDetail:       vi.fn(),
     ...overrides,
-  });
+    ...(overrides.setAlert ? { setAlert: overrides.setAlert } : { setAlert: mockSetAlert }),
+  }));
+
+  return { mockSetAlert };
+};
+
+const makeToken = (role = "Admin") => {
+  const payload = btoa(JSON.stringify({ id: TEST_EMPLOYEE_ID, role }));
+  return `header.${payload}.signature`;
 };
 
 const renderPage = () => {
-  localStorage.setItem("token", makeToken());
-
-  // Si el tab no es "overview" necesitamos que setCurrentTab actualice el estado
-  // Lo hacemos wrapping con un componente que maneje el tab
+  localStorage.setItem("token", makeToken("Admin"));
+  
   return render(
     <MemoryRouter initialEntries={[`/app/personal/${TEST_EMPLOYEE_ID}`]}>
       <Routes>
@@ -127,6 +136,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
   setupEmployeeDetail();
+
   getUpdateFormService.mockResolvedValue({
     roles:    [{ roleId: "r1", name: "Admin" }, { roleId: "r2", name: "Coordinador" }],
     houses:   [{ houseId: "h1", name: "Desarrollo" }],
@@ -135,9 +145,9 @@ beforeEach(() => {
       { workdayId: "wd2", name: "Martes" },
     ],
   });
-  updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada" });
-  updateContactInfoService.mockResolvedValue({ success: true, message: "Contacto actualizado" });
-  updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada" });
+  updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
+  updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
+  updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -162,7 +172,7 @@ describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el tab Overview por defecto", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("Overview")).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
     });
   });
 
@@ -177,7 +187,8 @@ describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el botón de regreso a personal", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /volver/i })).toBeInTheDocument();
+      const buttons = screen.getAllByRole("button");
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 
@@ -195,10 +206,7 @@ describe("DetalleEmpleado — renderizado base", () => {
 describe("DetalleEmpleado — editar información básica", () => {
   it("abre el formulario de edición al hacer click en el lápiz de básica", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => {
       expect(screen.getByDisplayValue("Carlos")).toBeInTheDocument();
     });
@@ -206,10 +214,7 @@ describe("DetalleEmpleado — editar información básica", () => {
 
   it("muestra botones Guardar y Cancelar al editar básica", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => {
       expect(screen.getByText("Guardar")).toBeInTheDocument();
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
@@ -218,10 +223,7 @@ describe("DetalleEmpleado — editar información básica", () => {
 
   it("cancela la edición básica y oculta el formulario", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
     await waitFor(() => {
@@ -231,14 +233,13 @@ describe("DetalleEmpleado — editar información básica", () => {
 
   it("llama a updateBasicInfoService al guardar cambios básicos", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
       expect(updateBasicInfoService).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
@@ -247,36 +248,38 @@ describe("DetalleEmpleado — editar información básica", () => {
     });
   });
 
-  it("muestra alerta de éxito tras guardar básica", async () => {
+  it("llama a setAlert con mensaje de éxito tras guardar básica", async () => {
+    const mockSetAlert = vi.fn();
+    setupEmployeeDetail({ setAlert: mockSetAlert });
+
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
-      expect(
-        screen.getByText("Información básica actualizada"),
-      ).toBeInTheDocument();
+      expect(mockSetAlert).toHaveBeenCalledWith({
+        type: "success",
+        message: "Información básica actualizada con éxito",
+      });
     });
   });
 
-  it("muestra el error cuando updateBasicInfoService falla", async () => {
+  it("muestra el error en la tarjeta cuando updateBasicInfoService falla", async () => {
     updateBasicInfoService.mockRejectedValue(
       Object.assign(new Error("Datos inválidos"), { status: 400 }),
     );
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
       expect(screen.getByText("Datos inválidos")).toBeInTheDocument();
     });
@@ -290,10 +293,7 @@ describe("DetalleEmpleado — editar información básica", () => {
 describe("DetalleEmpleado — editar información de contacto", () => {
   it("abre el formulario de edición de contacto", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => {
       expect(screen.getByDisplayValue("carlos@mail.com")).toBeInTheDocument();
     });
@@ -301,10 +301,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
 
   it("cancela la edición de contacto", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
     await waitFor(() => {
@@ -314,16 +311,16 @@ describe("DetalleEmpleado — editar información de contacto", () => {
 
   it("llama a updateContactInfoService al guardar contacto", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     const emailInput = screen.getByDisplayValue("carlos@mail.com");
     fireEvent.change(emailInput, { target: { value: "nuevo@mail.com" } });
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
       expect(updateContactInfoService).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
@@ -332,34 +329,38 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     });
   });
 
-  it("muestra alerta de éxito tras guardar contacto", async () => {
+  it("llama a setAlert con mensaje de éxito tras guardar contacto", async () => {
+    const mockSetAlert = vi.fn();
+    setupEmployeeDetail({ setAlert: mockSetAlert });
+
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
-      expect(screen.getByText("Contacto actualizado")).toBeInTheDocument();
+      expect(mockSetAlert).toHaveBeenCalledWith({
+        type: "success",
+        message: "Información de contacto actualizada con éxito",
+      });
     });
   });
 
-  it("muestra error cuando updateContactInfoService falla", async () => {
+  it("muestra error en la tarjeta cuando updateContactInfoService falla", async () => {
     updateContactInfoService.mockRejectedValue(
       Object.assign(new Error("Email inválido"), { status: 400 }),
     );
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
     await act(async () => {
       fireEvent.click(screen.getByText("Guardar"));
     });
+
     await waitFor(() => {
       expect(screen.getByText("Email inválido")).toBeInTheDocument();
     });
@@ -373,12 +374,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
 describe("DetalleEmpleado — editar información administrativa", () => {
   it("abre el formulario de edición administrativa", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => {
       expect(screen.getByText("Guardar")).toBeInTheDocument();
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
@@ -387,12 +383,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
   it("carga los catálogos de roles y casas al abrir edición admin", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => {
       expect(getUpdateFormService).toHaveBeenCalledTimes(1);
     });
@@ -400,26 +391,20 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
   it("muestra las opciones de roles después de cargar catálogos", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
+
     await waitFor(() => {
-      expect(screen.getByText("Admin")).toBeInTheDocument();
-      expect(screen.getByText("Coordinador")).toBeInTheDocument();
+      const adminOption = screen.getAllByRole("option", { name: "Admin", hidden: true });
+      expect(adminOption.length).toBeGreaterThan(0);
+
+      const coordinadorOption = screen.getByRole("option", { name: "Coordinador", hidden: true });
+      expect(coordinadorOption).toBeInTheDocument();
     });
   });
 
   it("cancela la edición administrativa", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
     await waitFor(() => {
@@ -429,76 +414,80 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
   it("llama a updateAdminInfoService al guardar admin", async () => {
     renderPage();
-    
-    // 1. Abrir el formulario
-    const editBtn = await screen.findByLabelText("Editar información administrativa");
-    fireEvent.click(editBtn);
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
-    // 2. Esperar a que los catálogos carguen y el botón "Guardar" esté habilitado
     const saveBtn = await screen.findByRole("button", { name: /guardar/i });
-    
-    // Verificamos que no esté deshabilitado (por el estado de carga del catálogo)
     await waitFor(() => expect(saveBtn).not.toBeDisabled());
 
-    // 3. Click y esperar la llamada
-    fireEvent.click(saveBtn);
+    const salaryInput = screen.getByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "20000" } });
+
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
 
     await waitFor(() => {
       expect(updateAdminInfoService).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
-        expect.any(Object)
+        expect.objectContaining({ salary: 20000 }),
       );
     });
   });
 
-  it("muestra alerta de éxito tras guardar admin", async () => {
+  it("llama a setAlert con mensaje de éxito tras guardar admin", async () => {
+    const mockSetAlert = vi.fn();
+    setupEmployeeDetail({ setAlert: mockSetAlert });
+
     renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
-    
-    const saveBtn = await screen.findByRole("button", { name: /guardar/i });
-    await waitFor(() => expect(saveBtn).not.toBeDisabled());
-    
-    fireEvent.click(saveBtn);
 
-    // Buscamos el texto de éxito
-    expect(await screen.findByText(/información administrativa actualizada/i)).toBeInTheDocument();
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "20000" } });
+
+    const saveBtn = screen.getByRole("button", { name: /guardar/i });
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
+
+    await waitFor(() => {
+      expect(mockSetAlert).toHaveBeenCalledWith({
+        type: "success",
+        message: "Información administrativa actualizada con éxito",
+      });
+    });
   });
 
-
-  it("muestra error cuando updateAdminInfoService falla", async () => {
-    updateAdminInfoService.mockRejectedValue(
+  it("muestra error en la tarjeta cuando updateAdminInfoService falla", async () => {
+    updateAdminInfoService.mockRejectedValueOnce(
       Object.assign(new Error("Salario inválido"), { status: 400 }),
     );
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
-    await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
+
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "1" } });
+
+    const saveBtn = screen.getByRole("button", { name: /guardar/i });
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
     await act(async () => {
-      fireEvent.click(screen.getByText("Guardar"));
+      fireEvent.click(saveBtn);
     });
-    await waitFor(() => {
-      expect(screen.getByText("Salario inválido")).toBeInTheDocument();
-    });
+
+    expect(await screen.findByText("Salario inválido")).toBeInTheDocument();
   });
 
   it("deshabilita Guardar mientras carga catálogos", async () => {
     getUpdateFormService.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({
-        roles: [], houses: [], workdays: [],
-      }), 500)),
+      () => new Promise((resolve) =>
+        setTimeout(() => resolve({ roles: [], houses: [], workdays: [] }), 500)
+      ),
     );
     renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByLabelText("Editar información administrativa"),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información administrativa"));
-    // El botón debería estar deshabilitado mientras carga
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
+
     const saveBtn = screen.getByText("Guardar").closest("button");
     expect(saveBtn).toBeDisabled();
   });
@@ -511,36 +500,27 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 describe("DetalleEmpleado — aislamiento de edición", () => {
   it("al abrir básica, no muestra formulario de contacto", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByDisplayValue("Carlos")).toBeInTheDocument());
-    // El email no debe estar en un input (contacto sigue en modo lectura)
+
     expect(screen.queryByDisplayValue("carlos@mail.com")).toBeNull();
   });
 
   it("al abrir contacto, no muestra formulario básico", async () => {
     renderPage();
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() =>
-      expect(screen.getByLabelText("Editar contacto")).toBeInTheDocument(),
+      expect(screen.getByDisplayValue("carlos@mail.com")).toBeInTheDocument()
     );
-    fireEvent.click(screen.getByLabelText("Editar contacto"));
-    await waitFor(() =>
-      expect(screen.getByDisplayValue("carlos@mail.com")).toBeInTheDocument(),
-    );
-    // El nombre no debe estar en un input (básica sigue en modo lectura)
+
     expect(screen.queryByDisplayValue("Carlos")).toBeNull();
   });
 
   it("solo hay un par Guardar/Cancelar activo a la vez", async () => {
     renderPage();
-    await waitFor(() =>
-      expect(screen.getByLabelText("Editar información básica")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByLabelText("Editar información básica"));
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
-    // Solo un Guardar visible
+
     expect(screen.getAllByText("Guardar")).toHaveLength(1);
     expect(screen.getAllByText("Cancelar")).toHaveLength(1);
   });

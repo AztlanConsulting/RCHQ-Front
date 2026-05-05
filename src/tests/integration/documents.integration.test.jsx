@@ -17,12 +17,12 @@ vi.mock("../../services/documentService", () => ({
   updateDocumentService:   vi.fn(),
   deleteDocumentService:   vi.fn(),
   getDocumentTypesService: vi.fn(() => Promise.resolve([
-    { value: "cv", label: "CV" },
-    { value: "nss", label: "NSS" }
+    { value: "cv",  label: "CV" },
+    { value: "nss", label: "NSS" },
   ])),
   DOCUMENT_TYPES: [
-    { value: "cv", label: "CV" },
-    { value: "nss", label: "NSS" }
+    { value: "cv",  label: "CV" },
+    { value: "nss", label: "NSS" },
   ],
 }));
 
@@ -35,14 +35,14 @@ import {
 } from "../../services/documentService";
 
 // ─── Helpers ──────────────────────────────────────────────
-const makeToken = (role = "Administrador") => {
+const makeToken = (role = "Admin") => {
   const payload = btoa(JSON.stringify({ id: "emp-123", role }));
   return `header.${payload}.signature`;
 };
 
 const TEST_EMPLOYEE_ID = "emp-123";
 
-const renderPage = (role = "Administrador") => {
+const renderPage = (role = "Admin") => {
   localStorage.setItem("token", makeToken(role));
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
@@ -56,13 +56,17 @@ const renderPage = (role = "Administrador") => {
 // ─── Respuestas mock ──────────────────────────────────────
 const mockDocumentsResponse = {
   success: true,
-  body: {
-    documents: {
-      cv:                "uploads/documents/cv.pdf",
-      nss:               null,
-      birth_certificate: null,
-    },
-  },
+  data: [
+    { documentId: "cv", name: "CV", url: "uploads/documents/cv.pdf" },
+  ],
+};
+
+const mockDocumentsMultiple = {
+  success: true,
+  data: [
+    { documentId: "cv",  name: "CV",  url: "uploads/documents/cv.pdf" },
+    { documentId: "nss", name: "NSS", url: null },
+  ],
 };
 
 const mockEmptyResponse = {
@@ -76,8 +80,8 @@ beforeEach(() => {
   localStorage.clear();
   getDocumentsService.mockResolvedValue({ success: true, body: { documents: {} } });
   getDocumentTypesService.mockResolvedValue([
-    { value: "cv", label: "CV" },
-    { value: "nss", label: "NSS" }
+    { value: "cv",  label: "CV" },
+    { value: "nss", label: "NSS" },
   ]);
 });
 
@@ -87,7 +91,7 @@ beforeEach(() => {
 
 describe("Documents — carga inicial", () => {
   it("muestra los documentos del empleado cuando la carga es exitosa", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
@@ -119,7 +123,7 @@ describe("Documents — carga inicial", () => {
 describe("Documents — permisos por rol", () => {
   it("muestra el botón 'Subir documento' cuando el rol es Administrador", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
-    renderPage("Administrador");
+    renderPage("Admin");
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /subir documento/i }),
@@ -283,40 +287,44 @@ describe("Documents — editar documento", () => {
 // ══════════════════════════════════════════════════════════════════════════════
 // Eliminar documento
 // ══════════════════════════════════════════════════════════════════════════════
-
 describe("Documents — eliminar documento", () => {
   const getConfirmButton = () => {
     const modal = screen
-      .getByText(/esta acción no se puede deshacer/i)
+      .getByText(/esta acción no se puede revertir/i)
       .closest("div");
     return within(modal).getByRole("button", { name: /^eliminar$/i });
   };
 
+  const clickFirstDelete = () => {
+    const deleteButtons = screen.getAllByTitle("Eliminar");
+    fireEvent.click(deleteButtons[0]);
+  };
+
   it("abre el modal de confirmación al hacer click en eliminar", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByTitle("Eliminar"));
+    clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/esta acción no se puede deshacer/i),
+      screen.getByText(/esta acción no se puede revertir/i),
     ).toBeInTheDocument();
   });
 
   it("cancela la eliminación al hacer click en Cancelar del modal", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByTitle("Eliminar"));
+    clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
     await waitFor(() => {
       expect(
-        screen.queryByText(/esta acción no se puede deshacer/i),
+        screen.queryByText(/esta acción no se puede revertir/i),
       ).toBeNull();
     });
     expect(deleteDocumentService).not.toHaveBeenCalled();
@@ -329,6 +337,7 @@ describe("Documents — eliminar documento", () => {
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
+    // Un solo documento → getByTitle no falla
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument(),
@@ -357,7 +366,7 @@ describe("Documents — eliminar documento", () => {
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(
-        screen.getByText(/esta acción no se puede deshacer/i),
+        screen.getByText(/esta acción no se puede revertir/i),
       ).toBeInTheDocument(),
     );
     await act(async () => {

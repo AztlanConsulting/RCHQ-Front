@@ -105,21 +105,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaveError(null);
   }, []);
 
-  // ── Setters Interceptados (Validación en tiempo real) ────────────
   const setBasicField = useCallback((field, value) => {
     let finalValue = value;
     
-    // 1. Campos que NO aceptan números ni emojis (solo letras y espacios)
     if (field === "name" || field === "surname") {
       finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
     
-    // 2. Campos que NO aceptan emojis (se mantienen mayúsculas para UX)
     if (field === "curp" || field === "rfc") {
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "").toUpperCase();
     }
     
-    // 3. Campos que SOLO aceptan números
     if (field === "bankAccount" || field === "nss") {
       finalValue = value.replace(/\D/g, ""); 
     }
@@ -130,17 +126,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const setContactField = useCallback((field, value) => {
     let finalValue = value;
     
-    // 1. Campos que NO aceptan números ni emojis (solo letras y espacios)
     if (field === "municipio" || field === "city") {
       finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
 
-    // 2. Campos que NO aceptan emojis
     if (field === "email" || field === "street") {
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
     }
 
-    // 3. Campos que SOLO aceptan números
     if (field === "phoneNumber") {
       finalValue = value.replace(/\D/g, "");
     }
@@ -150,7 +143,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const setAdminField = useCallback((field, value) => {
     let finalValue = value;
-    // Evitar letras y emojis en salario, permitiendo solo puntos y números
     if (field === "salary") {
       finalValue = value.replace(/[^\d.]/g, ""); 
     }
@@ -175,7 +167,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     }));
   }, []);
 
-  // ── Submits ────────────────────────────────────────────────────────
   const submitBasic = useCallback(async () => {
     setSaving(true);
     setSaveError(null);

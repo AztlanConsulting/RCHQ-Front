@@ -21,7 +21,6 @@ const EmployeeBasicCard = ({
 }) => {
   return (
     <div className="relative w-full flex p-3 items-start rounded-xl border border-slate-200 bg-white shadow-sm">
-      {/* Avatar */}
       <div className="flex shrink-0 mr-8 mt-1">
         <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
           <img
@@ -36,9 +35,7 @@ const EmployeeBasicCard = ({
         </div>
       </div>
 
-      {/* Contenido */}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        {/* Nombre + botones */}
         <div className="flex justify-between items-start">
           <div>
             <Type variant="page-title" as="h2">
@@ -82,7 +79,6 @@ const EmployeeBasicCard = ({
           </p>
         )}
 
-        {/* Modo lectura */}
         {!isEditing && (
           <>
             <div className="w-[97%] mr-auto flex flex-wrap justify-between">
@@ -119,7 +115,6 @@ const EmployeeBasicCard = ({
           </>
         )}
 
-        {/* Modo edición */}
         {isEditing && (
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
@@ -130,14 +125,13 @@ const EmployeeBasicCard = ({
                 { label: "RFC",      field: "rfc", type: "text" },
                 { label: "NSS",      field: "nss", type: "text" },
                 { label: "Cuenta Bancaria (CLABE)", field: "bankAccount", type: "text" },
-                // 👇 Definimos el type como date para invocar el calendario nativo
                 { label: "Fecha de Nacimiento", field: "birthDate", type: "date" },
               ].map(({ label, field, type }) => (
                 <div key={field} className="flex flex-col gap-1">
                   <Type variant="metric-label" as="p">{label}</Type>
                   <TextField
                     id={field}
-                    type={type} /* <-- Aquí inyectamos el type "date" o "text" */
+                    type={type}
                     value={basicForm[field]}
                     setValue={(v) => setBasicField(field, v)}
                     labelClassName="hidden"
@@ -150,7 +144,6 @@ const EmployeeBasicCard = ({
         )}
       </div>
 
-      {/* Toggle drawer (solo en lectura) */}
       {!isEditing && (
         <Drawer.Toggle
           isOpen={infoDrawer.isOpen}

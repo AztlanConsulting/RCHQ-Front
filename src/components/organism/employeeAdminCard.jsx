@@ -150,7 +150,6 @@ const EmployeeAdminCard = ({
         </div>
       )}
 
-      {/* Modo edición */}
       {isEditing && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
