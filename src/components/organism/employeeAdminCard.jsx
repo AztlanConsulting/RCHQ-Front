@@ -27,6 +27,7 @@ const EmployeeAdminCard = ({
   adminForm,
   roles,
   houses,
+  frecuentPaymentTypes,
   setAdminField,
   toggleWorkday,
   setWorkdayTime,
@@ -80,6 +81,12 @@ const EmployeeAdminCard = ({
               <Type variant="metric-label" as="p">Tipo</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employee?.type ?? "N/A"}
+              </Type>
+            </div>
+              <div className="text-right">
+              <Type variant="metric-label" as="p">Frecuencia de Pago</Type>
+              <Type variant="metric-value" as="p" className="mt-0.5">
+                {employee?.frequencyOfPaymentName ?? "N/A"}
               </Type>
             </div>
             <div className="text-right">
@@ -189,6 +196,24 @@ const EmployeeAdminCard = ({
                   labelClassName="hidden" text=""
                 />
               </div>
+                <div className="flex flex-col gap-1">
+                <Type variant="metric-label" as="p">Salario (MXN)</Type>
+                <SelectField
+                  label="Frecuencia de pago" id="frequencyOfPaymentId"
+                  value={adminForm.frequencyOfPaymentId}
+                  onChange={(e) => setAdminField("frequencyOfPaymentId", e.target.value)}
+                  options={[
+                    { value: "", label: "Sin asignar" },
+                    ...(frecuentPaymentTypes ?? []).map((f) => ({
+                      value: f.optionId,
+                      label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                    })),
+                  ]}
+                  placeholder="Selecciona frecuencia"
+                  labelColor="text-slate-500"
+                />
+                </div>
+
             </div>
 
             {adminForm.selectedWorkdays.length > 0 && (

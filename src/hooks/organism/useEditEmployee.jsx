@@ -20,6 +20,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [roles, setRoles]       = useState([]);
   const [houses, setHouses]     = useState([]);
   const [allWorkdays, setAllWorkdays] = useState([]);
+  const [frecuentPaymentTypes, setFrecuentPaymentTypes] = useState([]);
 
   const [basicForm, setBasicFormState] = useState({
     name: "", surname: "", curp: "", rfc: "",
@@ -33,6 +34,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const [adminForm, setAdminFormState] = useState({
     houseId: "", roleId: "", type: "", salary: "",
+    frequencyOfPaymentId: "",
     selectedWorkdays: [],
   });
 
@@ -63,15 +65,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setEditSection("contact");
   }, []);
 
+
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
     setEditSection("admin");
     setLoadingCatalogues(true);
     try {
-      const formData     = await getUpdateFormService();
+      const formData = await getUpdateFormService();
       setRoles(formData?.roles ?? []);
       setHouses(formData?.houses ?? []);
       setAllWorkdays(formData?.workdays ?? []);
+      setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
 
       const preselected = (formData?.workdays ?? []).map((wd) => {
         const wdId    = wd.workdayId ?? wd.workday_id;
@@ -81,22 +85,23 @@ export const useEditEmployee = (employeeId, onSuccess) => {
           name:      wd.name,
           selected:  !!existing,
           start:     existing ? String(existing.start).slice(11, 16) : "08:00",
-          end:       existing ? String(existing.end).slice(11, 16) : "17:00",
+          end:       existing ? String(existing.end).slice(11, 16)   : "17:00",
         };
       });
 
       setAdminFormState({
-        houseId: employee?.houseId ?? "",
-        roleId:  employee?.roleId ?? "",
-        type:    employee?.type ?? "",
-        salary:  employee?.salary ?? "",
-        selectedWorkdays: preselected,
+        houseId:              employee?.houseId ?? "",
+        roleId:               employee?.roleId  ?? "",
+        type:                 employee?.type    ?? "",
+        salary:               employee?.salary  ?? "",
+        frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
+        selectedWorkdays:     preselected,
       });
     } catch (err) {
-        console.error("Error cargando catálogos:", err);
-        setSaveError("Error cargando catálogos");
+      console.error("Error cargando catálogos:", err);
+      setSaveError("Error cargando catálogos");
     } finally {
-        setLoadingCatalogues(false);
+      setLoadingCatalogues(false);
     }
   }, []);
 
@@ -233,41 +238,46 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       }
 
       const payload = {
-        houseId: adminForm.houseId,
-        roleId:  adminForm.roleId,
-        type:    adminForm.type,
-        salary:  Number(adminForm.salary),
+        houseId:              adminForm.houseId,
+        roleId:               adminForm.roleId,
+        type:                 adminForm.type,
+        salary:               Number(adminForm.salary),
+        frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
-      
       if (selectedWorkdays.length === 0) {
         throw new Error("Debes seleccionar al menos un día de trabajo.");
       }
 
-      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
-        if (!start || !end) {
-          throw new Error(`Debes asignar un horario completo para el día ${name}.`);
-        }
+  const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
+    if (!start || !end) {
+      throw new Error(`Debes asignar un horario completo para el día ${name}.`);
+    }
 
-        const isStartInWindow = start >= "07:00" && start <= "22:00";
-        if (!isStartInWindow) {
-          throw new Error(`La entrada para el ${name} debe ser entre las 07:00 y las 22:00.`);
-        }
+    const [sh] = start.split(":").map(Number);
+    const [eh] = end.split(":").map(Number);
 
-        const isOvernight = end <= start;
-        if (isOvernight && end > "07:00") {
-          throw new Error(`El turno nocturno del ${name} no puede terminar después de las 07:00 AM.`);
-        }
+    const isOvernight = end <= start;
+    const durationHours = isOvernight
+      ? (24 - sh) + eh
+      : eh - sh;
 
-        return { workdayId, start, end };
-      });
+    if (durationHours < 1) {
+      throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
+    }
+    if (durationHours > 24) {
+      throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
+    }
+
+    return { workdayId, start, end };
+  });
 
       payload.workdays = workdaysToSend;
 
       const validation = employeeAdminUpdateSchema.safeParse(payload);
       if (!validation.success) {
-        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
+        const firstIssue = validation.error?.issues?.[0];
         throw new Error(firstIssue?.message || "Revisa los campos administrativos.");
       }
 
@@ -284,7 +294,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   return {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses, allWorkdays,
+    roles, houses, allWorkdays, frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
