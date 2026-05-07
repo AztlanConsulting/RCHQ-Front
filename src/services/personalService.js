@@ -1,3 +1,4 @@
+import { secureFetch } from "../utils/secureFetchWrapper";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const getToken = () => localStorage.getItem("token");
@@ -83,7 +84,7 @@ export const getEmployees = async (
     active,
   });
 
-  const res = await fetch(`${API_URL}/employee/getAll?${params}`, {
+  const res = await secureFetch(`${API_URL}/employee/getAll?${params}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
