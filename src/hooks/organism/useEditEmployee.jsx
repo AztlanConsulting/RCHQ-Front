@@ -233,8 +233,16 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaving(true);
     setSaveError(null);
     try {
-      if (!adminForm.houseId || !adminForm.roleId || !adminForm.type || !adminForm.salary) {
+      if (!adminForm.houseId || !adminForm.roleId || !adminForm.type || adminForm.salary === "") {
         throw new Error("Debes llenar todos los campos administrativos (Casa, Puesto, Tipo y Salario).");
+      }
+
+      const salaryNum = Number(adminForm.salary);
+      if (isNaN(salaryNum) || salaryNum < 0) {
+        throw new Error("El salario debe ser un número válido.");
+      }
+      if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
+        throw new Error("El salario debe ser mayor a 0 para este tipo de contrato.");
       }
 
       const payload = {

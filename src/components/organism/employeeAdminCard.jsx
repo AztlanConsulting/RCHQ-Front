@@ -11,9 +11,10 @@ import {
 } from "@/utils/detalle-empleado.utils";
 
 const TIPOS = [
-  { value: "nomina", label: "Nómina" },
+  { value: "Nomina", label: "Nómina" },
   { value: "Asalariado",    label: "Asalariado" },
   { value: "Honorarios",      label: "Honorarios" },
+  { value: "Voluntariado",    label: "Voluntariado" },
 ];
 
 const EmployeeAdminCard = ({
@@ -197,7 +198,6 @@ const EmployeeAdminCard = ({
                 />
               </div>
                 <div className="flex flex-col gap-1">
-                <Type variant="metric-label" as="p">Salario (MXN)</Type>
                 <SelectField
                   label="Frecuencia de pago" id="frequencyOfPaymentId"
                   value={adminForm.frequencyOfPaymentId}
