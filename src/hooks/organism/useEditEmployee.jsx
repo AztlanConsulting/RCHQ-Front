@@ -260,28 +260,28 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error("Debes seleccionar al menos un día de trabajo.");
       }
 
-  const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
-    if (!start || !end) {
-      throw new Error(`Debes asignar un horario completo para el día ${name}.`);
-    }
+      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
+        if (!start || !end) {
+          throw new Error(`Debes asignar un horario completo para el día ${name}.`);
+        }
 
-    const [sh] = start.split(":").map(Number);
-    const [eh] = end.split(":").map(Number);
+      const [sh] = start.split(":").map(Number);
+      const [eh] = end.split(":").map(Number);
 
-    const isOvernight = end <= start;
-    const durationHours = isOvernight
-      ? (24 - sh) + eh
-      : eh - sh;
+      const isOvernight = end <= start;
+      const durationHours = isOvernight
+        ? (24 - sh) + eh
+        : eh - sh;
 
-    if (durationHours < 1) {
-      throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
-    }
-    if (durationHours > 24) {
-      throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
-    }
+      if (durationHours < 1) {
+        throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
+      }
+      if (durationHours > 24) {
+        throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
+      }
 
-    return { workdayId, start, end };
-  });
+      return { workdayId, start, end };
+      });
 
       payload.workdays = workdaysToSend;
 
