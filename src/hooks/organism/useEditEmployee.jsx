@@ -154,7 +154,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     }
     
     if (field === "email") finalValue = finalValue.slice(0, 60);
-    if (field === "phoneNumber") finalValue = finalValue.slice(0, 20);
+    if (field === "phoneNumber") finalValue = finalValue.slice(0, 10);
     if (field === "street") finalValue = finalValue.slice(0, 200);
     if (field === "municipio") finalValue = finalValue.slice(0, 120);
     if (field === "city") finalValue = finalValue.slice(0, 100);
@@ -252,6 +252,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         salary:               Number(adminForm.salary),
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
+
+      console.log("frequencyOfPaymentId:", adminForm.frequencyOfPaymentId);
 
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
       if (selectedWorkdays.length === 0) {

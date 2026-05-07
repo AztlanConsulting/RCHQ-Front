@@ -14,6 +14,8 @@ const EmployeeContactCard = ({
   onSubmit,
   onCancel,
 }) => {
+
+  const EMPTY_LABEL = "N/A";
   return (
     <div className="basis-1/3 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="flex justify-between items-start">
@@ -59,14 +61,14 @@ const EmployeeContactCard = ({
               label: "Dirección",           
               value: [employeeAddress?.street, employeeAddress?.municipio, employeeAddress?.city]
                        .filter(Boolean)
-                       .join(", ") 
+                       .join(", ") || null
             },
             { label: "Código Postal",       value: employeeAddress?.postalCode },
           ].map(({ label, value }) => (
             <div key={label} className="min-w-[12rem] flex-1">
               <Type variant="metric-label" as="p" className="mb-1.5">{label}</Type>
               <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
-                <Type variant="metric-value" as="p">{value ?? "N/A"}</Type>
+                <Type variant="metric-value" as="p">{value ?? EMPTY_LABEL}</Type>
               </div>
             </div>
           ))}
