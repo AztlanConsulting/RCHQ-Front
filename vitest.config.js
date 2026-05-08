@@ -1,40 +1,63 @@
-import { defineConfig } from "vitest/config";
+// vitest.config.js
+import { defineConfig, mergeConfig } from "vitest/config";
+import viteConfig from "./vite.config.js";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
-export default defineConfig({
-  plugins: [react()],
-  
-  resolve: {
-    alias: {
-      "/error.svg": path.resolve(__dirname, "./src/tests/__mocks__/svgMock.js"),
-      "/check.svg": path.resolve(__dirname, "./src/tests/__mocks__/svgMock.js"),
-      "/showEye.svg": path.resolve(__dirname, "./src/tests/__mocks__/svgMock.js"),
-      "/hideEye.svg": path.resolve(__dirname, "./src/tests/__mocks__/svgMock.js"),
-    },
-  },
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    plugins: [react()],
 
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: "./vitest.setup.js",
-
-    environmentOptions: {
-      jsdom: {
-        url: "http://localhost",
+    resolve: {
+      alias: {
+        "/error.svg": path.resolve(
+          __dirname,
+          "./src/tests/__mocks__/svgMock.js"
+        ),
+        "/check.svg": path.resolve(
+          __dirname,
+          "./src/tests/__mocks__/svgMock.js"
+        ),
+        "/showEye.svg": path.resolve(
+          __dirname,
+          "./src/tests/__mocks__/svgMock.js"
+        ),
+        "/hideEye.svg": path.resolve(
+          __dirname,
+          "./src/tests/__mocks__/svgMock.js"
+        ),
       },
     },
 
-    include: [
-      "src/tests/unit/**/*.test.{js,jsx}",
-      "src/tests/integration/**/*.test.{js,jsx}",
-    ],
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: "./vitest.setup.js",
 
-    coverage: {
-      reporter: ["text", "html"],
-      reportsDirectory: "./coverage",
+      environmentOptions: {
+        jsdom: {
+          url: "http://localhost",
+        },
+      },
+
+      include: [
+        "src/tests/unit/**/*.test.{js,jsx}",
+        "src/tests/integration/**/*.test.{js,jsx}",
+      ],
+
+      coverage: {
+        reporter: ["text", "html"],
+        reportsDirectory: "./coverage",
+      },
+
+      testTimeout: 10000,
+
+      server: {
+        deps: {
+          inline: ["react-router", "react-router-dom", "react-router/dom"],
+        },
+      },
     },
-
-    testTimeout: 10000,
-  },
-});
+  })
+);

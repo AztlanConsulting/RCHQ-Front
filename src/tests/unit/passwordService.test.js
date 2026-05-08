@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   changePasswordFirstLoginService,
   changePasswordService,
-} from "../../Services/PasswordService";
+} from "../../services/passwordService";
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({
