@@ -179,14 +179,16 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
 
   return (
     <>
-      {/* Barra superior fija */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40" onClick={closeMobile} />
+      )}
+
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#1F3664] shadow-[0_0_8px_0_rgba(0,0,0,0.8)]">
         <div className="flex items-center h-14 px-4">
           <button
             onClick={mobileOpen ? closeMobile : openMobile}
             className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-[#FAFAFA]/10 transition-colors shrink-0"
           >
-            {/* Hamburger / X */}
             {mobileOpen ? (
               <svg className="h-5 w-5 text-[#FAFAFA]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -202,7 +204,6 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
           </span>
         </div>
 
-        {/* Dropdown menu */}
         {mobileOpen && (
           <nav className="bg-[#1F3664] border-t border-[#FAFAFA]/25 px-4 py-3 flex flex-col gap-1">
             {NAV_ITEMS.map(({ to, label, Icon }) => (
@@ -270,12 +271,20 @@ const SideBar = () => {
 
   return (
     <>
-      {/* Desktop: sidebar fijo flotante */}
+      {/* Overlay desktop */}
+      {expanded && (
+        <div
+          className="hidden md:block fixed inset-0 z-30"
+          onClick={toggle}
+        />
+      )}
+
+      {/* Desktop sidebar */}
       <div className="hidden md:block fixed top-0 left-0 z-40 ml-5 my-4">
         <SidebarContent expanded={expanded} toggle={toggle} />
       </div>
 
-      {/* Mobile: navbar superior con dropdown */}
+      {/* Mobile navbar */}
       <MobileNav
         mobileOpen={mobileOpen}
         openMobile={openMobile}
