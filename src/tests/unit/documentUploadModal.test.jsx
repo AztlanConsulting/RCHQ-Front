@@ -5,17 +5,20 @@ import { useDocuments } from "../../hooks/organism/useDocuments";
 
 // ── Mocks de servicios ──────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
-  getDocumentsService: vi.fn().mockResolvedValue({ body: { documents: {} } }),
+  getDocumentsService: vi.fn().mockResolvedValue({ data: { documents: {} } }),
+  getDocumentTypesService: vi.fn().mockResolvedValue([
+    { value: "cv", label: "CV" },
+    { value: "nss", label: "NSS" },
+  ]),
   uploadDocumentService: vi.fn().mockResolvedValue({}),
   updateDocumentService: vi.fn().mockResolvedValue({}),
   deleteDocumentService: vi.fn().mockResolvedValue({}),
-  DOCUMENT_TYPES: [],
 }));
 
 // ── Mock token con rol administrador ────────────────────────────
 beforeEach(() => {
   vi.clearAllMocks();
-  const payload = btoa(JSON.stringify({ role: "administrador", id: "1" }));
+  const payload = btoa(JSON.stringify({ role: "admin", id: "1" }));
   localStorage.setItem("token", `header.${payload}.sig`);
 });
 
@@ -32,7 +35,7 @@ const openUploadModal = async (result) => {
 };
 
 // ── Helper: abre el modal en modo edición ──────────────────────
-const openEditModal = async (result, doc = { type: "cv" }) => {
+const openEditModal = async (result, doc = { documentId: "cv" }) => {
   await act(async () => {
     result.current.handleOpenEdit(doc);
   });
@@ -53,7 +56,7 @@ describe("useDocuments — modal: estado inicial", () => {
 
   it("pre-rellena el tipo cuando se edita un documento", async () => {
     const { result } = renderHook(() => useDocuments(EMPLOYEE_ID));
-    await openEditModal(result, { type: "nss" });
+    await openEditModal(result, { documentId: "nss" });
     expect(result.current.documentType.value).toBe("nss");
   });
 });
@@ -104,7 +107,7 @@ describe("useDocuments — modal: validaciones al submit", () => {
     const { updateDocumentService } =
       await import("../../services/documentService");
     const { result } = renderHook(() => useDocuments(EMPLOYEE_ID));
-    await openEditModal(result, { type: "cv" });
+    await openEditModal(result, { documentId: "cv" });
     await act(async () => {
       await result.current.handleModalSubmit();
     });

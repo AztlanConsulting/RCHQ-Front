@@ -2,18 +2,18 @@ import { useEffect, useState, useCallback } from "react";
 import { getEmployeeDetailService } from "../../services/employeeDetailService";
 
 export const useEmployeeDetail = (employeeId) => {
-  const [employee, setEmployee] = useState({});
-  const [employeeAddress, setEmployeeAddress] = useState({});
-  const [employeeHouse, setEmployeeHouse] = useState({});
-  const [employeeFaults, setEmployeeFaults] = useState({});
-  const [employeeWorkdays, setEmployeeWorkdays] = useState({});
-  const [employeeVacationRequests, setEmployeeVacationRequests] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [employee, setEmployee]                       = useState({});
+  const [employeeAddress, setEmployeeAddress]         = useState({});
+  const [employeeHouse, setEmployeeHouse]             = useState({});
+  const [employeeFaults, setEmployeeFaults]           = useState([]);
+  const [employeeWorkdays, setEmployeeWorkdays]       = useState([]);
+  const [employeeVacationRequests, setEmployeeVacationRequests] = useState([]);
+  const [isLoading, setIsLoading]   = useState(true);
   const [currentTab, setCurrentTab] = useState("overview");
-  const [alert, setAlert] = useState({});
+  const [alert, setAlert]           = useState({});
 
   useEffect(() => {
-    if (!alert) return;
+    if (!alert?.message) return;
     const timer = setTimeout(() => setAlert({}), 4000);
     return () => clearTimeout(timer);
   }, [alert]);
@@ -21,18 +21,17 @@ export const useEmployeeDetail = (employeeId) => {
   const getEmployeeDetail = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await getEmployeeDetailService(employeeId);
+      const data      = await getEmployeeDetailService(employeeId);
       const basicInfo = data?.data?.employee?.basicInfo ?? null;
       const adminInfo = data?.data?.employee?.adminInfo ?? null;
-
       setEmployee(basicInfo.employee);
       setEmployeeAddress(basicInfo.address);
       setEmployeeHouse(basicInfo.house);
-      setEmployeeFaults(adminInfo.faults);
-      setEmployeeWorkdays(adminInfo.workdays);
-      setEmployeeVacationRequests(adminInfo.vacationRequests);
+      setEmployeeFaults(adminInfo.faults   ?? []);
+      setEmployeeWorkdays(adminInfo.workdays ?? []);
+      setEmployeeVacationRequests(adminInfo.vacationRequests ?? []);
     } catch (err) {
-      setAlert({ type: "error", message: `${err.message}` });
+      setAlert({ type: "error", message: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +39,7 @@ export const useEmployeeDetail = (employeeId) => {
 
   useEffect(() => {
     getEmployeeDetail();
-  }, [employeeId]);
+  }, [getEmployeeDetail]);
 
   return {
     employee,
@@ -53,5 +52,7 @@ export const useEmployeeDetail = (employeeId) => {
     currentTab,
     setCurrentTab,
     alert,
+    setAlert,
+    getEmployeeDetail,
   };
 };
