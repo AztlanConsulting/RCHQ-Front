@@ -7,36 +7,38 @@ const EmployeeFilters = ({
   setSearchQuery,
   activeFilter,
   setActiveFilter,
+  searchLabel = "Buscar empleado",                    
+  searchPlaceholder = "Ingresa nombre o apellido",    
+  statusOptions = [                                   
+    { value: "true",  label: "Activos" },
+    { value: "false", label: "Inactivos" },
+  ],
+  statusLabel = "Estado (activo/inactivo)",           
+  children,                                           
 }) => {
-  const { inputValue, handleChange, handleKeyDown } = useSearch(
-    searchQuery,
-    setSearchQuery,
-  );
+  const { inputValue, handleChange, handleKeyDown } = useSearch(searchQuery, setSearchQuery);
 
   return (
     <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <TextField
           id="search"
-          text="Buscar empleado"
-          placeholder="Ingresa nombre o apellido"
+          text={searchLabel}
+          placeholder={searchPlaceholder}
           value={inputValue}
           setValue={handleChange}
           onKeyDown={handleKeyDown}
           labelClassName="text-sm font-bold text-[#121212]"
         />
-
         <SelectField
-          label="Estado (activo/inactivo)"
+          label={statusLabel}
           name="status"
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value)}
-          options={[
-            { value: "true", label: "Activos" },
-            { value: "false", label: "Inactivos" },
-          ]}
+          options={statusOptions}
           labelColor="text-[#121212]"
         />
+        {children}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+//absenceService.jsx
 import { getToken } from "../utils/authStorage";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
@@ -9,7 +10,7 @@ export const getAllAbsencesService = async (page = 1, limit = 6) => {
   if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await secureFetch(
-    `${API_URL}/absences?page=${page}&limit=${limit}`,
+    `${API_URL}/absence/all?page=${page}&limit=${limit}`,
     {
       method: "GET",
       headers: {

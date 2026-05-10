@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useMemo } from "react";
 
 const CloudUploadIcon = () => (
   <svg
@@ -23,18 +23,15 @@ const PhotoUploader = ({
   label = "Foto del usuario",
   labelColor = "text-[#121212]",
   accept = "image/*",
+  uploadLabel = "Subir fotografía",
+  height = "h-[130px]",
 }) => {
   const inputRef = useRef(null);
-  const [preview, setPreview] = useState(null);
 
-  useEffect(() => {
-    if (!file) {
-      setPreview(null);
-      return;
-    }
+  const preview = useMemo(() => {
+    if (!file) return null;
     const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
+    return url;
   }, [file]);
 
   const handleClick = () => inputRef.current?.click();
@@ -59,15 +56,12 @@ const PhotoUploader = ({
       <div
         role="button"
         tabIndex={0}
-        aria-label="Subir fotografía"
+        aria-label={uploadLabel}
         onClick={handleClick}
         onKeyDown={(e) => e.key === "Enter" && handleClick()}
-        className="
-          relative h-[130px] flex flex-col items-center justify-center gap-2
+        className={`relative ${height} flex flex-col items-center justify-center gap-2
           bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]
-          cursor-pointer transition-colors hover:bg-neutral-100
-          overflow-hidden
-        "
+          cursor-pointer transition-colors hover:bg-neutral-100 overflow-hidden`}
       >
         {preview ? (
           <>
@@ -94,7 +88,7 @@ const PhotoUploader = ({
           <>
             <CloudUploadIcon />
             <span className="font-bold text-base text-[#121212]">
-              Subir fotografía
+              {uploadLabel}
             </span>
           </>
         )}

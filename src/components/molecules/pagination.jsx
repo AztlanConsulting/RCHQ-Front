@@ -1,49 +1,28 @@
 import Button from "../atoms/button";
 
 const Pagination = ({
-  page,
-  totalPages,
-  total,
-  onPrevPage,
-  onNextPage,
-  loading,
-  hasEmployees,
+  page, totalPages, total,
+  onPrevPage, onNextPage,
+  loading, hasEmployees,
+  itemLabel = "empleados",
 }) => {
-  if (loading || !hasEmployees) {
-    return null;
-  }
+  if (loading || !hasEmployees) return null;
 
   return (
     <div className="flex items-center justify-between mt-6">
-      <Button
-        text="Anterior"
-        onClick={onPrevPage}
-        disabled={page === 1}
-        bgColor="bg-[#24375e]"
-        hoverColor="hover:bg-[#162d4a]"
-        activeColor="active:bg-[#0f2035]"
-        textColor="text-white"
-        width="w-32"
-        className="disabled:opacity-50 disabled:cursor-not-allowed"
-      />
+      <Button text="Anterior" onClick={onPrevPage} disabled={page === 1}
+        bgColor="bg-[#24375e]" hoverColor="hover:bg-[#162d4a]" activeColor="active:bg-[#0f2035]"
+        textColor="text-white" width="w-32"
+        className="disabled:opacity-50 disabled:cursor-not-allowed" />
 
-      <div className="flex items-center justify-center gap-4">
-        <span className="text-sm text-gray-600">
-          Página {page} de {totalPages} | Total: {total} empleados
-        </span>
-      </div>
+      <span className="text-sm text-gray-600">
+        Página {page} de {totalPages} | Total: {total} {itemLabel}
+      </span>
 
-      <Button
-        text="Siguiente"
-        onClick={onNextPage}
-        disabled={page === totalPages}
-        bgColor="bg-[#24375e]"
-        hoverColor="hover:bg-[#162d4a]"
-        activeColor="active:bg-[#0f2035]"
-        textColor="text-white"
-        width="w-32"
-        className="disabled:opacity-50 disabled:cursor-not-allowed"
-      />
+      <Button text="Siguiente" onClick={onNextPage} disabled={page === totalPages}
+        bgColor="bg-[#24375e]" hoverColor="hover:bg-[#162d4a]" activeColor="active:bg-[#0f2035]"
+        textColor="text-white" width="w-32"
+        className="disabled:opacity-50 disabled:cursor-not-allowed" />
     </div>
   );
 };
