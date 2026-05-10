@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@source "../node_modules/flowbite";
+@source "../node_modules/flowbite-react";
+@import "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   font-family: Inter, "Segoe UI", sans-serif;
