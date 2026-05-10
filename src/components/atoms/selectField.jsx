@@ -1,10 +1,10 @@
 const SelectField = ({
   label,
   id,
-  name,      
+  name,
   value,
   setValue,
-  onChange, 
+  onChange,
   options = [],
   placeholder = "Selecciona una opción",
   required = false,
@@ -26,11 +26,13 @@ const SelectField = ({
       <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
         <select
           id={id}
-          name={name || id} 
+          name={name || id}
           value={value}
-          onChange={onChange ? onChange : (e) => setValue && setValue(e.target.value)}
+          onChange={
+            onChange ? onChange : (e) => setValue && setValue(e.target.value)
+          }
           disabled={disabled}
-          className="flex-1 h-full ml-[19px] mr-[13px] font-medium text-base bg-transparent border-0 outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 min-w-0 h-full ml-[19px] mr-[13px] font-medium text-base bg-transparent border-0 outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
           style={{ color: value ? "#121212" : "#aaaaaa" }}
         >
           <option value="" disabled hidden>

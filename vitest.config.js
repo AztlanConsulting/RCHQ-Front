@@ -1,24 +1,32 @@
 // vitest.config.js
-import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
+import { defineConfig, mergeConfig } from "vitest/config";
+import viteConfig from "./vite.config.js";
 
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: "./vitest.setup.js",
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: "./vitest.setup.js",
 
-    include: [
-      "src/tests/unit/**/*.test.{js,jsx}",
-      "src/tests/integration/**/*.test.{js,jsx}",
-    ],
+      include: [
+        "src/tests/unit/**/*.test.{js,jsx}",
+        "src/tests/integration/**/*.test.{js,jsx}",
+      ],
 
-    coverage: {
-      reporter: ["text", "html"],
-      reportsDirectory: "./coverage",
+      coverage: {
+        reporter: ["text", "html"],
+        reportsDirectory: "./coverage",
+      },
+
+      testTimeout: 10000,
+
+      server: {
+        deps: {
+          inline: ["react-router", "react-router-dom", "react-router/dom"],
+        },
+      },
     },
-
-    testTimeout: 10000,
-  },
-});
+  }),
+);

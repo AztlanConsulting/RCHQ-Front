@@ -12,14 +12,17 @@ import Documents from "../../pages/documents";
 
 // ─── Mocks ────────────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
-  getDocumentsService: vi.fn(),
-  uploadDocumentService: vi.fn(),
-  updateDocumentService: vi.fn(),
-  deleteDocumentService: vi.fn(),
-  DOCUMENT_TYPES: [
-    { value: "cv", label: "CV" },
+  getDocumentsService:     vi.fn(),
+  uploadDocumentService:   vi.fn(),
+  updateDocumentService:   vi.fn(),
+  deleteDocumentService:   vi.fn(),
+  getDocumentTypesService: vi.fn(() => Promise.resolve([
+    { value: "cv",  label: "CV" },
     { value: "nss", label: "NSS" },
-    { value: "birth_certificate", label: "Acta de Nacimiento" },
+  ])),
+  DOCUMENT_TYPES: [
+    { value: "cv",  label: "CV" },
+    { value: "nss", label: "NSS" },
   ],
 }));
 
@@ -28,17 +31,18 @@ import {
   uploadDocumentService,
   updateDocumentService,
   deleteDocumentService,
+  getDocumentTypesService,
 } from "../../services/documentService";
 
-// ─── Token con rol Administrador ──────────────────────────
-const makeToken = (role = "Administrador") => {
+// ─── Helpers ──────────────────────────────────────────────
+const makeToken = (role = "Admin") => {
   const payload = btoa(JSON.stringify({ id: "emp-123", role }));
   return `header.${payload}.signature`;
 };
 
 const TEST_EMPLOYEE_ID = "emp-123";
 
-const renderPage = (role = "Administrador") => {
+const renderPage = (role = "Admin") => {
   localStorage.setItem("token", makeToken(role));
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
@@ -49,33 +53,45 @@ const renderPage = (role = "Administrador") => {
   );
 };
 
-// ─── Respuesta con documentos ─────────────────────────────
+// ─── Respuestas mock ──────────────────────────────────────
 const mockDocumentsResponse = {
   success: true,
-  body: {
-    documents: {
-      cv: "uploads/documents/cv.pdf",
-      nss: null,
-      birth_certificate: null,
-    },
-  },
+  data: [
+    { documentId: "cv", name: "CV", url: "uploads/documents/cv.pdf" },
+  ],
+};
+
+const mockDocumentsMultiple = {
+  success: true,
+  data: [
+    { documentId: "cv",  name: "CV",  url: "uploads/documents/cv.pdf" },
+    { documentId: "nss", name: "NSS", url: null },
+  ],
 };
 
 const mockEmptyResponse = {
   success: true,
   message: "El empleado no tiene documentos",
-  body: null,
+  body:    null,
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
+  getDocumentsService.mockResolvedValue({ success: true, body: { documents: {} } });
+  getDocumentTypesService.mockResolvedValue([
+    { value: "cv",  label: "CV" },
+    { value: "nss", label: "NSS" },
+  ]);
 });
 
-// ─── Carga inicial ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Carga inicial
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — carga inicial", () => {
   it("muestra los documentos del empleado cuando la carga es exitosa", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
@@ -100,11 +116,14 @@ describe("Documents — carga inicial", () => {
   });
 });
 
-// ─── Permisos ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Permisos por rol
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — permisos por rol", () => {
   it("muestra el botón 'Subir documento' cuando el rol es Administrador", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
-    renderPage("Administrador");
+    renderPage("Admin");
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /subir documento/i }),
@@ -133,7 +152,10 @@ describe("Documents — permisos por rol", () => {
   });
 });
 
-// ─── Subir documento ──────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Subir documento
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — subir documento", () => {
   it("abre el modal al hacer click en 'Subir documento'", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
@@ -194,7 +216,7 @@ describe("Documents — subir documento", () => {
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     const select = document.querySelector("select");
     fireEvent.change(select, { target: { value: "cv" } });
-    const file = new File(["contenido"], "cv.pdf", { type: "application/pdf" });
+    const file      = new File(["contenido"], "cv.pdf", { type: "application/pdf" });
     const fileInput = document.querySelector("input[type='file']");
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
@@ -214,7 +236,10 @@ describe("Documents — subir documento", () => {
   });
 });
 
-// ─── Editar documento ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Editar documento
+// ══════════════════════════════════════════════════════════════════════════════
+
 describe("Documents — editar documento", () => {
   it("abre el modal en modo edición al hacer click en el botón editar", async () => {
     getDocumentsService.mockResolvedValue(mockDocumentsResponse);
@@ -238,9 +263,7 @@ describe("Documents — editar documento", () => {
     await waitFor(() =>
       expect(screen.getByText("Editar documento")).toBeInTheDocument(),
     );
-    const file = new File(["nuevo"], "cv_nuevo.pdf", {
-      type: "application/pdf",
-    });
+    const file      = new File(["nuevo"], "cv_nuevo.pdf", { type: "application/pdf" });
     const fileInput = document.querySelector("input[type='file']");
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
@@ -261,41 +284,47 @@ describe("Documents — editar documento", () => {
   });
 });
 
-// ─── Eliminar documento ───────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Eliminar documento
+// ══════════════════════════════════════════════════════════════════════════════
 describe("Documents — eliminar documento", () => {
-  // Helper para obtener el botón de confirmar dentro del modal
   const getConfirmButton = () => {
     const modal = screen
-      .getByText(/esta acción no se puede deshacer/i)
+      .getByText(/esta acción no se puede revertir/i)
       .closest("div");
     return within(modal).getByRole("button", { name: /^eliminar$/i });
   };
 
+  const clickFirstDelete = () => {
+    const deleteButtons = screen.getAllByTitle("Eliminar");
+    fireEvent.click(deleteButtons[0]);
+  };
+
   it("abre el modal de confirmación al hacer click en eliminar", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByTitle("Eliminar"));
+    clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/esta acción no se puede deshacer/i),
+      screen.getByText(/esta acción no se puede revertir/i),
     ).toBeInTheDocument();
   });
 
   it("cancela la eliminación al hacer click en Cancelar del modal", async () => {
-    getDocumentsService.mockResolvedValue(mockDocumentsResponse);
+    getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByTitle("Eliminar"));
+    clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
     await waitFor(() => {
       expect(
-        screen.queryByText(/esta acción no se puede deshacer/i),
+        screen.queryByText(/esta acción no se puede revertir/i),
       ).toBeNull();
     });
     expect(deleteDocumentService).not.toHaveBeenCalled();
@@ -308,6 +337,7 @@ describe("Documents — eliminar documento", () => {
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
+    // Un solo documento → getByTitle no falla
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument(),
@@ -336,7 +366,7 @@ describe("Documents — eliminar documento", () => {
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(
-        screen.getByText(/esta acción no se puede deshacer/i),
+        screen.getByText(/esta acción no se puede revertir/i),
       ).toBeInTheDocument(),
     );
     await act(async () => {

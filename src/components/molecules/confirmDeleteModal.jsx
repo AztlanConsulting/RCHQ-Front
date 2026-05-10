@@ -1,19 +1,45 @@
 import Button from "../atoms/button";
 
-const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading }) => {
+const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading, mode = "delete" }) => {
   if (!label) return null;
+
+  const config = {
+    delete: {
+      title: "Eliminar documento",
+      body: (
+        <>
+          ¿Seguro que quiere eliminar{" "}
+          <span className="font-semibold text-slate-700">{label}</span>?{" "}
+          Esta acción no se puede revertir.
+        </>
+      ),
+      confirmText: loading ? "Eliminando..." : "Eliminar",
+      confirmColor: "bg-[#dd4344]",
+      confirmHover: "hover:bg-red-700",
+      confirmActive: "active:bg-red-800",
+    },
+    replace: {
+      title: "Documento ya existe",
+      body: (
+        <>
+          <span className="font-semibold text-slate-700">{label}</span> ya
+          existe. ¿Desea reemplazarlo?
+        </>
+      ),
+      confirmText: loading ? "Reemplazando..." : "Reemplazar",
+      confirmColor: "bg-[#dd4344]",
+      confirmHover: "hover:bg-red-700",
+      confirmActive: "active:bg-red-800",
+    },
+  };
+
+  const { title, body, confirmText, confirmColor, confirmHover, confirmActive } = config[mode];
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl flex flex-col gap-4">
-        <h3 className="text-lg font-semibold text-slate-900">
-          Eliminar documento
-        </h3>
-        <p className="text-sm text-slate-500">
-          ¿Estás seguro de que deseas eliminar{" "}
-          <span className="font-semibold text-slate-700">{label}</span>? Esta
-          acción no se puede deshacer.
-        </p>
+        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <p className="text-sm text-slate-500">{body}</p>
         <div className="flex gap-3 justify-end">
           <Button
             text="Cancelar"
@@ -29,12 +55,12 @@ const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading }) => {
             className="px-4"
           />
           <Button
-            text={loading ? "Eliminando..." : "Eliminar"}
+            text={confirmText}
             onClick={onConfirm}
             disabled={loading}
-            bgColor="bg-[#dd4344]"
-            hoverColor="hover:bg-red-700"
-            activeColor="active:bg-red-800"
+            bgColor={confirmColor}
+            hoverColor={confirmHover}
+            activeColor={confirmActive}
             textColor="text-white"
             width="w-auto"
             height="h-[42px]"
