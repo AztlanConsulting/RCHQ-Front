@@ -1,5 +1,3 @@
-// Sin cambios en la lógica — solo se elimina el fallback de EmployeeRow
-// porque ahora siempre se pasa renderRow desde la página.
 const DEFAULT_COLUMNS = ["Foto", "Nombre Completo", "Puesto", "Estado", "Acciones"];
 
 const EmployeeTable = ({

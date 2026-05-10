@@ -1,13 +1,3 @@
-/**
- * EmployeeRow — molecule genérica
- *
- * Props:
- *  - cells: Array de { key, content, className }
- *      Cada elemento es una celda del <tr>.
- *      content puede ser string, número o JSX.
- *  - actions: JSX con los botones (opcional).
- *             Si no se pasa, no se renderiza la última celda.
- */
 const EmployeeRow = ({ cells = [], actions }) => {
   return (
     <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">

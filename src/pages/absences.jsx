@@ -29,7 +29,6 @@ const formatDate = (dateStr) => {
   return `${d}/${m}/${y}`;
 };
 
-// ── Íconos inline ──────────────────────────────────────────────────
 const IconDelete = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -54,7 +53,6 @@ const IconPDF = () => (
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z" />
   </svg>
 );
-// ──────────────────────────────────────────────────────────────────
 
 const AbsencesPage = () => {
   const navigate = useNavigate();
@@ -67,7 +65,6 @@ const AbsencesPage = () => {
   return (
     <div className="flex flex-col gap-4 text-black">
 
-      {/* Título + botón */}
       <div className="flex items-center justify-between">
         <Type variant="page-title" as="h1">Ausencias de todas las casas</Type>
         <Button
@@ -80,7 +77,6 @@ const AbsencesPage = () => {
         />
       </div>
 
-      {/* Filtros */}
       <EmployeeFilters
         cols={3}
         /*searchQuery={searchName} */    /*setSearchQuery={setSearchName} */
@@ -123,7 +119,6 @@ const AbsencesPage = () => {
         />
       </EmployeeFilters>
 
-      {/* Tabla */}
       <EmployeeTable
         employees={absences}
         loading={loading}
@@ -194,7 +189,6 @@ const AbsencesPage = () => {
         )}
       />
 
-      {/* Paginación */}
       <Pagination
         page={page} totalPages={totalPages} total={total}
         onPrevPage={goPrevPage} onNextPage={goNextPage}
