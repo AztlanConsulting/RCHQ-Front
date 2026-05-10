@@ -18,7 +18,7 @@ import TwoFactorAuth from "./pages/auth/twoFactorAuth";
 import MoreOptions from "./pages/moreOptions";
 import Documents from "./pages/documents";
 import DetalleEmpleado from "./pages/detalleEmpleado";
-import AbsencesPage from "./pages/absencesTable";
+import AbsencesPage from "./pages/absences";
 
 function App() {
   return (

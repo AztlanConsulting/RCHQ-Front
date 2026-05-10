@@ -8,7 +8,6 @@ import Button             from "../components/atoms/button";
 import Type               from "../components/atoms/type";
 import EmployeeRow        from "../components/molecules/employeeRow";
 import EmployeeAvatar     from "../components/atoms/employeeAvatar";
-import AbsenceDetailModal from "../components/molecules/absenceDetailModal";
 import { useAbsences }    from "../hooks/organism/useAbsences";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -63,14 +62,6 @@ const AbsencesPage = () => {
     absences, loading, error,
     page, totalPages, total,
     goNextPage, goPrevPage,
-    filtersEnabled, toggleFilters,
-    searchName,     setSearchName,
-    filterStatus,   setFilterStatus,
-    filterHouse,    setFilterHouse,
-    filterEvidence, setFilterEvidence,
-    filterStart,    setFilterStart,
-    filterEnd,      setFilterEnd,
-    selectedAbsence, openDetail, closeDetail,
   } = useAbsences();
 
   return (
@@ -91,47 +82,45 @@ const AbsencesPage = () => {
 
       {/* Filtros */}
       <EmployeeFilters
-        searchQuery={searchName}     setSearchQuery={setSearchName}
+        cols={3}
+        /*searchQuery={searchName} */    /*setSearchQuery={setSearchName} */
         searchLabel="Buscar por Nombre" searchPlaceholder="Nombre del empleado"
-        activeFilter={filterStatus}  setActiveFilter={setFilterStatus}
-        statusLabel="Filtrar por  status" statusOptions={STATUS_OPTIONS}
+        /*activeFilter={filterStatus}  setActiveFilter={setFilterStatus}*/
+        statusLabel="Filtrar por estatus" statusOptions={STATUS_OPTIONS}
       >
-        <TextField
-          id="filter-house" text="Filtrar por Casa Hogar"
-          placeholder="Nombre de la casa" value={filterHouse}
-          setValue={setFilterHouse} labelClassName="text-sm font-bold text-[#121212]"
-        />
         <SelectField
-          label="Filtrar por  evidencia" name="evidence"
-          value={filterEvidence} onChange={(e) => setFilterEvidence(e.target.value)}
-          options={STATUS_OPTIONS} labelColor="text-[#121212]"
-        />
-        <TextField
-          id="filter-start" type="date" text="Filtrar por fecha de inicio"
-          value={filterStart} setValue={setFilterStart}
+          label="Filtrar por casa"
+          id="filter-house" 
+          text="Filtrar por casa" 
+          placeholder="Nombre de la casa" 
           labelClassName="text-sm font-bold text-[#121212]"
+          /*value={filterHouse}*/
+          /*setValue={setFilterHouse}*/
         />
+        
+        <SelectField
+          label="Filtrar por evidencia" 
+          name="evidence"
+          options={STATUS_OPTIONS} 
+          labelColor="text-[#121212]"
+          /*value={filterEvidence} onChange={(e) => setFilterEvidence(e.target.value)}*/
+        />
+        
         <TextField
-          id="filter-end" type="date" text="Filtrar por fecha de fin"
-          value={filterEnd} setValue={setFilterEnd}
+          id="filter-start" 
+          type="date" 
+          text="Filtrar por fecha de inicio"
           labelClassName="text-sm font-bold text-[#121212]"
+          /* value={filterStart} setValue={setFilterStart}*/
         />
-        <div className="flex items-end gap-3 lg:col-span-2">
-          <Button
-            text="Aplicar filtros"
-            bgColor="bg-[#24375e]" hoverColor="hover:bg-[#162d4a]"
-            activeColor="active:bg-[#0f2035]" textColor="text-white"
-            width="w-36" height="h-[42px]" textSize="text-sm" fontWeight="font-semibold"
-          />
-          <Button
-            text={filtersEnabled ? "Deshabilitar filtros" : "Habilitar filtros"}
-            onClick={toggleFilters}
-            bgColor="bg-transparent" hoverColor="hover:bg-gray-100"
-            activeColor="active:bg-gray-200" textColor="text-[#444]"
-            width="w-auto" height="h-[42px]" textSize="text-sm"
-            fontWeight="font-medium" className="px-4 border border-gray-300"
-          />
-        </div>
+        
+        <TextField
+          id="filter-end" 
+          type="date" 
+          text="Filtrar por fecha de fin"
+          labelClassName="text-sm font-bold text-[#121212]"
+          /* value={filterEnd} setValue={setFilterEnd}*/
+        />
       </EmployeeFilters>
 
       {/* Tabla */}
@@ -193,7 +182,7 @@ const AbsencesPage = () => {
                   <IconEdit />
                 </button>
                 <button
-                  onClick={() => openDetail(absence)}
+                  onClick={() => {/* openDetail(absence) */}}
                   className="text-gray-500 hover:text-[#24375e] transition-colors p-2 rounded-lg hover:bg-gray-100"
                   aria-label="Ver detalles" title="Ver detalles"
                 >
@@ -212,9 +201,6 @@ const AbsencesPage = () => {
         loading={loading} hasEmployees={absences.length > 0}
         itemLabel="ausencias"
       />
-
-      {/* Modal */}
-      <AbsenceDetailModal absence={selectedAbsence} onClose={closeDetail} />
     </div>
   );
 };
