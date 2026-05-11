@@ -3,58 +3,60 @@ import Alert from "../../components/atoms/alerts";
 import useEmployeeCreateForm from "../../hooks/pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
-  const {
-    form,
-    roles,
-    photo,
-    errors,
-    isLoading,
-    isLoadingData,
-    setErrors,
-    setPhoto,
-    handleChange,
-    handleSubmit,
-    navigate,
-  } = useEmployeeCreateForm(onSuccess);
+    const {
+        form,
+        roles,
+        photo,
+        errors,
+        isLoading,
+        isLoadingData,
+        setErrors,
+        setPhoto,
+        handleChange,
+        handleSubmit,
+        navigate,
+    } = useEmployeeCreateForm(onSuccess);
 
-  return (
-    <div className="min-h-screen bg-[#f2f2f2] px-8 py-12 flex justify-center">
-      <div className="w-full max-w-6xl flex flex-col gap-6">
-        <h1 className="font-bold text-3xl text-[#121212] ml-1">
-          Alta de nuevo usuario
-        </h1>
+    return (
+        <div className="min-h-screen flex justify-center px-4 py-6 sm:px-6 md:px-8 md:py-12">
+            <div className="w-full max-w-6xl flex flex-col gap-4 sm:gap-6">
+                <h1 className="ml-1 text-2xl font-bold text-[#121212] sm:text-3xl">
+                    Registrar usuario
+                </h1>
 
-        {isLoadingData ? (
-          <div className="flex items-center justify-center py-20 bg-white rounded-xl shadow-sm border border-[#e0e0e0]">
-            <span className="text-[#6b6b6b] text-base">Cargando datos...</span>
-          </div>
-        ) : (
-          <div className="relative w-full">
-            {errors && (
-              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-[calc(100%+6rem)] md:w-[calc(100%+12rem)] z-50">
-                <Alert
-                  type="error"
-                  message={errors}
-                  onClose={() => setErrors(null)}
-                />
-              </div>
-            )}
+                {isLoadingData ? (
+                    <div className="flex items-center justify-center rounded-xl border border-[#e0e0e0] bg-white py-16 shadow-sm sm:py-20">
+                        <span className="text-sm text-[#6b6b6b] sm:text-base">
+                            Cargando datos...
+                        </span>
+                    </div>
+                ) : (
+                    <div className="relative w-full">
+                        {errors && (
+                            <div className="absolute left-1/2 top-0 z-50 w-full -translate-x-1/2 px-2 sm:-top-6 sm:w-[calc(100%+6rem)] md:w-[calc(100%+12rem)]">
+                                <Alert
+                                    type="error"
+                                    message={errors}
+                                    onClose={() => setErrors(null)}
+                                />
+                            </div>
+                        )}
 
-            <UserInfoSection
-              form={form}
-              handleChange={handleChange}
-              roles={roles}
-              photo={photo}
-              onPhotoChange={setPhoto}
-              onSubmit={handleSubmit}
-              onCancel={onCancel || (() => navigate(-1))}
-              isLoading={isLoading}
-            />
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                        <UserInfoSection
+                            form={form}
+                            handleChange={handleChange}
+                            roles={roles}
+                            photo={photo}
+                            onPhotoChange={setPhoto}
+                            onSubmit={handleSubmit}
+                            onCancel={onCancel || (() => navigate(-1))}
+                            isLoading={isLoading}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default AltaNuevoUsuarioPage;

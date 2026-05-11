@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@source "../node_modules/flowbite";
+@source "../node_modules/flowbite-react";
+@import "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
     font-family: Inter, "Segoe UI", sans-serif;
@@ -6,6 +11,7 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+<<<<<<< feature/US29/solicitarVacaciones
 
     /* FullCalendar custom CSS */
     --fc-border-color: #a3a3a3;
@@ -16,6 +22,8 @@
 
     --fc-button-text-color: #fff;
     --fc-today-bg-color: #0059ff30;
+=======
+>>>>>>> develop
 }
 
 html,
@@ -38,6 +46,7 @@ input:-webkit-autofill:active {
     transition: background-color 9999s ease-in-out 0s;
 }
 
+<<<<<<< feature/US29/solicitarVacaciones
 /* Full Calendar CSS */
 .fc * {
     color: #121212;
@@ -290,4 +299,54 @@ svg {
     font-weight: 900;
     font-style: italic;
     font-display: swap;
+=======
+/* DATEPICKER */
+
+.bg-primary-700 {
+    background-color: #24375e !important;
+
+    color: white !important;
+}
+
+.bg-primary-700:hover {
+    background-color: #162d4a !important;
+}
+
+button.outside-month-day {
+    color: #999999 !important;
+
+    opacity: 0.5 !important;
+
+    cursor: not-allowed !important;
+}
+
+button.outside-month-day:hover {
+    background-color: #f3f4f6 !important;
+
+    opacity: 0.5 !important;
+}
+
+.dark .bg-primary-700 {
+    background-color: #24375e !important;
+
+    color: white !important;
+}
+
+.dark .bg-primary-700:hover {
+    background-color: #162d4a !important;
+}
+
+.dark button.outside-month-day {
+    color: #999999 !important;
+
+    opacity: 0.5 !important;
+
+    cursor: not-allowed !important;
+}
+
+.dark button.outside-month-day:hover {
+    background-color: #374151 !important;
+
+    opacity: 0.5 !important;
+>>>>>>> develop
 }
