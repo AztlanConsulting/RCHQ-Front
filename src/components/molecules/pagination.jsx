@@ -18,7 +18,7 @@ const Pagination = ({
         hoverColor="hover:bg-[#162d4a]" 
         activeColor="active:bg-[#0f2035]"
         textColor="text-white" 
-        width="w-full sm:w-32" // Ancho completo en móvil, fijo en escritorio
+        width="w-full sm:w-32"
         className="disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1" 
       />
 
@@ -34,7 +34,7 @@ const Pagination = ({
         hoverColor="hover:bg-[#162d4a]" 
         activeColor="active:bg-[#0f2035]"
         textColor="text-white" 
-        width="w-full sm:w-32" // Ancho completo en móvil, fijo en escritorio
+        width="w-full sm:w-32"
         className="disabled:opacity-50 disabled:cursor-not-allowed order-3" 
       />
     </div>

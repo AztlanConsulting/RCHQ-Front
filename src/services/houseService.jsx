@@ -1,0 +1,21 @@
+import { getToken }    from "../utils/authStorage";
+import { buildApiError } from "../utils/apiErrors";
+import { secureFetch } from "../utils/secureFetchWrapper";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+export const getHousesService = async () => {
+  const token = getToken();
+  if (!token) throw new Error("No se encontró token de sesión");
+
+  const response = await secureFetch(`${API_URL}/house/all`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al obtener las casas");
+  }
+  return data;
+};
