@@ -1,11 +1,17 @@
 import React, { useEffect } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
+import CalendarFilters from "../components/molecules/calendarFilters";
 
 const Calendario = () => {
     const calendarRef = React.useRef(null);
     const {
         setViewEmployeeId,
+        employeeHouseName,
+        scopeFilters,
+        setScopeFilters,
+        typeFilters,
+        setTypeFilters,
         loadButtonsAtStart,
         toggleList,
         setMonthView,
@@ -23,7 +29,16 @@ const Calendario = () => {
     }, []);
 
     return (
-        <div>
+        <div className="flex">
+            <CalendarFilters 
+                className="basis-1/6"
+                houseName={employeeHouseName}
+                scopeFilters={scopeFilters}
+                setScopeFilters={setScopeFilters}
+                typeFilters={typeFilters}
+                setTypeFilters={setTypeFilters}
+            />
+
             <BaseCalendar
                 loadButtonsAtStart={loadButtonsAtStart}
                 calendarRef={calendarRef}

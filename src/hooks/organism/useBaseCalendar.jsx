@@ -6,6 +6,9 @@ export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
     const [viewType, setViewType] = useState("Month");
     const [viewEmployeeId, setViewEmployeeId] = useState("");
+    const [employeeHouseName, setEmployeeHouseName] = useState("");
+    const [scopeFilters, setScopeFilters] = useState(["global", "house", "personal"]);
+    const [typeFilters, setTypeFilters] = useState(["vacations", "general", "other"]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -207,6 +210,11 @@ export const useBaseCalendar = () => {
 
     return {
         setViewEmployeeId,
+        employeeHouseName,
+        scopeFilters,
+        setScopeFilters,
+        typeFilters,
+        setTypeFilters,
         loadButtonsAtStart,
         toggleList,
         setMonthView,
