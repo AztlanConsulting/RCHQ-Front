@@ -4,20 +4,26 @@ import { secureFetch } from "@/utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export const getUpdateFormService = async () => {
+export const getUpdateFormService = async (excludeEmployeeId = null) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
-  const response = await secureFetch(`${API_URL}/employee/update-form`, {
+
+  const url = new URL(`${API_URL}/employee/update-form`);
+  if (excludeEmployeeId) url.searchParams.set("excludeEmployeeId", excludeEmployeeId);
+
+  const response = await secureFetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al obtener catálogos");
+  console.log("Catálogos obtenidos:", data);
   return data;
 };
 
 export const updateBasicInfoService = async (employeeId, body) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
+
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/basic-info`, {
     method: "PUT",
     headers: {
@@ -34,6 +40,7 @@ export const updateBasicInfoService = async (employeeId, body) => {
 export const updateContactInfoService = async (employeeId, body) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
+
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/contact-info`, {
     method: "PUT",
     headers: {
@@ -50,6 +57,7 @@ export const updateContactInfoService = async (employeeId, body) => {
 export const updateAdminInfoService = async (employeeId, body) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
+
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/admin-info`, {
     method: "PUT",
     headers: {

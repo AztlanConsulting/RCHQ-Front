@@ -32,11 +32,11 @@ const DetalleEmpleado = () => {
   const {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses,
-    frecuentPaymentTypes,
+    roles, houses, frecuentPaymentTypes,
+    houseEmployees,
+    setAdminFormState,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime,
     submitBasic, submitContact, submitAdmin,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
@@ -93,7 +93,7 @@ const DetalleEmpleado = () => {
           className="w-max max-md:hidden ml-6"
         >
           <Tabs.List type="underline" items={tabs}>
-            {(tab) => <Tabs.Item {...tab} />}
+            {(tab) => <Tabs.Item key={tab.id}{...tab} />}
           </Tabs.List>
         </Tabs>
       </div>
@@ -138,17 +138,17 @@ const DetalleEmpleado = () => {
             isEditing={editSection === "admin"}
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
+            setAdminFormState={setAdminFormState}
             roles={roles}
             houses={houses}
             frecuentPaymentTypes={frecuentPaymentTypes}
             setAdminField={setAdminField}
-            toggleWorkday={toggleWorkday}
-            setWorkdayTime={setWorkdayTime}
             saving={saving}
             saveError={editSection === "admin" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
+            houseEmployees={houseEmployees}
           />
         </div>
       )}

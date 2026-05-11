@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { 
-  employeeBasicUpdateSchema, 
-  employeeContactUpdateSchema, 
-  employeeAdminUpdateSchema 
+import {
+  employeeBasicUpdateSchema,
+  employeeContactUpdateSchema,
+  employeeAdminUpdateSchema,
 } from "../../utils/schema/employee/update.schema";
 import {
   getUpdateFormService,
@@ -12,15 +12,16 @@ import {
 } from "../../services/employeeUpdateService";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
-  const [editSection, setEditSection] = useState(null);
-  const [saving, setSaving]           = useState(false);
-  const [saveError, setSaveError]     = useState(null);
+  const [editSection, setEditSection]           = useState(null);
+  const [saving, setSaving]                     = useState(false);
+  const [saveError, setSaveError]               = useState(null);
   const [loadingCatalogues, setLoadingCatalogues] = useState(false);
 
-  const [roles, setRoles]       = useState([]);
-  const [houses, setHouses]     = useState([]);
-  const [allWorkdays, setAllWorkdays] = useState([]);
+  const [roles, setRoles]                         = useState([]);
+  const [houses, setHouses]                       = useState([]);
+  const [allWorkdays, setAllWorkdays]             = useState([]);
   const [frecuentPaymentTypes, setFrecuentPaymentTypes] = useState([]);
+  const [houseEmployees, setHouseEmployees]       = useState([]);
 
   const [basicForm, setBasicFormState] = useState({
     name: "", surname: "", curp: "", rfc: "",
@@ -46,8 +47,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       curp:        employee?.curp ?? "",
       rfc:         employee?.rfc ?? "",
       nss:         employee?.nss ?? "",
-      bankAccount: employee?.bankAccount && !isNaN(employee.bankAccount) ? String(employee.bankAccount) : "",
-      birthDate:   employee?.birthDate ? String(employee.birthDate).slice(0, 10) : "",
+      bankAccount: employee?.bankAccount && !isNaN(employee.bankAccount)
+        ? String(employee.bankAccount)
+        : "",
+      birthDate: employee?.birthDate
+        ? String(employee.birthDate).slice(0, 10)
+        : "",
     });
     setEditSection("basic");
   }, []);
@@ -65,27 +70,37 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setEditSection("contact");
   }, []);
 
-
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
     setEditSection("admin");
     setLoadingCatalogues(true);
     try {
-      const formData = await getUpdateFormService();
+      const formData = await getUpdateFormService(employeeId);
+
       setRoles(formData?.roles ?? []);
       setHouses(formData?.houses ?? []);
       setAllWorkdays(formData?.workdays ?? []);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
+      setHouseEmployees(formData?.employees ?? []);
 
       const preselected = (formData?.workdays ?? []).map((wd) => {
-        const wdId    = wd.workdayId ?? wd.workday_id;
-        const existing = currentWorkdays?.find((cw) => (cw.workdayId ?? cw.workday_id) === wdId);
+        const wdId     = wd.workdayId ?? wd.workday_id;
+        const existing = currentWorkdays?.find(
+          (cw) => String(cw.workdayId ?? cw.workday_id) === String(wdId)
+        );
+
+        const extractTime = (t, defaultT) => {
+          if (!t) return defaultT;
+          const s = String(t);
+          return s.includes("T") ? s.slice(11, 16) : s.substring(0, 5);
+        };
+
         return {
           workdayId: wdId,
           name:      wd.name,
           selected:  !!existing,
-          start:     existing ? String(existing.start).slice(11, 16) : "08:00",
-          end:       existing ? String(existing.end).slice(11, 16)   : "17:00",
+          start:     extractTime(existing?.start, "08:00"),
+          end:       extractTime(existing?.end, "17:00"),
         };
       });
 
@@ -103,7 +118,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setLoadingCatalogues(false);
     }
-  }, []);
+  }, [employeeId]);
 
   const closeEdit = useCallback(() => {
     setEditSection(null);
@@ -112,23 +127,20 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const setBasicField = useCallback((field, value) => {
     let finalValue = value;
-    
-    if (field === "name" || field === "surname") {
+
+    if (field === "name" || field === "surname")
       finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-    }
-    
-    if (field === "curp" || field === "rfc") {
+
+    if (field === "curp" || field === "rfc")
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "").toUpperCase();
-    }
-    
-    if (field === "bankAccount" || field === "nss") {
-      finalValue = value.replace(/\D/g, ""); 
-    }
+
+    if (field === "bankAccount" || field === "nss")
+      finalValue = value.replace(/\D/g, "");
 
     if (field === "name" || field === "surname") finalValue = finalValue.slice(0, 50);
-    if (field === "curp") finalValue = finalValue.slice(0, 18);
-    if (field === "rfc")  finalValue = finalValue.slice(0, 13); 
-    if (field === "nss")  finalValue = finalValue.slice(0, 11);
+    if (field === "curp")        finalValue = finalValue.slice(0, 18);
+    if (field === "rfc")         finalValue = finalValue.slice(0, 13);
+    if (field === "nss")         finalValue = finalValue.slice(0, 11);
     if (field === "bankAccount") finalValue = finalValue.slice(0, 18);
 
     setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
@@ -136,38 +148,32 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const setContactField = useCallback((field, value) => {
     let finalValue = value;
-    
-    if (field === "municipio" || field === "city") {
+
+    if (field === "municipio" || field === "city")
       finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-    }
 
-    if (field === "email" || field === "street") {
+    if (field === "email" || field === "street")
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
-    }
 
-    if (field === "phoneNumber") {
+    if (field === "phoneNumber")
       finalValue = value.replace(/\D/g, "");
-    }
 
-    if (field === "postalCode") {
+    if (field === "postalCode")
       finalValue = value.replace(/\D/g, "");
-    }
-    
-    if (field === "email") finalValue = finalValue.slice(0, 60);
+
+    if (field === "email")       finalValue = finalValue.slice(0, 60);
     if (field === "phoneNumber") finalValue = finalValue.slice(0, 10);
-    if (field === "street") finalValue = finalValue.slice(0, 200);
-    if (field === "municipio") finalValue = finalValue.slice(0, 120);
-    if (field === "city") finalValue = finalValue.slice(0, 100);
-    if (field === "postalCode") finalValue = finalValue.slice(0, 10);
+    if (field === "street")      finalValue = finalValue.slice(0, 200);
+    if (field === "municipio")   finalValue = finalValue.slice(0, 120);
+    if (field === "city")        finalValue = finalValue.slice(0, 100);
+    if (field === "postalCode")  finalValue = finalValue.slice(0, 10);
 
     setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
   const setAdminField = useCallback((field, value) => {
     let finalValue = value;
-    if (field === "salary") {
-      finalValue = value.replace(/[^\d.]/g, ""); 
-    }
+    if (field === "salary") finalValue = value.replace(/[^\d.]/g, "");
     setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
@@ -196,9 +202,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const validation = employeeBasicUpdateSchema.safeParse(basicForm);
       if (!validation.success) {
         const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
+        throw new Error(
+          firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente."
+        );
       }
-
       await updateBasicInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
@@ -216,9 +223,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const validation = employeeContactUpdateSchema.safeParse(contactForm);
       if (!validation.success) {
         const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Es necesario completar todos los campos de contacto.");
+        throw new Error(
+          firstIssue?.message || "Es necesario completar todos los campos de contacto."
+        );
       }
-
       await updateContactInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información de contacto actualizada con éxito");
@@ -238,12 +246,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       }
 
       const salaryNum = Number(adminForm.salary);
-      if (isNaN(salaryNum) || salaryNum < 0) {
+      if (isNaN(salaryNum) || salaryNum < 0)
         throw new Error("El salario debe ser un número válido.");
-      }
-      if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
+      if (adminForm.type !== "Voluntariado" && salaryNum === 0)
         throw new Error("El salario debe ser mayor a 0 para este tipo de contrato.");
-      }
 
       const payload = {
         houseId:              adminForm.houseId,
@@ -253,34 +259,25 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 
-      console.log("frequencyOfPaymentId:", adminForm.frequencyOfPaymentId);
-
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
-      if (selectedWorkdays.length === 0) {
+      if (selectedWorkdays.length === 0)
         throw new Error("Debes seleccionar al menos un día de trabajo.");
-      }
 
       const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
-        if (!start || !end) {
+        if (!start || !end)
           throw new Error(`Debes asignar un horario completo para el día ${name}.`);
-        }
 
-      const [sh] = start.split(":").map(Number);
-      const [eh] = end.split(":").map(Number);
+        const [sh] = start.split(":").map(Number);
+        const [eh] = end.split(":").map(Number);
+        const isOvernight   = end <= start;
+        const durationHours = isOvernight ? (24 - sh) + eh : eh - sh;
 
-      const isOvernight = end <= start;
-      const durationHours = isOvernight
-        ? (24 - sh) + eh
-        : eh - sh;
+        if (durationHours < 1)
+          throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
+        if (durationHours > 24)
+          throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
 
-      if (durationHours < 1) {
-        throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
-      }
-      if (durationHours > 24) {
-        throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
-      }
-
-      return { workdayId, start, end };
+        return { workdayId, start, end };
       });
 
       payload.workdays = workdaysToSend;
@@ -299,12 +296,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [adminForm, employeeId, closeEdit, onSuccess]);
+  }, [employeeId, closeEdit, onSuccess, adminForm]);
 
   return {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
     roles, houses, allWorkdays, frecuentPaymentTypes,
+    houseEmployees,
+    setAdminFormState,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,

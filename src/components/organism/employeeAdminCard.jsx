@@ -1,8 +1,9 @@
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
-import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
+import Drawer from "../atoms/drawer";
+import WorkdayScheduleGrid from "./workdayScheduleGrid";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -11,10 +12,10 @@ import {
 } from "@/utils/detalle-empleado.utils";
 
 const TIPOS = [
-  { value: "Nomina", label: "Nómina" },
-  { value: "Asalariado",    label: "Asalariado" },
-  { value: "Honorarios",      label: "Honorarios" },
-  { value: "Voluntariado",    label: "Voluntariado" },
+  { value: "Nomina",       label: "Nómina" },
+  { value: "Asalariado",   label: "Asalariado" },
+  { value: "Honorarios",   label: "Honorarios" },
+  { value: "Voluntariado", label: "Voluntariado" },
 ];
 
 const EmployeeAdminCard = ({
@@ -26,17 +27,17 @@ const EmployeeAdminCard = ({
   isEditing,
   loadingCatalogues,
   adminForm,
+  setAdminFormState,
   roles,
   houses,
   frecuentPaymentTypes,
   setAdminField,
-  toggleWorkday,
-  setWorkdayTime,
   saving,
   saveError,
   onOpenEdit,
   onSubmit,
   onCancel,
+  houseEmployees,
 }) => {
   return (
     <div className="basis-2/3 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -74,7 +75,7 @@ const EmployeeAdminCard = ({
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
-      {/* Modo lectura */}
+      {/* ── Modo lectura ── */}
       {!isEditing && (
         <div className="mt-4 w-full flex flex-col gap-4">
           <div className="w-full flex justify-between">
@@ -84,7 +85,7 @@ const EmployeeAdminCard = ({
                 {employee?.type ?? "N/A"}
               </Type>
             </div>
-              <div className="text-right">
+            <div className="text-right">
               <Type variant="metric-label" as="p">Frecuencia de Pago</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employee?.frequencyOfPaymentName ?? "N/A"}
@@ -126,7 +127,7 @@ const EmployeeAdminCard = ({
                 <div key={w.workdayId} className="w-full flex justify-between">
                   <Type variant="metric-label">{w.name}</Type>
                   <Type variant="metric-label">
-                    {`${parseUTCDateToHours(w.start)} - ${parseUTCDateToHours(w.end)}`}
+                    {`${parseUTCDateToHours(w.start)} – ${parseUTCDateToHours(w.end)}`}
                   </Type>
                 </div>
               ))}
@@ -157,11 +158,12 @@ const EmployeeAdminCard = ({
         </div>
       )}
 
+      {/* ── Modo edición ── */}
       {isEditing && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="mt-4 flex flex-col gap-6">
             <div className="grid grid-cols-2 gap-4">
               <SelectField
                 label="Casa" id="houseId"
@@ -197,7 +199,7 @@ const EmployeeAdminCard = ({
                   labelClassName="hidden" text=""
                 />
               </div>
-                <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
                 <SelectField
                   label="Frecuencia de pago" id="frequencyOfPaymentId"
                   value={adminForm.frequencyOfPaymentId}
@@ -212,52 +214,17 @@ const EmployeeAdminCard = ({
                   placeholder="Selecciona frecuencia"
                   labelColor="text-slate-500"
                 />
-                </div>
-
+              </div>
             </div>
 
-            {adminForm.selectedWorkdays.length > 0 && (
-              <div>
-                <Type variant="metric-label" as="p" className="mb-2">
-                  Días y horario de trabajo
-                </Type>
-                <div className="flex flex-col gap-1.5">
-                  {adminForm.selectedWorkdays.map((w) => (
-                    <div
-                      key={w.workdayId}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                        w.selected ? "bg-slate-50 border border-slate-200" : ""
-                      }`}
-                    >
-                      <label className="flex items-center gap-2 cursor-pointer w-28 shrink-0">
-                        <input
-                          type="checkbox"
-                          checked={w.selected}
-                          onChange={() => toggleWorkday(w.workdayId)}
-                          className="h-4 w-4 rounded border-slate-300 accent-slate-800"
-                        />
-                        <span className="text-sm font-semibold text-slate-700">{w.name}</span>
-                      </label>
-                      {w.selected && (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time" value={w.start}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "start", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
-                          />
-                          <span className="text-slate-400 text-xs">—</span>
-                          <input
-                            type="time" value={w.end}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "end", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              <div className="flex flex-col gap-2">
+              <Type variant="metric-label" as="p">Días y horario de trabajo</Type>
+              <WorkdayScheduleGrid
+                adminForm={adminForm}
+                setAdminFormState={setAdminFormState}
+                houseEmployees={houseEmployees ?? []}
+              />
+            </div>
           </div>
         )
       )}
