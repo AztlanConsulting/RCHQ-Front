@@ -4,7 +4,7 @@ import {
   SLOTS, 
   REF_COLORS, 
   slotToTime,
-  timeToSlot // ✅ Importamos la función segura
+  timeToSlot
 } from "@/hooks/organism/useWorkdaySchedule";
 
 const WorkdayScheduleGrid = ({ adminForm, setAdminFormState, houseEmployees = [] }) => {
