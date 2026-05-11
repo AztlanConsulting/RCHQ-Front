@@ -11,7 +11,7 @@ export const DAYS = [
 ];
 
 export const START_HOUR = 6;
-export const END_HOUR = 23;
+export const END_HOUR = 24; // Mantenemos 24
 export const SLOTS = (END_HOUR - START_HOUR) * 2;
 
 export const REF_COLORS = [
