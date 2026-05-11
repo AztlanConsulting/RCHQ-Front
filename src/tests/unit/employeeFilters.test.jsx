@@ -1,66 +1,101 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import EmployeeFilters from "../../components/molecules/employeeFilters";
 
-describe("EmployeeFilters Component", () => {
-  const mockSetSearchQuery = vi.fn();
-  const mockSetActiveFilter = vi.fn();
+vi.mock("../../hooks/molecules/useSearch", () => ({
+  default: (query, setQuery) => ({
+    inputValue: query ?? "",
+    handleChange: (val) => setQuery(val),
+    handleKeyDown: (e) => {
+      if (e.key === "Enter") setQuery(e.target.value);
+    },
+  }),
+}));
 
-  const defaultProps = {
-    searchQuery: "",
-    setSearchQuery: mockSetSearchQuery,
-    activeFilter: "true",
-    setActiveFilter: mockSetActiveFilter,
-  };
+const STATUS_OPTIONS = [
+  { value: "true",  label: "Activos" },
+  { value: "false", label: "Inactivos" },
+];
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+const defaultProps = {
+  searchQuery:    "",
+  setSearchQuery: vi.fn(),
+  activeFilter:   "",
+  setActiveFilter: vi.fn(),
+  statusOptions:  STATUS_OPTIONS,
+};
+
+describe("EmployeeFilters — renderizado base", () => {
+  it("muestra el campo de búsqueda con placeholder por defecto", () => {
+    render(<EmployeeFilters {...defaultProps} />);
+    expect(
+      screen.getByPlaceholderText(/ingresa nombre o apellido/i),
+    ).toBeInTheDocument();
   });
 
-  it("debe llamar a setSearchQuery cuando el usuario escribe en el campo de búsqueda", () => {
-    render(<EmployeeFilters {...defaultProps} />);
+  it("muestra el label de búsqueda personalizado", () => {
+    render(
+      <EmployeeFilters {...defaultProps} searchLabel="Buscar por Nombre" />,
+    );
+    expect(screen.getByText("Buscar por Nombre")).toBeInTheDocument();
+  });
 
+  it("muestra el statusLabel personalizado", () => {
+    render(
+      <EmployeeFilters {...defaultProps} statusLabel="Filtrar por estado" />,
+    );
+    expect(screen.getByText("Filtrar por estado")).toBeInTheDocument();
+  });
+
+  it("renderiza las opciones del select de status", () => {
+    render(<EmployeeFilters {...defaultProps} />);
+    expect(screen.getByText("Activos")).toBeInTheDocument();
+    expect(screen.getByText("Inactivos")).toBeInTheDocument();
+  });
+
+  it("renderiza children adicionales dentro del grid", () => {
+    render(
+      <EmployeeFilters {...defaultProps}>
+        <div data-testid="extra-filter">Filtro extra</div>
+      </EmployeeFilters>,
+    );
+    expect(screen.getByTestId("extra-filter")).toBeInTheDocument();
+  });
+});
+
+describe("EmployeeFilters — grid según cols", () => {
+  it("aplica grid-cols-2 con cols=2 (default)", () => {
+    const { container } = render(<EmployeeFilters {...defaultProps} cols={2} />);
+    const grid = container.querySelector(".grid");
+    expect(grid.className).toContain("sm:grid-cols-2");
+  });
+
+  it("aplica grid-cols-3 con cols=3", () => {
+    const { container } = render(<EmployeeFilters {...defaultProps} cols={3} />);
+    const grid = container.querySelector(".grid");
+    expect(grid.className).toContain("lg:grid-cols-3");
+  });
+});
+
+describe("EmployeeFilters — interacción", () => {
+  it("llama a setSearchQuery al escribir y presionar Enter", () => {
+    const setSearchQuery = vi.fn();
+    render(
+      <EmployeeFilters {...defaultProps} setSearchQuery={setSearchQuery} />,
+    );
     const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
-
-    fireEvent.change(input, { target: { value: "Juan" } });
-    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-
-    expect(mockSetSearchQuery).toHaveBeenCalledWith("Juan");
+    fireEvent.change(input, { target: { value: "Carlos" } });
+    fireEvent.keyDown(input, { key: "Enter", target: { value: "Carlos" } });
+    expect(setSearchQuery).toHaveBeenCalledWith("Carlos");
   });
 
-  it("debe llamar a setActiveFilter cuando se cambia la opción del select", () => {
-    render(<EmployeeFilters {...defaultProps} />);
-
+  it("llama a setActiveFilter al cambiar el select", () => {
+    const setActiveFilter = vi.fn();
+    render(
+      <EmployeeFilters {...defaultProps} setActiveFilter={setActiveFilter} />,
+    );
     const select = screen.getByRole("combobox");
-
     fireEvent.change(select, { target: { value: "false" } });
-
-    expect(mockSetActiveFilter).toHaveBeenCalledWith("false");
-  });
-
-  it("debe mostrar los valores iniciales correctos en los campos", () => {
-    const propsConValores = {
-      ...defaultProps,
-      searchQuery: "Admin",
-      activeFilter: "false",
-    };
-
-    render(<EmployeeFilters {...propsConValores} />);
-
-    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
-    const select = screen.getByRole("combobox");
-
-    expect(input.value).toBe("Admin");
-    expect(select.value).toBe("false");
-  });
-
-  it("debe renderizar todas las opciones del select correctamente", () => {
-    render(<EmployeeFilters {...defaultProps} />);
-
-    const options = screen.getAllByRole("option");
-
-    expect(options).toHaveLength(2);
-    expect(options[0]).toHaveTextContent("Activos");
-    expect(options[1]).toHaveTextContent("Inactivos");
+    expect(setActiveFilter).toHaveBeenCalledWith("false");
   });
 });

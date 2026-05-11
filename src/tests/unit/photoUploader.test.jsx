@@ -1,153 +1,100 @@
-// tests/unit/PhotoUploader.test.jsx
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import PhotoUploader from "../../components/atoms/photoUploader";
 
-beforeAll(() => {
-  globalThis.URL.createObjectURL = vi.fn(
-    () => "blob:http://localhost/mock-url",
-  );
-  globalThis.URL.revokeObjectURL = vi.fn();
-});
+// URL.createObjectURL no existe en jsdom
+globalThis.URL.createObjectURL = vi.fn(() => "blob:fake-url");
+globalThis.URL.revokeObjectURL = vi.fn();
 
-afterAll(() => {
-  vi.restoreAllMocks();
-});
-
-const makeProps = (overrides = {}) => ({
-  file: null,
-  onFileChange: vi.fn(),
-  label: "Foto de perfil",
-  ...overrides,
-});
+const makeFile = (name = "foto.jpg", type = "image/jpeg") =>
+  new File(["contenido"], name, { type });
 
 describe("PhotoUploader — renderizado base", () => {
-  it("muestra el label con el texto recibido", () => {
-    // Arrange
-    const props = makeProps({ label: "Fotografía del empleado" });
-
-    // Act
-    render(<PhotoUploader {...props} />);
-
-    // Assert
-    expect(screen.getByText("Fotografía del empleado")).toBeInTheDocument();
+  it("muestra el label por defecto", () => {
+    render(<PhotoUploader onFileChange={vi.fn()} />);
+    expect(screen.getByText("Foto del usuario")).toBeInTheDocument();
   });
 
-  it("muestra el estado inicial vacío (ícono y texto) cuando no hay archivo", () => {
-    // Arrange
-    const props = makeProps({ file: null });
+  it("muestra un label personalizado", () => {
+    render(<PhotoUploader label="Avatar del perfil" onFileChange={vi.fn()} />);
+    expect(screen.getByText("Avatar del perfil")).toBeInTheDocument();
+  });
 
-    // Act
-    render(<PhotoUploader {...props} />);
+  it("muestra el uploadLabel dentro del área", () => {
+    render(<PhotoUploader onFileChange={vi.fn()} uploadLabel="Cargar imagen" />);
+    expect(screen.getByText("Cargar imagen")).toBeInTheDocument();
+  });
 
-    // Assert
-    expect(screen.getByText("Subir fotografía")).toBeInTheDocument();
+  it("el área tiene role=button y aria-label", () => {
+    render(<PhotoUploader onFileChange={vi.fn()} uploadLabel="Subir foto" />);
+    expect(screen.getByRole("button", { name: "Subir foto" })).toBeInTheDocument();
+  });
+
+  it("no muestra preview ni botón de eliminar sin archivo", () => {
+    render(<PhotoUploader onFileChange={vi.fn()} />);
     expect(screen.queryByAltText("Vista previa")).not.toBeInTheDocument();
-  });
-
-  it("configura el input oculto con los atributos correctos", () => {
-    // Arrange
-    const props = makeProps({ accept: "image/png, image/jpeg" });
-
-    // Act
-    render(<PhotoUploader {...props} />);
-    const fileInput = document.querySelector('input[type="file"]');
-
-    // Assert
-    expect(fileInput).toBeInTheDocument();
-    expect(fileInput).toHaveAttribute("accept", "image/png, image/jpeg");
-    expect(fileInput).toHaveClass("hidden");
+    expect(screen.queryByLabelText("Eliminar foto")).not.toBeInTheDocument();
   });
 });
 
-describe("PhotoUploader — vista previa de imagen", () => {
-  it("renderiza la imagen y el botón de eliminar cuando recibe un archivo", () => {
-    // Arrange
-    const mockFile = new File(["(⌐□_□)"], "chucknorris.png", {
-      type: "image/png",
-    });
-    const props = makeProps({ file: mockFile });
-
-    // Act
-    render(<PhotoUploader {...props} />);
-
-    // Assert
+describe("PhotoUploader — con archivo (preview)", () => {
+  it("muestra la imagen de preview cuando file tiene valor", () => {
+    const file = makeFile();
+    render(<PhotoUploader file={file} onFileChange={vi.fn()} />);
     expect(screen.getByAltText("Vista previa")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Eliminar foto" }),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Subir Fotografía")).not.toBeInTheDocument();
+  });
+
+  it("muestra el botón de eliminar cuando hay preview", () => {
+    const file = makeFile();
+    render(<PhotoUploader file={file} onFileChange={vi.fn()} />);
+    expect(screen.getByLabelText("Eliminar foto")).toBeInTheDocument();
+  });
+
+  it("llama a onFileChange(null) al hacer click en eliminar", () => {
+    const onFileChange = vi.fn();
+    const file = makeFile();
+    render(<PhotoUploader file={file} onFileChange={onFileChange} />);
+    fireEvent.click(screen.getByLabelText("Eliminar foto"));
+    expect(onFileChange).toHaveBeenCalledWith(null);
+  });
+
+  it("no muestra el uploadLabel cuando hay preview", () => {
+    const file = makeFile();
+    render(
+      <PhotoUploader
+        file={file}
+        onFileChange={vi.fn()}
+        uploadLabel="Subir fotografía"
+      />,
+    );
+    expect(screen.queryByText("Subir fotografía")).not.toBeInTheDocument();
   });
 });
 
-describe("PhotoUploader — interacción del usuario", () => {
-  it("simula el click en el input oculto al hacer click en el contenedor principal", () => {
-    // Arrange
-    const props = makeProps();
-    render(<PhotoUploader {...props} />);
-    const container = screen.getByRole("button", {
-      name: "Subir fotografía",
-    });
-    const clickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-
-    // Act
-    fireEvent.click(container);
-
-    // Assert
-    expect(clickSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("simula el click en el input oculto al presionar 'Enter' en el contenedor", () => {
-    // Arrange
-    const props = makeProps();
-    render(<PhotoUploader {...props} />);
-    const container = screen.getByRole("button", {
-      name: "Subir fotografía",
-    });
-    const clickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-
-    // Act
-    fireEvent.keyDown(container, { key: "Enter", code: "Enter" });
-
-    // Assert
-    expect(clickSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("llama a onFileChange con el archivo seleccionado cuando el usuario sube algo", () => {
-    // Arrange
+describe("PhotoUploader — interacción con input", () => {
+  it("llama a onFileChange con el archivo seleccionado", () => {
     const onFileChange = vi.fn();
-    const props = makeProps({ onFileChange });
-    render(<PhotoUploader {...props} />);
-    const fileInput = document.querySelector('input[type="file"]');
-    const mockFile = new File(["hello"], "foto.jpg", {
-      type: "image/jpeg",
-    });
+    render(<PhotoUploader onFileChange={onFileChange} />);
 
-    // Act
-    fireEvent.change(fileInput, {
-      target: { files: [mockFile] },
-    });
+    const input = document.querySelector('input[type="file"]');
+    const file = makeFile("nueva.jpg");
+    fireEvent.change(input, { target: { files: [file] } });
 
-    // Assert
-    expect(onFileChange).toHaveBeenCalledTimes(1);
-    expect(onFileChange).toHaveBeenCalledWith(mockFile);
+    expect(onFileChange).toHaveBeenCalledWith(file);
   });
 
-  it("llama a onFileChange con null cuando el usuario hace click en eliminar", () => {
-    // Arrange
-    const mockFile = new File(["dummy"], "foto.png", { type: "image/png" });
+  it("activa el input al presionar Enter en el área", () => {
     const onFileChange = vi.fn();
-    const props = makeProps({ file: mockFile, onFileChange });
-    render(<PhotoUploader {...props} />);
-    const removeButton = screen.getByRole("button", {
-      name: "Eliminar foto",
+    render(<PhotoUploader onFileChange={onFileChange} uploadLabel="Subir" />);
+
+    const clickSpy = vi.spyOn(
+      document.querySelector('input[type="file"]'),
+      "click",
+    );
+    fireEvent.keyDown(screen.getByRole("button", { name: "Subir" }), {
+      key: "Enter",
     });
 
-    // Act
-    fireEvent.click(removeButton);
-
-    // Assert
-    expect(onFileChange).toHaveBeenCalledTimes(1);
-    expect(onFileChange).toHaveBeenCalledWith(null);
+    expect(clickSpy).toHaveBeenCalled();
   });
 });

@@ -3,60 +3,90 @@ import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import EmployeeRow from "../../components/molecules/employeeRow";
 
-const mockNavigate = vi.fn();
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+const renderInTable = (ui) =>
+  render(
+    <BrowserRouter>
+      <table>
+        <tbody>{ui}</tbody>
+      </table>
+    </BrowserRouter>,
+  );
 
-describe("EmployeeRow Component", () => {
-  const mockEmployee = {
-    employeeId: "123",
-    fullName: "Jane Doe",
-    role: "Software Engineer",
-    status: true,
-    picture: "path/to/photo.jpg",
-  };
-
-  const renderInTable = (component) => {
-    return render(
-      <BrowserRouter>
-        <table>
-          <tbody>{component}</tbody>
-        </table>
-      </BrowserRouter>,
+describe("EmployeeRow — renderizado con cells", () => {
+  it("renderiza el contenido string de cada celda", () => {
+    renderInTable(
+      <EmployeeRow
+        cells={[
+          { key: "name", content: "Ana López" },
+          { key: "role", content: "Psicóloga" },
+        ]}
+      />,
     );
-  };
-
-  it("debe mostrar la información correctamente (Nombre y Rol)", () => {
-    renderInTable(<EmployeeRow employee={mockEmployee} />);
-
-    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
-    expect(screen.getByText("Software Engineer")).toBeInTheDocument();
+    expect(screen.getByText("Ana López")).toBeInTheDocument();
+    expect(screen.getByText("Psicóloga")).toBeInTheDocument();
   });
 
-  it('debe navegar a los detalles del empleado al hacer clic en el botón "Ver"', () => {
-    renderInTable(<EmployeeRow employee={mockEmployee} />);
-
-    const button = screen.getByRole("button", { name: /ver empleado/i });
-    fireEvent.click(button);
-
-    expect(mockNavigate).toHaveBeenCalledWith("/app/personal/ver/123");
+  it("renderiza contenido numérico en una celda", () => {
+    renderInTable(
+      <EmployeeRow cells={[{ key: "num", content: 42 }]} />,
+    );
+    expect(screen.getByText("42")).toBeInTheDocument();
   });
 
-  it("debe pasar las props correctas a StatusBadge", () => {
-    renderInTable(<EmployeeRow employee={mockEmployee} />);
-
-    expect(screen.getByText(/activo/i)).toBeInTheDocument();
+  it("renderiza contenido JSX centrado en div", () => {
+    renderInTable(
+      <EmployeeRow
+        cells={[
+          { key: "badge", content: <span data-testid="badge">Activo</span> },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId("badge")).toBeInTheDocument();
   });
 
-  it("debe renderizar el avatar con la imagen del empleado", () => {
-    renderInTable(<EmployeeRow employee={mockEmployee} />);
+  it("aplica className personalizada a la celda", () => {
+    const { container } = renderInTable(
+      <EmployeeRow
+        cells={[{ key: "col", content: "Texto", className: "text-red-500" }]}
+      />,
+    );
+    const td = container.querySelector("td");
+    expect(td).toHaveClass("text-red-500");
+  });
 
-    const avatarImg = screen.getByAltText("Jane Doe");
-    expect(avatarImg).toBeInTheDocument();
+  it("no renderiza la celda de acciones si actions es undefined", () => {
+    const { container } = renderInTable(
+      <EmployeeRow cells={[{ key: "name", content: "Sin acciones" }]} />,
+    );
+    const tds = container.querySelectorAll("td");
+    expect(tds).toHaveLength(1);
+  });
+
+  it("renderiza la celda de acciones si actions tiene valor", () => {
+    renderInTable(
+      <EmployeeRow
+        cells={[{ key: "name", content: "Con acciones" }]}
+        actions={<button>Ver</button>}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Ver" })).toBeInTheDocument();
+  });
+
+  it("ejecuta el handler de la acción al hacer click", () => {
+    const onClick = vi.fn();
+    renderInTable(
+      <EmployeeRow
+        cells={[{ key: "name", content: "Test" }]}
+        actions={<button onClick={onClick}>Eliminar</button>}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Eliminar" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("renderiza correctamente sin cells (array vacío)", () => {
+    const { container } = renderInTable(<EmployeeRow cells={[]} />);
+    const tr = container.querySelector("tr");
+    expect(tr).toBeInTheDocument();
   });
 });

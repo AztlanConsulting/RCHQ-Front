@@ -1,5 +1,3 @@
-// src/tests/integration/employeeUpdate.integration.test.jsx
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   render,
@@ -85,7 +83,9 @@ const mockAddress = {
 };
 
 const mockHouse    = { houseId: "h1", name: "Desarrollo" };
-const mockWorkdays = [];
+const mockWorkdays = [
+  { workdayId: "wd1", name: "Lunes", start: "1970-01-01T09:00:00Z", end: "1970-01-01T18:00:00Z" },
+];
 
 // ── setupEmployeeDetail con setAlert reactivo ──────────────────────────────
 const setupEmployeeDetail = (overrides = {}) => {
@@ -143,6 +143,11 @@ beforeEach(() => {
     workdays: [
       { workdayId: "wd1", name: "Lunes" },
       { workdayId: "wd2", name: "Martes" },
+    ],
+    frecuencyOptions: [                          // ← faltaba
+      { optionId: "fp1", name: "semanal" },
+      { optionId: "fp2", name: "quincenal" },
+      { optionId: "fp3", name: "mensual" },
     ],
   });
   updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });

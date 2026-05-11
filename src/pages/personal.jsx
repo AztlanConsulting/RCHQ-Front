@@ -48,6 +48,7 @@ const Personal = () => {
         loading={loading}
         error={error}
         columns={EMPLOYEE_COLUMNS}
+        loadingMessage="Cargando empleados..."
         renderRow={(employee, i) => (
           <EmployeeRow
             key={employee.employeeId ?? i}

@@ -1,4 +1,3 @@
-// tests/unit/Button.test.jsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Button from "../../components/atoms/button";
@@ -94,10 +93,10 @@ describe("Button — estados y estilos", () => {
 
     // Assert
     expect(button).toHaveClass("bg-neutral-50");
-    expect(button).toHaveClass("w-[206px]");
-    expect(button).toHaveClass("h-[50px]");
+    expect(button).toHaveClass("sm:w-[206px]");
+    expect(button).toHaveClass("sm:h-[50px]");
+    expect(textSpan).toHaveClass("sm:text-xl");
     expect(textSpan).toHaveClass("text-[#121212]");
-    expect(textSpan).toHaveClass("text-xl");
     expect(textSpan).toHaveClass("font-bold");
   });
 
