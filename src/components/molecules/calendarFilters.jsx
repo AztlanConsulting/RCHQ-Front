@@ -1,10 +1,10 @@
 import FilterGroup from "../atoms/filterGroup";
 import Type from "../atoms/type";
 
-const CalendarFilters = ({ houseName, scopeFilters, typeFilters, className = "" }) => {
+const CalendarFilters = ({ houseName, scopeFilters, setScopeFilters, typeFilters, setTypeFilters, className = "" }) => {
   return (
     <div
-      className={`bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200 ${className}`}
+      className={`p-6 mb-6 ${className}`}
     >
       {houseName ? (
         <Type variant="section-title" as="h2" className="mb-4">
