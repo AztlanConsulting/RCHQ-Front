@@ -7,6 +7,8 @@ const DateField = ({
     value,
     onChange,
     labelColor = "text-[#6b6b6b]",
+    minDate,
+    maxDate,
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : undefined;
 
@@ -47,8 +49,8 @@ const DateField = ({
                 onChange={handleDateChange}
                 showTodayButton={false}
                 showClearButton={false}
-                minDate={new Date("1900-01-01")}
-                maxDate={new Date()}
+                minDate={minDate}
+                maxDate={maxDate}
                 theme={{
                     root: {
                         input: {

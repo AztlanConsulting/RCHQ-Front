@@ -123,6 +123,8 @@ const UserInfoSection = ({
                     value={form.birthDate}
                     onChange={handleChange}
                     labelColor={LABEL_COLOR}
+                    minDate={new Date("1900-01-01")}
+                    maxDate={new Date()}
                 />
 
                 <SelectField
