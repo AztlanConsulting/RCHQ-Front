@@ -159,7 +159,7 @@ const UserInfoSection = ({
                 />
 
                 <Button
-                    text={isLoading ? "Registrando..." : "Registrar Usuario"}
+                    text={isLoading ? "Registrando..." : "Registrar"}
                     onClick={onSubmit}
                     disabled={isLoading}
                     bgColor="bg-[#24375e]"
