@@ -1,29 +1,84 @@
 @import "tailwindcss";
+@source "../node_modules/flowbite";
+@source "../node_modules/flowbite-react";
+@import "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  font-family: Inter, "Segoe UI", sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html,
 body {
-  margin: 0;
-  min-height: 100%;
+    margin: 0;
+    min-height: 100%;
 }
 
 #root {
-  min-height: 100svh;
-  width: 100%;
+    min-height: 100svh;
+    width: 100%;
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #fafafa inset !important;
-  -webkit-text-fill-color: #222 !important;
-  transition: background-color 9999s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 1000px #fafafa inset !important;
+    -webkit-text-fill-color: #222 !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+/* DATEPICKER */
+
+.bg-primary-700 {
+    background-color: #24375e !important;
+
+    color: white !important;
+}
+
+.bg-primary-700:hover {
+    background-color: #162d4a !important;
+}
+
+button.outside-month-day {
+    color: #999999 !important;
+
+    opacity: 0.5 !important;
+
+    cursor: not-allowed !important;
+}
+
+button.outside-month-day:hover {
+    background-color: #f3f4f6 !important;
+
+    opacity: 0.5 !important;
+}
+
+.dark .bg-primary-700 {
+    background-color: #24375e !important;
+
+    color: white !important;
+}
+
+.dark .bg-primary-700:hover {
+    background-color: #162d4a !important;
+}
+
+.dark button.outside-month-day {
+    color: #999999 !important;
+
+    opacity: 0.5 !important;
+
+    cursor: not-allowed !important;
+}
+
+.dark button.outside-month-day:hover {
+    background-color: #374151 !important;
+
+    opacity: 0.5 !important;
 }

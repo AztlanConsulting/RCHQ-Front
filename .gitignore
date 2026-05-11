@@ -9,11 +9,20 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+#package-lock.json
+package-lock.json
+
 # Mac
 .DS_Store
 
 # Windows
 Thumbs.db
+
+# Editor settings
+.vscode/
+
+# Flowbite React v4 cache
+.flowbite-react/
 
 # Runtime data
 pids
