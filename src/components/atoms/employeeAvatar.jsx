@@ -1,7 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
 const EmployeeAvatar = ({ picture, fullName, className = "w-12 h-12", src }) => {
-  // src tiene prioridad (URL completa), picture usa el prefijo API
   const imageUrl = src ?? (picture ? `${API_URL}/${picture}` : null);
 
   return (
