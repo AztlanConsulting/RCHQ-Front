@@ -12,7 +12,8 @@ const FilterGroup = ({
   labelColor = "text-[#121212]",
   className = "w-full",
   defaultOpen = true,
-  children
+  /** Optional: render a node to the right of each option row (icon, dot, etc.). Receives that row’s `opt` from `options`. */
+  renderTrailing,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -66,7 +67,7 @@ const FilterGroup = ({
                 htmlFor={inputId}
                 className="flex items-center justify-between"
               >
-                <div className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 min-w-0 shrink">
                   <input
                     id={inputId}
                     type="checkbox"
@@ -74,16 +75,18 @@ const FilterGroup = ({
                     value={String(opt.value)}
                     checked={values.includes(opt.value)}
                     onChange={(e) => toggle(opt.value, e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
                     disabled={disabled}
                   />
-                  <span className="text-sm font-medium text-slate-700">
+                  <span className="text-sm font-medium text-slate-700 truncate">
                     {opt.label}
                   </span>
                 </div>
-                <div>
-                  {children}
-                </div>
+                {renderTrailing ? (
+                  <span className="shrink-0 flex items-center justify-end ml-2">
+                    {renderTrailing(opt)}
+                  </span>
+                ) : null}
               </label>
             );
           })}

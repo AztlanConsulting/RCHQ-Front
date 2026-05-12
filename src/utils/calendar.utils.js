@@ -15,3 +15,15 @@ export const STATUS_OPTIONS = [
     { value: "en_espera",  label: "En espera" },
     { value: "rechazadas", label: "Rechazadas" },
 ];
+
+export const getFocusOption = (event) => {
+    return FOCUS_OPTIONS.find(
+        (f) => f.value === event.focus
+    );
+}
+
+export const getScopeOption = (event) => {
+    return SCOPE_OPTIONS.find(
+        (s) => s.value === event.scope
+    );
+}

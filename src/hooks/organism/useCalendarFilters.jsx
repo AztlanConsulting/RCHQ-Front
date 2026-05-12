@@ -1,18 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { getEventsTypes } from "../../services/calendarService";
-import { FOCUS_OPTIONS, SCOPE_OPTIONS } from "../../utils/calendar.utils";
-
-const getFocusOption = (event) => {
-    return FOCUS_OPTIONS.find(
-        (f) => f.value === event.focus
-    );
-}
-
-const getScopeOption = (event) => {
-    return SCOPE_OPTIONS.find(
-        (s) => s.value === event.scope
-    );
-}
+import { 
+    FOCUS_OPTIONS, SCOPE_OPTIONS,
+    getFocusOption, getScopeOption,
+} from "../../utils/calendar.utils";
 
 const getFilteredEvents = (
     allEvents = [],

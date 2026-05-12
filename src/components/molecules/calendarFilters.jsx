@@ -1,7 +1,28 @@
 import { useState } from "react";
 import FilterGroup from "../atoms/filterGroup";
 import Type from "../atoms/type";
-import { STATUS_OPTIONS } from "../../utils/calendar.utils";
+import {
+  STATUS_OPTIONS,
+} from "../../utils/calendar.utils";
+
+const focusTrailing = (opt) =>
+  opt.icon ? (
+    <img
+      src={`/${opt.icon}.svg`}
+      alt=""
+      className="h-4 w-4 shrink-0 object-contain"
+      loading="lazy"
+    />
+  ) : null;
+
+const scopeTrailing = (opt) =>
+  opt.color ? (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200"
+      style={{ backgroundColor: opt.color }}
+      aria-hidden
+    />
+  ) : null;
 
 const CalendarFilters = ({
   houseName,
@@ -39,11 +60,7 @@ const CalendarFilters = ({
           options={focusOptions}
           values={focusFilters}
           setValues={setFocusFilters}
-          children={
-            <div>
-
-            </div>
-          }
+          renderTrailing={focusTrailing}
         />
         <FilterGroup
           label="ALCANCE"
@@ -51,6 +68,7 @@ const CalendarFilters = ({
           options={scopeOptions}
           values={scopeFilters}
           setValues={setScopeFilters}
+          renderTrailing={scopeTrailing}
         />
         <div className="border border-b"></div>
         {showEventFilters && (
