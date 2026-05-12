@@ -172,6 +172,29 @@ svg {
     color: #fff;
 }
 
+.fc .fc-daygrid-more-link {
+    width: 100%;
+    margin: 1px 0 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.fc-dayGridOverflow {
+    display: block;
+    width: 100%;
+    padding: 0.0625rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.65rem;
+    line-height: 1.25;
+    color: #1e293b;
+    background: #e2e8f0;
+    text-align: center;
+}
+
 /* Month grid: tighter day number so more event rows fit */
 .fc-dayGridMonth-view .fc-daygrid-day-number {
     padding: 1px 3px 0;

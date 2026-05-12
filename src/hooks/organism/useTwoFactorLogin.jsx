@@ -19,7 +19,7 @@ export const useTwoFactorLogin = () => {
   useEffect(() => {
     const sessionToken = getToken();
     if (sessionToken) {
-      navigate("/app/dashboard", { replace: true });
+      navigate("/app/calendario", { replace: true });
     }
   }, [navigate]);
 
@@ -40,7 +40,7 @@ export const useTwoFactorLogin = () => {
       if (response.nextStep === "LOGIN_COMPLETE") {
         localStorage.removeItem("preTwoFactorAuth");
         login({ token: response.token, user: response.data });
-        navigate("/app/dashboard", { replace: true });
+        navigate("/app/calendario", { replace: true });
       }
     } catch (err) {
       console.error(err);

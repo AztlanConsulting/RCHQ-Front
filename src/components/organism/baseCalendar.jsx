@@ -6,8 +6,11 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import { useCallback, useEffect } from "react";
 import DayGridCard from "../molecules/calendarCards/dayGridCard";
+import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard";
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
+
+const MONTH_DAY_EVENT_CAP = 3;
 
 const renderEventContent = (arg) => {
   const viewType = arg.view.type;
@@ -40,6 +43,11 @@ const BaseCalendar = ({
   onEventClick,
 }) => {
   const eventContent = useCallback((arg) => renderEventContent(arg), []);
+
+  const moreLinkContent = useCallback(
+    (arg) => <DayGridOverflowCard count={arg.num} />,
+    [],
+  );
 
     useEffect(() => {
         loadButtonsAtStart();
@@ -74,6 +82,7 @@ const BaseCalendar = ({
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}
@@ -98,6 +107,7 @@ const BaseCalendar = ({
             events={visibleEvents}
             datesSet={handleDatesSet}
             eventContent={eventContent}
+            moreLinkContent={moreLinkContent}
             eventClick={(info) => onEventClick?.(info)}
         />
     );

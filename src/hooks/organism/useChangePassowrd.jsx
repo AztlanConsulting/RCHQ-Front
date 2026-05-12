@@ -82,7 +82,7 @@ export const useChangePassword = () => {
       }
 
       login({ token, user });
-      navigate("/app/dashboard", { replace: true });
+      navigate("/app/calendario", { replace: true });
     } catch (err) {
       console.error(err);
       setErrors(mapPasswordApiError(err, "first-login"));
