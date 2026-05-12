@@ -1,21 +1,38 @@
 /**
  * Month grid (and list-month) event chip — replace markup when you define the real card.
  */
-const DayGridCard = ({ arg }) => {
-  console.log("arg: ", arg)
+/** +6h: DB wall time vs UTC instant mismatch — replace with proper timezone when backend is aligned. */
+const DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
 
-  const getStartHour = (timestamp) => {
-    return "08:00"
-  }
+const getStartHour = (timestamp) => {
+  if (timestamp == null) return "";
+  const base =
+    timestamp instanceof Date ? new Date(timestamp.getTime()) : new Date(timestamp);
+  if (Number.isNaN(base.getTime())) return "";
+  const shifted = new Date(base.getTime() + DISPLAY_OFFSET_MS);
+  const h = shifted.getHours();
+  const m = shifted.getMinutes();
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
+const DayGridCard = ({ arg }) => {
+  const start = arg.event.start;
+  const timeLabel = start != null ? getStartHour(start) : "";
 
   return (
-    <div className={`fc-custom-daygrid-card bg-color-[${arg.event.backgroundColor}] px-1.5 py-0.5 rounded text-xs flex justify-between w-full min-w-0`}>
+    <div
+      className="text-white px-1.5 py-0.5 rounded text-xs flex justify-between w-full min-w-0"
+      style={{
+        backgroundColor: arg.event.backgroundColor,
+        borderColor: arg.event.borderColor ?? arg.event.backgroundColor,
+      }}
+    >
       <span className="font-medium truncate block">{arg.event.title}</span>
-      {arg.timeText ? (
-        <span className="opacity-90 text-[0.65rem]">{getStartHour(arg.timeText)}</span>
+      {timeLabel ? (
+        <span className="opacity-90 text-[0.65rem] shrink-0 ml-1">{timeLabel}</span>
       ) : null}
     </div>
-  )
+  );
 };
 
 export default DayGridCard;
