@@ -19,18 +19,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< feature/US29/solicitarVacaciones
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/list": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
-    "@tailwindcss/vite": "^4.2.2",
-=======
     "flowbite": "^4.0.1",
     "flowbite-react": "^0.12.17",
->>>>>>> develop
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
