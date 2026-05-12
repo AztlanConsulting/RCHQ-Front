@@ -10,7 +10,7 @@ const focusTrailing = (opt) =>
     <img
       src={`/${opt.icon}.svg`}
       alt=""
-      className="h-4 w-4 shrink-0 object-contain"
+      className="h-4 w-4 shrink-0 object-contain brightness-0"
       loading="lazy"
     />
   ) : null;
@@ -53,7 +53,7 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
-      <div className="flex flex-col gap-4 mt-4 max-h-[80vh] overflow-y-auto scrollbar-hide">
+      <div className="flex flex-col gap-4 mt-4 max-h-[75vh] overflow-y-auto scrollbar-hide">
         <FilterGroup
           label="ENFOQUE"
           name="focus"

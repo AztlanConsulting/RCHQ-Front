@@ -1,7 +1,7 @@
 export const FOCUS_OPTIONS = [
-    { value: "eventos",    label: "Eventos",    icon: "key" },
-    { value: "vacaciones", label: "Vacaciones", icon: "showEye" },
-    { value: "ausencias",  label: "Ausencias",  icon: "hideEye" },
+    { value: "eventos",    label: "Eventos",    icon: "employee" },
+    { value: "vacaciones", label: "Vacaciones", icon: "vacation" },
+    { value: "ausencias",  label: "Ausencias",  icon: "absences" },
 ];
 
 export const SCOPE_OPTIONS = [
