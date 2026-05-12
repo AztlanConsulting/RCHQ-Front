@@ -10,35 +10,36 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 
 const renderEventContent = (arg) => {
-    const viewType = arg.view.type;
+  const viewType = arg.view.type;
 
-    if (viewType === "dayGridMonth" || viewType === "listMonth") {
-        return <DayGridCard arg={arg} />;
-    }
-    if (viewType === "timeGridWeek" || viewType === "listWeek") {
-        return <WeekTimeCard arg={arg} />;
-    }
-    if (viewType === "timeGridDay" || viewType === "listDay") {
-        return <DayTimeCard arg={arg} />;
-    }
-
+  if (viewType === "dayGridMonth" || viewType === "listMonth") {
     return <DayGridCard arg={arg} />;
+  }
+  if (viewType === "timeGridWeek" || viewType === "listWeek") {
+    return <WeekTimeCard arg={arg} />;
+  }
+  if (viewType === "timeGridDay" || viewType === "listDay") {
+    return <DayTimeCard arg={arg} />;
+  }
+
+  return <DayGridCard arg={arg} />;
 };
 
 const BaseCalendar = ({
-    loadButtonsAtStart,
-    calendarRef,
-    toggleList,
-    setMonthView,
-    setWeekView,
-    setDayView,
-    generateTitle,
-    getWeekDayName,
-    resizeHandler,
-    visibleEvents,
-    handleDatesSet,
+  loadButtonsAtStart,
+  calendarRef,
+  toggleList,
+  setMonthView,
+  setWeekView,
+  setDayView,
+  generateTitle,
+  getWeekDayName,
+  resizeHandler,
+  visibleEvents,
+  handleDatesSet,
+  onEventClick,
 }) => {
-    const eventContent = useCallback((arg) => renderEventContent(arg), []);
+  const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
     useEffect(() => {
         loadButtonsAtStart();
@@ -97,6 +98,7 @@ const BaseCalendar = ({
             events={visibleEvents}
             datesSet={handleDatesSet}
             eventContent={eventContent}
+            eventClick={(info) => onEventClick?.(info)}
         />
     );
 };

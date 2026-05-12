@@ -1,5 +1,3 @@
-import Type from "../../atoms/type";
-
 /**
  * Month grid (and list-month) event chip — replace markup when you define the real card.
  */
@@ -23,16 +21,13 @@ const DayGridCard = ({ arg }) => {
 
   return (
     <div
-      className="fc-card px-1.5 py-0.5 rounded text-xs flex justify-between items-center w-full min-w-0"
+      className="fc-card cursor-pointer px-1.5 py-0.5 rounded text-xs flex justify-between items-center w-full min-w-0 text-white"
       style={{
         backgroundColor: arg.event.backgroundColor,
         borderColor: arg.event.borderColor ?? arg.event.backgroundColor,
       }}
     >
       <span className="fc-card font-medium truncate block">{arg.event.title}</span>
-      {/* <Type variant="subtitle" size="sm" className="fc-card" as="span">
-        {arg.event.title}
-      </Type> */}
       {timeLabel ? (
         <span className="fc-card opacity-90 text-[0.65rem] shrink-0 ml-1">{timeLabel}</span>
       ) : null}

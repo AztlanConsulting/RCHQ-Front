@@ -40,14 +40,21 @@ const getFilteredEvents = (
             title: rawEvent.name,
             start: rawEvent.start,
             end: rawEvent.end,
-            date: rawEvent.date,
-            subtitle: rawEvent.subtitle,
-            description: rawEvent.description,
-            icon: getFocusOption(rawEvent)?.icon || "",
             backgroundColor: getScopeOption(rawEvent)?.color || rawEvent.color,
             borderColor: rawEvent.color,
-            allDay: rawEvent.lastsAllDay,
-            lastsAllDay: rawEvent.lastsAllDay,
+            allDay: Boolean(rawEvent.lastsAllDay),
+            extendedProps: {
+                subtitle: rawEvent.subtitle ?? "",
+                description: rawEvent.description ?? "",
+                focus: rawEvent.focus,
+                focusLabel: getFocusOption(rawEvent)?.label ?? rawEvent.focus,
+                scope: rawEvent.scope,
+                scopeLabel: getScopeOption(rawEvent)?.label ?? rawEvent.scope,
+                eventType: rawEvent.type,
+                date: rawEvent.date ?? "",
+                icon: getFocusOption(rawEvent)?.icon ?? "",
+                status: rawEvent.status,
+            },
         }));
 }
 
