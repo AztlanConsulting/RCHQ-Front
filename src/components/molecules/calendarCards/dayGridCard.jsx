@@ -18,6 +18,7 @@ const getStartHour = (timestamp) => {
 const DayGridCard = ({ arg }) => {
   const start = arg.event.start;
   const timeLabel = start != null ? getStartHour(start) : "";
+  const showDayLabel = arg.event.allDay || timeLabel === "00:00";
 
   return (
     <div
@@ -30,7 +31,7 @@ const DayGridCard = ({ arg }) => {
       <span className="fc-card font-medium truncate block">{arg.event.title}</span>
       {timeLabel ? (
         <span className="fc-card  font-medium opacity-90 shrink-0 ml-1">
-          {arg.event.allDay ? "Día" : timeLabel}
+          {showDayLabel ? "Día" : timeLabel}
         </span>
       ) : null}
     </div>

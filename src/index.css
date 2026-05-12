@@ -157,6 +157,21 @@ svg {
     color: #fff;
 }
 
+/* Month grid: tighter day number so more event rows fit */
+.fc-dayGridMonth-view .fc-daygrid-day-number {
+    padding: 1px 3px 0;
+    font-size: 0.8em;
+    line-height: 1.15;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-month-start {
+    font-size: 1em;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-day-events {
+    margin-top: 0;
+}
+
 /* Thin (100) */
 @font-face {
     font-family: "Public Sans";
