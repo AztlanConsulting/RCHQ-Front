@@ -1,7 +1,5 @@
-import SideBar from "./organism/SideBar";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import button from "./atoms/button";
-import useAuth from "../hooks/useAuth";
+import SideBar from "./organism/sideBar";
+import { Outlet } from "react-router-dom";
 
 const navLinkClass = ({ isActive }) =>
   `block rounded px-3 py-2 text-sm ${
