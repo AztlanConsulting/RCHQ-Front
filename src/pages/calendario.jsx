@@ -54,9 +54,9 @@ const Calendario = () => {
   }, []);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-4">
       <CalendarFilters
-        className="basis-1/6 min-w-40"
+        className="basis-1/6 min-w-40 "
         houseName={employeeHouseName}
         focusFilters={focusFilters}
         setFocusFilters={setFocusFilters}

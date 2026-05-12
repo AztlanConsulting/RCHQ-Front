@@ -53,7 +53,7 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
-      <div className="flex flex-col gap-4 mt-4">
+      <div className="flex flex-col gap-4 mt-4 max-h-[80vh] overflow-y-auto scrollbar-hide">
         <FilterGroup
           label="ENFOQUE"
           name="focus"
