@@ -4,7 +4,7 @@ import { getEventsTypes } from "../../services/calendarService";
 export const FOCUS_OPTIONS = [
     { value: "eventos",    label: "Eventos",    icon: "key" },
     { value: "vacaciones", label: "Vacaciones", icon: "showEye" },
-    { value: "ausencias", label: "Ausencias",  icon: "hideEye" },,
+    { value: "ausencias",  label: "Ausencias",  icon: "hideEye" },
 ];
 
 export const SCOPE_OPTIONS = [
@@ -19,16 +19,12 @@ const getFilteredEvents = (
     scopeFilters,
     eventTypeFilters,
 ) => {
-    console.log("all events: ", allEvents);
-    console.log("focusFilters: ", focusFilters);
-    console.log("scopeFilters: ", scopeFilters);
-    console.log("eventTypeFilters: ", eventTypeFilters);
     return allEvents
         .filter((e) => focusFilters.includes(e.focus))
         .filter((e) => scopeFilters.includes(e.scope))
-        .filter((e) => eventTypeFilters.includes(e.type))
+        .filter((e) => eventTypeFilters.includes(String(e.type).toLowerCase()))
         .map((rawEvent, idx) => ({
-            id: idx,
+            id: String(idx),
             title: rawEvent.name,
             start: rawEvent.start,
             end: rawEvent.end,
@@ -86,12 +82,10 @@ export const useCalendarFilters = (
     const showVacationFilters  = focusFilters.includes("vacaciones");
     const showAbscenceFilters  = focusFilters.includes("ausencias");
 
-    const visibleEvents = useMemo(() => {
-        console.log("all events before filter: ", allEvents);
-        const res = getFilteredEvents(allEvents, focusFilters, scopeFilters, eventTypeFilters);
-        console.log("after filer: ", res);
-        // return getFilteredEvents(allEvents, focusFilters, scopeFilters, eventTypeFilters);
-    }, [allEvents, focusFilters, scopeFilters, eventTypeFilters]);
+    const visibleEvents = useMemo(
+        () => getFilteredEvents(allEvents, focusFilters, scopeFilters, eventTypeFilters),
+        [allEvents, focusFilters, scopeFilters, eventTypeFilters],
+    );
 
     // const visibleVacations = useMemo(() => {
 
