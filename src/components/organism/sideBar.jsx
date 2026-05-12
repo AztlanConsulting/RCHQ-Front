@@ -99,8 +99,8 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
   );
 };
 
-// ─── Desktop Sidebar ──────────────────────────────────────────────────────────
-const SidebarContent = ({ expanded, toggle }) => {
+// ─── Desktop SideBar ──────────────────────────────────────────────────────────
+const SideBarContent = ({ expanded, toggle }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -291,7 +291,7 @@ const SideBar = () => {
       )}
 
       <div className="hidden md:block fixed top-0 left-0 z-40 ml-5 my-4">
-        <SidebarContent expanded={expanded} toggle={toggle} />
+        <SideBarContent expanded={expanded} toggle={toggle} />
       </div>
 
       <MobileNav

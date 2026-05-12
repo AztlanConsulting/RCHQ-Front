@@ -1,4 +1,4 @@
-import sideBar from "./organism/SideBar";
+import SideBar from "./organism/SideBar";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import button from "./atoms/button";
 import useAuth from "../hooks/useAuth";
@@ -11,7 +11,7 @@ const navLinkClass = ({ isActive }) =>
 export default function AppLayout() {
   return (
     <div className="h-screen overflow-hidden bg-gray-50">
-      <sideBar />
+      <SideBar />
       <main
         className="h-screen overflow-y-auto py-4 pr-6 pt-20 md:pt-4"
         style={{ paddingLeft: "104px" }}
