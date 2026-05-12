@@ -12,6 +12,7 @@ const FilterGroup = ({
   labelColor = "text-[#121212]",
   className = "w-full",
   defaultOpen = true,
+  children
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -63,21 +64,26 @@ const FilterGroup = ({
               <label
                 key={String(opt.value)}
                 htmlFor={inputId}
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center justify-between"
               >
-                <input
-                  id={inputId}
-                  type="checkbox"
-                  name={name}
-                  value={String(opt.value)}
-                  checked={values.includes(opt.value)}
-                  onChange={(e) => toggle(opt.value, e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  disabled={disabled}
-                />
-                <span className="text-sm font-medium text-slate-700">
-                  {opt.label}
-                </span>
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    id={inputId}
+                    type="checkbox"
+                    name={name}
+                    value={String(opt.value)}
+                    checked={values.includes(opt.value)}
+                    onChange={(e) => toggle(opt.value, e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={disabled}
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    {opt.label}
+                  </span>
+                </div>
+                <div>
+                  {children}
+                </div>
               </label>
             );
           })}

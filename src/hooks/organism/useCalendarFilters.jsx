@@ -1,17 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getEventsTypes } from "../../services/calendarService";
-
-export const FOCUS_OPTIONS = [
-    { value: "eventos",    label: "Eventos",    icon: "key" },
-    { value: "vacaciones", label: "Vacaciones", icon: "showEye" },
-    { value: "ausencias",  label: "Ausencias",  icon: "hideEye" },
-];
-
-export const SCOPE_OPTIONS = [
-    { value: "global",   label: "Global",   color: "#C524FF" },
-    { value: "house",    label: "Casa",     color: "#7FD447" },
-    { value: "personal", label: "Personal", color: "#EFBF22" },
-];
+import { FOCUS_OPTIONS, SCOPE_OPTIONS } from "../../utils/calendar.utils";
 
 const getFocusOption = (event) => {
     return FOCUS_OPTIONS.find(

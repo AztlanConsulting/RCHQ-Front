@@ -1,12 +1,7 @@
 import { useState } from "react";
 import FilterGroup from "../atoms/filterGroup";
 import Type from "../atoms/type";
-
-const STATUS_OPTIONS = [
-  { value: "aprobadas",  label: "Aprobadas" },
-  { value: "en_espera",  label: "En espera" },
-  { value: "rechazadas", label: "Rechazadas" },
-];
+import { STATUS_OPTIONS } from "../../utils/calendar.utils";
 
 const CalendarFilters = ({
   houseName,
@@ -44,6 +39,11 @@ const CalendarFilters = ({
           options={focusOptions}
           values={focusFilters}
           setValues={setFocusFilters}
+          children={
+            <div>
+
+            </div>
+          }
         />
         <FilterGroup
           label="ALCANCE"

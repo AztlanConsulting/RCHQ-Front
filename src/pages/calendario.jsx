@@ -54,7 +54,7 @@ const Calendario = () => {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex gap-2">
       <CalendarFilters
         className="basis-1/6 min-w-40"
         houseName={employeeHouseName}
