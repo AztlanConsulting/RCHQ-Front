@@ -55,6 +55,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
 
     const response = await rawResponse.json();
     const rawEvents = response.data.events;
+    console.log("raw events: ", rawEvents);
 
     return rawEvents;
 };

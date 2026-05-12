@@ -10,25 +10,25 @@ const STATUS_OPTIONS = [
 
 const CalendarFilters = ({
   houseName,
-  enfoqueFilters,
-  setEnfoqueFilters,
-  enfoqueOptions,
+  focusFilters,
+  setFocusFilters,
+  focusOptions,
   scopeFilters,
   setScopeFilters,
   scopeOptions,
-  tipoEventoFilters,
-  setTipoEventoFilters,
-  tipoEventoOptions,
-  showTipoEvento,
-  showVacaciones,
-  showAusencias,
+  eventTypeFilters,
+  setEventTypeFilters,
+  eventTypeOptions,
+  showEventFilters,
+  showVacationFilters,
+  showAbscenceFilters,
   className = "",
 }) => {
   const [vacacionesVals, setVacacionesVals] = useState([]);
   const [ausenciasVals,  setAusenciasVals]  = useState([]);
 
   return (
-    <div className={`p-4 flex flex-col gap-1 ${className}`}>
+    <div className={`p-2 flex flex-col gap-1 ${className}`}>
       <Type variant="page-title" as="h2">
         Calendario
       </Type>
@@ -39,40 +39,41 @@ const CalendarFilters = ({
       )}
       <div className="flex flex-col gap-4 mt-4">
         <FilterGroup
-          label="Enfoque"
-          name="enfoque"
-          options={enfoqueOptions}
-          values={enfoqueFilters}
-          setValues={setEnfoqueFilters}
+          label="ENFOQUE"
+          name="focus"
+          options={focusOptions}
+          values={focusFilters}
+          setValues={setFocusFilters}
         />
         <FilterGroup
-          label="Alcance"
-          name="alcance"
+          label="ALCANCE"
+          name="scope"
           options={scopeOptions}
           values={scopeFilters}
           setValues={setScopeFilters}
         />
-        {showTipoEvento && (
+        <div className="border border-b"></div>
+        {showEventFilters && (
           <FilterGroup
-            label="Tipo de evento"
+            label="TIPO DE EVENTO"
             name="tipo-evento"
-            options={tipoEventoOptions}
-            values={tipoEventoFilters}
-            setValues={setTipoEventoFilters}
+            options={eventTypeOptions}
+            values={eventTypeFilters}
+            setValues={setEventTypeFilters}
           />
         )}
-        {showVacaciones && (
+        {showVacationFilters && (
           <FilterGroup
-            label="Vacaciones"
+            label="VACACIONES"
             name="vacaciones"
             options={STATUS_OPTIONS}
             values={vacacionesVals}
             setValues={setVacacionesVals}
           />
         )}
-        {showAusencias && (
+        {showAbscenceFilters && (
           <FilterGroup
-            label="Ausencias"
+            label="AUSENCIAS"
             name="ausencias"
             options={STATUS_OPTIONS}
             values={ausenciasVals}

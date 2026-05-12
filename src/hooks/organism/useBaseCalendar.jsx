@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getEmployeeHouseName, getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
 
 export const useBaseCalendar = () => {
@@ -189,6 +189,16 @@ export const useBaseCalendar = () => {
             console.error(err);
         }
     };
+
+    // datesSet fires before setOwnCalendar sets the employee ID, so the first
+    // call is skipped. Once the ID is available, re-fetch the stored range.
+    useEffect(() => {
+        if (!viewEmployeeId || !lastFetchedRange.current) return;
+        const { start, end } = lastFetchedRange.current;
+        getEventsInRange(viewEmployeeId, start.split("T")[0], end.split("T")[0])
+            .then((raw) => setAllEvents(raw ?? []))
+            .catch(console.error);
+    }, [viewEmployeeId]);
 
     const setOwnCalendar = () => {
         const ownId = getOwnEmployeeId();

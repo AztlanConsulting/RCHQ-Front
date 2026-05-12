@@ -23,10 +23,10 @@ const Calendario = () => {
     } = useBaseCalendar();
 
     const {
-        enfoqueFilters, setEnfoqueFilters, enfoqueOptions,
+        focusFilters, setFocusFilters, focusOptions,
         scopeFilters,   setScopeFilters,   scopeOptions,
-        tipoEventoFilters, setTipoEventoFilters, tipoEventoOptions,
-        showTipoEvento, showVacaciones, showAusencias,
+        eventTypeFilters, setEventTypeFilters, eventTypeOptions,
+        showEventFilters, showVacationFilters, showAbscenceFilters,
         visibleEvents,
     } = useCalendarFilters(allEvents);
 
@@ -39,18 +39,18 @@ const Calendario = () => {
             <CalendarFilters
                 className="basis-1/6 min-w-40"
                 houseName={employeeHouseName}
-                enfoqueFilters={enfoqueFilters}
-                setEnfoqueFilters={setEnfoqueFilters}
-                enfoqueOptions={enfoqueOptions}
+                focusFilters={focusFilters}
+                setFocusFilters={setFocusFilters}
+                focusOptions={focusOptions}
                 scopeFilters={scopeFilters}
                 setScopeFilters={setScopeFilters}
                 scopeOptions={scopeOptions}
-                tipoEventoFilters={tipoEventoFilters}
-                setTipoEventoFilters={setTipoEventoFilters}
-                tipoEventoOptions={tipoEventoOptions}
-                showTipoEvento={showTipoEvento}
-                showVacaciones={showVacaciones}
-                showAusencias={showAusencias}
+                eventTypeFilters={eventTypeFilters}
+                setEventTypeFilters={setEventTypeFilters}
+                eventTypeOptions={eventTypeOptions}
+                showEventFilters={showEventFilters}
+                showVacationFilters={showVacationFilters}
+                showAbscenceFilters={showAbscenceFilters}
             />
 
             <BaseCalendar

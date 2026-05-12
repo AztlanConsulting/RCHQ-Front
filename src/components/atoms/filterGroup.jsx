@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Type from "./type";
 
 const FilterGroup = ({
   label,
@@ -38,9 +39,9 @@ const FilterGroup = ({
         className="flex w-full items-center justify-between cursor-pointer"
       >
         {label && (
-          <legend className={`font-semibold text-sm ${labelColor}`}>
+          <Type variant="metric-label" className="text-sm" as="p">
             {label}
-          </legend>
+          </Type>
         )}
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -1,27 +1,72 @@
 import { useEffect, useMemo, useState } from "react";
 import { getEventsTypes } from "../../services/calendarService";
 
-export const ENFOQUE_OPTIONS = [
-    { value: "eventos",    label: "Eventos" },
-    { value: "ausencias",  label: "Ausencias" },
-    { value: "vacaciones", label: "Vacaciones" },
+export const FOCUS_OPTIONS = [
+    { value: "eventos",    label: "Eventos",    icon: "key" },
+    { value: "vacaciones", label: "Vacaciones", icon: "showEye" },
+    { value: "ausencias", label: "Ausencias",  icon: "hideEye" },,
 ];
 
 export const SCOPE_OPTIONS = [
-    { value: "global",   label: "Global" },
-    { value: "house",    label: "Casa" },
-    { value: "personal", label: "Personal" },
+    { value: "global",   label: "Global",   color: "#C524FF" },
+    { value: "house",    label: "Casa",     color: "#7FD447" },
+    { value: "personal", label: "Personal", color: "#EFBF22" },
 ];
 
-export const useCalendarFilters = (allEvents = []) => {
-    const [enfoqueFilters, setEnfoqueFilters] = useState(() =>
-        ENFOQUE_OPTIONS.map((o) => o.value),
+const getFilteredEvents = (
+    allEvents = [],
+    focusFilters,
+    scopeFilters,
+    eventTypeFilters,
+) => {
+    console.log("all events: ", allEvents);
+    console.log("focusFilters: ", focusFilters);
+    console.log("scopeFilters: ", scopeFilters);
+    console.log("eventTypeFilters: ", eventTypeFilters);
+    return allEvents
+        .filter((e) => focusFilters.includes(e.focus))
+        .filter((e) => scopeFilters.includes(e.scope))
+        .filter((e) => eventTypeFilters.includes(e.type))
+        .map((rawEvent, idx) => ({
+            id: idx,
+            title: rawEvent.name,
+            start: rawEvent.start,
+            end: rawEvent.end,
+            // date: rawEvent.date,
+            // subtitle: rawEvent.subtitle,
+            // description: rawEvent.description,
+            backgroundColor: rawEvent.color,
+            borderColor: rawEvent.color,
+            allDay: rawEvent.lastsAllDay,
+            // lastsAllDay: rawEvent.lastsAllDay,
+        }));
+}
+
+// const getFilteredVacations = (allVacations = []) => {
+//     console.log("all vacations: ", all)
+//     return allVacations
+//         .filter((e) => scopeFilters.includes(e.scope))
+// }
+
+// const filterAbscences = (abscences = []) => {
+
+// }
+
+// export const useCalendarFilters = (allEvents = []) => {
+export const useCalendarFilters = (
+    allEvents = [],
+    // allVacations = [],
+    // allAbscences = [],
+) => {
+    const [focusFilters, setFocusFilters] = useState(() =>
+        FOCUS_OPTIONS.map((o) => o.value),
     );
     const [scopeFilters, setScopeFilters] = useState(() =>
         SCOPE_OPTIONS.map((o) => o.value),
     );
-    const [tipoEventoOptions, setTipoEventoOptions] = useState([]);
-    const [tipoEventoFilters, setTipoEventoFilters] = useState([]);
+
+    const [eventTypeOptions, setEventTypeOptions] = useState([]);
+    const [eventTypeFilters, setEventTypeFilters] = useState([]);
 
     useEffect(() => {
         getEventsTypes()
@@ -31,34 +76,33 @@ export const useCalendarFilters = (allEvents = []) => {
                     value: String(t.name).toLowerCase(),
                     label: t.name,
                 }));
-                setTipoEventoOptions(opts);
-                setTipoEventoFilters(opts.map((o) => o.value));
+                setEventTypeOptions(opts);
+                setEventTypeFilters(opts.map((o) => o.value));
             })
             .catch(console.error);
     }, []);
 
-    const showTipoEvento = enfoqueFilters.includes("eventos");
-    const showVacaciones = enfoqueFilters.includes("vacaciones");
-    const showAusencias  = enfoqueFilters.includes("ausencias");
+    const showEventFilters = focusFilters.includes("eventos");
+    const showVacationFilters  = focusFilters.includes("vacaciones");
+    const showAbscenceFilters  = focusFilters.includes("ausencias");
 
     const visibleEvents = useMemo(() => {
-        return allEvents
-            .filter((e) => scopeFilters.includes(e.scope))         // TODO: confirm field name
-            .filter((e) => tipoEventoFilters.includes(e.type))     // TODO: confirm field name
-            .map((rawEvent) => ({
-                title: rawEvent.name,
-                start: rawEvent.start,
-                end: rawEvent.end,
-                backgroundColor: rawEvent.color,
-                borderColor: rawEvent.color,
-            }));
-    }, [allEvents, scopeFilters, tipoEventoFilters]);
+        console.log("all events before filter: ", allEvents);
+        const res = getFilteredEvents(allEvents, focusFilters, scopeFilters, eventTypeFilters);
+        console.log("after filer: ", res);
+        // return getFilteredEvents(allEvents, focusFilters, scopeFilters, eventTypeFilters);
+    }, [allEvents, focusFilters, scopeFilters, eventTypeFilters]);
+
+    // const visibleVacations = useMemo(() => {
+
+    // }, [allVacations, focusFilters, scopeFilters, vacationFilters])
 
     return {
-        enfoqueFilters, setEnfoqueFilters, enfoqueOptions: ENFOQUE_OPTIONS,
+        focusFilters, setFocusFilters, focusOptions: FOCUS_OPTIONS,
         scopeFilters,   setScopeFilters,   scopeOptions: SCOPE_OPTIONS,
-        tipoEventoFilters, setTipoEventoFilters, tipoEventoOptions,
-        showTipoEvento, showVacaciones, showAusencias,
-        visibleEvents,
+        eventTypeFilters, setEventTypeFilters, eventTypeOptions,
+        showEventFilters, showVacationFilters, showAbscenceFilters,
+        visibleEvents, 
+        // visibleVacations, visibleAbscences,
     };
 };
