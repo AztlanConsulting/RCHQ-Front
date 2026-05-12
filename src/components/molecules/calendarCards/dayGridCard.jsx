@@ -21,7 +21,7 @@ const DayGridCard = ({ arg }) => {
 
   return (
     <div
-      className="fc-card cursor-pointer px-1.5 py-0.5 rounded text-xs flex justify-between items-center w-full min-w-0 text-white"
+      className="fc-card cursor-pointer px-1.5 py-0.5 rounded text-xs flex justify-between items-center w-full min-w-0"
       style={{
         backgroundColor: arg.event.backgroundColor,
         borderColor: arg.event.borderColor ?? arg.event.backgroundColor,
@@ -29,7 +29,9 @@ const DayGridCard = ({ arg }) => {
     >
       <span className="fc-card font-medium truncate block">{arg.event.title}</span>
       {timeLabel ? (
-        <span className="fc-card opacity-90 text-[0.65rem] shrink-0 ml-1">{timeLabel}</span>
+        <span className="fc-card  font-medium opacity-90 shrink-0 ml-1">
+          {arg.event.allDay ? "Día" : timeLabel}
+        </span>
       ) : null}
     </div>
   );
