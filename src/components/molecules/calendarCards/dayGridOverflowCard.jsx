@@ -6,7 +6,7 @@ const DayGridOverflowCard = ({ count }) => {
   if (count == null || count < 1) return null;
 
   return (
-    <span className="fc-dayGridOverflow font-semibold tabular-nums">
+    <span className="fc-dayGridOverflowCard">
       +{count} más
     </span>
   );

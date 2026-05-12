@@ -155,7 +155,6 @@ svg {
 
 .fc-dayGridCard {
     width: 100%;
-    width: 100%;
     min-width: 0;
     cursor: pointer;
     padding: 0.125rem 0.375rem;
@@ -172,27 +171,42 @@ svg {
     color: #fff;
 }
 
+/* bg-color-blue w-[50%] ml-auto font-semibold tabular-nums */
+.fc .fc-daygrid-more-link .fc-dayGridOverflowCard {
+    display: block;
+    box-sizing: border-box;
+    width: 50%;
+    margin-left: auto;
+    background-color: #162d4a;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    color: #fff;
+    text-align: center;
+    transition: background-color 0.15s ease;
+}
+
+.fc .fc-daygrid-more-link:hover .fc-dayGridOverflowCard,
+.fc .fc-daygrid-more-link:focus-visible .fc-dayGridOverflowCard {
+    background-color: #1a3a5c;
+}
+
 .fc .fc-daygrid-more-link {
     width: 100%;
     margin: 1px 0 0;
     padding: 0;
     font-size: inherit;
     font-weight: inherit;
-    background: transparent;
+    background: transparent !important;
     border: none;
     box-shadow: none;
 }
 
-.fc-dayGridOverflow {
-    display: block;
-    width: 100%;
-    padding: 0.0625rem 0.25rem;
-    border-radius: 0.25rem;
-    font-size: 0.65rem;
-    line-height: 1.25;
-    color: #1e293b;
-    background: #e2e8f0;
-    text-align: center;
+.fc .fc-daygrid-more-link:hover,
+.fc .fc-daygrid-more-link:focus-visible {
+    background: transparent !important;
+    color: inherit;
 }
 
 /* Month grid: tighter day number so more event rows fit */

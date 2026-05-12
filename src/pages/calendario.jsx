@@ -73,6 +73,7 @@ const Calendario = () => {
       />
 
       <BaseCalendar
+        classname="flex-1"
         loadButtonsAtStart={loadButtonsAtStart}
         calendarRef={calendarRef}
         toggleList={toggleList}
