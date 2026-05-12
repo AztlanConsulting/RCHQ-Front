@@ -11,7 +11,6 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-<<<<<<< feature/US29/solicitarVacaciones
 
     /* FullCalendar custom CSS */
     --fc-border-color: #a3a3a3;
@@ -22,8 +21,6 @@
 
     --fc-button-text-color: #fff;
     --fc-today-bg-color: #0059ff30;
-=======
->>>>>>> develop
 }
 
 html,
@@ -46,7 +43,6 @@ input:-webkit-autofill:active {
     transition: background-color 9999s ease-in-out 0s;
 }
 
-<<<<<<< feature/US29/solicitarVacaciones
 /* Full Calendar CSS */
 .fc * {
     color: #121212;
@@ -146,6 +142,10 @@ svg {
 
 .fc .fc-col-header-cell {
     vertical-align: middle;
+}
+
+.fc-card {
+    color: #fff;
 }
 
 /* Thin (100) */
@@ -299,7 +299,8 @@ svg {
     font-weight: 900;
     font-style: italic;
     font-display: swap;
-=======
+}
+
 /* DATEPICKER */
 
 .bg-primary-700 {
@@ -348,5 +349,4 @@ button.outside-month-day:hover {
     background-color: #374151 !important;
 
     opacity: 0.5 !important;
->>>>>>> develop
 }

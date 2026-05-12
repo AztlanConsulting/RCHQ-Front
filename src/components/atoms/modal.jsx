@@ -1,11 +1,20 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
+const placements = {
+    "center": "fixed inset-0 z-50 flex items-center justify-center",
+    "right": "fixed inset-0 z-50 flex items-center justify-end",
+    "left": "fixed inset-0 z-50 flex items-center justify-start"
+}
+
 const Modal = ({
     open,
     onClose,
     children,
     title,
+    /** When true: dim backdrop, click backdrop closes, body scroll locked. When false: transparent, page stays clickable (only the panel receives clicks). */
+    grayBackground = true,
+    placement = "center",
     className = "",
 }) => {
     useEffect(() => {
@@ -19,30 +28,38 @@ const Modal = ({
 
         document.addEventListener("keydown", handleKeyDown);
 
-        // Prevent body scroll while modal is open
-        document.body.style.overflow = "hidden";
+        if (grayBackground) {
+            document.body.style.overflow = "hidden";
+        }
 
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
             document.body.style.overflow = "";
         };
-    }, [open, onClose]);
+    }, [open, onClose, grayBackground]);
 
     if (!open) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
-            <div
-                // className="absolute inset-0 bg-black/50"
-                onClick={onClose}
-            />
+        <div
+            className={`${placements[placement] || placements.center} ${
+                grayBackground ? "" : "pointer-events-none"
+            }`}
+        >
+            {grayBackground ? (
+                <div
+                    className="absolute inset-0 bg-black/50 pointer-events-auto"
+                    onClick={onClose}
+                    aria-hidden
+                />
+            ) : null}
 
-            {/* Modal Panel */}
+            {/* Modal Panel — always receives pointer events so it stays usable when the shell is pointer-events-none */}
             <div
                 role="dialog"
-                aria-modal="true"
+                aria-modal={grayBackground}
                 className={`
+                    pointer-events-auto
                     relative z-10
                     w-full max-w-2xl
                     rounded-xl bg-white shadow-xl
