@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
@@ -18,24 +18,27 @@ const getReadableErrors = (err) => {
   return ["Ocurrió un error inesperado"];
 };
 
-/**
- * getUserData
- * GET /auth/profile
- * Requiere token en localStorage (lo inyecta getToken de AuthService).
- */
 const getUserData = async (token) => {
-  const response = await fetch(`${API_URL}/user/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try{
+    const response = await fetch(`${API_URL}/user/profile`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    throw new Error("Error al obtener los datos del usuario.");
+  }
 
-  const data = await response.json();
+  try{
+    const data = await response.json();
+  }
+    catch (error) {
+    throw new Error("Error al procesar los datos del usuario.");
+  }
 
   if (!response.ok) {
-    // Mapeamos los status relevantes al mensaje legible
     const fallbackMessages = {
       401: "No tienes permisos para ver esta información.",
       404: "Ruta no encontrada.",

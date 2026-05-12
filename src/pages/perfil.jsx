@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getUserData, getReadableErrors } from "../services/profileService";
 import { getToken } from "../utils/authStorage";
-import ProfileCard from "../components/Organism/profileCard";
+import ProfileCard from "../components/organism/profileCard";
 
 const STATUS_MAP = {
   401: { title: "Sin permisos", message: "No tienes permisos para ver esta información." },
