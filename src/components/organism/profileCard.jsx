@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Field = ({ label, value }) => (
   <div className="flex flex-col gap-0.5">
     <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
@@ -12,6 +14,7 @@ const Field = ({ label, value }) => (
 );
 
 const ProfileCard = ({ user }) => {
+  const imageUrl = user?.foto ? `${API_URL}/${user.foto}` : null;
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col lg:flex-row gap-6">
@@ -33,12 +36,20 @@ const ProfileCard = ({ user }) => {
             <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
               Foto del Usuario
             </label>
-            <div className="w-full h-[160px] rounded-xl border border-slate-200 bg-[#F2F2F2] flex items-center justify-center">
-              <img
-                src={user?.foto || "/profilePhoto.svg"}
-                alt={user?.foto ? "Foto de perfil" : "Sin foto de perfil"}
-                className="h-[70%] w-auto object-contain"
-              />
+            <div className="w-full h-[160px] rounded-xl border border-slate-200 bg-[#F2F2F2] flex items-center justify-center overflow-hidden">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Foto de perfil"
+                  className="h-[70%] w-auto object-contain"
+                />
+              ) : (
+                <img
+                  src="/profilePhoto.svg"
+                  alt="Sin foto de perfil"
+                  className="h-[70%] w-auto object-contain"
+                />
+              )}
             </div>
           </div>
 
