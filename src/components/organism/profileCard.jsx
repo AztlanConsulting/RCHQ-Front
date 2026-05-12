@@ -3,7 +3,7 @@ const Field = ({ label, value }) => (
     <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
       {label}
     </label>
-    <div className="flex items-center min-h-[38px] w-full rounded-lg bg-slate-100 px-4 shadow-[inset_0px_2px_4px_#00000020] gap-2">
+    <div className="flex items-center min-h-[38px] w-full rounded-lg bg-[#F2F2F2] px-4 shadow-[inset_0px_2px_4px_#00000020] gap-2">
       <span className="flex-1 text-sm font-medium text-slate-700 truncate">
         {value || <span className="text-slate-400 italic">Sin información</span>}
       </span>
@@ -33,31 +33,12 @@ const ProfileCard = ({ user }) => {
             <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
               Foto del Usuario
             </label>
-            <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-slate-100 h-[120px]">
-              {user?.foto ? (
-                <img
-                  src={user.foto}
-                  alt="Foto de perfil"
-                  className="h-full w-full object-cover rounded-xl"
-                />
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 680 400"
-                  className="h-full w-full"
-                  aria-label="Sin foto"
-                >
-                  <circle cx="340" cy="200" r="160" fill="#c8c8c8" />
-                  <circle cx="340" cy="170" r="42" fill="none" stroke="#a0a0a0" strokeWidth="6" />
-                  <path
-                    d="M260 295 Q260 248 340 248 Q420 248 420 295"
-                    fill="none"
-                    stroke="#a0a0a0"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
+            <div className="w-full h-[160px] rounded-xl border border-slate-200 bg-[#F2F2F2] flex items-center justify-center">
+              <img
+                src={user?.foto || "/profilePhoto.svg"}
+                alt={user?.foto ? "Foto de perfil" : "Sin foto de perfil"}
+                className="h-[70%] w-auto object-contain"
+              />
             </div>
           </div>
 

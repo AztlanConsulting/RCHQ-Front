@@ -19,24 +19,15 @@ const getReadableErrors = (err) => {
 };
 
 const getUserData = async (token) => {
-  try{
-    const response = await fetch(`${API_URL}/user/profile`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (error) {
-    throw new Error("Error al obtener los datos del usuario.");
-  }
+  const response = await fetch(`${API_URL}/user/profile`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  try{
-    const data = await response.json();
-  }
-    catch (error) {
-    throw new Error("Error al procesar los datos del usuario.");
-  }
+  const data = await response.json();
 
   if (!response.ok) {
     const fallbackMessages = {
