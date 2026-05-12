@@ -16,7 +16,8 @@ const BaseCalendar = ({
     generateTitle,
     getWeekDayName,
     resizeHandler,
-    fetchEventsInRange,
+    visibleEvents,
+    handleDatesSet,
 }) => {
     useEffect(() => { 
         loadButtonsAtStart();
@@ -35,7 +36,7 @@ const BaseCalendar = ({
             locales={[esLocale]}
             locale="es"
             windowResizeDelay="10"
-            height="calc(100vh - 80px)"
+            height="calc(100vh - 40px)"
             headerToolbar={{
                 left: "prev,next today",
                 center: "title",
@@ -72,9 +73,8 @@ const BaseCalendar = ({
                     click: () => setDayView(calendarRef),
                 },
             }}
-            events={(info, successCallback, failureCallback) =>
-                fetchEventsInRange(info, successCallback, failureCallback)
-            }
+            events={visibleEvents}
+            datesSet={handleDatesSet}
         />
     );
 };
