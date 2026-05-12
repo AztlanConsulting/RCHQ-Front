@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
 
@@ -108,8 +109,22 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
 
 // ─── Desktop SidebarContent ───────────────────────────────────────────────────
 const SideBarContent = ({ expanded, toggle }) => {
+  const sideBarRef = useRef(null);
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  useEffect(() => {
+    if (!expanded) return;
+
+    const handleClickOutside = (e) => {
+      if (sideBarRef.current && !sideBarRef.current.contains(e.target)) {
+        toggle();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [expanded, toggle]);
 
   const handleLogout = () => {
     logout();
@@ -118,6 +133,7 @@ const SideBarContent = ({ expanded, toggle }) => {
 
   return (
     <aside
+      ref={sideBarRef}
       aria-label="Menú principal"
       className={`
         flex flex-col bg-[#1F3664] rounded-lg
