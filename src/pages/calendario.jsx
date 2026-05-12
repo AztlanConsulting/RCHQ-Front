@@ -1,17 +1,16 @@
 import React, { useEffect } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
-import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
+import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
+import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 
 const Calendario = () => {
     const calendarRef = React.useRef(null);
+
     const {
-        setViewEmployeeId,
         employeeHouseName,
-        scopeFilters,
-        setScopeFilters,
-        typeFilters,
-        setTypeFilters,
+        allEvents,
+        handleDatesSet,
         loadButtonsAtStart,
         toggleList,
         setMonthView,
@@ -20,9 +19,16 @@ const Calendario = () => {
         generateTitle,
         getWeekDayName,
         resizeHandler,
-        fetchEventsInRange,
-        setOwnCalendar
+        setOwnCalendar,
     } = useBaseCalendar();
+
+    const {
+        enfoqueFilters, setEnfoqueFilters, enfoqueOptions,
+        scopeFilters,   setScopeFilters,   scopeOptions,
+        tipoEventoFilters, setTipoEventoFilters, tipoEventoOptions,
+        showTipoEvento, showVacaciones, showAusencias,
+        visibleEvents,
+    } = useCalendarFilters(allEvents);
 
     useEffect(() => {
         setOwnCalendar();
@@ -30,13 +36,21 @@ const Calendario = () => {
 
     return (
         <div className="flex">
-            <CalendarFilters 
-                className="basis-1/6"
+            <CalendarFilters
+                className="basis-1/6 min-w-40"
                 houseName={employeeHouseName}
+                enfoqueFilters={enfoqueFilters}
+                setEnfoqueFilters={setEnfoqueFilters}
+                enfoqueOptions={enfoqueOptions}
                 scopeFilters={scopeFilters}
                 setScopeFilters={setScopeFilters}
-                typeFilters={typeFilters}
-                setTypeFilters={setTypeFilters}
+                scopeOptions={scopeOptions}
+                tipoEventoFilters={tipoEventoFilters}
+                setTipoEventoFilters={setTipoEventoFilters}
+                tipoEventoOptions={tipoEventoOptions}
+                showTipoEvento={showTipoEvento}
+                showVacaciones={showVacaciones}
+                showAusencias={showAusencias}
             />
 
             <BaseCalendar
@@ -49,7 +63,8 @@ const Calendario = () => {
                 generateTitle={generateTitle}
                 getWeekDayName={getWeekDayName}
                 resizeHandler={resizeHandler}
-                fetchEventsInRange={fetchEventsInRange}
+                visibleEvents={visibleEvents}
+                handleDatesSet={handleDatesSet}
             />
         </div>
     );
