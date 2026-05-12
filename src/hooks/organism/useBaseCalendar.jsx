@@ -1,14 +1,13 @@
-import { useState } from "react";
-import { getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
-import { getReadableErrors } from "../../services/authService";
+import { useRef, useState } from "react";
+import { getEmployeeHouseName, getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
     const [viewType, setViewType] = useState("Month");
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
-    const [scopeFilters, setScopeFilters] = useState(["global", "house", "personal"]);
-    const [typeFilters, setTypeFilters] = useState(["vacations", "general", "other"]);
+    const [allEvents, setAllEvents] = useState([]);
+    const lastFetchedRange = useRef(null);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -169,52 +168,39 @@ export const useBaseCalendar = () => {
         calendarApi.render();
     }
 
-    const fetchEventsInRange = async (dates, successCallback, failureCallback) => {
-        if (viewEmployeeId == "") {
-            successCallback([]);
-            return;
-        }
+    const handleDatesSet = async (dateInfo) => {
+        const { startStr, endStr } = dateInfo;
+        if (
+            lastFetchedRange.current?.start === startStr &&
+            lastFetchedRange.current?.end === endStr
+        ) return;
+        lastFetchedRange.current = { start: startStr, end: endStr };
 
-        const startDate = dates.startStr.split("T")[0];
-        const endDate = dates.endStr.split("T")[0];
+        if (viewEmployeeId == "") return;
 
         try {
-            const rawEvents = await getEventsInRange(viewEmployeeId, startDate, endDate);
-            console.log(rawEvents);
-
-            const events = [];
-            rawEvents.forEach(rawEvent => {
-                const color = (rawEvent.color).slice(1);
-                console.log(color);
-                const event = {
-                    title: rawEvent.name,
-                    start: rawEvent.start,
-                    end: rawEvent.end,
-                    backgroundColor: rawEvent.color,
-                    borderColor: rawEvent.color,
-                }
-                events.push(event);
-            });
-
-            successCallback(events);
+            const rawEvents = await getEventsInRange(
+                viewEmployeeId,
+                startStr.split("T")[0],
+                endStr.split("T")[0],
+            );
+            setAllEvents(rawEvents ?? []);
         } catch (err) {
-            failureCallback(err);
-            console.log(err);
+            console.error(err);
         }
-    }
+    };
 
     const setOwnCalendar = () => {
         const ownId = getOwnEmployeeId();
         setViewEmployeeId(ownId);
+        const employeeHouse = getEmployeeHouseName();
+        setEmployeeHouseName("Maria Goretti");
     }
 
     return {
-        setViewEmployeeId,
         employeeHouseName,
-        scopeFilters,
-        setScopeFilters,
-        typeFilters,
-        setTypeFilters,
+        allEvents,
+        handleDatesSet,
         loadButtonsAtStart,
         toggleList,
         setMonthView,
@@ -223,7 +209,6 @@ export const useBaseCalendar = () => {
         generateTitle,
         getWeekDayName,
         resizeHandler,
-        fetchEventsInRange,
-        setOwnCalendar
+        setOwnCalendar,
     }
 }
