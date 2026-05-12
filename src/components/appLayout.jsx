@@ -1,5 +1,6 @@
+import sideBar from "./organism/SideBar";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import Button from "./atoms/button";
+import button from "./atoms/button";
 import useAuth from "../hooks/useAuth";
 
 const navLinkClass = ({ isActive }) =>
@@ -8,56 +9,13 @@ const navLinkClass = ({ isActive }) =>
   }`;
 
 export default function AppLayout() {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/iniciar-sesion", { replace: true });
-  };
-
   return (
-    <div className="flex min-h-screen text-slate-100">
-      <aside className="w-52 shrink-0 border-r border-slate-800 p-4">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Menú
-        </p>
-
-        <nav className="flex h-full flex-col justify-between gap-1">
-          <div>
-            <NavLink to="/app/dashboard" className={navLinkClass} end>
-              Dashboard
-            </NavLink>
-            <NavLink to="/app/casas" className={navLinkClass}>
-              Casas
-            </NavLink>
-            <NavLink to="/app/personal" className={navLinkClass}>
-              Personal
-            </NavLink>
-            <NavLink to="/app/calendario" className={navLinkClass}>
-              Calendario
-            </NavLink>
-            <NavLink to="/app/perfil" className={navLinkClass}>
-              Perfil
-            </NavLink>
-          </div>
-
-          <div className="mb-6">
-            <Button
-              text="Cerrar sesión"
-              type="button"
-              onClick={handleLogout}
-              bgColor="bg-red-600"
-              textColor="text-white"
-              hoverColor="hover:bg-red-700"
-              activeColor="active:bg-red-800"
-              fullWidth={true}
-            />
-          </div>
-        </nav>
-      </aside>
-
-      <main className="min-w-0 flex-1 p-6">
+    <div className="h-screen overflow-hidden bg-gray-50">
+      <sideBar />
+      <main
+        className="h-screen overflow-y-auto py-4 pr-6 pt-20 md:pt-4"
+        style={{ paddingLeft: "104px" }}
+      >
         <Outlet />
       </main>
     </div>
