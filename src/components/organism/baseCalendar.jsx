@@ -4,7 +4,26 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import DayGridCard from "../molecules/calendarCards/dayGridCard";
+import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
+import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
+
+const renderEventContent = (arg) => {
+    const viewType = arg.view.type;
+
+    if (viewType === "dayGridMonth" || viewType === "listMonth") {
+        return <DayGridCard arg={arg} />;
+    }
+    if (viewType === "timeGridWeek" || viewType === "listWeek") {
+        return <WeekTimeCard arg={arg} />;
+    }
+    if (viewType === "timeGridDay" || viewType === "listDay") {
+        return <DayTimeCard arg={arg} />;
+    }
+
+    return <DayGridCard arg={arg} />;
+};
 
 const BaseCalendar = ({
     loadButtonsAtStart,
@@ -19,7 +38,9 @@ const BaseCalendar = ({
     visibleEvents,
     handleDatesSet,
 }) => {
-    useEffect(() => { 
+    const eventContent = useCallback((arg) => renderEventContent(arg), []);
+
+    useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
     });
@@ -75,6 +96,7 @@ const BaseCalendar = ({
             }}
             events={visibleEvents}
             datesSet={handleDatesSet}
+            eventContent={eventContent}
         />
     );
 };

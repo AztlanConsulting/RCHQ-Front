@@ -13,6 +13,18 @@ export const SCOPE_OPTIONS = [
     { value: "personal", label: "Personal", color: "#EFBF22" },
 ];
 
+const getFocusOption = (event) => {
+    return FOCUS_OPTIONS.find(
+        (f) => f.value === event.focus
+    );
+}
+
+const getScopeOption = (event) => {
+    return SCOPE_OPTIONS.find(
+        (s) => s.value === event.scope
+    );
+}
+
 const getFilteredEvents = (
     allEvents = [],
     focusFilters,
@@ -28,13 +40,14 @@ const getFilteredEvents = (
             title: rawEvent.name,
             start: rawEvent.start,
             end: rawEvent.end,
-            // date: rawEvent.date,
-            // subtitle: rawEvent.subtitle,
-            // description: rawEvent.description,
-            backgroundColor: rawEvent.color,
+            date: rawEvent.date,
+            subtitle: rawEvent.subtitle,
+            description: rawEvent.description,
+            icon: getFocusOption(rawEvent)?.icon || "",
+            backgroundColor: getScopeOption(rawEvent)?.color || rawEvent.color,
             borderColor: rawEvent.color,
             allDay: rawEvent.lastsAllDay,
-            // lastsAllDay: rawEvent.lastsAllDay,
+            lastsAllDay: rawEvent.lastsAllDay,
         }));
 }
 
