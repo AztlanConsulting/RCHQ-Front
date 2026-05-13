@@ -13,8 +13,6 @@ const capitalizeFirst = (value) => {
 
 const EventDetail = ({ event }) => {
   if (!event) return null;
-  console.log("event: ", event);
-  console.log("start: ", event.start)
 
   return (
     <div className="text-left">
