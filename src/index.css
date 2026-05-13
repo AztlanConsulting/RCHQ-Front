@@ -34,6 +34,14 @@ body {
     width: 100%;
 }
 
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -123,7 +131,6 @@ svg {
     pointer-events: none;
     z-index: 10;
 
-    /* crea el "borde" que tapa */
     border: 1px solid var(--fc-border-color);
     border-radius: 8px 8px 0 0;
 }
@@ -142,6 +149,74 @@ svg {
 
 .fc .fc-col-header-cell {
     vertical-align: middle;
+}
+
+.fc-dayGridCard {
+    width: 100%;
+    min-width: 0;
+    cursor: pointer;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+
+.fc-dayGridCard span {
+    color: #fff;
+}
+
+.fc .fc-daygrid-more-link .fc-dayGridOverflowCard {
+    display: block;
+    box-sizing: border-box;
+    width: 50%;
+    margin-left: auto;
+    background-color: #162d4a;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    color: #fff;
+    text-align: center;
+    transition: background-color 0.15s ease;
+}
+
+.fc .fc-daygrid-more-link:hover .fc-dayGridOverflowCard,
+.fc .fc-daygrid-more-link:focus-visible .fc-dayGridOverflowCard {
+    background-color: #1a3a5c;
+}
+
+.fc .fc-daygrid-more-link {
+    width: 100%;
+    margin: 1px 0 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    background: transparent !important;
+    border: none;
+    box-shadow: none;
+}
+
+.fc .fc-daygrid-more-link:hover,
+.fc .fc-daygrid-more-link:focus-visible {
+    background: transparent !important;
+    color: inherit;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-day-number {
+    padding: 1px 3px 0;
+    font-size: 0.8em;
+    line-height: 1.15;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-month-start {
+    font-size: 1em;
+}
+
+.fc-dayGridMonth-view .fc-daygrid-day-events {
+    margin-top: 0;
 }
 
 /* Thin (100) */

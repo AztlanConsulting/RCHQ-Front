@@ -5,7 +5,7 @@ const PublicRoute = () => {
   const { isAuthenticated } = useAuth();
 
   return isAuthenticated ? (
-    <Navigate to="/app/dashboard" replace />
+    <Navigate to="/app/calendario" replace />
   ) : (
     <Outlet />
   );

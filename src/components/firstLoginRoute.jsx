@@ -12,7 +12,7 @@ const FirstLoginRoute = () => {
   const sessionToken = getToken();
 
   if (sessionToken) {
-    return <Navigate to="/app/dashboard" replace />;
+    return <Navigate to="/app/calendario" replace />;
   }
 
   return firstLoginToken ? (

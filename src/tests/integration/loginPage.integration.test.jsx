@@ -67,7 +67,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
         token: "real-token-123",
         user: { id: 1, name: "Test" },
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+      expect(mockNavigate).toHaveBeenCalledWith("/app/calendario", {
         replace: true,
       });
     });
