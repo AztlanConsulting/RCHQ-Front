@@ -205,7 +205,6 @@ svg {
     color: inherit;
 }
 
-/* Month grid: tighter day number so more event rows fit */
 .fc-dayGridMonth-view .fc-daygrid-day-number {
     padding: 1px 3px 0;
     font-size: 0.8em;
