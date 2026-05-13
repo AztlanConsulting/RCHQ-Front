@@ -3,7 +3,7 @@ import Type from "../../atoms/type";
 import {
   formatEventCalendarDate,
   formatEventDateTime,
-} from "../../../utils/calendarEventDetail";
+} from "../../../utils/dates";
 
 const capitalizeFirst = (value) => {
   if (value == null || value === "") return "";
@@ -13,6 +13,8 @@ const capitalizeFirst = (value) => {
 
 const EventDetail = ({ event }) => {
   if (!event) return null;
+  console.log("event: ", event);
+  console.log("start: ", event.start)
 
   return (
     <div className="text-left">
