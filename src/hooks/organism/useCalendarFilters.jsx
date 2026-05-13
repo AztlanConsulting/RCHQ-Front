@@ -87,6 +87,11 @@ export const useCalendarFilters = (
         [allEvents, focusFilters, scopeFilters, eventTypeFilters],
     );
 
+    useEffect(() => {
+        console.log("All events from back: ", allEvents);
+        console.log("visible/filtered events: ", visibleEvents);
+    }, [allEvents, visibleEvents]);
+
     // const visibleVacations = useMemo(() => {
 
     // }, [allVacations, focusFilters, scopeFilters, vacationFilters])
