@@ -73,7 +73,7 @@ const CalendarFilters = ({
         <div className="border border-b"></div>
         {showEventFilters && (
           <FilterGroup
-            label="TIPO DE EVENTO"
+            label="CATEGORIA"
             name="tipo-evento"
             options={eventTypeOptions}
             values={eventTypeFilters}
