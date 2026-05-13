@@ -53,7 +53,7 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
-      <div className="flex flex-col gap-4 mt-4 max-h-[75vh] overflow-y-auto scrollbar-hide">
+      <div className="flex flex-col gap-4 mt-4 max-h-[75vh]">
         <FilterGroup
           label="ENFOQUE"
           name="focus"
@@ -62,42 +62,53 @@ const CalendarFilters = ({
           setValues={setFocusFilters}
           renderTrailing={focusTrailing}
         />
-        <FilterGroup
-          label="ALCANCE"
-          name="scope"
-          options={scopeOptions}
-          values={scopeFilters}
-          setValues={setScopeFilters}
-          renderTrailing={scopeTrailing}
-        />
-        <div className="border border-b"></div>
+        <div className="border border-b  border-[#1F3664]"></div>
+        <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
         {showEventFilters && (
-          <FilterGroup
-            label="TIPO DE EVENTO"
-            name="tipo-evento"
-            options={eventTypeOptions}
-            values={eventTypeFilters}
-            setValues={setEventTypeFilters}
-          />
+          <>
+            <FilterGroup
+              label="VISIBILIDAD"
+              name="scope"
+              options={scopeOptions}
+              values={scopeFilters}
+              setValues={setScopeFilters}
+              renderTrailing={scopeTrailing}
+            />
+              <FilterGroup
+                label="CATEGORIA"
+                name="tipo-evento"
+                options={eventTypeOptions}
+                values={eventTypeFilters}
+                setValues={setEventTypeFilters}
+              />
+              <div className="border border-b border-[#EAEAEA]"></div>
+          </>
         )}
         {showVacationFilters && (
-          <FilterGroup
-            label="VACACIONES"
-            name="vacaciones"
-            options={STATUS_OPTIONS}
-            values={vacacionesVals}
-            setValues={setVacacionesVals}
-          />
+          <>
+            <FilterGroup
+              label="VACACIONES"
+              name="vacaciones"
+              options={STATUS_OPTIONS}
+              values={vacacionesVals}
+              setValues={setVacacionesVals}
+            />
+            <div className="border border-b border-[#EAEAEA]"></div>
+          </>
+          
         )}
         {showAbscenceFilters && (
-          <FilterGroup
-            label="AUSENCIAS"
-            name="ausencias"
-            options={STATUS_OPTIONS}
-            values={ausenciasVals}
-            setValues={setAusenciasVals}
-          />
+          <>
+            <FilterGroup
+              label="AUSENCIAS"
+              name="ausencias"
+              options={STATUS_OPTIONS}
+              values={ausenciasVals}
+              setValues={setAusenciasVals}
+            />
+          </>
         )}
+        </div>
       </div>
     </div>
   );

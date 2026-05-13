@@ -38,22 +38,7 @@ const getFilteredEvents = (
         }));
 }
 
-// const getFilteredVacations = (allVacations = []) => {
-//     console.log("all vacations: ", all)
-//     return allVacations
-//         .filter((e) => scopeFilters.includes(e.scope))
-// }
-
-// const filterAbscences = (abscences = []) => {
-
-// }
-
-// export const useCalendarFilters = (allEvents = []) => {
-export const useCalendarFilters = (
-    allEvents = [],
-    // allVacations = [],
-    // allAbscences = [],
-) => {
+export const useCalendarFilters = (allEvents = []) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
     );
@@ -87,21 +72,11 @@ export const useCalendarFilters = (
         [allEvents, focusFilters, scopeFilters, eventTypeFilters],
     );
 
-    useEffect(() => {
-        console.log("All events from back: ", allEvents);
-        console.log("visible/filtered events: ", visibleEvents);
-    }, [allEvents, visibleEvents]);
-
-    // const visibleVacations = useMemo(() => {
-
-    // }, [allVacations, focusFilters, scopeFilters, vacationFilters])
-
     return {
         focusFilters, setFocusFilters, focusOptions: FOCUS_OPTIONS,
         scopeFilters,   setScopeFilters,   scopeOptions: SCOPE_OPTIONS,
         eventTypeFilters, setEventTypeFilters, eventTypeOptions,
         showEventFilters, showVacationFilters, showAbscenceFilters,
         visibleEvents, 
-        // visibleVacations, visibleAbscences,
     };
 };
