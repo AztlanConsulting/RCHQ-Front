@@ -1,13 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { getEmployeeHouseName, getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    getCalendarViewerRole,
+    getEmployeeHouseName,
+    getEventsInRange,
+    getHouseAbsencesInRange,
+    getOwnEmployeeId,
+} from "../../services/calendarService";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
     const [viewType, setViewType] = useState("Month");
     const [viewEmployeeId, setViewEmployeeId] = useState("");
+    const [viewerRole, setViewerRole] = useState("");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const lastFetchedRange = useRef(null);
+
+    const canViewHouseAbsences = (role) =>
+        role === "Admin" || role === "Coordinador";
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -96,7 +106,7 @@ export const useBaseCalendar = () => {
 
     const getMonth = (monthNumber, isComplete) => {
         const shortenedMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
-        const fullMonths = ["Enero", "Fererob", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const fullMonths = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const monthText = isComplete ? fullMonths[monthNumber] : shortenedMonths[monthNumber];
 
         return monthText;
@@ -168,6 +178,23 @@ export const useBaseCalendar = () => {
         calendarApi.render();
     }
 
+    const loadCalendarEvents = useCallback(async (startDate, endDate, employeeId, role) => {
+        const personalEventsPromise = employeeId
+            ? getEventsInRange(employeeId, startDate, endDate)
+            : Promise.resolve([]);
+
+        const houseAbsencesPromise = canViewHouseAbsences(role)
+            ? getHouseAbsencesInRange(startDate, endDate)
+            : Promise.resolve([]);
+
+        const [personalEvents, houseAbsences] = await Promise.all([
+            personalEventsPromise,
+            houseAbsencesPromise,
+        ]);
+
+        return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
+    }, []);
+
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         if (
@@ -176,13 +203,14 @@ export const useBaseCalendar = () => {
         ) return;
         lastFetchedRange.current = { start: startStr, end: endStr };
 
-        if (viewEmployeeId == "") return;
+        if (viewEmployeeId == "" && !canViewHouseAbsences(viewerRole)) return;
 
         try {
-            const rawEvents = await getEventsInRange(
-                viewEmployeeId,
+            const rawEvents = await loadCalendarEvents(
                 startStr.split("T")[0],
                 endStr.split("T")[0],
+                viewEmployeeId,
+                viewerRole,
             );
             setAllEvents(rawEvents ?? []);
         } catch (err) {
@@ -193,24 +221,34 @@ export const useBaseCalendar = () => {
     // datesSet fires before setOwnCalendar sets the employee ID, so the first
     // call is skipped. Once the ID is available, re-fetch the stored range.
     useEffect(() => {
-        if (!viewEmployeeId || !lastFetchedRange.current) return;
+        if (!lastFetchedRange.current) return;
+        if (!viewEmployeeId && !canViewHouseAbsences(viewerRole)) return;
         const { start, end } = lastFetchedRange.current;
-        getEventsInRange(viewEmployeeId, start.split("T")[0], end.split("T")[0])
+        loadCalendarEvents(
+            start.split("T")[0],
+            end.split("T")[0],
+            viewEmployeeId,
+            viewerRole,
+        )
             .then((raw) => setAllEvents(raw ?? []))
             .catch(console.error);
-    }, [viewEmployeeId]);
+    }, [loadCalendarEvents, viewEmployeeId, viewerRole]);
 
-    const setOwnCalendar = async () => {
+    const setOwnCalendar = useCallback(async () => {
         const ownId = getOwnEmployeeId();
+        const role = getCalendarViewerRole();
         setViewEmployeeId(ownId);
+        setViewerRole(role);
         const employeeHouseName = await getEmployeeHouseName();
-        console.log("result of getEmployeeHouseName call: ", employeeHouseName);
         setEmployeeHouseName(employeeHouseName);
-    }
+    }, []);
 
     return {
         employeeHouseName,
         allEvents,
+        isList,
+        viewType,
+        viewerRole,
         handleDatesSet,
         loadButtonsAtStart,
         toggleList,

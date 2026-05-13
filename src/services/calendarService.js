@@ -1,7 +1,25 @@
 import { getToken, getStoredUser } from "../utils/authStorage";
-import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const parseJwtPayload = (token) => {
+    if (!token) return null;
+
+    try {
+        const [, payload] = token.split(".");
+        if (!payload) return null;
+
+        const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const padded = normalized.padEnd(
+            normalized.length + ((4 - (normalized.length % 4)) % 4),
+            "=",
+        );
+        const decoded = atob(padded);
+        return JSON.parse(decoded);
+    } catch {
+        return null;
+    }
+};
 
 export const getEventsTypes = async () => {
     const token = getToken();
@@ -10,7 +28,7 @@ export const getEventsTypes = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
+    const rawResponse = await fetch(
         `${API_URL}/event/getAllTypes`,
         {
             method: "GET",
@@ -21,11 +39,67 @@ export const getEventsTypes = async () => {
         },
     );
 
+    if (!rawResponse.ok) {
+        throw new Error("No se pudieron obtener los tipos de evento");
+    }
+
     const response = await rawResponse.json();
     const eventTypes = response?.data?.eventTypes;
 
     return eventTypes;
 }
+
+export const getAbsenceTypes = async () => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await fetch(
+        `${API_URL}/absence/types`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    if (!rawResponse.ok) {
+        throw new Error("No se pudieron obtener los tipos de ausencia");
+    }
+
+    const response = await rawResponse.json();
+    return response?.data?.absenceTypes ?? [];
+};
+
+export const getHouseEmployees = async () => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await fetch(
+        `${API_URL}/house/employees`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    if (!rawResponse.ok) {
+        throw new Error("No se pudieron obtener los empleados de la casa");
+    }
+
+    const response = await rawResponse.json();
+    return response?.data?.employees ?? [];
+};
 
 const getEventsInRange = async (employeeId, startDate, endDate) => {
 
@@ -50,7 +124,9 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
         },
     );
 
-    if (rawResponse === undefined) return [];
+    if (!rawResponse.ok) {
+        throw new Error("No se pudieron obtener los eventos del calendario");
+    }
 
     const response = await rawResponse.json();
     const rawEvents = response.data.events;
@@ -58,10 +134,44 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
     return rawEvents;
 };
 
+export const getHouseAbsencesInRange = async (startDate, endDate) => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await fetch(
+        `${API_URL}/event/house/range/${startDate}/${endDate}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    if (!rawResponse.ok) {
+        throw new Error("No se pudieron obtener las ausencias de la casa");
+    }
+
+    const response = await rawResponse.json();
+    return response?.data?.events ?? [];
+};
+
 const getOwnEmployeeId = () => {
     const userData = getStoredUser();
-    const employeeId = userData.employeeId;
+    const tokenPayload = parseJwtPayload(getToken());
+    const employeeId = userData?.employeeId ?? tokenPayload?.id ?? "";
     return employeeId;
+};
+
+export const getCalendarViewerRole = () => {
+    const userData = getStoredUser();
+    const tokenPayload = parseJwtPayload(getToken());
+
+    return userData?.role ?? userData?.roleName ?? tokenPayload?.role ?? "";
 };
 
 export const getEmployeeHouseName = async () => {
@@ -71,7 +181,7 @@ export const getEmployeeHouseName = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
+    const rawResponse = await fetch(
         `${API_URL}/house/getHouseName`,
         {
             method: "GET",
@@ -81,6 +191,10 @@ export const getEmployeeHouseName = async () => {
             },
         },
     );
+
+    if (!rawResponse.ok) {
+        throw new Error("No se pudo obtener el nombre de la casa");
+    }
 
     const response = await rawResponse.json();
     const houseName = response?.data?.houseName;

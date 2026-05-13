@@ -5,7 +5,10 @@ export const eventApiToDetail = (ev) => {
   const end = ev.end;
   return {
     id: ev.id,
+    absenceId: x.absenceId,
+    employeeId: x.employeeId,
     title: ev.title,
+    employeeName: x.employeeName,
     start,
     end,
     startStr: start != null ? start.toISOString?.() ?? String(start) : "",
@@ -23,6 +26,12 @@ export const eventApiToDetail = (ev) => {
     date: x.date,
     icon: x.icon,
     status: x.status,
+    curp: x.curp,
+    usedDays: x.usedDays,
+    link: x.link,
+    startDate: x.startDate,
+    endDate: x.endDate,
+    isDeleted: x.isDeleted,
   };
 };
 
@@ -33,5 +42,14 @@ export const formatEventDateTime = (value) => {
   return d.toLocaleString("es-MX", {
     dateStyle: "medium",
     timeStyle: "short",
+  });
+};
+
+export const formatEventDate = (value) => {
+  if (value == null || value === "") return "—";
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleDateString("es-MX", {
+    dateStyle: "long",
   });
 };

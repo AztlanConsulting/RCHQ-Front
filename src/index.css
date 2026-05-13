@@ -119,6 +119,40 @@ svg {
     border: none;
 }
 
+.fc .fc-list-day-cushion {
+    background: #c9c9c9;
+    padding: 12px 20px;
+}
+
+.fc .fc-list-day-text,
+.fc .fc-list-day-side-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #121212;
+}
+
+.fc .fc-list-event:hover td {
+    background: #f8fafc;
+}
+
+.fc .fc-list-event-time {
+    width: 150px;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #121212;
+}
+
+.fc .fc-list-event-graphic {
+    display: none;
+}
+
+.fc .fc-list-event td {
+    padding: 10px 12px;
+    border-color: #d1d5db;
+    vertical-align: middle;
+}
+
 .fc .fc-view {
     border-radius: 8px 8px 0 0;
     overflow: hidden;

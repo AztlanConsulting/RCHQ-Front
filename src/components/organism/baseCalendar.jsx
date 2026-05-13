@@ -9,20 +9,28 @@ import DayGridCard from "../molecules/calendarCards/dayGridCard";
 import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard";
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
+import ListEventCard from "../molecules/calendarCards/listEventCard";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
 
-    if (viewType === "dayGridMonth" || viewType === "listMonth") {
+    if (viewType === "dayGridMonth") {
         return <DayGridCard arg={arg} />;
     }
-    if (viewType === "timeGridWeek" || viewType === "listWeek") {
+    if (viewType === "timeGridWeek") {
         return <WeekTimeCard arg={arg} />;
     }
-    if (viewType === "timeGridDay" || viewType === "listDay") {
+    if (viewType === "timeGridDay") {
         return <DayTimeCard arg={arg} />;
+    }
+    if (
+        viewType === "listMonth" ||
+        viewType === "listWeek" ||
+        viewType === "listDay"
+    ) {
+        return <ListEventCard arg={arg} />;
     }
 
     return <DayGridCard arg={arg} />;
