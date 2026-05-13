@@ -81,25 +81,32 @@ const CalendarFilters = ({
                 values={eventTypeFilters}
                 setValues={setEventTypeFilters}
               />
+              <div className="border border-b border-[#EAEAEA]"></div>
           </>
         )}
         {showVacationFilters && (
-          <FilterGroup
-            label="VACACIONES"
-            name="vacaciones"
-            options={STATUS_OPTIONS}
-            values={vacacionesVals}
-            setValues={setVacacionesVals}
-          />
+          <>
+            <FilterGroup
+              label="VACACIONES"
+              name="vacaciones"
+              options={STATUS_OPTIONS}
+              values={vacacionesVals}
+              setValues={setVacacionesVals}
+            />
+            <div className="border border-b border-[#EAEAEA]"></div>
+          </>
+          
         )}
         {showAbscenceFilters && (
-          <FilterGroup
-            label="AUSENCIAS"
-            name="ausencias"
-            options={STATUS_OPTIONS}
-            values={ausenciasVals}
-            setValues={setAusenciasVals}
-          />
+          <>
+            <FilterGroup
+              label="AUSENCIAS"
+              name="ausencias"
+              options={STATUS_OPTIONS}
+              values={ausenciasVals}
+              setValues={setAusenciasVals}
+            />
+          </>
         )}
         </div>
       </div>
