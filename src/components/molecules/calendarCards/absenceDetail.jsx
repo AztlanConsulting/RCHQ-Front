@@ -3,7 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import { formatEventDate } from "../../../utils/dates";
 import documentIcon from "/document.svg";
 
 const PlusIcon = () => (

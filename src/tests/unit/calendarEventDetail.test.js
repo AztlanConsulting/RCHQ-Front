@@ -3,7 +3,7 @@ import {
   addDaysToDateOnly,
   formatEventDate,
   normalizeDateOnly,
-} from "../../utils/calendarEventDetail";
+} from "../../utils/dates";
 
 describe("calendarEventDetail", () => {
   it("normaliza strings ISO a fechas YYYY-MM-DD sin desfase por zona horaria", () => {
