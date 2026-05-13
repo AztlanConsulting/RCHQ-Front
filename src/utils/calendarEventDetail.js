@@ -1,3 +1,8 @@
+import {
+  formatMexicoLongWeekdayCalendarDate,
+  formatMexicoDayMonthCommaTime12h,
+} from "./detalle-empleado.utils";
+
 export const eventApiToDetail = (ev) => {
   if (!ev) return null;
   const x = ev.extendedProps ?? {};
@@ -26,12 +31,10 @@ export const eventApiToDetail = (ev) => {
   };
 };
 
-export const formatEventDateTime = (value) => {
-  if (value == null || value === "") return "—";
-  const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return String(value);
-  return d.toLocaleString("es-MX", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-};
+/** Fecha (solo día de calendario): "Martes 5 de Mayo 2026" en zona México. */
+export const formatEventCalendarDate = (value) =>
+  formatMexicoLongWeekdayCalendarDate(value);
+
+/** Inicio / fin: "1 de Mayo, 3:00pm" en zona México. */
+export const formatEventDateTime = (value) =>
+  formatMexicoDayMonthCommaTime12h(value);
