@@ -6,6 +6,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import { useEffect } from "react";
 
+import { normalToUTCWithOffset } from "../../utils/dates";
+
 const BaseCalendar = ({
     loadButtonsAtStart,
     calendarRef,
@@ -18,10 +20,36 @@ const BaseCalendar = ({
     resizeHandler,
     fetchEventsInRange,
 }) => {
-    useEffect(() => { 
+    useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
     });
+
+    const dateClicked = (info) => {
+        const realStartDate = normalToUTCWithOffset(info.date);
+
+        const realEndDate = normalToUTCWithOffset(info.date, { days: 1, minutes: -1 });
+
+        alert(
+            "Start on " +
+                realStartDate.toISOString() +
+                "and ends on " +
+                realEndDate.toISOString(),
+        );
+    };
+
+    const finalDrag = (info) => {
+        const realStartDate = normalToUTCWithOffset(info.start);
+
+        const realEndDate = normalToUTCWithOffset(info.end, { minutes: -1 });
+
+        alert(
+            "Start on " +
+                realStartDate.toISOString() +
+                "and ends on " +
+                realEndDate.toISOString(),
+        );
+    };
 
     return (
         <FullCalendar
@@ -75,6 +103,9 @@ const BaseCalendar = ({
             events={(info, successCallback, failureCallback) =>
                 fetchEventsInRange(info, successCallback, failureCallback)
             }
+            dateClick={(info) => dateClicked(info)}
+            selectable={true}
+            select={(info) => finalDrag(info)}
         />
     );
 };

@@ -1,0 +1,17 @@
+export const normalToUTCWithOffset = (
+    date,
+    { days = 0, months = 0, years = 0, hours = 0, minutes = 0 } = {},
+) => {
+    const newDate = new Date(
+        Date.UTC(
+            date.getFullYear() + years,
+            date.getMonth() + months,
+            date.getDate() + days,
+            date.getHours() + hours,
+            date.getMinutes() + minutes,
+            0,
+        ),
+    );
+
+    return newDate;
+};
