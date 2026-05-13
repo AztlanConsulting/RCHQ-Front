@@ -72,21 +72,22 @@ const Calendario = () => {
         showAbscenceFilters={showAbscenceFilters}
       />
 
-      <BaseCalendar
-        classname="flex-1"
-        loadButtonsAtStart={loadButtonsAtStart}
-        calendarRef={calendarRef}
-        toggleList={toggleList}
-        setMonthView={setMonthView}
-        setWeekView={setWeekView}
-        setDayView={setDayView}
-        generateTitle={generateTitle}
-        getWeekDayName={getWeekDayName}
-        resizeHandler={resizeHandler}
-        visibleEvents={visibleEvents}
-        handleDatesSet={handleDatesSet}
-        onEventClick={handleEventClick}
-      />
+      <div className="flex-1">
+        <BaseCalendar
+            loadButtonsAtStart={loadButtonsAtStart}
+            calendarRef={calendarRef}
+            toggleList={toggleList}
+            setMonthView={setMonthView}
+            setWeekView={setWeekView}
+            setDayView={setDayView}
+            generateTitle={generateTitle}
+            getWeekDayName={getWeekDayName}
+            resizeHandler={resizeHandler}
+            visibleEvents={visibleEvents}
+            handleDatesSet={handleDatesSet}
+            onEventClick={handleEventClick}
+        />
+      </div>
 
       <Modal
         open={selectedEvent != null}
