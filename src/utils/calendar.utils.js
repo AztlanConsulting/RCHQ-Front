@@ -6,7 +6,7 @@ export const FOCUS_OPTIONS = [
 
 export const SCOPE_OPTIONS = [
     { value: "global",   label: "Global",   color: "#C524FF" },
-    { value: "house",    label: "Casa",     color: "#7FD447" },
+    { value: "house",    label: "De Casa",  color: "#7FD447" },
     { value: "personal", label: "Personal", color: "#EFBF22" },
 ];
 
