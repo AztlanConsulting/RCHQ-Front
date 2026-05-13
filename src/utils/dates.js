@@ -24,6 +24,20 @@ export const CALENDAR_DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
 
 const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
 
+// Convierte timestamp en hora de inicio
+// input: Date o ISO
+// output: "03:00" (tras compensación FullCalendar)
+export const getStartHour = (timestamp) => {
+  if (timestamp == null) return "";
+  const base =
+    timestamp instanceof Date ? new Date(timestamp.getTime()) : new Date(timestamp);
+  if (Number.isNaN(base.getTime())) return "";
+  const shifted = new Date(base.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
+  const h = shifted.getHours();
+  const m = shifted.getMinutes();
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
 // ─── internal helpers ─────────────────────────────────────────────────────────
 
 function capitalizeEs(word) {
