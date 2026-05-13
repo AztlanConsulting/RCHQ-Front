@@ -1,6 +1,3 @@
-/**
- * Single-day time grid / list-day event — replace when you define the real card.
- */
 const DayTimeCard = ({ arg }) => (
   <div className="fc-custom-day-card px-1.5 py-1 text-sm min-w-0">
     <div className="font-semibold truncate">{arg.event.title}</div>

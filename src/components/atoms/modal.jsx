@@ -12,7 +12,6 @@ const Modal = ({
     onClose,
     children,
     title,
-    /** When true: dim backdrop, click backdrop closes, body scroll locked. When false: transparent, page stays clickable (only the panel receives clicks). */
     grayBackground = true,
     placement = "center",
     className = "",
@@ -54,7 +53,6 @@ const Modal = ({
                 />
             ) : null}
 
-            {/* Modal Panel — always receives pointer events so it stays usable when the shell is pointer-events-none */}
             <div
                 role="dialog"
                 aria-modal={grayBackground}
@@ -70,7 +68,6 @@ const Modal = ({
                     ${className}
                 `}
             >
-                {/* Header */}
                 {(title || onClose) && (
                     <div className="mb-4 flex items-center justify-between">
                         {title && (
@@ -90,7 +87,6 @@ const Modal = ({
                     </div>
                 )}
 
-                {/* Content */}
                 <div>{children}</div>
             </div>
         </div>,

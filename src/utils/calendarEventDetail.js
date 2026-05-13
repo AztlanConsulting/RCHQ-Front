@@ -1,6 +1,3 @@
-/**
- * Build a plain object for EventDetail from FullCalendar's EventApi (after click).
- */
 export const eventApiToDetail = (ev) => {
   if (!ev) return null;
   const x = ev.extendedProps ?? {};

@@ -12,7 +12,6 @@ const FilterGroup = ({
   labelColor = "text-[#121212]",
   className = "w-full",
   defaultOpen = true,
-  /** Optional: render a node to the right of each option row (icon, dot, etc.). Receives that row’s `opt` from `options`. */
   renderTrailing,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);

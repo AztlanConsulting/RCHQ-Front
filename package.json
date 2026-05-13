@@ -25,7 +25,6 @@
     "@fullcalendar/list": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
-    "@tailwindcss/vite": "^4.2.2",
     "flowbite": "^4.0.1",
     "flowbite-react": "^0.12.17",
     "react": "^19.2.4",

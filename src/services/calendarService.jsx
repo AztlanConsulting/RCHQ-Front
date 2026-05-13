@@ -3,7 +3,7 @@ import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const getEventsTypes = async () => {
+export const getEventsTypes = async () => {
     const token = getToken();
 
     if (!token) {
@@ -22,7 +22,6 @@ const getEventsTypes = async () => {
     );
 
     const response = await rawResponse.json();
-    console.log("response: ", response);
     const eventTypes = response?.data?.eventTypes;
 
     return eventTypes;
@@ -55,7 +54,6 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
 
     const response = await rawResponse.json();
     const rawEvents = response.data.events;
-    console.log("raw events: ", rawEvents);
 
     return rawEvents;
 };
@@ -66,10 +64,10 @@ const getOwnEmployeeId = () => {
     return employeeId;
 };
 
-const getEmployeeHouseName = () => {
+export const getEmployeeHouseName = () => {
     const userData = getStoredUser();
     const employeeId = userData.employeeId;
     return ""
 }
 
-export { getEventsTypes, getEventsInRange, getOwnEmployeeId, getEmployeeHouseName };
+export { getEventsInRange, getOwnEmployeeId };

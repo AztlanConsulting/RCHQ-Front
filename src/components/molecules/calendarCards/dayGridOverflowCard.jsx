@@ -1,7 +1,3 @@
-/**
- * Summary row when a day has more events than dayMaxEvents (month grid).
- * RenderFullCalendar passes the link wrapper; this is only the inner label.
- */
 const DayGridOverflowCard = ({ count }) => {
   if (count == null || count < 1) return null;
 

@@ -1,7 +1,3 @@
-/**
- * Month grid (and list-month) event chip — replace markup when you define the real card.
- */
-/** +6h: DB wall time vs UTC instant mismatch — replace with proper timezone when backend is aligned. */
 const DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
 
 const getStartHour = (timestamp) => {

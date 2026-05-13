@@ -34,7 +34,6 @@ body {
     width: 100%;
 }
 
-/* Scrollable region without visible scrollbar (sidebar, etc.) */
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -132,7 +131,6 @@ svg {
     pointer-events: none;
     z-index: 10;
 
-    /* crea el "borde" que tapa */
     border: 1px solid var(--fc-border-color);
     border-radius: 8px 8px 0 0;
 }
@@ -164,14 +162,12 @@ svg {
     justify-content: space-between;
     align-items: center;
     color: #fff;
-    /* border: 1px solid #000; */
 }
 
 .fc-dayGridCard span {
     color: #fff;
 }
 
-/* bg-color-blue w-[50%] ml-auto font-semibold tabular-nums */
 .fc .fc-daygrid-more-link .fc-dayGridOverflowCard {
     display: block;
     box-sizing: border-box;
