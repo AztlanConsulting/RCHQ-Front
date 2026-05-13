@@ -95,7 +95,7 @@ const Calendario = () => {
         title="Detalle del evento"
         grayBackground={false}
         placement="right"
-        className="max-w-[25vw] max-h-[80vh]"
+        className="max-w-[30vw] min-w-[20vw] max-h-[80vh]"
       >
         <EventDetail event={selectedEvent} />
       </Modal>
