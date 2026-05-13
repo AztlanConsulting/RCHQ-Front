@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import Type from "./type";
 
 const placements = {
     "center": "fixed inset-0 z-50 flex items-center justify-center",
@@ -60,8 +61,8 @@ const Modal = ({
                     pointer-events-auto
                     relative z-10
                     w-full max-w-2xl
-                    rounded-xl bg-white shadow-xl
-                    p-6
+                    rounded-lg bg-white shadow-xl
+                    pt-4 pl-6 pr-6 pb-6
                     max-h-[90vh]
                     overflow-y-auto
                     mx-4
@@ -69,11 +70,13 @@ const Modal = ({
                 `}
             >
                 {(title || onClose) && (
-                    <div className="mb-4 flex items-center justify-between">
-                        {title && (
-                            <h2 className="text-xl font-semibold">
+                    <div className="mb-2 flex items-center justify-between">
+                        {title ? (
+                            <Type variant="subtitle" as="h2">
                                 {title}
-                            </h2>
+                            </Type>
+                        ) : (
+                            <p></p>
                         )}
 
                         <button
