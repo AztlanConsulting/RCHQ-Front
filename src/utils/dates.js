@@ -7,6 +7,20 @@ const MEXICO_TZ = "America/Mexico_City";
 // behind. Add this offset to recover the original displayed time.
 export const CALENDAR_DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
 
+// Convierte timestamp en hora de inicio
+// input: 
+// output: 03:00
+export const getStartHour = (timestamp) => {
+  if (timestamp == null) return "";
+  const base =
+    timestamp instanceof Date ? new Date(timestamp.getTime()) : new Date(timestamp);
+  if (Number.isNaN(base.getTime())) return "";
+  const shifted = new Date(base.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
+  const h = shifted.getHours();
+  const m = shifted.getMinutes();
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
 // ─── internal helpers ─────────────────────────────────────────────────────────
 
 function capitalizeEs(word) {
