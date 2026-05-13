@@ -200,11 +200,12 @@ export const useBaseCalendar = () => {
             .catch(console.error);
     }, [viewEmployeeId]);
 
-    const setOwnCalendar = () => {
+    const setOwnCalendar = async () => {
         const ownId = getOwnEmployeeId();
         setViewEmployeeId(ownId);
-        const employeeHouse = getEmployeeHouseName();
-        setEmployeeHouseName("Maria Goretti");
+        const employeeHouseName = await getEmployeeHouseName();
+        console.log("result of getEmployeeHouseName call: ", employeeHouseName);
+        setEmployeeHouseName(employeeHouseName);
     }
 
     return {

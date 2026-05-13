@@ -64,10 +64,28 @@ const getOwnEmployeeId = () => {
     return employeeId;
 };
 
-export const getEmployeeHouseName = () => {
-    const userData = getStoredUser();
-    const employeeId = userData.employeeId;
-    return ""
+export const getEmployeeHouseName = async () => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(
+        `${API_URL}/house/getHouseName`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    const response = await rawResponse.json();
+    const houseName = response?.data?.houseName;
+
+    return houseName;
 }
 
 export { getEventsInRange, getOwnEmployeeId };
