@@ -28,8 +28,6 @@ const renderEventContent = (arg) => {
     return <DayGridCard arg={arg} />;
 };
 
-import { normalToUTCWithOffset } from "../../utils/dates";
-
 const BaseCalendar = ({
     loadButtonsAtStart,
     calendarRef,
@@ -43,6 +41,7 @@ const BaseCalendar = ({
     visibleEvents,
     handleDatesSet,
     onEventClick,
+    onDateDrag,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -56,18 +55,6 @@ const BaseCalendar = ({
         resizeHandler(calendarRef);
     });
 
-    const finalDrag = (info) => {
-        const realStartDate = normalToUTCWithOffset(info.start);
-
-        const realEndDate = normalToUTCWithOffset(info.end, { minutes: -1 });
-
-        alert(
-            "Start on " +
-                realStartDate.toISOString() +
-                "and ends on " +
-                realEndDate.toISOString(),
-        );
-    };
 
     return (
         <FullCalendar
@@ -125,7 +112,7 @@ const BaseCalendar = ({
             moreLinkContent={moreLinkContent}
             eventClick={(info) => onEventClick?.(info)}
             selectable={true}
-            select={(info) => finalDrag(info)}
+            select={(info) => onDateDrag?.(info)}
         />
     );
 };

@@ -7,9 +7,12 @@ import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { eventApiToDetail } from "../utils/calendarEventDetail";
 
+import { normalToUTCWithOffset } from "../utils/dates";
+
 const Calendario = () => {
   const calendarRef = React.useRef(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedDates, setSelectedDates] = useState(null);
 
   const {
     employeeHouseName,
@@ -43,10 +46,20 @@ const Calendario = () => {
   } = useCalendarFilters(allEvents);
 
   const closeDetail = useCallback(() => setSelectedEvent(null), []);
+  const closeCreationModal = useCallback(() => setSelectedDates(null), []);
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
     setSelectedEvent(detail);
+  }, []);
+
+  const handleDateDrags = useCallback((info) => {
+    const startDate = normalToUTCWithOffset(info.start);
+    const endDate = normalToUTCWithOffset(info.end, { minutes: -1 });
+
+    const detail = `De ${startDate.getUTCFullYear()}-${startDate.getUTCMonth() + 1}-${startDate.getUTCDate()} a ${endDate.getUTCFullYear()}-${endDate.getUTCMonth() + 1}-${endDate.getUTCDate()}`;
+
+    setSelectedDates(detail);
   }, []);
 
   useEffect(() => {
@@ -86,6 +99,7 @@ const Calendario = () => {
             visibleEvents={visibleEvents}
             handleDatesSet={handleDatesSet}
             onEventClick={handleEventClick}
+            onDateDrag={handleDateDrags}
         />
       </div>
 
@@ -98,6 +112,17 @@ const Calendario = () => {
         className="max-w-[25vw] max-h-[80vh]"
       >
         <EventDetail event={selectedEvent} />
+      </Modal>
+
+      <Modal
+        open={selectedDates != null}
+        onClose={closeCreationModal}
+        title="Creación de evento"
+        grayBackground={false}
+        placement="center"
+        className="max-w-[25vw] max-h-[80vh]"
+      >
+        <p>{selectedDates}</p>
       </Modal>
     </div>
   );
