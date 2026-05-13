@@ -5,7 +5,7 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
-import { eventApiToDetail } from "../utils/dates";
+import { eventApiToDetail } from "../utils/calendar.utils";
 
 const Calendario = () => {
   const calendarRef = React.useRef(null);
