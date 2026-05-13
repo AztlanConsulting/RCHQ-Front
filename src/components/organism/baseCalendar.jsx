@@ -13,41 +13,41 @@ import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 const MONTH_DAY_EVENT_CAP = 3;
 
 const renderEventContent = (arg) => {
-  const viewType = arg.view.type;
+    const viewType = arg.view.type;
 
-  if (viewType === "dayGridMonth" || viewType === "listMonth") {
+    if (viewType === "dayGridMonth" || viewType === "listMonth") {
+        return <DayGridCard arg={arg} />;
+    }
+    if (viewType === "timeGridWeek" || viewType === "listWeek") {
+        return <WeekTimeCard arg={arg} />;
+    }
+    if (viewType === "timeGridDay" || viewType === "listDay") {
+        return <DayTimeCard arg={arg} />;
+    }
+
     return <DayGridCard arg={arg} />;
-  }
-  if (viewType === "timeGridWeek" || viewType === "listWeek") {
-    return <WeekTimeCard arg={arg} />;
-  }
-  if (viewType === "timeGridDay" || viewType === "listDay") {
-    return <DayTimeCard arg={arg} />;
-  }
-
-  return <DayGridCard arg={arg} />;
 };
 
 const BaseCalendar = ({
-  loadButtonsAtStart,
-  calendarRef,
-  toggleList,
-  setMonthView,
-  setWeekView,
-  setDayView,
-  generateTitle,
-  getWeekDayName,
-  resizeHandler,
-  visibleEvents,
-  handleDatesSet,
-  onEventClick,
+    loadButtonsAtStart,
+    calendarRef,
+    toggleList,
+    setMonthView,
+    setWeekView,
+    setDayView,
+    generateTitle,
+    getWeekDayName,
+    resizeHandler,
+    visibleEvents,
+    handleDatesSet,
+    onEventClick,
 }) => {
-  const eventContent = useCallback((arg) => renderEventContent(arg), []);
+    const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
-  const moreLinkContent = useCallback(
-    (arg) => <DayGridOverflowCard count={arg.num} />,
-    [],
-  );
+    const moreLinkContent = useCallback(
+        (arg) => <DayGridOverflowCard count={arg.num} />,
+        [],
+    );
 
     useEffect(() => {
         loadButtonsAtStart();
