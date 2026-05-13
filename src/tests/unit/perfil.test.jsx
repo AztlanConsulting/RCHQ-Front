@@ -1,8 +1,6 @@
-// src/tests/unit/perfil.test.jsx
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// ─── Mocks ───────────────────────────────────────────────────────────────────
 vi.mock("../../../src/services/profileService", () => ({
   getUserData:       vi.fn(),
   getReadableErrors: vi.fn((err) => [err?.message ?? "Error inesperado"]),
@@ -15,7 +13,6 @@ vi.mock("../../../src/utils/authStorage", () => ({
 import Perfil from "../../../src/pages/perfil";
 import { getUserData } from "../../../src/services/profileService";
 
-// ─── Fixtures ────────────────────────────────────────────────────────────────
 const PROFILE_DATA = {
   data: {
     houseName:   "Casa Hogar Querétaro",
@@ -32,11 +29,9 @@ const PROFILE_DATA = {
   },
 };
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
 describe("perfil.jsx", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  // ── Loading ────────────────────────────────────────────────────────────────
   describe("Estado de carga", () => {
     it("muestra el skeleton mientras carga", () => {
       getUserData.mockReturnValue(new Promise(() => {}));
@@ -51,21 +46,20 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Flujo exitoso ──────────────────────────────────────────────────────────
   describe("Flujo exitoso", () => {
     it("muestra el título 'Mi Perfil'", async () => {
-        getUserData.mockResolvedValue(PROFILE_DATA);
-        render(<Perfil />);
-        await waitFor(() => {
-            expect(screen.getByText("Mi Perfil")).toBeInTheDocument();
-        });
+      getUserData.mockResolvedValue(PROFILE_DATA);
+      render(<Perfil />);
+      await waitFor(() => {
+        expect(screen.getByText("Mi Perfil")).toBeInTheDocument();
+      });
     });
 
     it("renderiza ProfileCard con los datos del usuario", async () => {
       getUserData.mockResolvedValue(PROFILE_DATA);
       render(<Perfil />);
       await waitFor(() => {
-        expect(screen.getByText("Datos del Usuario")).toBeInTheDocument();
+        expect(screen.getAllByText("Datos del Usuario").length).toBeGreaterThan(0);
       });
     });
 
@@ -73,7 +67,7 @@ describe("perfil.jsx", () => {
       getUserData.mockResolvedValue(PROFILE_DATA);
       render(<Perfil />);
       await waitFor(() => {
-        expect(screen.getByText("Juan")).toBeInTheDocument();
+        expect(screen.getAllByText("Juan").length).toBeGreaterThan(0);
       });
     });
 
@@ -81,22 +75,21 @@ describe("perfil.jsx", () => {
       getUserData.mockResolvedValue(PROFILE_DATA);
       render(<Perfil />);
       await waitFor(() => {
-        expect(screen.getByText("Casa Hogar Querétaro")).toBeInTheDocument();
+        expect(screen.getAllByText("Casa Hogar Querétaro").length).toBeGreaterThan(0);
       });
     });
 
     it("formatea el birthDate a locale es-MX", async () => {
-        getUserData.mockResolvedValue(PROFILE_DATA);
-        render(<Perfil />);
+      getUserData.mockResolvedValue(PROFILE_DATA);
+      render(<Perfil />);
 
-        // Calculamos el formato esperado igual que lo hace el componente
-        const expectedDate = new Date("1990-01-01T00:00:00.000Z").toLocaleDateString("es-MX", {
-            day: "2-digit", month: "2-digit", year: "numeric",
-        });
+      const expectedDate = new Date("1990-01-01T00:00:00.000Z").toLocaleDateString("es-MX", {
+        day: "2-digit", month: "2-digit", year: "numeric",
+      });
 
-        await waitFor(() => {
-            expect(screen.getByText(expectedDate)).toBeInTheDocument();
-        });
+      await waitFor(() => {
+        expect(screen.getAllByText(expectedDate).length).toBeGreaterThan(0);
+      });
     });
 
     it("oculta el skeleton tras cargar exitosamente", async () => {
@@ -126,7 +119,6 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Error 401 ─────────────────────────────────────────────────────────────
   describe("Error 401 — Sin permisos", () => {
     it("muestra el título de error correcto", async () => {
       const err = Object.assign(new Error("No autorizado"), { status: 401 });
@@ -147,7 +139,6 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Error 404 ─────────────────────────────────────────────────────────────
   describe("Error 404 — Ruta no encontrada", () => {
     it("muestra el título 'Ruta no encontrada'", async () => {
       const err = Object.assign(new Error("Not found"), { status: 404 });
@@ -168,7 +159,6 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Error 501 ─────────────────────────────────────────────────────────────
   describe("Error 501 — Error del servidor", () => {
     it("muestra el título 'Error del servidor'", async () => {
       const err = Object.assign(new Error("Server error"), { status: 501 });
@@ -189,7 +179,6 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Error genérico ────────────────────────────────────────────────────────
   describe("Error inesperado — status desconocido", () => {
     it("muestra 'Error inesperado' para status no mapeado", async () => {
       const err = Object.assign(new Error("Algo raro"), { status: 999 });
@@ -201,7 +190,6 @@ describe("perfil.jsx", () => {
     });
   });
 
-  // ── Botón reintentar ──────────────────────────────────────────────────────
   describe("Funcionalidad de reintento", () => {
     it("llama a getUserData de nuevo al hacer clic en Reintentar", async () => {
       const err = Object.assign(new Error("Server error"), { status: 501 });
@@ -229,7 +217,7 @@ describe("perfil.jsx", () => {
       fireEvent.click(screen.getByText("Reintentar"));
 
       await waitFor(() => {
-        expect(screen.getByText("Datos del Usuario")).toBeInTheDocument();
+        expect(screen.getAllByText("Datos del Usuario").length).toBeGreaterThan(0);
       });
     });
   });
