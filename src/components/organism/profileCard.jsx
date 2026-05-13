@@ -1,10 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const Field = ({ label, value }) => (
   <div className="flex flex-col gap-0.5">
-    <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
+    <span className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
       {label}
-    </label>
+    </span>
     <div className="flex items-center min-h-[38px] w-full rounded-lg bg-[#F2F2F2] px-4 shadow-[inset_0px_2px_4px_#00000020] gap-2">
       <span className="flex-1 text-sm font-medium text-slate-700 truncate">
         {value || <span className="text-slate-400 italic">Sin información</span>}
@@ -14,7 +14,9 @@ const Field = ({ label, value }) => (
 );
 
 const ProfileCard = ({ user }) => {
-  const imageUrl = user?.foto ? `${API_URL}/${user.foto}` : null;
+  const imageUrl = user?.foto
+     ? new URL(String(user.foto).replace(/^\/+/, ""), `${API_URL.replace(/\/+$/, "")}/`).toString()
+     : null;
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col lg:flex-row gap-6">
@@ -33,9 +35,9 @@ const ProfileCard = ({ user }) => {
         {/* Columna derecha */}
         <div className="flex-1 flex flex-col gap-3">
           <div className="flex flex-col gap-0.5">
-            <label className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
+            <span className="text-xs font-semibold text-slate-500 camelcase tracking-wide">
               Foto del Usuario
-            </label>
+            </span>
             <div className="w-full h-[160px] rounded-xl border border-slate-200 bg-[#F2F2F2] flex items-center justify-center overflow-hidden">
               {imageUrl ? (
                 <img

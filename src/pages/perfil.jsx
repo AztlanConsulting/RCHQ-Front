@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getUserData, getReadableErrors } from "../services/profileService";
 import { getToken } from "../utils/authStorage";
 import ProfileCard from "../components/organism/profileCard";
@@ -61,7 +61,7 @@ const Perfil = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -90,9 +90,9 @@ const Perfil = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchProfile(); }, []);
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   return (
     <div className="flex flex-col gap-4">
