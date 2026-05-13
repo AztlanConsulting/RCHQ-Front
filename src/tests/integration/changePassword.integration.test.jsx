@@ -107,7 +107,7 @@ describe("ChangePassword — integración", () => {
         token: "session-token",
         user: { employeeId: 1, name: "Test User" },
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+      expect(mockNavigate).toHaveBeenCalledWith("/app/calendario", {
         replace: true,
       });
     });

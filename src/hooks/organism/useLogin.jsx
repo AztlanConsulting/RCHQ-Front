@@ -72,7 +72,7 @@ export const useLogin = () => {
       }
 
       login({ token, user });
-      navigate("/app/dashboard", { replace: true });
+      navigate("/app/calendario", { replace: true });
     } catch (err) {
       console.error(err);
       setErrors(getReadableErrors(err));

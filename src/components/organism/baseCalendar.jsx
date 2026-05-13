@@ -4,39 +4,57 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import DayGridCard from "../molecules/calendarCards/dayGridCard";
+import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard";
+import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
+import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
+
+const MONTH_DAY_EVENT_CAP = 3;
+
+const renderEventContent = (arg) => {
+  const viewType = arg.view.type;
+
+  if (viewType === "dayGridMonth" || viewType === "listMonth") {
+    return <DayGridCard arg={arg} />;
+  }
+  if (viewType === "timeGridWeek" || viewType === "listWeek") {
+    return <WeekTimeCard arg={arg} />;
+  }
+  if (viewType === "timeGridDay" || viewType === "listDay") {
+    return <DayTimeCard arg={arg} />;
+  }
+
+  return <DayGridCard arg={arg} />;
+};
 
 import { normalToUTCWithOffset } from "../../utils/dates";
 
 const BaseCalendar = ({
-    loadButtonsAtStart,
-    calendarRef,
-    toggleList,
-    setMonthView,
-    setWeekView,
-    setDayView,
-    generateTitle,
-    getWeekDayName,
-    resizeHandler,
-    fetchEventsInRange,
+  loadButtonsAtStart,
+  calendarRef,
+  toggleList,
+  setMonthView,
+  setWeekView,
+  setDayView,
+  generateTitle,
+  getWeekDayName,
+  resizeHandler,
+  visibleEvents,
+  handleDatesSet,
+  onEventClick,
 }) => {
+  const eventContent = useCallback((arg) => renderEventContent(arg), []);
+
+  const moreLinkContent = useCallback(
+    (arg) => <DayGridOverflowCard count={arg.num} />,
+    [],
+  );
+
     useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
     });
-
-    const dateClicked = (info) => {
-        const realStartDate = normalToUTCWithOffset(info.date);
-
-        const realEndDate = normalToUTCWithOffset(info.date, { days: 1, minutes: -1 });
-
-        alert(
-            "Start on " +
-                realStartDate.toISOString() +
-                "and ends on " +
-                realEndDate.toISOString(),
-        );
-    };
 
     const finalDrag = (info) => {
         const realStartDate = normalToUTCWithOffset(info.start);
@@ -63,7 +81,7 @@ const BaseCalendar = ({
             locales={[esLocale]}
             locale="es"
             windowResizeDelay="10"
-            height="calc(100vh - 80px)"
+            height="calc(100vh - 40px)"
             headerToolbar={{
                 left: "prev,next today",
                 center: "title",
@@ -79,6 +97,7 @@ const BaseCalendar = ({
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}
@@ -100,10 +119,11 @@ const BaseCalendar = ({
                     click: () => setDayView(calendarRef),
                 },
             }}
-            events={(info, successCallback, failureCallback) =>
-                fetchEventsInRange(info, successCallback, failureCallback)
-            }
-            dateClick={(info) => dateClicked(info)}
+            events={visibleEvents}
+            datesSet={handleDatesSet}
+            eventContent={eventContent}
+            moreLinkContent={moreLinkContent}
+            eventClick={(info) => onEventClick?.(info)}
             selectable={true}
             select={(info) => finalDrag(info)}
         />

@@ -38,15 +38,15 @@ beforeEach(() => {
 });
 
 describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", () => {
-  it("redirige al dashboard cuando ya hay sessionToken en localStorage", () => {
+  it("redirige al calendario cuando ya hay sessionToken en localStorage", () => {
     getToken.mockReturnValue("existing-session-token");
     renderPage();
-    expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+    expect(mockNavigate).toHaveBeenCalledWith("/app/calendario", {
       replace: true,
     });
   });
 
-  it("llama a login() con el token final y navega al dashboard cuando el código es válido", async () => {
+  it("llama a login() con el token final y navega al calendario cuando el código es válido", async () => {
     validateLoginTwoFactorAuthService.mockResolvedValue({
       nextStep: "LOGIN_COMPLETE",
       token: "final-session-token",
@@ -64,7 +64,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
         token: "final-session-token",
         user: { id: 1, name: "Test User" },
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/app/dashboard", {
+      expect(mockNavigate).toHaveBeenCalledWith("/app/calendario", {
         replace: true,
       });
     });
@@ -86,7 +86,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
         screen.getByText(/código de autenticación en dos pasos inválido/i),
       ).toBeInTheDocument(),
     );
-    expect(mockNavigate).not.toHaveBeenCalledWith("/app/dashboard", {
+    expect(mockNavigate).not.toHaveBeenCalledWith("/app/calendario", {
       replace: true,
     });
   });
