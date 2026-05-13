@@ -10,7 +10,7 @@ import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard"
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 
-const MONTH_DAY_EVENT_CAP = 3;
+const MONTH_DAY_EVENT_CAP = 2;
 
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
