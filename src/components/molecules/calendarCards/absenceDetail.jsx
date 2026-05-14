@@ -260,12 +260,11 @@ const AbsenceDetail = ({
           width="w-full sm:w-[8.2rem]"
           height="h-10"
           textSize="text-base"
-          bgColor="bg-[#C20000]"
+          bgColor="bg-[#A20000]"
           textColor="text-white"
-          hoverColor="hover:bg-[#930000]"
-          activeColor="active:bg-[#7C0000]"
-          disabled
-          className="rounded-md shadow-[0_4px_10px_rgba(194,0,0,0.28)]"
+          hoverColor="hover:bg-[#870000]"
+          activeColor="active:bg-[#6B0000]"
+          className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
         />
         <Button
           type="button"
