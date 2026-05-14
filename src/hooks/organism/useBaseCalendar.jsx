@@ -12,6 +12,7 @@ export const useBaseCalendar = () => {
     const [viewType, setViewType] = useState("Month");
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [viewerRole, setViewerRole] = useState("");
+    const [calendarMode, setCalendarMode] = useState("personal");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const lastFetchedRange = useRef(null);
@@ -27,6 +28,39 @@ export const useBaseCalendar = () => {
 
     const canViewHouseAbsences = (role) =>
         role === "Admin" || role === "Coordinador";
+
+    const canSwitchCalendarMode = useMemo(
+        () => canViewHouseAbsences(effectiveViewerRole),
+        [effectiveViewerRole],
+    );
+
+    const calendarModeOptions = useMemo(
+        () => [
+            { value: "personal", label: "Mi calendario" },
+            { value: "house", label: "Calendario de la casa" },
+        ],
+        [],
+    );
+
+    const filteredCalendarEvents = useMemo(() => {
+        if (!canSwitchCalendarMode || calendarMode === "personal") {
+            return allEvents.filter((event) => (
+                !(event.focus === "ausencias" && event.scope === "house")
+            ));
+        }
+
+        return allEvents.filter((event) => {
+            if (event.focus === "ausencias") {
+                return event.scope === "house";
+            }
+
+            if (event.focus === "eventos") {
+                return event.scope === "house" || event.scope === "global";
+            }
+
+            return false;
+        });
+    }, [allEvents, calendarMode, canSwitchCalendarMode]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -254,16 +288,21 @@ export const useBaseCalendar = () => {
         const role = getCalendarViewerRole();
         setViewEmployeeId(ownId);
         setViewerRole(role);
+        setCalendarMode("personal");
         const employeeHouseName = await getEmployeeHouseName();
         setEmployeeHouseName(employeeHouseName);
     }, []);
 
     return {
         employeeHouseName,
-        allEvents,
+        allEvents: filteredCalendarEvents,
         isList,
         viewType,
         viewerRole,
+        calendarMode,
+        setCalendarMode,
+        calendarModeOptions,
+        canSwitchCalendarMode,
         handleDatesSet,
         loadButtonsAtStart,
         toggleList,

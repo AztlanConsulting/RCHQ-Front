@@ -19,6 +19,10 @@ const Calendario = () => {
     handleDatesSet,
     loadButtonsAtStart,
     viewerRole,
+    calendarMode,
+    setCalendarMode,
+    calendarModeOptions,
+    canSwitchCalendarMode,
     toggleList,
     setMonthView,
     setWeekView,
@@ -137,6 +141,10 @@ const Calendario = () => {
         showVacationFilters={showVacationFilters}
         showAbscenceFilters={showAbscenceFilters}
         viewerRole={viewerRole}
+        calendarMode={calendarMode}
+        onCalendarModeChange={setCalendarMode}
+        calendarModeOptions={calendarModeOptions}
+        canSwitchCalendarMode={canSwitchCalendarMode}
       />
 
       <div className="flex-1">
