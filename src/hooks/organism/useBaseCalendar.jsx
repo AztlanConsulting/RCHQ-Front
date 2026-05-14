@@ -29,6 +29,11 @@ export const useBaseCalendar = () => {
     const canViewHouseAbsences = (role) =>
         role === "Admin" || role === "Coordinador";
 
+    const isCoordinator = useMemo(
+        () => effectiveViewerRole === "Coordinador",
+        [effectiveViewerRole],
+    );
+
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseAbsences(effectiveViewerRole),
         [effectiveViewerRole],
@@ -43,6 +48,17 @@ export const useBaseCalendar = () => {
     );
 
     const filteredCalendarEvents = useMemo(() => {
+        if (isCoordinator) {
+            if (calendarMode === "personal") {
+                return allEvents.filter((event) => (
+                    event.focus === "ausencias" &&
+                    String(event.employeeId) === String(effectiveEmployeeId)
+                ));
+            }
+
+            return allEvents;
+        }
+
         if (!canSwitchCalendarMode || calendarMode === "personal") {
             return allEvents.filter((event) => (
                 !(event.focus === "ausencias" && event.scope === "house")
@@ -60,7 +76,13 @@ export const useBaseCalendar = () => {
 
             return false;
         });
-    }, [allEvents, calendarMode, canSwitchCalendarMode]);
+    }, [
+        allEvents,
+        calendarMode,
+        canSwitchCalendarMode,
+        effectiveEmployeeId,
+        isCoordinator,
+    ]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -222,7 +244,7 @@ export const useBaseCalendar = () => {
     }
 
     const loadCalendarEvents = useCallback(async (startDate, endDate, employeeId, role) => {
-        const personalEventsPromise = employeeId
+        const personalEventsPromise = role !== "Coordinador" && employeeId
             ? getEventsInRange(employeeId, startDate, endDate)
             : Promise.resolve([]);
 
