@@ -25,6 +25,13 @@
     "@fullcalendar/list": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    "@tailwindcss/vite": "^4.2.2",
+=======
+>>>>>>> 50e807e78164a249a126456a2543c351da72f6aa
+>>>>>>> 01150a3 (merge: pull develop a local)
     "flowbite": "^4.0.1",
     "flowbite-react": "^0.12.17",
     "react": "^19.2.4",
