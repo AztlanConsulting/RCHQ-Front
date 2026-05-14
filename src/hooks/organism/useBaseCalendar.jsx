@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { getEmployeeHouseName, getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {
+    getEmployeeHouseName,
+    getEventsInRange,
+    getOwnEmployeeId,
+} from "../../services/calendarService";
+import { eventApiToDetail } from "../../utils/calendarEventDetail";
+import { normalToUTCWithOffset } from "../../utils/dates";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -8,6 +14,8 @@ export const useBaseCalendar = () => {
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const lastFetchedRange = useRef(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedDates, setSelectedDates] = useState(null);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -32,7 +40,7 @@ export const useBaseCalendar = () => {
     const loadButtonsAtStart = () => {
         const currentView = getCorrespondingView(isList, viewType);
         updateButtons(currentView);
-    }
+    };
 
     const updateButtons = (currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
@@ -95,9 +103,37 @@ export const useBaseCalendar = () => {
     };
 
     const getMonth = (monthNumber, isComplete) => {
-        const shortenedMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
-        const fullMonths = ["Enero", "Fererob", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const monthText = isComplete ? fullMonths[monthNumber] : shortenedMonths[monthNumber];
+        const shortenedMonths = [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dic",
+        ];
+        const fullMonths = [
+            "Enero",
+            "Fererob",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre",
+        ];
+        const monthText = isComplete
+            ? fullMonths[monthNumber]
+            : shortenedMonths[monthNumber];
 
         return monthText;
     };
@@ -143,7 +179,7 @@ export const useBaseCalendar = () => {
         const cellWidth = tableCell.clientWidth || 0;
 
         return cellWidth;
-    }
+    };
 
     const validateShortenedSize = () => {
         if (viewType == "Day") return false;
@@ -153,27 +189,38 @@ export const useBaseCalendar = () => {
         if (currentDayWidth < 96) return true;
 
         return false;
-    }
+    };
 
     const getWeekDayName = (currentDay) => {
         const weekDayIndex = currentDay.dow;
-        const shortenedDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        const fullDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const weekDay = validateShortenedSize() ? shortenedDays[weekDayIndex] : fullDays[weekDayIndex];
+        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        const fullDays = [
+            "Domingo",
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes",
+            "Sábado",
+        ];
+        const weekDay = validateShortenedSize()
+            ? shortenedDays[weekDayIndex]
+            : fullDays[weekDayIndex];
         return weekDay;
-    }
+    };
 
     const resizeHandler = (calendarRef) => {
         const calendarApi = calendarRef.current.getApi();
         calendarApi.render();
-    }
+    };
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
-        ) return;
+        )
+            return;
         lastFetchedRange.current = { start: startStr, end: endStr };
 
         if (viewEmployeeId == "") return;
@@ -206,7 +253,31 @@ export const useBaseCalendar = () => {
         const employeeHouseName = await getEmployeeHouseName();
         console.log("result of getEmployeeHouseName call: ", employeeHouseName);
         setEmployeeHouseName(employeeHouseName);
-    }
+    };
+
+    const closeDetail = useCallback(() => setSelectedEvent(null), []);
+    const closeCreationModal = useCallback((calendarRef) => {
+        setSelectedDates(null);
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.unselect();
+    }, []);
+
+    const handleEventClick = useCallback((info) => {
+        const detail = eventApiToDetail(info?.event);
+        setSelectedEvent(detail);
+    }, []);
+
+    const handleDateDrags = useCallback((info, calendarRef) => {
+        const startDate = normalToUTCWithOffset(info.start);
+        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+
+        const detail = `De ${startDate.getUTCDate()}/${startDate.getUTCMonth() + 1}/${startDate.getUTCFullYear()} ${startDate.getUTCHours()}:${startDate.getUTCMinutes()}:${startDate.getUTCSeconds()} a ${endDate.getUTCDate()}/${endDate.getUTCMonth() + 1}/${endDate.getUTCFullYear()} ${endDate.getUTCHours()}:${endDate.getUTCMinutes()}:${endDate.getUTCSeconds()}`;
+
+        setSelectedDates(detail);
+
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.selectable = false;
+    }, []);
 
     return {
         employeeHouseName,
@@ -221,5 +292,11 @@ export const useBaseCalendar = () => {
         getWeekDayName,
         resizeHandler,
         setOwnCalendar,
-    }
-}
+        selectedEvent,
+        selectedDates,
+        closeDetail,
+        closeCreationModal,
+        handleEventClick,
+        handleDateDrags,
+    };
+};

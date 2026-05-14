@@ -5,14 +5,9 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
-import { eventApiToDetail } from "../utils/calendarEventDetail";
-
-import { normalToUTCWithOffset } from "../utils/dates";
 
 const Calendario = () => {
   const calendarRef = React.useRef(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedDates, setSelectedDates] = useState(null);
 
   const {
     employeeHouseName,
@@ -27,6 +22,12 @@ const Calendario = () => {
     getWeekDayName,
     resizeHandler,
     setOwnCalendar,
+    selectedEvent,
+    selectedDates,
+    closeDetail,
+    closeCreationModal,
+    handleEventClick,
+    handleDateDrags,
   } = useBaseCalendar();
 
   const {
@@ -44,23 +45,6 @@ const Calendario = () => {
     showAbscenceFilters,
     visibleEvents,
   } = useCalendarFilters(allEvents);
-
-  const closeDetail = useCallback(() => setSelectedEvent(null), []);
-  const closeCreationModal = useCallback(() => setSelectedDates(null), []);
-
-  const handleEventClick = useCallback((info) => {
-    const detail = eventApiToDetail(info?.event);
-    setSelectedEvent(detail);
-  }, []);
-
-  const handleDateDrags = useCallback((info) => {
-    const startDate = normalToUTCWithOffset(info.start);
-    const endDate = normalToUTCWithOffset(info.end, { minutes: -1 });
-
-    const detail = `De ${startDate.getUTCFullYear()}-${startDate.getUTCMonth() + 1}-${startDate.getUTCDate()} a ${endDate.getUTCFullYear()}-${endDate.getUTCMonth() + 1}-${endDate.getUTCDate()}`;
-
-    setSelectedDates(detail);
-  }, []);
 
   useEffect(() => {
     setOwnCalendar();
@@ -116,7 +100,7 @@ const Calendario = () => {
 
       <Modal
         open={selectedDates != null}
-        onClose={closeCreationModal}
+        onClose={() => closeCreationModal(calendarRef)}
         title="Creación de evento"
         grayBackground={false}
         placement="center"

@@ -112,7 +112,8 @@ const BaseCalendar = ({
             moreLinkContent={moreLinkContent}
             eventClick={(info) => onEventClick?.(info)}
             selectable={true}
-            select={(info) => onDateDrag?.(info)}
+            select={(info) => onDateDrag?.(info, calendarRef)}
+            unselectAuto={false}
         />
     );
 };
