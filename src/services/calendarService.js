@@ -1,4 +1,6 @@
 import { getToken, getStoredUser } from "../utils/authStorage";
+import { buildApiError } from "../utils/apiErrors";
+import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,7 +30,7 @@ export const getEventsTypes = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/event/getAllTypes`,
         {
             method: "GET",
@@ -39,11 +41,14 @@ export const getEventsTypes = async () => {
         },
     );
 
-    if (!rawResponse.ok) {
-        throw new Error("No se pudieron obtener los tipos de evento");
-    }
-
     const response = await rawResponse.json();
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener los tipos de evento",
+        );
+    }
     const eventTypes = response?.data?.eventTypes;
 
     return eventTypes;
@@ -56,7 +61,7 @@ export const getAbsenceTypes = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/absence/types`,
         {
             method: "GET",
@@ -67,11 +72,14 @@ export const getAbsenceTypes = async () => {
         },
     );
 
-    if (!rawResponse.ok) {
-        throw new Error("No se pudieron obtener los tipos de ausencia");
-    }
-
     const response = await rawResponse.json();
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener los tipos de ausencia",
+        );
+    }
     return response?.data?.absenceTypes ?? [];
 };
 
@@ -82,7 +90,7 @@ export const getHouseEmployees = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/house/employees`,
         {
             method: "GET",
@@ -93,11 +101,14 @@ export const getHouseEmployees = async () => {
         },
     );
 
-    if (!rawResponse.ok) {
-        throw new Error("No se pudieron obtener los empleados de la casa");
-    }
-
     const response = await rawResponse.json();
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener los empleados de la casa",
+        );
+    }
     return response?.data?.employees ?? [];
 };
 
@@ -113,7 +124,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}`,
         {
             method: "GET",
@@ -124,11 +135,14 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
         },
     );
 
-    if (!rawResponse.ok) {
-        throw new Error("No se pudieron obtener los eventos del calendario");
-    }
-
     const response = await rawResponse.json();
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener los eventos del calendario",
+        );
+    }
     const rawEvents = response.data.events;
 
     return rawEvents;
@@ -141,7 +155,7 @@ export const getHouseAbsencesInRange = async (startDate, endDate) => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/event/house/range/${startDate}/${endDate}`,
         {
             method: "GET",
@@ -152,12 +166,47 @@ export const getHouseAbsencesInRange = async (startDate, endDate) => {
         },
     );
 
+    const response = await rawResponse.json();
     if (!rawResponse.ok) {
-        throw new Error("No se pudieron obtener las ausencias de la casa");
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener las ausencias de la casa",
+        );
+    }
+    return response?.data?.events ?? [];
+};
+
+export const updateAbsenceService = async (absenceId, payload) => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
     }
 
-    const response = await rawResponse.json();
-    return response?.data?.events ?? [];
+    const rawResponse = await secureFetch(
+        `${API_URL}/absence/${absenceId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudo actualizar la ausencia",
+        );
+    }
+
+    return response?.data?.absence;
 };
 
 const getOwnEmployeeId = () => {
@@ -181,7 +230,7 @@ export const getEmployeeHouseName = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await fetch(
+    const rawResponse = await secureFetch(
         `${API_URL}/house/getHouseName`,
         {
             method: "GET",
@@ -192,11 +241,14 @@ export const getEmployeeHouseName = async () => {
         },
     );
 
-    if (!rawResponse.ok) {
-        throw new Error("No se pudo obtener el nombre de la casa");
-    }
-
     const response = await rawResponse.json();
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudo obtener el nombre de la casa",
+        );
+    }
     const houseName = response?.data?.houseName;
 
     return houseName;

@@ -6,6 +6,7 @@ export const eventApiToDetail = (ev) => {
   return {
     id: ev.id,
     absenceId: x.absenceId,
+    absenceTypeId: x.absenceTypeId,
     employeeId: x.employeeId,
     title: ev.title,
     employeeName: x.employeeName,
@@ -32,6 +33,42 @@ export const eventApiToDetail = (ev) => {
     startDate: x.startDate,
     endDate: x.endDate,
     isDeleted: x.isDeleted,
+  };
+};
+
+export const calendarItemToDetail = (item) => {
+  if (!item) return null;
+
+  return {
+    id: item.id ?? item.absenceId ?? item.employeeId ?? item.name,
+    absenceId: item.absenceId,
+    absenceTypeId: item.absenceTypeId,
+    employeeId: item.employeeId,
+    title: item.focus === "ausencias" ? `Ausencia de ${item.name}` : item.name,
+    employeeName: item.name,
+    start: item.start,
+    end: item.end,
+    startStr: item.start ? item.start.toISOString?.() ?? String(item.start) : "",
+    endStr: item.end ? item.end.toISOString?.() ?? String(item.end) : "",
+    allDay: Boolean(item.lastsAllDay),
+    backgroundColor: item.backgroundColor ?? item.color,
+    borderColor: item.borderColor ?? item.color,
+    subtitle: item.subtitle ?? "",
+    description: item.description ?? "",
+    focus: item.focus,
+    focusLabel: item.focusLabel ?? item.focus,
+    scope: item.scope,
+    scopeLabel: item.scopeLabel ?? item.scope,
+    eventType: item.type,
+    date: item.date ?? "",
+    icon: item.icon ?? "",
+    status: item.status,
+    curp: item.curp ?? "",
+    usedDays: item.usedDays,
+    link: item.link ?? "",
+    startDate: item.startDate ?? item.start,
+    endDate: item.endDate ?? item.end,
+    isDeleted: item.isDeleted,
   };
 };
 

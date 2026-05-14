@@ -9,10 +9,11 @@ const DateField = ({
     labelColor = "text-[#6b6b6b]",
     minDate,
     maxDate,
+    native = false,
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : undefined;
 
-    useDateField();
+    useDateField(!native);
 
     const handleDateChange = (date) => {
         if (!date) {
@@ -36,6 +37,35 @@ const DateField = ({
             },
         });
     };
+
+    if (native) {
+        const minValue = minDate instanceof Date
+            ? minDate.toISOString().slice(0, 10)
+            : undefined;
+        const maxValue = maxDate instanceof Date
+            ? maxDate.toISOString().slice(0, 10)
+            : undefined;
+
+        return (
+            <div className="date-field-wrapper flex w-full flex-col gap-1.5">
+                <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+                    {label}
+                </label>
+
+                <div className="flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040]">
+                    <input
+                        type="date"
+                        name={name}
+                        value={value ?? ""}
+                        min={minValue}
+                        max={maxValue}
+                        onChange={onChange}
+                        className="h-full w-full flex-1 bg-transparent border-0 outline-none text-sm font-medium text-[#222] sm:text-base"
+                    />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="date-field-wrapper flex w-full flex-col gap-1.5">

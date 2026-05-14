@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
+import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
@@ -26,18 +27,8 @@ const Calendario = () => {
     getWeekDayName,
     resizeHandler,
     setOwnCalendar,
+    reloadCurrentRange,
   } = useBaseCalendar();
-
-  const {
-    selectedEvent,
-    isAbsenceEditing,
-    closeDetail,
-    handleEventClick,
-    absenceEvidenceLabel,
-    openAbsenceEvidence,
-    startAbsenceEdit,
-    cancelAbsenceEdit,
-  } = useCalendarPage();
 
   const {
     focusFilters,
@@ -74,12 +65,43 @@ const Calendario = () => {
     visibleEvents,
   } = useCalendarFilters(allEvents, { isList });
 
+  const {
+    selectedEvent,
+    isAbsenceEditing,
+    absenceForm,
+    absenceEditError,
+    isSavingAbsence,
+    alert,
+    closeDetail,
+    handleEventClick,
+    absenceEvidenceLabel,
+    openAbsenceEvidence,
+    startAbsenceEdit,
+    cancelAbsenceEdit,
+    setAbsenceField,
+    submitAbsenceEdit,
+    clearCalendarAlert,
+  } = useCalendarPage({
+    absenceTypeOptions,
+    reloadCurrentRange,
+  });
+
   useEffect(() => {
     setOwnCalendar();
   }, [setOwnCalendar]);
 
   return (
     <div className="flex items-center gap-4">
+      {alert?.message ? (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2">
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={clearCalendarAlert}
+          />
+        </div>
+      ) : null}
+
       <CalendarFilters
         className="basis-1/6 min-w-40 "
         houseName={employeeHouseName}
@@ -151,9 +173,15 @@ const Calendario = () => {
             event={selectedEvent}
             isEditing={isAbsenceEditing}
             evidenceLabel={absenceEvidenceLabel}
+            absenceTypeOptions={absenceTypeOptions}
+            absenceForm={absenceForm}
+            absenceEditError={absenceEditError}
+            isSaving={isSavingAbsence}
             onOpenEvidence={openAbsenceEvidence}
             onStartEdit={startAbsenceEdit}
             onCancelEdit={cancelAbsenceEdit}
+            onSubmitEdit={submitAbsenceEdit}
+            onAbsenceFieldChange={setAbsenceField}
           />
         ) : (
           <EventDetail event={selectedEvent} />

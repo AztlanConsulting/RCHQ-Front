@@ -1,4 +1,6 @@
 import Button from "../../atoms/button";
+import DateField from "../../atoms/dateField";
+import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 
@@ -13,13 +15,37 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
   </div>
 );
 
+const EditableTextArea = ({ label, value, onChange }) => (
+  <div className="sm:col-span-2">
+    <Type
+      variant="metric-label"
+      className="mb-1.5 block font-bold text-[#121212]"
+    >
+      {label}
+    </Type>
+    <textarea
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      rows={4}
+      placeholder="Describe la ausencia"
+      className="min-h-[110px] w-full resize-none rounded-lg border border-slate-200 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000020] outline-none focus:border-slate-400"
+    />
+  </div>
+);
+
 const AbsenceDetail = ({
   event,
   isEditing = false,
   evidenceLabel = "Ver evidencia",
+  absenceTypeOptions = [],
+  absenceForm,
+  absenceEditError = "",
+  isSaving = false,
   onOpenEvidence,
   onStartEdit,
   onCancelEdit,
+  onSubmitEdit,
+  onAbsenceFieldChange,
 }) => {
   if (!event) return null;
 
@@ -33,11 +59,57 @@ const AbsenceDetail = ({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ReadOnlyField label="Nombre del trabajador" value={event.employeeName} />
           <ReadOnlyField label="CURP" value={event.curp} />
-          <ReadOnlyField label="Tipo de ausencia" value={event.eventType} fullWidth />
-          <ReadOnlyField label="Fecha de inicio" value={formatEventDate(event.startDate)} />
-          <ReadOnlyField label="Fecha de fin" value={formatEventDate(event.endDate)} />
-          <ReadOnlyField label="Descripción" value={event.description} fullWidth />
+          <div className="sm:col-span-2">
+            <SelectField
+              label="Tipo de ausencia"
+              id="absenceTypeId"
+              value={absenceForm?.absenceTypeId ?? ""}
+              onChange={(editEvent) =>
+                onAbsenceFieldChange?.("absenceTypeId", editEvent.target.value)
+              }
+              options={absenceTypeOptions.map((option) => ({
+                value: option.value,
+                label: option.label,
+              }))}
+              placeholder="Selecciona un tipo"
+              labelColor="text-[#121212]"
+            />
+          </div>
+          <DateField
+            label="Fecha de inicio"
+            name="startDate"
+            value={absenceForm?.startDate ?? ""}
+            onChange={(editEvent) =>
+              onAbsenceFieldChange?.("startDate", editEvent.target.value)
+            }
+            labelColor="text-[#121212]"
+          />
+          <DateField
+            label="Fecha de fin"
+            name="endDate"
+            value={absenceForm?.endDate ?? ""}
+            onChange={(editEvent) =>
+              onAbsenceFieldChange?.("endDate", editEvent.target.value)
+            }
+            minDate={
+              absenceForm?.startDate
+                ? new Date(`${absenceForm.startDate}T12:00:00`)
+                : undefined
+            }
+            labelColor="text-[#121212]"
+          />
+          <EditableTextArea
+            label="Descripción"
+            value={absenceForm?.description ?? ""}
+            onChange={(value) => onAbsenceFieldChange?.("description", value)}
+          />
         </div>
+
+        {absenceEditError ? (
+          <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
+            {absenceEditError}
+          </p>
+        ) : null}
 
         <div className="mt-4 flex items-center gap-3">
           <Type variant="metric-label" className="font-bold text-[#121212]">
@@ -64,7 +136,8 @@ const AbsenceDetail = ({
             width="w-full"
             height="h-11"
             textSize="text-base"
-            disabled
+            onClick={onSubmitEdit}
+            disabled={isSaving}
           />
           <Button
             type="button"
@@ -77,6 +150,7 @@ const AbsenceDetail = ({
             hoverColor="hover:bg-[#15284A]"
             activeColor="active:bg-[#0E1B33]"
             onClick={onCancelEdit}
+            disabled={isSaving}
           />
         </div>
       </div>
