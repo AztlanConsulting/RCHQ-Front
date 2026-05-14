@@ -75,6 +75,9 @@ const Calendario = () => {
     absenceForm,
     absenceEditError,
     isSavingAbsence,
+    isDeleteAbsenceOpen,
+    absenceDeleteError,
+    isDeletingAbsence,
     alert,
     closeDetail,
     handleEventClick,
@@ -82,6 +85,9 @@ const Calendario = () => {
     openAbsenceEvidence,
     startAbsenceEdit,
     cancelAbsenceEdit,
+    openDeleteAbsence,
+    cancelDeleteAbsence,
+    confirmDeleteAbsence,
     setAbsenceField,
     submitAbsenceEdit,
     clearCalendarAlert,
@@ -184,11 +190,18 @@ const Calendario = () => {
             absenceTypeOptions={absenceTypeOptions}
             absenceForm={absenceForm}
             absenceEditError={absenceEditError}
+            absenceDeleteError={absenceDeleteError}
             isSaving={isSavingAbsence}
+            isDeleteOpen={isDeleteAbsenceOpen}
+            isDeleting={isDeletingAbsence}
+            canManageAbsence={["Admin", "Coordinador"].includes(viewerRole)}
             onOpenEvidence={openAbsenceEvidence}
             onStartEdit={startAbsenceEdit}
             onCancelEdit={cancelAbsenceEdit}
             onSubmitEdit={submitAbsenceEdit}
+            onOpenDelete={openDeleteAbsence}
+            onCancelDelete={cancelDeleteAbsence}
+            onConfirmDelete={confirmDeleteAbsence}
             onAbsenceFieldChange={setAbsenceField}
           />
         ) : (

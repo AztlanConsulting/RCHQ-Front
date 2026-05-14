@@ -42,6 +42,13 @@ describe("ConfirmDeleteModal — renderizado", () => {
     render(<ConfirmDeleteModal {...makeProps({ loading: true })} />);
     expect(screen.getByText("Eliminando...").closest("button")).toBeDisabled();
   });
+
+  it("conserva el modo modal completo de documentos cuando no se usa inline", () => {
+    const { container } = render(<ConfirmDeleteModal {...makeProps()} />);
+
+    expect(screen.getByText("Eliminar documento")).toBeInTheDocument();
+    expect(container.querySelector(".fixed.inset-0.bg-black\\/50")).not.toBeNull();
+  });
 });
 
 describe("ConfirmDeleteModal — interacción", () => {

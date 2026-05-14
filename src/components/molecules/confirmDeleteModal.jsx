@@ -1,6 +1,15 @@
 import Button from "../atoms/button";
 
-const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading, mode = "delete" }) => {
+const ConfirmDeleteModal = ({
+  label,
+  onConfirm,
+  onCancel,
+  loading,
+  mode = "delete",
+  title,
+  body,
+  inline = false,
+}) => {
   if (!label) return null;
 
   const config = {
@@ -33,13 +42,29 @@ const ConfirmDeleteModal = ({ label, onConfirm, onCancel, loading, mode = "delet
     },
   };
 
-  const { title, body, confirmText, confirmColor, confirmHover, confirmActive } = config[mode];
+  const {
+    title: defaultTitle,
+    body: defaultBody,
+    confirmText,
+    confirmColor,
+    confirmHover,
+    confirmActive,
+  } = config[mode];
+
+  const wrapperClass = inline
+    ? "absolute inset-0 z-30 flex items-center justify-center p-4"
+    : "fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4";
+
+  const cardClass = inline
+    ? "w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-xl"
+    : "w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl";
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl flex flex-col gap-4">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-        <p className="text-sm text-slate-500">{body}</p>
+    <div className={wrapperClass}>
+      {inline ? <div className="absolute inset-0 rounded-xl bg-white/65" aria-hidden /> : null}
+      <div className={`${cardClass} relative flex flex-col gap-4`}>
+        <h3 className="text-lg font-semibold text-slate-900">{title ?? defaultTitle}</h3>
+        <div className="text-sm text-slate-500">{body ?? defaultBody}</div>
         <div className="flex gap-3 justify-end">
           <Button
             text="Cancelar"

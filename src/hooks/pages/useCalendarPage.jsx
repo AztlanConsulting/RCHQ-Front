@@ -3,7 +3,10 @@ import {
   calendarItemToDetail,
   eventApiToDetail,
 } from "../../utils/calendarEventDetail";
-import { updateAbsenceService } from "../../services/calendarService";
+import {
+  deleteAbsenceService,
+  updateAbsenceService,
+} from "../../services/calendarService";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -53,19 +56,26 @@ export const useCalendarPage = ({
   });
   const [absenceEditError, setAbsenceEditError] = useState("");
   const [isSavingAbsence, setIsSavingAbsence] = useState(false);
+  const [isDeleteAbsenceOpen, setIsDeleteAbsenceOpen] = useState(false);
+  const [absenceDeleteError, setAbsenceDeleteError] = useState("");
+  const [isDeletingAbsence, setIsDeletingAbsence] = useState(false);
   const [alert, setAlert] = useState(null);
 
   const closeDetail = useCallback(() => {
     setSelectedEvent(null);
     setIsAbsenceEditing(false);
+    setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
+    setAbsenceDeleteError("");
   }, []);
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
     setSelectedEvent(detail);
     setIsAbsenceEditing(false);
+    setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
+    setAbsenceDeleteError("");
   }, []);
 
   const absenceEvidenceLabel = useMemo(
@@ -87,6 +97,7 @@ export const useCalendarPage = ({
       endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
       description: sanitizeAbsenceDescription(selectedEvent.description ?? ""),
     });
+    setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
   }, [absenceTypeOptions, selectedEvent]);
@@ -94,6 +105,19 @@ export const useCalendarPage = ({
   const cancelAbsenceEdit = useCallback(() => {
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
+  }, []);
+
+  const openDeleteAbsence = useCallback(() => {
+    if (!selectedEvent?.absenceId) return;
+    setIsAbsenceEditing(false);
+    setAbsenceEditError("");
+    setAbsenceDeleteError("");
+    setIsDeleteAbsenceOpen(true);
+  }, [selectedEvent?.absenceId]);
+
+  const cancelDeleteAbsence = useCallback(() => {
+    setIsDeleteAbsenceOpen(false);
+    setAbsenceDeleteError("");
   }, []);
 
   const setAbsenceField = useCallback((field, value) => {
@@ -223,12 +247,38 @@ export const useCalendarPage = ({
     }
   }, [absenceForm, absenceTypeOptions, reloadCurrentRange, selectedEvent]);
 
+  const confirmDeleteAbsence = useCallback(async () => {
+    if (!selectedEvent?.absenceId) return;
+
+    setIsDeletingAbsence(true);
+    setAbsenceDeleteError("");
+
+    try {
+      await deleteAbsenceService(selectedEvent.absenceId);
+      await reloadCurrentRange?.();
+      closeDetail();
+      setAlert({
+        type: "success",
+        message: "Ausencia eliminada correctamente",
+      });
+    } catch (error) {
+      setAbsenceDeleteError(
+        error?.message || "No se pudo eliminar la ausencia.",
+      );
+    } finally {
+      setIsDeletingAbsence(false);
+    }
+  }, [closeDetail, reloadCurrentRange, selectedEvent?.absenceId]);
+
   return {
     selectedEvent,
     isAbsenceEditing,
     absenceForm,
     absenceEditError,
     isSavingAbsence,
+    isDeleteAbsenceOpen,
+    absenceDeleteError,
+    isDeletingAbsence,
     alert,
     closeDetail,
     handleEventClick,
@@ -236,6 +286,9 @@ export const useCalendarPage = ({
     openAbsenceEvidence,
     startAbsenceEdit,
     cancelAbsenceEdit,
+    openDeleteAbsence,
+    cancelDeleteAbsence,
+    confirmDeleteAbsence,
     setAbsenceField,
     submitAbsenceEdit,
     clearCalendarAlert: () => setAlert(null),

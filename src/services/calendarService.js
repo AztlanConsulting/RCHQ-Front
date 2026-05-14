@@ -209,6 +209,37 @@ export const updateAbsenceService = async (absenceId, payload) => {
     return response?.data?.absence;
 };
 
+export const deleteAbsenceService = async (absenceId) => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(
+        `${API_URL}/absence/${absenceId}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudo eliminar la ausencia",
+        );
+    }
+
+    return response?.data?.absence;
+};
+
 const getOwnEmployeeId = () => {
     const userData = getStoredUser();
     const tokenPayload = parseJwtPayload(getToken());

@@ -2,6 +2,7 @@ import Button from "../../atoms/button";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
+import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
@@ -44,11 +45,18 @@ const AbsenceDetail = ({
   absenceTypeOptions = [],
   absenceForm,
   absenceEditError = "",
+  absenceDeleteError = "",
   isSaving = false,
+  isDeleteOpen = false,
+  isDeleting = false,
+  canManageAbsence = true,
   onOpenEvidence,
   onStartEdit,
   onCancelEdit,
   onSubmitEdit,
+  onOpenDelete,
+  onCancelDelete,
+  onConfirmDelete,
   onAbsenceFieldChange,
 }) => {
   if (!event) return null;
@@ -257,32 +265,61 @@ const AbsenceDetail = ({
         />
       </div>
 
-      <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-6">
-        <Button
-          type="button"
-          text="Eliminar"
-          width="w-full sm:w-40"
-          height="h-10"
-          textSize="text-base"
-          bgColor="bg-[#C20000]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#930000]"
-          activeColor="active:bg-[#7C0000]"
-          disabled
+      {canManageAbsence ? (
+        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-6">
+          <Button
+            type="button"
+            text="Eliminar"
+            width="w-full sm:w-40"
+            height="h-10"
+            textSize="text-base"
+            bgColor="bg-[#C20000]"
+            textColor="text-white"
+            hoverColor="hover:bg-[#930000]"
+            activeColor="active:bg-[#7C0000]"
+            onClick={onOpenDelete}
+          />
+          <Button
+            type="button"
+            text="Editar"
+            width="w-full sm:w-40"
+            height="h-10"
+            textSize="text-base"
+            bgColor="bg-[#1F3664]"
+            textColor="text-white"
+            hoverColor="hover:bg-[#15284A]"
+            activeColor="active:bg-[#0E1B33]"
+            onClick={onStartEdit}
+          />
+        </div>
+      ) : null}
+
+      {isDeleteOpen ? (
+        <ConfirmDeleteModal
+          label={event.employeeName || "ausencia"}
+          mode="delete"
+          inline
+          loading={isDeleting}
+          title="Eliminar ausencia"
+          body={(
+            <>
+              Está a punto de eliminar la ausencia de{" "}
+              <span className="font-semibold text-slate-700">
+                {event.employeeName || "este trabajador"}
+              </span>
+              {event.curp ? ` · ${event.curp}` : ""}. Esta acción no se puede
+              revertir.
+              {absenceDeleteError ? (
+                <span className="mt-2 block rounded-md bg-red-50 px-3 py-2 text-red-600">
+                  {absenceDeleteError}
+                </span>
+              ) : null}
+            </>
+          )}
+          onCancel={onCancelDelete}
+          onConfirm={onConfirmDelete}
         />
-        <Button
-          type="button"
-          text="Editar"
-          width="w-full sm:w-40"
-          height="h-10"
-          textSize="text-base"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          onClick={onStartEdit}
-        />
-      </div>
+      ) : null}
     </div>
   );
 };
