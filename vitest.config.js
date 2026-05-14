@@ -5,6 +5,9 @@ import viteConfig from "./vite.config.js";
 export default mergeConfig(
   viteConfig,
   defineConfig({
+    define: {
+      "import.meta.env.VITE_API_URL": JSON.stringify("http://test-api.local"),
+    },
     test: {
       environment: "jsdom",
       globals: true,
