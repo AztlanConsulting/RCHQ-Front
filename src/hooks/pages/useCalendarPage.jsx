@@ -5,11 +5,13 @@ import {
 } from "../../utils/calendarEventDetail";
 import { updateAbsenceService } from "../../services/calendarService";
 
+const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
+
 const sanitizeAbsenceDescription = (value = "") =>
   String(value)
-    .replace(/[\p{Extended_Pictographic}\p{So}]/gu, "")
+    .replace(/[^\p{L}\p{N}\s¿?¡!]/gu, "")
     .replace(/\s+/g, " ")
-    .slice(0, 300);
+    .slice(0, 200);
 
 const inferAbsenceTypeId = (selectedEvent, absenceTypeOptions) => {
   if (selectedEvent?.absenceTypeId) {
@@ -83,7 +85,7 @@ export const useCalendarPage = ({
       absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
       startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
       endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: selectedEvent.description ?? "",
+      description: sanitizeAbsenceDescription(selectedEvent.description ?? ""),
     });
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
@@ -115,7 +117,7 @@ export const useCalendarPage = ({
       absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
       startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
       endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: String(selectedEvent.description ?? "").trim(),
+      description: sanitizeAbsenceDescription(selectedEvent.description ?? "").trim(),
     };
 
     if (!absenceForm.startDate || !absenceForm.endDate) {
@@ -137,6 +139,16 @@ export const useCalendarPage = ({
       )
     ) {
       setAbsenceEditError("Tipo de ausencia inválido.");
+      return;
+    }
+
+    if (
+      normalizedDescription &&
+      !ABSENCE_DESCRIPTION_PATTERN.test(normalizedDescription)
+    ) {
+      setAbsenceEditError(
+        "La descripción solo puede contener letras, números, espacios y signos de interrogación o exclamación.",
+      );
       return;
     }
 

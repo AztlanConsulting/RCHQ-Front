@@ -27,9 +27,13 @@ const EditableTextArea = ({ label, value, onChange }) => (
       value={value}
       onChange={(event) => onChange(event.target.value)}
       rows={4}
+      maxLength={200}
       placeholder="Describe la ausencia"
       className="min-h-[110px] w-full resize-none rounded-lg border border-slate-200 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000020] outline-none focus:border-slate-400"
     />
+    <div className="mt-1 text-right text-xs font-medium text-slate-500">
+      {`${String(value ?? "").length}/200`}
+    </div>
   </div>
 );
 
@@ -83,6 +87,8 @@ const AbsenceDetail = ({
               onAbsenceFieldChange?.("startDate", editEvent.target.value)
             }
             labelColor="text-[#121212]"
+            popupAlign="left"
+            popupSize="compact"
           />
           <DateField
             label="Fecha de fin"
@@ -97,6 +103,8 @@ const AbsenceDetail = ({
                 : undefined
             }
             labelColor="text-[#121212]"
+            popupAlign="right"
+            popupSize="compact"
           />
           <EditableTextArea
             label="Descripción"
@@ -118,7 +126,7 @@ const AbsenceDetail = ({
           <Button
             type="button"
             text={event.link ? "Cambiar evidencia" : "Subir evidencia"}
-            width="w-auto"
+            width="w-auto min-w-[9.5rem]"
             height="h-10"
             textSize="text-sm"
             bgColor="bg-[#1F3664]"
@@ -132,16 +140,20 @@ const AbsenceDetail = ({
         <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:gap-4">
           <Button
             type="button"
-            text="Modificar"
+            text="Cancelar"
             width="w-full"
             height="h-11"
             textSize="text-base"
-            onClick={onSubmitEdit}
+            bgColor="bg-white"
+            textColor="text-[#121212]"
+            hoverColor="hover:bg-slate-50"
+            activeColor="active:bg-slate-100"
+            onClick={onCancelEdit}
             disabled={isSaving}
           />
           <Button
             type="button"
-            text="Cancelar"
+            text="Guardar"
             width="w-full"
             height="h-11"
             textSize="text-base"
@@ -149,7 +161,7 @@ const AbsenceDetail = ({
             textColor="text-white"
             hoverColor="hover:bg-[#15284A]"
             activeColor="active:bg-[#0E1B33]"
-            onClick={onCancelEdit}
+            onClick={onSubmitEdit}
             disabled={isSaving}
           />
         </div>
@@ -233,7 +245,7 @@ const AbsenceDetail = ({
         <Button
           type="button"
           text={evidenceLabel}
-          width="w-auto"
+          width="w-auto min-w-[9.5rem]"
           height="h-9"
           textSize="text-xs"
           bgColor="bg-[#1F3664]"

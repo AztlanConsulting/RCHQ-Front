@@ -64,17 +64,18 @@ describe("useCalendarPage", () => {
     });
   });
 
-  it("sanitiza emojis e iconos al editar la descripción", () => {
+  it("sanitiza caracteres especiales, conserva signos permitidos y limita a 200 caracteres", () => {
     const { result } = renderHook(() => useCalendarPage());
+    const longText = `Texto base!!! 😀 📌 con emoji ¿vale? #123 ${"a".repeat(220)}`;
 
     act(() => {
-      result.current.setAbsenceField(
-        "description",
-        "Texto base 😀 📌 con emoji",
-      );
+      result.current.setAbsenceField("description", longText);
     });
 
-    expect(result.current.absenceForm.description).toBe("Texto base con emoji");
+    expect(result.current.absenceForm.description).toMatch(
+      /^Texto base!!! con emoji ¿vale\? 123/,
+    );
+    expect(result.current.absenceForm.description.length).toBe(200);
   });
 
   it("no manda petición si no hubo cambios al modificar la ausencia", async () => {
