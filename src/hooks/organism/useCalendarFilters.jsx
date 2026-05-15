@@ -31,6 +31,21 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
+const getAbsenceTitle = (event) => {
+    const rawName = String(event.name ?? "").trim();
+    const rawType = String(event.type ?? "").trim();
+
+    if (!rawName || rawName.toLowerCase() === "ausencia") {
+        return rawType ? `Ausencia ${rawType}` : "Ausencia";
+    }
+
+    if (rawName.toLowerCase().startsWith("ausencia")) {
+        return rawName;
+    }
+
+    return `Ausencia ${rawName}`;
+};
+
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
@@ -147,7 +162,7 @@ const getFilteredEvents = (
             return {
                 id: String(idx),
                 title: rawEvent.focus === "ausencias"
-                    ? `Ausencia de ${rawEvent.name}`
+                    ? getAbsenceTitle(rawEvent)
                     : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,
@@ -175,7 +190,7 @@ const getFilteredEvents = (
                     status: rawEvent.status,
                     curp: rawEvent.curp ?? "",
                     usedDays: rawEvent.usedDays,
-                    link: rawEvent.link ?? "",
+                    link: rawEvent.focus === "ausencias" ? rawEvent.link ?? "" : "",
                     startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start,
                     endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end,
                     isDeleted: Boolean(rawEvent.isDeleted),
@@ -186,7 +201,10 @@ const getFilteredEvents = (
         });
 }
 
-export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
+export const useCalendarFilters = (
+    allEvents = [],
+    { isList = false, viewerRole = "" } = {},
+) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
     );
@@ -210,6 +228,8 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
+    const canUseEmployeeCatalog =
+        viewerRole === "Admin" || viewerRole === "Coordinador";
 
     useEffect(() => {
         getEventsTypes()
@@ -243,6 +263,13 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
             .catch(() => {
                 setCatalogAbsenceTypeOptions([]);
             });
+    }, []);
+
+    useEffect(() => {
+        if (!canUseEmployeeCatalog) {
+            Promise.resolve().then(() => setCatalogAbsenceEmployeeOptions([]));
+            return;
+        }
 
         getHouseEmployees()
             .then((employees) => {
@@ -259,7 +286,7 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
             .catch(() => {
                 setCatalogAbsenceEmployeeOptions([]);
             });
-    }, []);
+    }, [canUseEmployeeCatalog]);
 
     const fallbackAbsenceTypeOptions = useMemo(() => {
         const labels = new Set();

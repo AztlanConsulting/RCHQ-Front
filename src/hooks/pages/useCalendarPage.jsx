@@ -17,6 +17,17 @@ const sanitizeAbsenceDescription = (value = "") =>
     .replace(/\s+/g, " ")
     .slice(0, 200);
 
+const canManageAbsenceEvidence = (role) =>
+  role === "Admin" || role === "Coordinador";
+
+const getAbsenceEvidenceLabel = (selectedEvent, viewerRole) => {
+  if (!selectedEvent) return "Sin evidencia";
+  if (selectedEvent.link) return "Ver evidencia";
+  return canManageAbsenceEvidence(viewerRole)
+    ? "Subir evidencia"
+    : "Sin evidencia";
+};
+
 const inferAbsenceTypeId = (selectedEvent, absenceTypeOptions) => {
   if (selectedEvent?.absenceTypeId) {
     return String(selectedEvent.absenceTypeId);
@@ -46,6 +57,7 @@ const inferAbsenceTypeId = (selectedEvent, absenceTypeOptions) => {
 export const useCalendarPage = ({
   absenceTypeOptions = [],
   reloadCurrentRange,
+  viewerRole = "",
 } = {}) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const selectedEventRef = useRef(null);
@@ -84,8 +96,8 @@ export const useCalendarPage = ({
   }, []);
 
   const absenceEvidenceLabel = useMemo(
-    () => (selectedEvent?.link ? "Ver evidencia" : "Subir evidencia"),
-    [selectedEvent?.link],
+    () => getAbsenceEvidenceLabel(selectedEvent, viewerRole),
+    [selectedEvent, viewerRole],
   );
 
   const openAbsenceEvidence = useCallback(() => {

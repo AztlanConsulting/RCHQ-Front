@@ -57,6 +57,15 @@ vi.mock("../../components/molecules/calendarCards/absenceDetail", () => ({
   ),
 }));
 
+vi.mock("../../components/molecules/calendarCards/workerAbsenceDetail", () => ({
+  default: ({ event, evidenceLabel }) => (
+    <div>
+      <span>Ausencia trabajador: {event?.employeeName}</span>
+      <span>{evidenceLabel}</span>
+    </div>
+  ),
+}));
+
 describe("Integración: Calendario page", () => {
   const setOwnCalendar = vi.fn();
 
@@ -158,6 +167,43 @@ describe("Integración: Calendario page", () => {
     expect(screen.getByText(/ausencia: luis martínez/i)).toBeInTheDocument();
     expect(screen.getByText("editing")).toBeInTheDocument();
     expect(screen.getByText(/subir evidencia/i)).toBeInTheDocument();
+  });
+
+  it("renderiza el detalle de trabajador para ausencias sin rol administrativo", () => {
+    useBaseCalendar.mockReturnValue({
+      employeeHouseName: "Operaciones CDMX",
+      allEvents: [{ id: "1" }],
+      isList: false,
+      handleDatesSet: vi.fn(),
+      loadButtonsAtStart: vi.fn(),
+      viewerRole: "Mantenimiento",
+      toggleList: vi.fn(),
+      setMonthView: vi.fn(),
+      setWeekView: vi.fn(),
+      setDayView: vi.fn(),
+      generateTitle: vi.fn(() => "Mayo 2026"),
+      getWeekDayName: vi.fn(() => "Lunes"),
+      resizeHandler: vi.fn(),
+      setOwnCalendar,
+    });
+    useCalendarPage.mockReturnValue({
+      selectedEvent: {
+        focus: "ausencias",
+        employeeName: "Luis Martínez",
+      },
+      isAbsenceEditing: false,
+      closeDetail: vi.fn(),
+      handleEventClick: vi.fn(),
+      absenceEvidenceLabel: "Sin evidencia",
+      openAbsenceEvidence: vi.fn(),
+      startAbsenceEdit: vi.fn(),
+      cancelAbsenceEdit: vi.fn(),
+    });
+
+    render(<Calendario />);
+
+    expect(screen.getByText(/ausencia trabajador: luis martínez/i)).toBeInTheDocument();
+    expect(screen.queryByText(/ausencia: luis martínez/i)).not.toBeInTheDocument();
   });
 
   it("renderiza el detalle de evento cuando selectedEvent no es ausencia", () => {
