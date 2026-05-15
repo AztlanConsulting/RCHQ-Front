@@ -5,6 +5,33 @@ import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 
+const PlusIcon = () => (
+  <span
+    aria-hidden="true"
+    className="mr-2 inline-flex text-[1.7rem] leading-none text-white"
+  >
+    +
+  </span>
+);
+
+const DocumentIcon = () => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    className="mr-2 h-5 w-5 shrink-0 text-white"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" />
+    <path d="M14 2v5h5" />
+    <path d="M9 13h6" />
+    <path d="M9 17h6" />
+  </svg>
+);
+
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
   <div className={fullWidth ? "col-span-2" : ""}>
     <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
@@ -161,6 +188,7 @@ const AbsenceDetail = ({
             hoverColor="hover:bg-[#15284A]"
             activeColor="active:bg-[#0E1B33]"
             disabled
+            icon={<PlusIcon />}
             className="px-4 shadow-md"
           />
         </div>
@@ -282,6 +310,7 @@ const AbsenceDetail = ({
           activeColor="active:bg-[#0E1B33]"
           onClick={onOpenEvidence}
           disabled={!event.link}
+          icon={event.link ? <DocumentIcon /> : <PlusIcon />}
           className="px-3 rounded-md shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
         />
       </div>
