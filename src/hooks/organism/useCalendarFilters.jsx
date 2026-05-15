@@ -190,7 +190,7 @@ const getFilteredEvents = (
                     status: rawEvent.status,
                     curp: rawEvent.curp ?? "",
                     usedDays: rawEvent.usedDays,
-                    link: rawEvent.link ?? "",
+                    link: rawEvent.focus === "ausencias" ? rawEvent.link ?? "" : "",
                     startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start,
                     endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end,
                     isDeleted: Boolean(rawEvent.isDeleted),
