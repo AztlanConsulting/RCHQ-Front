@@ -4,6 +4,18 @@ import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const normalizeCalendarEvent = (event) => {
+    const isAbsence = event?.focus === "ausencias" || event?.absenceId;
+    const evidencePath = isAbsence ? event?.link || event?.url || "" : "";
+
+    return {
+        ...event,
+        link: evidencePath
+            ? `${API_URL}/${String(evidencePath).replace(/^\/+/, "")}`
+            : "",
+    };
+};
+
 const parseJwtPayload = (token) => {
     if (!token) return null;
 
@@ -143,9 +155,9 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
             "No se pudieron obtener los eventos del calendario",
         );
     }
-    const rawEvents = response.data.events;
+    const rawEvents = response?.data?.events ?? [];
 
-    return rawEvents;
+    return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
 export const getHouseAbsencesInRange = async (startDate, endDate) => {
@@ -174,7 +186,9 @@ export const getHouseAbsencesInRange = async (startDate, endDate) => {
             "No se pudieron obtener las ausencias de la casa",
         );
     }
-    return response?.data?.events ?? [];
+    const rawEvents = response?.data?.events ?? [];
+
+    return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
 export const updateAbsenceService = async (absenceId, payload) => {

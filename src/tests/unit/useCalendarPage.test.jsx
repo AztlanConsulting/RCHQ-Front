@@ -66,6 +66,37 @@ describe("useCalendarPage", () => {
     });
   });
 
+  it.each(["Admin", "Coordinador"])(
+    "muestra subir evidencia para %s cuando la ausencia no tiene evidencia",
+    (viewerRole) => {
+      const { result } = renderHook(() =>
+        useCalendarPage({
+          viewerRole,
+        }),
+      );
+
+      act(() => {
+        result.current.handleEventClick(buildCalendarClickInfo());
+      });
+
+      expect(result.current.absenceEvidenceLabel).toBe("Subir evidencia");
+    },
+  );
+
+  it("muestra sin evidencia para roles no administrativos cuando no hay evidencia", () => {
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        viewerRole: "Mantenimiento",
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    expect(result.current.absenceEvidenceLabel).toBe("Sin evidencia");
+  });
+
   it("sanitiza caracteres especiales, conserva signos permitidos y limita a 200 caracteres", () => {
     const { result } = renderHook(() => useCalendarPage());
     const longText = `Texto base!!! 😀 📌 con emoji ¿vale? #123 ${"a".repeat(220)}`;
