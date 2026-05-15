@@ -20,7 +20,7 @@
     --fc-button-active-bg-color: #1f5acd;
 
     --fc-button-text-color: #fff;
-    --fc-today-bg-color: #0059ff30;
+    --fc-today-bg-color: #ffcc0030;
 }
 
 html,
@@ -58,6 +58,10 @@ input:-webkit-autofill:active {
 
 svg {
     vertical-align: middle;
+}
+
+.fc .fc-highlight {
+    background-color: #00a6ff   30;
 }
 
 .fc-button,
