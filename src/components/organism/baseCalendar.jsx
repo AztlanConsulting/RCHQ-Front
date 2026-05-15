@@ -42,6 +42,7 @@ const BaseCalendar = ({
     handleDatesSet,
     onEventClick,
     onDateDrag,
+    onDateDragging,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -54,7 +55,6 @@ const BaseCalendar = ({
         loadButtonsAtStart();
         resizeHandler(calendarRef);
     });
-
 
     return (
         <FullCalendar
@@ -113,6 +113,7 @@ const BaseCalendar = ({
             eventClick={(info) => onEventClick?.(info)}
             selectable={true}
             select={(info) => onDateDrag?.(info, calendarRef)}
+            selectAllow={() => onDateDragging?.()}
             unselectAuto={false}
         />
     );

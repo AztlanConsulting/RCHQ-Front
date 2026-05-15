@@ -271,13 +271,16 @@ export const useBaseCalendar = () => {
         const startDate = normalToUTCWithOffset(info.start);
         const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
 
-        const detail = `De ${startDate.getUTCDate()}/${startDate.getUTCMonth() + 1}/${startDate.getUTCFullYear()} ${startDate.getUTCHours()}:${startDate.getUTCMinutes()}:${startDate.getUTCSeconds()} a ${endDate.getUTCDate()}/${endDate.getUTCMonth() + 1}/${endDate.getUTCFullYear()} ${endDate.getUTCHours()}:${endDate.getUTCMinutes()}:${endDate.getUTCSeconds()}`;
-
-        setSelectedDates(detail);
+        setSelectedDates({startDate, endDate});
 
         const calendarApi = calendarRef.current.getApi();
         calendarApi.selectable = false;
     }, []);
+
+    const handleDateDragging = () => {
+        setSelectedDates(null);
+        return true;
+    }
 
     return {
         employeeHouseName,
@@ -298,5 +301,6 @@ export const useBaseCalendar = () => {
         closeCreationModal,
         handleEventClick,
         handleDateDrags,
+        handleDateDragging,
     };
 };
