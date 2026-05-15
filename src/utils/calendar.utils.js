@@ -16,6 +16,16 @@ export const STATUS_OPTIONS = [
     { value: "rechazadas", label: "Rechazadas" },
 ];
 
+export const ABSENCE_STATUS_OPTIONS = [
+    { value: "no_eliminadas", label: "No eliminadas" },
+    { value: "eliminadas", label: "Eliminadas" },
+];
+
+export const ABSENCE_EVIDENCE_OPTIONS = [
+    { value: "con_evidencia", label: "Con evidencia" },
+    { value: "sin_evidencia", label: "Sin evidencia" },
+];
+
 export const getFocusOption = (event) => {
     return FOCUS_OPTIONS.find(
         (f) => f.value === event.focus

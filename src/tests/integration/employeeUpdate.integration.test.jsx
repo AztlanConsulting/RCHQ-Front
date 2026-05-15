@@ -422,6 +422,8 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     const salaryInput = screen.getByPlaceholderText(/Ej: 15000/i);
     fireEvent.change(salaryInput, { target: { value: "20000" } });
 
+    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
+
     await act(async () => {
       fireEvent.click(saveBtn);
     });
@@ -443,6 +445,8 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
     const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
     fireEvent.change(salaryInput, { target: { value: "20000" } });
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
 
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
     await waitFor(() => expect(saveBtn).not.toBeDisabled());
@@ -468,6 +472,8 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
     const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
     fireEvent.change(salaryInput, { target: { value: "1" } });
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
 
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
     await waitFor(() => expect(saveBtn).not.toBeDisabled());

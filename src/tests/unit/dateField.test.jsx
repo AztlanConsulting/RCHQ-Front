@@ -97,6 +97,23 @@ describe("Pruebas Unitarias: DateField y useDateField", () => {
                 },
             });
         });
+
+        it("debe renderizar un input nativo cuando native=true", () => {
+            render(
+                <DateField
+                    native
+                    label="Fecha"
+                    name="testDate"
+                    value="2026-05-18"
+                    onChange={mockOnChange}
+                />,
+            );
+
+            expect(screen.getByDisplayValue("2026-05-18")).toHaveAttribute(
+                "type",
+                "date",
+            );
+        });
     });
 
     describe("Hook useDateField", () => {
