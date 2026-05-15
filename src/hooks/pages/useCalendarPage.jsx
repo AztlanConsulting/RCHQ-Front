@@ -136,7 +136,7 @@ export const useCalendarPage = ({
         (option) => String(option.value) === String(absenceForm.absenceTypeId),
       )
     ) {
-      setAbsenceEditError("Tipo de ausencia invÃ¡lido.");
+      setAbsenceEditError("Tipo de ausencia inválido.");
       return;
     }
 

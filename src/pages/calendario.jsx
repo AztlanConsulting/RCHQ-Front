@@ -183,6 +183,7 @@ const Calendario = () => {
             onSubmitEdit={submitAbsenceEdit}
             onAbsenceFieldChange={setAbsenceField}
             onClose={closeDetail}
+            viewerRole={viewerRole}
           />
         ) : (
           <EventDetail event={selectedEvent} />

@@ -3,6 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import WorkerAbsenceDetail from "./workerAbsenceDetail";
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
   <div className={fullWidth ? "col-span-2" : ""}>
@@ -10,7 +11,7 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
       {label}
     </Type>
     <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-      {value || "—"}
+      {value || "-"}
     </div>
   </div>
 );
@@ -33,6 +34,11 @@ const EditableTextArea = ({ label, value, onChange }) => (
   </div>
 );
 
+const isManagementRole = (role = "") => {
+  const normalizedRole = String(role).trim().toLowerCase();
+  return normalizedRole === "admin" || normalizedRole === "coordinador";
+};
+
 const AbsenceDetail = ({
   event,
   isEditing = false,
@@ -46,8 +52,21 @@ const AbsenceDetail = ({
   onCancelEdit,
   onSubmitEdit,
   onAbsenceFieldChange,
+  onClose,
+  viewerRole = "",
 }) => {
   if (!event) return null;
+
+  if (!isManagementRole(viewerRole)) {
+    return (
+      <WorkerAbsenceDetail
+        event={event}
+        evidenceLabel={evidenceLabel}
+        onOpenEvidence={onOpenEvidence}
+        onClose={onClose}
+      />
+    );
+  }
 
   if (isEditing) {
     return (
@@ -165,73 +184,73 @@ const AbsenceDetail = ({
   }
 
   return (
-      <div className="px-1 text-left sm:px-2">
-        <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
-          Ausencia
-        </Type>
+    <div className="px-1 text-left sm:px-2">
+      <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
+        Ausencia
+      </Type>
 
-        <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
-          <div>
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Nombre del trabajador
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {event.employeeName || "—"}
-            </Type>
-          </div>
-          <div>
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              CURP
-            </Type>
-            <Type variant="body" className="break-all text-[1.05rem] leading-snug sm:break-normal">
-              {event.curp || "—"}
-            </Type>
-          </div>
-
-          <div>
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Fecha de inicio:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {formatEventDate(event.startDate)}
-            </Type>
-          </div>
-          <div>
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Fecha de fin:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {formatEventDate(event.endDate)}
-            </Type>
-          </div>
-
-          <div className="sm:col-span-2">
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Tipo de ausencia:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {event.eventType || "—"}
-            </Type>
-          </div>
-
-          <div className="sm:col-span-2">
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Descripción:
-            </Type>
-            <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
-              {event.description || "—"}
-            </Type>
-          </div>
-
-          <div className="sm:col-span-2">
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Días hábiles:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {event.usedDays ?? "—"}
-            </Type>
-          </div>
+      <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Nombre del trabajador
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.employeeName || "-"}
+          </Type>
         </div>
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            CURP
+          </Type>
+          <Type variant="body" className="break-all text-[1.05rem] leading-snug sm:break-normal">
+            {event.curp || "-"}
+          </Type>
+        </div>
+
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Fecha de inicio:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {formatEventDate(event.startDate)}
+          </Type>
+        </div>
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Fecha de fin:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {formatEventDate(event.endDate)}
+          </Type>
+        </div>
+
+        <div className="sm:col-span-2">
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Tipo de ausencia:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.eventType || "-"}
+          </Type>
+        </div>
+
+        <div className="sm:col-span-2">
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Descripción:
+          </Type>
+          <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
+            {event.description || "-"}
+          </Type>
+        </div>
+
+        <div className="sm:col-span-2">
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Días hábiles:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.usedDays ?? "-"}
+          </Type>
+        </div>
+      </div>
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
         <Type variant="metric-label" className="text-[0.9rem] font-bold text-[#121212]">
