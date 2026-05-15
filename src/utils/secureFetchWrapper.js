@@ -1,4 +1,3 @@
-// apiFetch.js — concept only
 import { getToken, clearAuthStorage } from "./authStorage";
 
 const LOGIN_PATH = "/iniciar-sesion";

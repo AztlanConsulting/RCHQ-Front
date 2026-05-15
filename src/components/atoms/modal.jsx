@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 const placements = {
     "center": "fixed inset-0 z-50 flex items-center justify-center",
-    "right": "fixed inset-0 z-50 flex items-center justify-end",
+    "right": "fixed inset-0 z-50 flex items-center justify-end pr-4 md:pr-12 lg:pr-20",
     "left": "fixed inset-0 z-50 flex items-center justify-start"
 }
 
@@ -61,7 +61,7 @@ const Modal = ({
                     relative z-10
                     w-full max-w-2xl
                     rounded-xl bg-white shadow-xl
-                    p-6
+                    p-[30px] md:p-8
                     max-h-[90vh]
                     overflow-y-auto
                     mx-4
@@ -69,7 +69,11 @@ const Modal = ({
                 `}
             >
                 {(title || onClose) && (
-                    <div className="mb-4 flex items-center justify-between">
+                    <div
+                        className={`mb-4 flex items-center ${
+                            title ? "justify-between" : "justify-end"
+                        }`}
+                    >
                         {title && (
                             <h2 className="text-xl font-semibold">
                                 {title}
@@ -79,7 +83,7 @@ const Modal = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="text-2xl leading-none cursor-pointer"
+                            className="cursor-pointer text-[1.75rem] leading-none"
                             aria-label="Close modal"
                         >
                             ×

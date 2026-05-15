@@ -1,13 +1,90 @@
-import { useEffect, useRef, useState } from "react";
-import { getEmployeeHouseName, getEventsInRange, getOwnEmployeeId } from "../../services/calendarService";
+import { useCallback, useMemo, useRef, useState } from "react";
+import {
+    getCalendarViewerRole,
+    getEmployeeHouseName,
+    getEventsInRange,
+    getHouseAbsencesInRange,
+    getOwnEmployeeId,
+} from "../../services/calendarService";
+import { normalToUTCWithOffset } from "../../utils/dates";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
     const [viewType, setViewType] = useState("Month");
     const [viewEmployeeId, setViewEmployeeId] = useState("");
+    const [viewerRole, setViewerRole] = useState("");
+    const [calendarMode, setCalendarMode] = useState("personal");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
+    const [selectedDates, setSelectedDates] = useState(null);
     const lastFetchedRange = useRef(null);
+
+    const effectiveEmployeeId = useMemo(
+        () => viewEmployeeId || getOwnEmployeeId(),
+        [viewEmployeeId],
+    );
+    const effectiveViewerRole = useMemo(
+        () => viewerRole || getCalendarViewerRole(),
+        [viewerRole],
+    );
+
+    const canViewHouseAbsences = (role) =>
+        role === "Admin" || role === "Coordinador";
+
+    const isCoordinator = useMemo(
+        () => effectiveViewerRole === "Coordinador",
+        [effectiveViewerRole],
+    );
+
+    const canSwitchCalendarMode = useMemo(
+        () => canViewHouseAbsences(effectiveViewerRole),
+        [effectiveViewerRole],
+    );
+
+    const calendarModeOptions = useMemo(
+        () => [
+            { value: "personal", label: "Mi calendario" },
+            { value: "house", label: "Calendario de la casa" },
+        ],
+        [],
+    );
+
+    const filteredCalendarEvents = useMemo(() => {
+        if (isCoordinator) {
+            if (calendarMode === "personal") {
+                return allEvents.filter((event) => (
+                    event.focus === "ausencias" &&
+                    String(event.employeeId) === String(effectiveEmployeeId)
+                ));
+            }
+
+            return allEvents;
+        }
+
+        if (!canSwitchCalendarMode || calendarMode === "personal") {
+            return allEvents.filter((event) => (
+                !(event.focus === "ausencias" && event.scope === "house")
+            ));
+        }
+
+        return allEvents.filter((event) => {
+            if (event.focus === "ausencias") {
+                return event.scope === "house";
+            }
+
+            if (event.focus === "eventos") {
+                return event.scope === "house" || event.scope === "global";
+            }
+
+            return false;
+        });
+    }, [
+        allEvents,
+        calendarMode,
+        canSwitchCalendarMode,
+        effectiveEmployeeId,
+        isCoordinator,
+    ]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -25,6 +102,11 @@ export const useBaseCalendar = () => {
 
     const updateView = (calendarRef, newView) => {
         const calendarApi = calendarRef.current.getApi();
+
+        if (calendarApi.view.type == newView) return;
+
+        setSelectedDates(null);
+
         calendarApi.changeView(newView);
         updateButtons(newView);
     };
@@ -32,7 +114,7 @@ export const useBaseCalendar = () => {
     const loadButtonsAtStart = () => {
         const currentView = getCorrespondingView(isList, viewType);
         updateButtons(currentView);
-    }
+    };
 
     const updateButtons = (currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
@@ -96,7 +178,7 @@ export const useBaseCalendar = () => {
 
     const getMonth = (monthNumber, isComplete) => {
         const shortenedMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
-        const fullMonths = ["Enero", "Fererob", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const fullMonths = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const monthText = isComplete ? fullMonths[monthNumber] : shortenedMonths[monthNumber];
 
         return monthText;
@@ -143,7 +225,7 @@ export const useBaseCalendar = () => {
         const cellWidth = tableCell.clientWidth || 0;
 
         return cellWidth;
-    }
+    };
 
     const validateShortenedSize = () => {
         if (viewType == "Day") return false;
@@ -153,36 +235,87 @@ export const useBaseCalendar = () => {
         if (currentDayWidth < 96) return true;
 
         return false;
-    }
+    };
 
     const getWeekDayName = (currentDay) => {
         const weekDayIndex = currentDay.dow;
-        const shortenedDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        const fullDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const weekDay = validateShortenedSize() ? shortenedDays[weekDayIndex] : fullDays[weekDayIndex];
+        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        const fullDays = [
+            "Domingo",
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes",
+            "Sábado",
+        ];
+        const weekDay = validateShortenedSize()
+            ? shortenedDays[weekDayIndex]
+            : fullDays[weekDayIndex];
         return weekDay;
-    }
+    };
 
     const resizeHandler = (calendarRef) => {
         const calendarApi = calendarRef.current.getApi();
         calendarApi.render();
-    }
+    };
+
+    const loadCalendarEvents = useCallback(async (startDate, endDate, employeeId, role) => {
+        const personalEventsPromise = role !== "Coordinador" && employeeId
+            ? getEventsInRange(employeeId, startDate, endDate)
+            : Promise.resolve([]);
+
+        const houseAbsencesPromise = canViewHouseAbsences(role)
+            ? getHouseAbsencesInRange(startDate, endDate)
+            : Promise.resolve([]);
+
+        const [personalEvents, houseAbsences] = await Promise.all([
+            personalEventsPromise,
+            houseAbsencesPromise,
+        ]);
+
+        return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
+    }, []);
+
+    const reloadCurrentRange = useCallback(async () => {
+        if (!lastFetchedRange.current) return [];
+        if (
+            effectiveEmployeeId == "" &&
+            !canViewHouseAbsences(effectiveViewerRole)
+        ) return [];
+
+        const { start, end } = lastFetchedRange.current;
+        const rawEvents = await loadCalendarEvents(
+            start.split("T")[0],
+            end.split("T")[0],
+            effectiveEmployeeId,
+            effectiveViewerRole,
+        );
+
+        setAllEvents(rawEvents ?? []);
+        return rawEvents ?? [];
+    }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
-        ) return;
+        )
+            return;
         lastFetchedRange.current = { start: startStr, end: endStr };
 
-        if (viewEmployeeId == "") return;
+        if (
+            effectiveEmployeeId == "" &&
+            !canViewHouseAbsences(effectiveViewerRole)
+        ) return;
 
         try {
-            const rawEvents = await getEventsInRange(
-                viewEmployeeId,
+            const rawEvents = await loadCalendarEvents(
                 startStr.split("T")[0],
                 endStr.split("T")[0],
+                effectiveEmployeeId,
+                effectiveViewerRole,
             );
             setAllEvents(rawEvents ?? []);
         } catch (err) {
@@ -190,27 +323,47 @@ export const useBaseCalendar = () => {
         }
     };
 
-    // datesSet fires before setOwnCalendar sets the employee ID, so the first
-    // call is skipped. Once the ID is available, re-fetch the stored range.
-    useEffect(() => {
-        if (!viewEmployeeId || !lastFetchedRange.current) return;
-        const { start, end } = lastFetchedRange.current;
-        getEventsInRange(viewEmployeeId, start.split("T")[0], end.split("T")[0])
-            .then((raw) => setAllEvents(raw ?? []))
-            .catch(console.error);
-    }, [viewEmployeeId]);
-
-    const setOwnCalendar = async () => {
+    const setOwnCalendar = useCallback(async () => {
         const ownId = getOwnEmployeeId();
+        const role = getCalendarViewerRole();
         setViewEmployeeId(ownId);
+        setViewerRole(role);
+        setCalendarMode("personal");
         const employeeHouseName = await getEmployeeHouseName();
-        console.log("result of getEmployeeHouseName call: ", employeeHouseName);
         setEmployeeHouseName(employeeHouseName);
+    }, []);
+
+    const closeCreationModal = useCallback((calendarRef) => {
+        setSelectedDates(null);
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.unselect();
+    }, []);
+
+    const handleDateDrags = useCallback((info, calendarRef) => {
+        const startDate = normalToUTCWithOffset(info.start);
+        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+
+        setSelectedDates({startDate, endDate});
+
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.selectable = false;
+    }, []);
+
+    const handleDateDragging = () => {
+        setSelectedDates(null);
+        return true;
     }
 
     return {
         employeeHouseName,
-        allEvents,
+        allEvents: filteredCalendarEvents,
+        isList,
+        viewType,
+        viewerRole,
+        calendarMode,
+        setCalendarMode,
+        calendarModeOptions,
+        canSwitchCalendarMode,
         handleDatesSet,
         loadButtonsAtStart,
         toggleList,
@@ -221,5 +374,10 @@ export const useBaseCalendar = () => {
         getWeekDayName,
         resizeHandler,
         setOwnCalendar,
-    }
-}
+        selectedDates,
+        closeCreationModal,
+        handleDateDrags,
+        handleDateDragging,
+        reloadCurrentRange,
+    };
+};
