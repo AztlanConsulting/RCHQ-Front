@@ -4,6 +4,7 @@ import TextField from "../atoms/textField";
 import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
 
+const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
 
 const EmployeeBasicCard = ({
@@ -19,12 +20,14 @@ const EmployeeBasicCard = ({
   onSubmit,
   onCancel,
 }) => {
+  const image_url = `${API_URL}/${employee.picture}`;
+
   return (
     <div className="relative w-full flex p-3 items-start rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="flex shrink-0 mr-8 mt-1">
         <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
           <img
-            src={employee?.picture?.trim() ? employee.picture : AVATAR_PLACEHOLDER}
+            src={image_url?.trim() ? image_url : AVATAR_PLACEHOLDER}
             alt=""
             className="h-full w-full object-cover rounded-full ring-1 ring-slate-200"
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = AVATAR_PLACEHOLDER; }}
