@@ -13,9 +13,9 @@ export const useBaseCalendar = () => {
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
-    const lastFetchedRange = useRef(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedDates, setSelectedDates] = useState(null);
+    const lastFetchedRange = useRef(null);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -33,6 +33,11 @@ export const useBaseCalendar = () => {
 
     const updateView = (calendarRef, newView) => {
         const calendarApi = calendarRef.current.getApi();
+
+        if (calendarApi.view.type == newView) return;
+
+        setSelectedDates(null);
+
         calendarApi.changeView(newView);
         updateButtons(newView);
     };
