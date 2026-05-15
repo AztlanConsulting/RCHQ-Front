@@ -165,16 +165,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    if (
-      normalizedDescription &&
-      !ABSENCE_DESCRIPTION_PATTERN.test(normalizedDescription)
-    ) {
-      setAbsenceEditError(
-        "La descripción solo puede contener letras, números, espacios y signos de interrogación o exclamación.",
-      );
-      return;
-    }
-
     if (absenceEvidenceError) {
       setAbsenceEditError(absenceEvidenceError);
       return;
