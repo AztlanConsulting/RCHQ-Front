@@ -81,13 +81,19 @@ const EmployeeAdminCard = ({
             <div>
               <Type variant="metric-label" as="p">Tipo</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employee?.type ?? "N/A"}
+              {employee?.type
+              ? employee.type.charAt(0).toUpperCase() +
+                employee.type.slice(1)
+              : "N/A"}
               </Type>
             </div>
               <div className="text-right">
               <Type variant="metric-label" as="p">Frecuencia de Pago</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {employee?.frequencyOfPaymentName ?? "N/A"}
+              {employee?.frequencyOfPaymentName
+              ? employee.frequencyOfPaymentName.charAt(0).toUpperCase() +
+                employee.frequencyOfPaymentName.slice(1)
+              : "N/A"}
               </Type>
             </div>
             <div className="text-right">
