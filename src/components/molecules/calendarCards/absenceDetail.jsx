@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import Button from "../../atoms/button";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
@@ -14,6 +15,40 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
     </div>
   </div>
 );
+
+const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
+  const displayValue = value || "—";
+  const textRef = useRef(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const element = textRef.current;
+    if (!element) return;
+
+    setIsTruncated(element.scrollHeight > element.clientHeight + 1);
+  }, [displayValue, lines]);
+
+  return (
+    <div title={isTruncated ? displayValue : undefined}>
+      <div
+        ref={textRef}
+        className="max-w-full overflow-hidden whitespace-pre-wrap text-[1.05rem] leading-snug text-ellipsis"
+        style={{
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: lines,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          wordBreak: "break-word",
+        }}
+      >
+        <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
+          {displayValue}
+        </Type>
+      </div>
+    </div>
+  );
+};
 
 const EditableTextArea = ({ label, value, onChange }) => (
   <div className="sm:col-span-2">
@@ -190,6 +225,24 @@ const AbsenceDetail = ({
 
           <div>
             <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+              Tipo de ausencia:
+            </Type>
+            <Type variant="body" className="text-[1.05rem] leading-snug">
+              {event.eventType || "—"}
+            </Type>
+          </div>
+
+          <div>
+            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+              Días hábiles:
+            </Type>
+            <Type variant="body" className="text-[1.05rem] leading-snug">
+              {event.usedDays ?? "—"}
+            </Type>
+          </div>
+
+          <div>
+            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
               Fecha de inicio:
             </Type>
             <Type variant="body" className="text-[1.05rem] leading-snug">
@@ -207,29 +260,9 @@ const AbsenceDetail = ({
 
           <div className="sm:col-span-2">
             <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Tipo de ausencia:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {event.eventType || "—"}
-            </Type>
-          </div>
-
-          <div className="sm:col-span-2">
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
               Descripción:
             </Type>
-            <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
-              {event.description || "—"}
-            </Type>
-          </div>
-
-          <div className="sm:col-span-2">
-            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-              Días hábiles:
-            </Type>
-            <Type variant="body" className="text-[1.05rem] leading-snug">
-              {event.usedDays ?? "—"}
-            </Type>
+            <TruncatedReadOnlyText value={event.description} />
           </div>
         </div>
 
