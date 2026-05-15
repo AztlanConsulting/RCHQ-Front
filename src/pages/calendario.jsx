@@ -27,6 +27,10 @@ const Calendario = () => {
     getWeekDayName,
     resizeHandler,
     setOwnCalendar,
+    selectedDates,
+    closeCreationModal,
+    handleDateDrags,
+    handleDateDragging,
     reloadCurrentRange,
   } = useBaseCalendar();
 
@@ -153,6 +157,8 @@ const Calendario = () => {
             visibleEvents={visibleEvents}
             handleDatesSet={handleDatesSet}
             onEventClick={handleEventClick}
+            onDateDrag={handleDateDrags}
+            onDateDragging={handleDateDragging}
         />
       </div>
 
@@ -185,6 +191,34 @@ const Calendario = () => {
           />
         ) : (
           <EventDetail event={selectedEvent} />
+        )}
+      </Modal>
+
+      <Modal
+        open={selectedDates != null}
+        onClose={() => closeCreationModal(calendarRef)}
+        title="Creación de evento"
+        grayBackground={false}
+        placement="center"
+        className="max-w-[25vw] max-h-[80vh]"
+      >
+        {/* Aquí añadir el modal de eventos cuando se tenga */
+          selectedDates && (
+          <p>
+            {`De ${selectedDates.startDate.getUTCDate()}/${
+              selectedDates.startDate.getUTCMonth() + 1
+            }/${selectedDates.startDate.getUTCFullYear()} ${
+              selectedDates.startDate.getUTCHours()
+            }:${selectedDates.startDate.getUTCMinutes()}:${
+              selectedDates.startDate.getUTCSeconds()
+            } a ${selectedDates.endDate.getUTCDate()}/${
+              selectedDates.endDate.getUTCMonth() + 1
+            }/${selectedDates.endDate.getUTCFullYear()} ${
+              selectedDates.endDate.getUTCHours()
+            }:${selectedDates.endDate.getUTCMinutes()}:${
+              selectedDates.endDate.getUTCSeconds()
+            }`}
+          </p>
         )}
       </Modal>
     </div>
