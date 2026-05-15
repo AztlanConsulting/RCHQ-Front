@@ -55,6 +55,10 @@ const CalendarFilters = ({
   showVacationFilters,
   showAbscenceFilters,
   viewerRole,
+  calendarMode = "personal",
+  onCalendarModeChange,
+  calendarModeOptions = [],
+  canSwitchCalendarMode = false,
   className = "",
 }) => {
   return (
@@ -67,6 +71,28 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
+      {canSwitchCalendarMode ? (
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {calendarModeOptions.map((option) => {
+            const isActive = option.value === calendarMode;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onCalendarModeChange?.(option.value)}
+                className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
+                  isActive
+                    ? "bg-[#1F3664] text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
       <div className="flex flex-col gap-4 mt-4 max-h-[75vh]">
         <FilterGroup
           label="ENFOQUE"
@@ -121,7 +147,7 @@ const CalendarFilters = ({
               values={absenceTypeFilters}
               setValues={setAbsenceTypeFilters}
             />
-            {viewerRole === "Coordinador" ? (
+            {viewerRole === "Coordinador" && calendarMode === "house" ? (
               <SearchableCheckboxDropdown
                 label="TRABAJADOR"
                 name="absence-employee"

@@ -10,8 +10,11 @@ const DateField = ({
     minDate,
     maxDate,
     native = false,
+    popupAlign = "left",
+    popupSize = "default",
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : undefined;
+    const isCompactPopup = popupSize === "compact";
 
     useDateField(!native);
 
@@ -99,14 +102,67 @@ const DateField = ({
                     },
 
                     popup: {
-                        body: {
-                            view: {
-                                items: {
-                                    item: {
-                                        base: "flex items-center justify-center rounded-lg text-sm font-medium w-9 h-9 hover:bg-gray-100",
-                                        selected:
-                                            "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
-                                    },
+                        root: {
+                            base: `absolute top-10 z-50 block pt-2 ${popupAlign === "right" ? "right-0" : "left-0"}`,
+                            inline: "relative top-0 z-auto",
+                            inner: `inline-block rounded-lg bg-white shadow-lg dark:bg-gray-700 ${isCompactPopup ? "p-3" : "p-4"}`,
+                        },
+                        header: {
+                            selectors: {
+                                button: {
+                                    base: isCompactPopup
+                                        ? "rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                                        : "rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
+                                },
+                            },
+                        },
+                    },
+                    views: {
+                        days: {
+                            items: {
+                                base: isCompactPopup ? "grid w-56 grid-cols-7" : "grid w-64 grid-cols-7",
+                                item: {
+                                    base: isCompactPopup
+                                        ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
+                                        : "block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 hover:bg-gray-100",
+                                    selected:
+                                        "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
+                                },
+                            },
+                        },
+                        months: {
+                            items: {
+                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                item: {
+                                    base: isCompactPopup
+                                        ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
+                                        : "block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 hover:bg-gray-100",
+                                    selected:
+                                        "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
+                                },
+                            },
+                        },
+                        years: {
+                            items: {
+                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                item: {
+                                    base: isCompactPopup
+                                        ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
+                                        : "block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 hover:bg-gray-100",
+                                    selected:
+                                        "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
+                                },
+                            },
+                        },
+                        decades: {
+                            items: {
+                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                item: {
+                                    base: isCompactPopup
+                                        ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
+                                        : "block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 hover:bg-gray-100",
+                                    selected:
+                                        "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
                                 },
                             },
                         },

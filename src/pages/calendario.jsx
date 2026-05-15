@@ -23,6 +23,10 @@ const Calendario = () => {
     handleDatesSet,
     loadButtonsAtStart,
     viewerRole,
+    calendarMode,
+    setCalendarMode,
+    calendarModeOptions,
+    canSwitchCalendarMode,
     toggleList,
     setMonthView,
     setWeekView,
@@ -80,6 +84,8 @@ const Calendario = () => {
     absenceEditError,
     isSavingAbsence,
     alert,
+    absenceEvidenceFileName,
+    absenceEvidenceError,
     closeDetail,
     handleEventClick,
     absenceEvidenceLabel,
@@ -87,6 +93,7 @@ const Calendario = () => {
     startAbsenceEdit,
     cancelAbsenceEdit,
     setAbsenceField,
+    handleAbsenceEvidenceChange,
     submitAbsenceEdit,
     clearCalendarAlert,
   } = useCalendarPage({
@@ -146,6 +153,10 @@ const Calendario = () => {
         showVacationFilters={showVacationFilters}
         showAbscenceFilters={showAbscenceFilters}
         viewerRole={viewerRole}
+        calendarMode={calendarMode}
+        onCalendarModeChange={setCalendarMode}
+        calendarModeOptions={calendarModeOptions}
+        canSwitchCalendarMode={canSwitchCalendarMode}
       />
 
       <div className="flex-1">
@@ -182,19 +193,22 @@ const Calendario = () => {
         {selectedEvent?.focus === "ausencias" ? (
           isManagementRole(viewerRole) ? (
             <AbsenceDetail
-              event={selectedEvent}
-              isEditing={isAbsenceEditing}
-              evidenceLabel={absenceEvidenceLabel}
-              absenceTypeOptions={absenceTypeOptions}
-              absenceForm={absenceForm}
-              absenceEditError={absenceEditError}
-              isSaving={isSavingAbsence}
-              onOpenEvidence={openAbsenceEvidence}
-              onStartEdit={startAbsenceEdit}
-              onCancelEdit={cancelAbsenceEdit}
-              onSubmitEdit={submitAbsenceEdit}
-              onAbsenceFieldChange={setAbsenceField}
-            />
+            event={selectedEvent}
+            isEditing={isAbsenceEditing}
+            evidenceLabel={absenceEvidenceLabel}
+            absenceTypeOptions={absenceTypeOptions}
+            absenceForm={absenceForm}
+            absenceEditError={absenceEditError}
+            absenceEvidenceFileName={absenceEvidenceFileName}
+            absenceEvidenceError={absenceEvidenceError}
+            isSaving={isSavingAbsence}
+            onOpenEvidence={openAbsenceEvidence}
+            onStartEdit={startAbsenceEdit}
+            onCancelEdit={cancelAbsenceEdit}
+            onSubmitEdit={submitAbsenceEdit}
+            onAbsenceFieldChange={setAbsenceField}
+            onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
+          />
           ) : (
             <WorkerAbsenceDetail
               event={selectedEvent}
