@@ -3,7 +3,11 @@ import {
   calendarItemToDetail,
   eventApiToDetail,
 } from "../../utils/calendarEventDetail";
-import { updateAbsenceService } from "../../services/calendarService";
+import {
+  buildAbsenceEvidenceUrl,
+  updateAbsenceService,
+} from "../../services/calendarService";
+import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -54,12 +58,20 @@ export const useCalendarPage = ({
   const [absenceEditError, setAbsenceEditError] = useState("");
   const [isSavingAbsence, setIsSavingAbsence] = useState(false);
   const [alert, setAlert] = useState(null);
+  const {
+    file: absenceEvidenceFile,
+    fileName: absenceEvidenceFileName,
+    error: absenceEvidenceError,
+    handleFileChange: handleAbsenceEvidenceChange,
+    reset: resetAbsenceEvidence,
+  } = useDocumentFile();
 
   const closeDetail = useCallback(() => {
     setSelectedEvent(null);
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
-  }, []);
+    resetAbsenceEvidence();
+  }, [resetAbsenceEvidence]);
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
@@ -75,8 +87,12 @@ export const useCalendarPage = ({
 
   const openAbsenceEvidence = useCallback(() => {
     if (!selectedEvent?.link) return;
-    window.open(selectedEvent.link, "_blank", "noopener,noreferrer");
-  }, [absenceTypeOptions, selectedEvent]);
+    window.open(
+      buildAbsenceEvidenceUrl(selectedEvent.link),
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }, [selectedEvent]);
 
   const startAbsenceEdit = useCallback(() => {
     if (!selectedEvent) return;
@@ -89,12 +105,14 @@ export const useCalendarPage = ({
     });
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
-  }, [absenceTypeOptions, selectedEvent]);
+    resetAbsenceEvidence();
+  }, [absenceTypeOptions, resetAbsenceEvidence, selectedEvent]);
 
   const cancelAbsenceEdit = useCallback(() => {
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
-  }, []);
+    resetAbsenceEvidence();
+  }, [resetAbsenceEvidence]);
 
   const setAbsenceField = useCallback((field, value) => {
     setAbsenceForm((prev) => ({
@@ -152,6 +170,11 @@ export const useCalendarPage = ({
       return;
     }
 
+    if (absenceEvidenceError) {
+      setAbsenceEditError(absenceEvidenceError);
+      return;
+    }
+
     const payload = {};
 
     if (String(absenceForm.absenceTypeId) !== original.absenceTypeId) {
@@ -167,9 +190,14 @@ export const useCalendarPage = ({
       payload.description = normalizedDescription;
     }
 
+    if (absenceEvidenceFile) {
+      payload.file = absenceEvidenceFile;
+    }
+
     if (Object.keys(payload).length === 0) {
       setIsAbsenceEditing(false);
       setAbsenceEditError("");
+      resetAbsenceEvidence();
       return;
     }
 
@@ -214,6 +242,7 @@ export const useCalendarPage = ({
         message: "Ausencia actualizada correctamente",
       });
       setIsAbsenceEditing(false);
+      resetAbsenceEvidence();
     } catch (error) {
       setAbsenceEditError(
         error?.message || "No se pudo actualizar la ausencia.",
@@ -221,7 +250,15 @@ export const useCalendarPage = ({
     } finally {
       setIsSavingAbsence(false);
     }
-  }, [absenceForm, absenceTypeOptions, reloadCurrentRange, selectedEvent]);
+  }, [
+    absenceEvidenceError,
+    absenceEvidenceFile,
+    absenceForm,
+    absenceTypeOptions,
+    reloadCurrentRange,
+    resetAbsenceEvidence,
+    selectedEvent,
+  ]);
 
   return {
     selectedEvent,
@@ -230,6 +267,8 @@ export const useCalendarPage = ({
     absenceEditError,
     isSavingAbsence,
     alert,
+    absenceEvidenceFileName,
+    absenceEvidenceError,
     closeDetail,
     handleEventClick,
     absenceEvidenceLabel,
@@ -237,6 +276,7 @@ export const useCalendarPage = ({
     startAbsenceEdit,
     cancelAbsenceEdit,
     setAbsenceField,
+    handleAbsenceEvidenceChange,
     submitAbsenceEdit,
     clearCalendarAlert: () => setAlert(null),
   };

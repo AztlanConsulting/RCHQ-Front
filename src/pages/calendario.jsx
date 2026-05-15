@@ -76,6 +76,8 @@ const Calendario = () => {
     absenceEditError,
     isSavingAbsence,
     alert,
+    absenceEvidenceFileName,
+    absenceEvidenceError,
     closeDetail,
     handleEventClick,
     absenceEvidenceLabel,
@@ -83,6 +85,7 @@ const Calendario = () => {
     startAbsenceEdit,
     cancelAbsenceEdit,
     setAbsenceField,
+    handleAbsenceEvidenceChange,
     submitAbsenceEdit,
     clearCalendarAlert,
   } = useCalendarPage({
@@ -184,12 +187,15 @@ const Calendario = () => {
             absenceTypeOptions={absenceTypeOptions}
             absenceForm={absenceForm}
             absenceEditError={absenceEditError}
+            absenceEvidenceFileName={absenceEvidenceFileName}
+            absenceEvidenceError={absenceEvidenceError}
             isSaving={isSavingAbsence}
             onOpenEvidence={openAbsenceEvidence}
             onStartEdit={startAbsenceEdit}
             onCancelEdit={cancelAbsenceEdit}
             onSubmitEdit={submitAbsenceEdit}
             onAbsenceFieldChange={setAbsenceField}
+            onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
           />
         ) : (
           <EventDetail event={selectedEvent} />

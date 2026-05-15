@@ -184,15 +184,43 @@ export const updateAbsenceService = async (absenceId, payload) => {
         throw new Error("No se encontró token de sesión");
     }
 
+    const hasFile = payload?.file instanceof File;
+    const hasJsonFields = Object.entries(payload ?? {}).some(
+        ([key, value]) => key !== "file" && value !== undefined && value !== null && value !== "",
+    );
+
+    let headers = {
+        Authorization: `Bearer ${token}`,
+    };
+    let body;
+
+    if (hasFile) {
+        const formData = new FormData();
+
+        if (hasJsonFields) {
+            Object.entries(payload).forEach(([key, value]) => {
+                if (key === "file") return;
+                if (value === undefined || value === null || value === "") return;
+                formData.append(key, value);
+            });
+        }
+
+        formData.append("file", payload.file);
+        body = formData;
+    } else {
+        headers = {
+            ...headers,
+            "Content-Type": "application/json",
+        };
+        body = JSON.stringify(payload);
+    }
+
     const rawResponse = await secureFetch(
         `${API_URL}/absence/${absenceId}`,
         {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
+            headers,
+            body,
         },
     );
 
@@ -207,6 +235,19 @@ export const updateAbsenceService = async (absenceId, payload) => {
     }
 
     return response?.data?.absence;
+};
+
+export const buildAbsenceEvidenceUrl = (link) => {
+    if (!link) return "";
+
+    if (/^https?:\/\//i.test(link)) {
+        return link;
+    }
+
+    const baseUrl = String(API_URL ?? "").replace(/\/+$/, "");
+    const normalizedLink = String(link).replace(/^\/+/, "");
+
+    return `${baseUrl}/${normalizedLink}`;
 };
 
 const getOwnEmployeeId = () => {
