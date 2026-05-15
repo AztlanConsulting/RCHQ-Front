@@ -91,7 +91,7 @@ const EmployeeBasicCard = ({
                 { label: "Fecha de Inicio",     value: employee?.startDate ? String(employee.startDate).slice(0, 10) : "Sin fecha" },
                 { label: "Fecha de Terminación", value: employee?.endDate ?? "N/A" },
               ].map(({ label, value }) => (
-                <div key={label} className="basis-[calc(50%-0.25rem)] sm:basis-[calc(25%-0.375rem)] min-w-0">
+                <div key={label} className="basis-[calc(50%-0.25rem)] lg:basis-[calc(25%-0.375rem)] min-w-0">
                   <Type variant="metric-label" as="p">{label}</Type>
                   <Type variant="metric-value" as="p" className="mt-0.5">{value ?? "N/A"}</Type>
                 </div>
@@ -107,7 +107,7 @@ const EmployeeBasicCard = ({
                     { label: "RFC",             value: employee?.rfc },
                     { label: "Cuenta Bancaria", value: employee?.bankAccount },
                   ].map(({ label, value }) => (
-                    <div key={label} className="basis-[calc(50%-0.25rem)] sm:basis-[calc(25%-0.375rem)] min-w-0">
+                    <div key={label} className="basis-[calc(50%-0.25rem)] lg:basis-[calc(25%-0.375rem)] min-w-0">
                       <Type variant="metric-label" as="p">{label}</Type>
                       <Type variant="metric-value" as="p" className="mt-0.5">{value ?? "N/A"}</Type>
                     </div>

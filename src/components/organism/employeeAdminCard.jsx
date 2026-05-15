@@ -105,18 +105,19 @@ const EmployeeAdminCard = ({
                 {countWorkdayDays(employeeWorkdays)}
               </Type>
             </div>
-            <div className="flex items-start gap-2 sm:ml-auto sm:text-right">
-              <Drawer.Toggle
-                isOpen={workdaysDrawer.isOpen}
-                onToggle={workdaysDrawer.toggle}
-                ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
-              />
-              <div>
+            <div className="min-w-0 sm:ml-auto sm:text-right">
+              <div className="flex flex-row items-center justify-between gap-2 sm:justify-end">
                 <Type variant="metric-label" as="p">Horas Semanales</Type>
-                <Type variant="metric-value" as="p" className="mt-0.5">
-                  {countWorkdaysHours(employeeWorkdays)}
-                </Type>
+                <Drawer.Toggle
+                  isOpen={workdaysDrawer.isOpen}
+                  onToggle={workdaysDrawer.toggle}
+                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
+                  className="shrink-0"
+                />
               </div>
+              <Type variant="metric-value" as="p" className="mt-0.5 sm:text-right">
+                {countWorkdaysHours(employeeWorkdays)}
+              </Type>
             </div>
           </div>
 
