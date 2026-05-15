@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   calendarItemToDetail,
   eventApiToDetail,
@@ -48,6 +48,7 @@ export const useCalendarPage = ({
   reloadCurrentRange,
 } = {}) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const selectedEventRef = useRef(null);
   const [isAbsenceEditing, setIsAbsenceEditing] = useState(false);
   const [absenceForm, setAbsenceForm] = useState({
     absenceTypeId: "",
@@ -67,6 +68,7 @@ export const useCalendarPage = ({
   } = useDocumentFile();
 
   const closeDetail = useCallback(() => {
+    selectedEventRef.current = null;
     setSelectedEvent(null);
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
@@ -75,6 +77,7 @@ export const useCalendarPage = ({
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
+    selectedEventRef.current = detail;
     setSelectedEvent(detail);
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
@@ -95,13 +98,14 @@ export const useCalendarPage = ({
   }, [selectedEvent]);
 
   const startAbsenceEdit = useCallback(() => {
-    if (!selectedEvent) return;
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    if (!currentSelectedEvent) return;
 
     setAbsenceForm({
-      absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
-      startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: sanitizeAbsenceDescription(selectedEvent.description ?? ""),
+      absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
+      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
+      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? ""),
     });
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
@@ -125,17 +129,18 @@ export const useCalendarPage = ({
   }, []);
 
   const submitAbsenceEdit = useCallback(async () => {
-    if (!selectedEvent?.absenceId) return;
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    if (!currentSelectedEvent?.absenceId) return;
 
     const normalizedDescription = sanitizeAbsenceDescription(
       absenceForm.description,
     ).trim();
 
     const original = {
-      absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
-      startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: sanitizeAbsenceDescription(selectedEvent.description ?? "").trim(),
+      absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
+      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
+      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 
     if (!absenceForm.startDate || !absenceForm.endDate) {
@@ -206,7 +211,7 @@ export const useCalendarPage = ({
 
     try {
       const updatedAbsence = await updateAbsenceService(
-        selectedEvent.absenceId,
+        currentSelectedEvent.absenceId,
         payload,
       );
 
@@ -214,28 +219,30 @@ export const useCalendarPage = ({
       const refreshedAbsence = refreshedEvents?.find(
         (event) =>
           event.focus === "ausencias" &&
-          String(event.absenceId) === String(selectedEvent.absenceId),
+          String(event.absenceId) === String(currentSelectedEvent.absenceId),
       );
 
-      setSelectedEvent(
+      const nextSelectedEvent =
         refreshedAbsence
           ? calendarItemToDetail(refreshedAbsence)
           : {
-              ...selectedEvent,
-              absenceId: updatedAbsence?.absenceId ?? selectedEvent.absenceId,
+              ...currentSelectedEvent,
+              absenceId: updatedAbsence?.absenceId ?? currentSelectedEvent.absenceId,
               absenceTypeId:
                 updatedAbsence?.absenceTypeId ?? absenceForm.absenceTypeId,
-              employeeName: updatedAbsence?.name ?? selectedEvent.employeeName,
-              curp: updatedAbsence?.curp ?? selectedEvent.curp,
-              eventType: updatedAbsence?.type ?? selectedEvent.eventType,
+              employeeName: updatedAbsence?.name ?? currentSelectedEvent.employeeName,
+              curp: updatedAbsence?.curp ?? currentSelectedEvent.curp,
+              eventType: updatedAbsence?.type ?? currentSelectedEvent.eventType,
               description:
                 updatedAbsence?.description ?? normalizedDescription,
-              link: updatedAbsence?.link ?? selectedEvent.link,
+              link: updatedAbsence?.link ?? currentSelectedEvent.link,
               startDate: updatedAbsence?.startDate ?? absenceForm.startDate,
               endDate: updatedAbsence?.endDate ?? absenceForm.endDate,
-              isDeleted: updatedAbsence?.isDeleted ?? selectedEvent.isDeleted,
-            },
-      );
+              isDeleted: updatedAbsence?.isDeleted ?? currentSelectedEvent.isDeleted,
+            };
+
+      selectedEventRef.current = nextSelectedEvent;
+      setSelectedEvent(nextSelectedEvent);
 
       setAlert({
         type: "success",
