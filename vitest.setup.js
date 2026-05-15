@@ -8,6 +8,6 @@ vi.mock("/check.svg", () => ({ default: "check.svg" }));
 vi.mock("/showEye.svg", () => ({ default: "showEye.svg" }));
 
 afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
+    cleanup();
+    vi.clearAllMocks();
 });

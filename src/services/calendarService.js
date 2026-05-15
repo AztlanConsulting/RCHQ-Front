@@ -30,16 +30,13 @@ export const getEventsTypes = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
-        `${API_URL}/event/getAllTypes`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+    const rawResponse = await secureFetch(`${API_URL}/event/getAllTypes`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
-    );
+    });
 
     const response = await rawResponse.json();
     if (!rawResponse.ok) {
@@ -52,7 +49,7 @@ export const getEventsTypes = async () => {
     const eventTypes = response?.data?.eventTypes;
 
     return eventTypes;
-}
+};
 
 export const getAbsenceTypes = async () => {
     const token = getToken();
@@ -61,16 +58,13 @@ export const getAbsenceTypes = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
-        `${API_URL}/absence/types`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+    const rawResponse = await secureFetch(`${API_URL}/absence/types`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
-    );
+    });
 
     const response = await rawResponse.json();
     if (!rawResponse.ok) {
@@ -90,16 +84,13 @@ export const getHouseEmployees = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
-        `${API_URL}/house/employees`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+    const rawResponse = await secureFetch(`${API_URL}/house/employees`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
-    );
+    });
 
     const response = await rawResponse.json();
     if (!rawResponse.ok) {
@@ -113,7 +104,6 @@ export const getHouseEmployees = async () => {
 };
 
 const getEventsInRange = async (employeeId, startDate, endDate) => {
-
     if (employeeId == "") {
         return [];
     }
@@ -184,17 +174,14 @@ export const updateAbsenceService = async (absenceId, payload) => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
-        `${API_URL}/absence/${absenceId}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
+    const rawResponse = await secureFetch(`${API_URL}/absence/${absenceId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
-    );
+        body: JSON.stringify(payload),
+    });
 
     const response = await rawResponse.json().catch(() => ({}));
 
@@ -230,16 +217,13 @@ export const getEmployeeHouseName = async () => {
         throw new Error("No se encontró token de sesión");
     }
 
-    const rawResponse = await secureFetch(
-        `${API_URL}/house/getHouseName`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+    const rawResponse = await secureFetch(`${API_URL}/house/getHouseName`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
-    );
+    });
 
     const response = await rawResponse.json();
     if (!rawResponse.ok) {
@@ -252,6 +236,6 @@ export const getEmployeeHouseName = async () => {
     const houseName = response?.data?.houseName;
 
     return houseName;
-}
+};
 
 export { getEventsInRange, getOwnEmployeeId };

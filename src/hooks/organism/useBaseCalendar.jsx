@@ -121,9 +121,37 @@ export const useBaseCalendar = () => {
     };
 
     const getMonth = (monthNumber, isComplete) => {
-        const shortenedMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
-        const fullMonths = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const monthText = isComplete ? fullMonths[monthNumber] : shortenedMonths[monthNumber];
+        const shortenedMonths = [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Sept",
+            "Oct",
+            "Nov",
+            "Dic",
+        ];
+        const fullMonths = [
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre",
+        ];
+        const monthText = isComplete
+            ? fullMonths[monthNumber]
+            : shortenedMonths[monthNumber];
 
         return monthText;
     };
@@ -204,29 +232,33 @@ export const useBaseCalendar = () => {
         calendarApi.render();
     };
 
-    const loadCalendarEvents = useCallback(async (startDate, endDate, employeeId, role) => {
-        const personalEventsPromise = employeeId
-            ? getEventsInRange(employeeId, startDate, endDate)
-            : Promise.resolve([]);
+    const loadCalendarEvents = useCallback(
+        async (startDate, endDate, employeeId, role) => {
+            const personalEventsPromise = employeeId
+                ? getEventsInRange(employeeId, startDate, endDate)
+                : Promise.resolve([]);
 
-        const houseAbsencesPromise = canViewHouseAbsences(role)
-            ? getHouseAbsencesInRange(startDate, endDate)
-            : Promise.resolve([]);
+            const houseAbsencesPromise = canViewHouseAbsences(role)
+                ? getHouseAbsencesInRange(startDate, endDate)
+                : Promise.resolve([]);
 
-        const [personalEvents, houseAbsences] = await Promise.all([
-            personalEventsPromise,
-            houseAbsencesPromise,
-        ]);
+            const [personalEvents, houseAbsences] = await Promise.all([
+                personalEventsPromise,
+                houseAbsencesPromise,
+            ]);
 
-        return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
-    }, []);
+            return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
+        },
+        [],
+    );
 
     const reloadCurrentRange = useCallback(async () => {
         if (!lastFetchedRange.current) return [];
         if (
             effectiveEmployeeId == "" &&
             !canViewHouseAbsences(effectiveViewerRole)
-        ) return [];
+        )
+            return [];
 
         const { start, end } = lastFetchedRange.current;
         const rawEvents = await loadCalendarEvents(
@@ -252,7 +284,8 @@ export const useBaseCalendar = () => {
         if (
             effectiveEmployeeId == "" &&
             !canViewHouseAbsences(effectiveViewerRole)
-        ) return;
+        )
+            return;
 
         try {
             const rawEvents = await loadCalendarEvents(
@@ -286,7 +319,7 @@ export const useBaseCalendar = () => {
         const startDate = normalToUTCWithOffset(info.start);
         const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
 
-        setSelectedDates({startDate, endDate});
+        setSelectedDates({ startDate, endDate });
 
         const calendarApi = calendarRef.current.getApi();
         calendarApi.selectable = false;
@@ -295,7 +328,7 @@ export const useBaseCalendar = () => {
     const handleDateDragging = () => {
         setSelectedDates(null);
         return true;
-    }
+    };
 
     return {
         employeeHouseName,

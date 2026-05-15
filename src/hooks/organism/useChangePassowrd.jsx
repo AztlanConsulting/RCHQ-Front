@@ -1,107 +1,110 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getFirstLoginToken,
-  setPreTwoFactorAuthToken,
+    getFirstLoginToken,
+    setPreTwoFactorAuthToken,
 } from "../../utils/authStorage";
 import { changePasswordFirstLoginService } from "../../services/passwordService";
 import useAuth from "../useAuth";
 import {
-  firstLoginChangePasswordSchema,
-  getFirstSchemaError,
+    firstLoginChangePasswordSchema,
+    getFirstSchemaError,
 } from "../../utils/schema/auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
 
 export const useChangePassword = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState([]);
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  useEffect(() => {
-    const token = getFirstLoginToken();
-    if (!token) {
-      navigate("/iniciar-sesion", { replace: true });
-    }
-  }, [navigate]);
+    useEffect(() => {
+        const token = getFirstLoginToken();
+        if (!token) {
+            navigate("/iniciar-sesion", { replace: true });
+        }
+    }, [navigate]);
 
-  const toggleNewPassword = () => setShowNewPassword((value) => !value);
-  const toggleConfirmPassword = () => setShowConfirmPassword((value) => !value);
+    const toggleNewPassword = () => setShowNewPassword((value) => !value);
+    const toggleConfirmPassword = () =>
+        setShowConfirmPassword((value) => !value);
 
-  const handleSubmit = async ({ newPassword, confirmPassword }) => {
-    setLoading(true);
-    setErrors([]);
+    const handleSubmit = async ({ newPassword, confirmPassword }) => {
+        setLoading(true);
+        setErrors([]);
 
-    const validation = firstLoginChangePasswordSchema.safeParse({
-      newPassword,
-      confirmPassword,
-    });
+        const validation = firstLoginChangePasswordSchema.safeParse({
+            newPassword,
+            confirmPassword,
+        });
 
-    if (!validation.success) {
-      setErrors([
-        getFirstSchemaError(validation) || "Revisa los campos del formulario",
-      ]);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await changePasswordFirstLoginService(
-        newPassword,
-        confirmPassword,
-      );
-
-      if (response?.nextStep === "VERIFY_TWO_FACTOR_AUTH") {
-        const preTwoFactorAuthToken = response?.data?.preTwoFactorAuthToken;
-
-        if (!preTwoFactorAuthToken) {
-          setErrors([
-            "No se recibió un token válido para continuar con la autentificación en dos pasos",
-          ]);
-          return;
+        if (!validation.success) {
+            setErrors([
+                getFirstSchemaError(validation) ||
+                    "Revisa los campos del formulario",
+            ]);
+            setLoading(false);
+            return;
         }
 
-        setPreTwoFactorAuthToken(preTwoFactorAuthToken);
-        navigate("/2FA", { replace: true });
-        return;
-      }
+        try {
+            const response = await changePasswordFirstLoginService(
+                newPassword,
+                confirmPassword,
+            );
 
-      const token = response?.data?.token;
-      const user = response?.data?.user;
+            if (response?.nextStep === "VERIFY_TWO_FACTOR_AUTH") {
+                const preTwoFactorAuthToken =
+                    response?.data?.preTwoFactorAuthToken;
 
-      if (!token) {
-        setErrors(["No se recibió un token de sesión válido"]);
-        return;
-      }
+                if (!preTwoFactorAuthToken) {
+                    setErrors([
+                        "No se recibió un token válido para continuar con la autentificación en dos pasos",
+                    ]);
+                    return;
+                }
 
-      login({ token, user });
-      navigate("/app/calendario", { replace: true });
-    } catch (err) {
-      console.error(err);
-      setErrors(mapPasswordApiError(err, "first-login"));
-    } finally {
-      setLoading(false);
-    }
-  };
+                setPreTwoFactorAuthToken(preTwoFactorAuthToken);
+                navigate("/2FA", { replace: true });
+                return;
+            }
 
-  return {
-    loading,
-    errors,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    showNewPassword,
-    toggleNewPassword,
-    showConfirmPassword,
-    toggleConfirmPassword,
-    handleSubmit,
-  };
+            const token = response?.data?.token;
+            const user = response?.data?.user;
+
+            if (!token) {
+                setErrors(["No se recibió un token de sesión válido"]);
+                return;
+            }
+
+            login({ token, user });
+            navigate("/app/calendario", { replace: true });
+        } catch (err) {
+            console.error(err);
+            setErrors(mapPasswordApiError(err, "first-login"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        loading,
+        errors,
+        newPassword,
+        setNewPassword,
+        confirmPassword,
+        setConfirmPassword,
+        showNewPassword,
+        toggleNewPassword,
+        showConfirmPassword,
+        toggleConfirmPassword,
+        handleSubmit,
+    };
 };

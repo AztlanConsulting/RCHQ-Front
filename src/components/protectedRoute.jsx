@@ -2,13 +2,13 @@ import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
 
-  return isAuthenticated ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/iniciar-sesion" replace />
-  );
+    return isAuthenticated ? (
+        <Outlet />
+    ) : (
+        <Navigate to="/iniciar-sesion" replace />
+    );
 };
 
 export default ProtectedRoute;

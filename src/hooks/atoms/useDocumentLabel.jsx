@@ -2,10 +2,10 @@
 import { DOCUMENT_TYPES } from "../../services/documentService";
 
 export const useDocumentLabel = () => {
-  const getLabel = (typeValue) => {
-    const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
-    return found ? found.label : typeValue;
-  };
+    const getLabel = (typeValue) => {
+        const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
+        return found ? found.label : typeValue;
+    };
 
-  return { getLabel };
+    return { getLabel };
 };

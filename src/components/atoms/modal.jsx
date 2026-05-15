@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 const placements = {
-    "center": "fixed inset-0 z-50 flex items-center justify-center",
-    "right": "fixed inset-0 z-50 flex items-center justify-end pr-4 md:pr-12 lg:pr-20",
-    "left": "fixed inset-0 z-50 flex items-center justify-start"
-}
+    center: "fixed inset-0 z-50 flex items-center justify-center",
+    right: "fixed inset-0 z-50 flex items-center justify-end pr-4 md:pr-12 lg:pr-20",
+    left: "fixed inset-0 z-50 flex items-center justify-start",
+};
 
 const Modal = ({
     open,
@@ -75,9 +75,7 @@ const Modal = ({
                         }`}
                     >
                         {title && (
-                            <h2 className="text-xl font-semibold">
-                                {title}
-                            </h2>
+                            <h2 className="text-xl font-semibold">{title}</h2>
                         )}
 
                         <button
@@ -94,7 +92,7 @@ const Modal = ({
                 <div>{children}</div>
             </div>
         </div>,
-        document.body
+        document.body,
     );
 };
 

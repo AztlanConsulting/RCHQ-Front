@@ -1,70 +1,73 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  validateLoginTwoFactorAuthService,
-  getToken,
+    validateLoginTwoFactorAuthService,
+    getToken,
 } from "../../services/authService";
 import { useAuthContext } from "../../context/authContext";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";
 
 export const useTwoFactorLogin = () => {
-  const navigate = useNavigate();
-  const { login } = useAuthContext();
-  const codeField = useField(6);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { value: isBlocked, toggle: blockToggle } = useToggle(false);
+    const navigate = useNavigate();
+    const { login } = useAuthContext();
+    const codeField = useField(6);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { value: isBlocked, toggle: blockToggle } = useToggle(false);
 
-  useEffect(() => {
-    const sessionToken = getToken();
-    if (sessionToken) {
-      navigate("/app/calendario", { replace: true });
-    }
-  }, [navigate]);
+    useEffect(() => {
+        const sessionToken = getToken();
+        if (sessionToken) {
+            navigate("/app/calendario", { replace: true });
+        }
+    }, [navigate]);
 
-  const handleSubmit = async () => {
-    if (isBlocked) return;
+    const handleSubmit = async () => {
+        if (isBlocked) return;
 
-    if (codeField.value.length !== 6) {
-      setError("El código debe tener 6 dígitos");
-      return;
-    }
+        if (codeField.value.length !== 6) {
+            setError("El código debe tener 6 dígitos");
+            return;
+        }
 
-    setLoading(true);
-    setError("");
+        setLoading(true);
+        setError("");
 
-    try {
-      const response = await validateLoginTwoFactorAuthService(codeField.value);
+        try {
+            const response = await validateLoginTwoFactorAuthService(
+                codeField.value,
+            );
 
-      if (response.nextStep === "LOGIN_COMPLETE") {
-        localStorage.removeItem("preTwoFactorAuth");
-        login({ token: response.token, user: response.data });
-        navigate("/app/calendario", { replace: true });
-      }
-    } catch (err) {
-      console.error(err);
-      if (err.status === 423) {
-        setError(
-          "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
-        );
-        blockToggle();
-      } else {
-        setError(
-          err.message || "Código de autenticación en dos pasos inválido",
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (response.nextStep === "LOGIN_COMPLETE") {
+                localStorage.removeItem("preTwoFactorAuth");
+                login({ token: response.token, user: response.data });
+                navigate("/app/calendario", { replace: true });
+            }
+        } catch (err) {
+            console.error(err);
+            if (err.status === 423) {
+                setError(
+                    "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
+                );
+                blockToggle();
+            } else {
+                setError(
+                    err.message ||
+                        "Código de autenticación en dos pasos inválido",
+                );
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return {
-    code: codeField.value,
-    setCode: codeField.handleValue,
-    error,
-    loading,
-    isBlocked,
-    handleSubmit,
-  };
+    return {
+        code: codeField.value,
+        setCode: codeField.handleValue,
+        error,
+        loading,
+        isBlocked,
+        handleSubmit,
+    };
 };

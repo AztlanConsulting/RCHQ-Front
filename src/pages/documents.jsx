@@ -3,10 +3,10 @@ import DocumentsSection from "../components/organism/documentsSection";
 import { useDocuments } from "../hooks/organism/useDocuments";
 
 const Documents = () => {
-  const { employeeId } = useParams();
-  const documentsState = useDocuments(employeeId);
+    const { employeeId } = useParams();
+    const documentsState = useDocuments(employeeId);
 
-  return <DocumentsSection {...documentsState} />;
+    return <DocumentsSection {...documentsState} />;
 };
 
 export default Documents;

@@ -39,16 +39,20 @@ const DateField = ({
     };
 
     if (native) {
-        const minValue = minDate instanceof Date
-            ? minDate.toISOString().slice(0, 10)
-            : undefined;
-        const maxValue = maxDate instanceof Date
-            ? maxDate.toISOString().slice(0, 10)
-            : undefined;
+        const minValue =
+            minDate instanceof Date
+                ? minDate.toISOString().slice(0, 10)
+                : undefined;
+        const maxValue =
+            maxDate instanceof Date
+                ? maxDate.toISOString().slice(0, 10)
+                : undefined;
 
         return (
             <div className="date-field-wrapper flex w-full flex-col gap-1.5">
-                <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+                <label
+                    className={`text-sm font-bold sm:text-base ${labelColor}`}
+                >
                     {label}
                 </label>
 
