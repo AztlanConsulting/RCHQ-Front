@@ -9,6 +9,7 @@ const baseAbsence = {
   description:
     "El empleado fue hospitalizado por resfriado común, menciona sentirse cansado e incapaz de trabajar",
   link: "",
+  usedDays: 3,
 };
 
 describe("WorkerAbsenceDetail", () => {
@@ -25,6 +26,8 @@ describe("WorkerAbsenceDetail", () => {
     expect(screen.getByText("Médica")).toBeInTheDocument();
     expect(screen.getByText("Fecha de inicio:")).toBeInTheDocument();
     expect(screen.getByText("Fecha de fin:")).toBeInTheDocument();
+    expect(screen.getByText("Días hábiles:")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText(baseAbsence.description)).toBeInTheDocument();
     expect(screen.getByText("Sin evidencia")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cerrar/i })).toBeInTheDocument();
@@ -48,5 +51,16 @@ describe("WorkerAbsenceDetail", () => {
 
     expect(onOpenEvidence).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("Sin evidencia")).not.toBeInTheDocument();
+  });
+
+  it("muestra cero días hábiles cuando la ausencia no usa días", () => {
+    render(
+      <WorkerAbsenceDetail
+        event={{ ...baseAbsence, usedDays: 0 }}
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("0")).toBeInTheDocument();
   });
 });

@@ -48,9 +48,14 @@ const WorkerAbsenceDetail = ({
       </Type>
 
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
-        <div className="sm:col-span-2">
+        <div>
           <DetailLabel>Tipo de ausencia:</DetailLabel>
           <DetailValue>{event?.eventType}</DetailValue>
+        </div>
+
+        <div>
+          <DetailLabel>Días hábiles:</DetailLabel>
+          <DetailValue>{event?.usedDays}</DetailValue>
         </div>
 
         <div>

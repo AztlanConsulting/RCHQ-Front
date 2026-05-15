@@ -247,9 +247,11 @@ export const useCalendarFilters = (
             .catch(() => {
                 setCatalogAbsenceTypeOptions([]);
             });
+    }, []);
 
+    useEffect(() => {
         if (!canUseEmployeeCatalog) {
-            Promise.resolve().then(() => setCatalogAbsenceEmployeeOptions([]));
+            setCatalogAbsenceEmployeeOptions([]);
             return;
         }
 

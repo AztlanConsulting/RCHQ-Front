@@ -84,6 +84,7 @@ const Calendario = () => {
   } = useCalendarPage({
     absenceTypeOptions,
     reloadCurrentRange,
+    viewerRole,
   });
 
   useEffect(() => {
