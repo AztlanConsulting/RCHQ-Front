@@ -1,9 +1,6 @@
-import { useState } from "react";
 import FilterGroup from "../atoms/filterGroup";
+import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
 import Type from "../atoms/type";
-import {
-  STATUS_OPTIONS,
-} from "../../utils/calendar.utils";
 
 const focusTrailing = (opt) =>
   opt.icon ? (
@@ -35,14 +32,31 @@ const CalendarFilters = ({
   eventTypeFilters,
   setEventTypeFilters,
   eventTypeOptions,
+  vacationStatusFilters,
+  setVacationStatusFilters,
+  vacationStatusOptions,
+  absenceTypeFilters,
+  setAbsenceTypeFilters,
+  absenceTypeOptions,
+  absenceEmployeeFilters,
+  filteredAbsenceEmployeeOptions,
+  absenceEmployeeSearch,
+  selectedAbsenceEmployeeLabel,
+  setAbsenceEmployeeSearch,
+  toggleAbsenceEmployeeValue,
+  clearAbsenceEmployeeSelection,
+  absenceStatusFilters,
+  setAbsenceStatusFilters,
+  absenceStatusOptions,
+  absenceEvidenceFilters,
+  setAbsenceEvidenceFilters,
+  absenceEvidenceOptions,
   showEventFilters,
   showVacationFilters,
   showAbscenceFilters,
+  viewerRole,
   className = "",
 }) => {
-  const [vacacionesVals, setVacacionesVals] = useState([]);
-  const [ausenciasVals,  setAusenciasVals]  = useState([]);
-
   return (
     <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
       <Type variant="page-title" as="h2">
@@ -64,34 +78,35 @@ const CalendarFilters = ({
         />
         <div className="border border-b  border-[#1F3664]"></div>
         <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
+        <FilterGroup
+          label="VISIBILIDAD"
+          name="scope"
+          options={scopeOptions}
+          values={scopeFilters}
+          setValues={setScopeFilters}
+          renderTrailing={scopeTrailing}
+        />
+        <div className="border border-b border-[#EAEAEA]"></div>
         {showEventFilters && (
           <>
             <FilterGroup
-              label="VISIBILIDAD"
-              name="scope"
-              options={scopeOptions}
-              values={scopeFilters}
-              setValues={setScopeFilters}
-              renderTrailing={scopeTrailing}
+              label="CATEGORIA"
+              name="tipo-evento"
+              options={eventTypeOptions}
+              values={eventTypeFilters}
+              setValues={setEventTypeFilters}
             />
-              <FilterGroup
-                label="CATEGORIA"
-                name="tipo-evento"
-                options={eventTypeOptions}
-                values={eventTypeFilters}
-                setValues={setEventTypeFilters}
-              />
-              <div className="border border-b border-[#EAEAEA]"></div>
+            <div className="border border-b border-[#EAEAEA]"></div>
           </>
         )}
         {showVacationFilters && (
           <>
             <FilterGroup
-              label="VACACIONES"
+              label="ESTATUS DE VACACIONES"
               name="vacaciones"
-              options={STATUS_OPTIONS}
-              values={vacacionesVals}
-              setValues={setVacacionesVals}
+              options={vacationStatusOptions}
+              values={vacationStatusFilters}
+              setValues={setVacationStatusFilters}
             />
             <div className="border border-b border-[#EAEAEA]"></div>
           </>
@@ -100,11 +115,38 @@ const CalendarFilters = ({
         {showAbscenceFilters && (
           <>
             <FilterGroup
-              label="AUSENCIAS"
-              name="ausencias"
-              options={STATUS_OPTIONS}
-              values={ausenciasVals}
-              setValues={setAusenciasVals}
+              label="TIPO DE AUSENCIA"
+              name="absence-type"
+              options={absenceTypeOptions}
+              values={absenceTypeFilters}
+              setValues={setAbsenceTypeFilters}
+            />
+            {viewerRole === "Coordinador" ? (
+              <SearchableCheckboxDropdown
+                label="TRABAJADOR"
+                name="absence-employee"
+                filteredOptions={filteredAbsenceEmployeeOptions}
+                values={absenceEmployeeFilters}
+                search={absenceEmployeeSearch}
+                selectedLabel={selectedAbsenceEmployeeLabel}
+                onSearchChange={setAbsenceEmployeeSearch}
+                onToggleValue={toggleAbsenceEmployeeValue}
+                onClearSelection={clearAbsenceEmployeeSelection}
+              />
+            ) : null}
+            <FilterGroup
+              label="ESTATUS"
+              name="absence-status"
+              options={absenceStatusOptions}
+              values={absenceStatusFilters}
+              setValues={setAbsenceStatusFilters}
+            />
+            <FilterGroup
+              label="EVIDENCIA"
+              name="absence-evidence"
+              options={absenceEvidenceOptions}
+              values={absenceEvidenceFilters}
+              setValues={setAbsenceEvidenceFilters}
             />
           </>
         )}

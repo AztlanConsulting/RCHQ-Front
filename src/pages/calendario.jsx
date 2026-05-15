@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
+import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
+import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
+import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 
 const Calendario = () => {
   const calendarRef = React.useRef(null);
@@ -12,8 +15,10 @@ const Calendario = () => {
   const {
     employeeHouseName,
     allEvents,
+    isList,
     handleDatesSet,
     loadButtonsAtStart,
+    viewerRole,
     toggleList,
     setMonthView,
     setWeekView,
@@ -22,13 +27,11 @@ const Calendario = () => {
     getWeekDayName,
     resizeHandler,
     setOwnCalendar,
-    selectedEvent,
     selectedDates,
-    closeDetail,
     closeCreationModal,
-    handleEventClick,
     handleDateDrags,
     handleDateDragging,
+    reloadCurrentRange,
   } = useBaseCalendar();
 
   const {
@@ -41,18 +44,68 @@ const Calendario = () => {
     eventTypeFilters,
     setEventTypeFilters,
     eventTypeOptions,
+    vacationStatusFilters,
+    setVacationStatusFilters,
+    vacationStatusOptions,
+    absenceTypeFilters,
+    setAbsenceTypeFilters,
+    absenceTypeOptions,
+    absenceEmployeeFilters,
+    filteredAbsenceEmployeeOptions,
+    absenceEmployeeSearch,
+    selectedAbsenceEmployeeLabel,
+    setAbsenceEmployeeSearch,
+    toggleAbsenceEmployeeValue,
+    clearAbsenceEmployeeSelection,
+    absenceStatusFilters,
+    setAbsenceStatusFilters,
+    absenceStatusOptions,
+    absenceEvidenceFilters,
+    setAbsenceEvidenceFilters,
+    absenceEvidenceOptions,
     showEventFilters,
     showVacationFilters,
     showAbscenceFilters,
     visibleEvents,
-  } = useCalendarFilters(allEvents);
+  } = useCalendarFilters(allEvents, { isList });
+
+  const {
+    selectedEvent,
+    isAbsenceEditing,
+    absenceForm,
+    absenceEditError,
+    isSavingAbsence,
+    alert,
+    closeDetail,
+    handleEventClick,
+    absenceEvidenceLabel,
+    openAbsenceEvidence,
+    startAbsenceEdit,
+    cancelAbsenceEdit,
+    setAbsenceField,
+    submitAbsenceEdit,
+    clearCalendarAlert,
+  } = useCalendarPage({
+    absenceTypeOptions,
+    reloadCurrentRange,
+  });
 
   useEffect(() => {
     setOwnCalendar();
-  }, []);
+  }, [setOwnCalendar]);
 
   return (
     <div className="flex items-center gap-4">
+      {alert?.message ? (
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2">
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={clearCalendarAlert}
+          />
+        </div>
+      ) : null}
+
       <CalendarFilters
         className="basis-1/6 min-w-40 "
         houseName={employeeHouseName}
@@ -65,9 +118,29 @@ const Calendario = () => {
         eventTypeFilters={eventTypeFilters}
         setEventTypeFilters={setEventTypeFilters}
         eventTypeOptions={eventTypeOptions}
+        vacationStatusFilters={vacationStatusFilters}
+        setVacationStatusFilters={setVacationStatusFilters}
+        vacationStatusOptions={vacationStatusOptions}
+        absenceTypeFilters={absenceTypeFilters}
+        setAbsenceTypeFilters={setAbsenceTypeFilters}
+        absenceTypeOptions={absenceTypeOptions}
+        absenceEmployeeFilters={absenceEmployeeFilters}
+        filteredAbsenceEmployeeOptions={filteredAbsenceEmployeeOptions}
+        absenceEmployeeSearch={absenceEmployeeSearch}
+        selectedAbsenceEmployeeLabel={selectedAbsenceEmployeeLabel}
+        setAbsenceEmployeeSearch={setAbsenceEmployeeSearch}
+        toggleAbsenceEmployeeValue={toggleAbsenceEmployeeValue}
+        clearAbsenceEmployeeSelection={clearAbsenceEmployeeSelection}
+        absenceStatusFilters={absenceStatusFilters}
+        setAbsenceStatusFilters={setAbsenceStatusFilters}
+        absenceStatusOptions={absenceStatusOptions}
+        absenceEvidenceFilters={absenceEvidenceFilters}
+        setAbsenceEvidenceFilters={setAbsenceEvidenceFilters}
+        absenceEvidenceOptions={absenceEvidenceOptions}
         showEventFilters={showEventFilters}
         showVacationFilters={showVacationFilters}
         showAbscenceFilters={showAbscenceFilters}
+        viewerRole={viewerRole}
       />
 
       <div className="flex-1">
@@ -92,12 +165,33 @@ const Calendario = () => {
       <Modal
         open={selectedEvent != null}
         onClose={closeDetail}
-        title="Detalle del evento"
+        title={selectedEvent?.focus === "ausencias" ? null : "Detalle del evento"}
         grayBackground={false}
         placement="right"
-        className="max-w-[25vw] max-h-[80vh]"
+        className={
+          selectedEvent?.focus === "ausencias"
+            ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+            : "max-w-[25vw] max-h-[80vh]"
+        }
       >
-        <EventDetail event={selectedEvent} />
+        {selectedEvent?.focus === "ausencias" ? (
+          <AbsenceDetail
+            event={selectedEvent}
+            isEditing={isAbsenceEditing}
+            evidenceLabel={absenceEvidenceLabel}
+            absenceTypeOptions={absenceTypeOptions}
+            absenceForm={absenceForm}
+            absenceEditError={absenceEditError}
+            isSaving={isSavingAbsence}
+            onOpenEvidence={openAbsenceEvidence}
+            onStartEdit={startAbsenceEdit}
+            onCancelEdit={cancelAbsenceEdit}
+            onSubmitEdit={submitAbsenceEdit}
+            onAbsenceFieldChange={setAbsenceField}
+          />
+        ) : (
+          <EventDetail event={selectedEvent} />
+        )}
       </Modal>
 
       <Modal
