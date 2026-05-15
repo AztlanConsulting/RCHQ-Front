@@ -126,41 +126,44 @@ const AbsenceDetail = ({
           <Button
             type="button"
             text={event.link ? "Cambiar evidencia" : "Subir evidencia"}
-            width="w-auto min-w-[9.5rem]"
-            height="h-10"
+            width="w-auto min-w-[10.5rem]"
+            height="h-9"
             textSize="text-sm"
             bgColor="bg-[#1F3664]"
             textColor="text-white"
             hoverColor="hover:bg-[#15284A]"
             activeColor="active:bg-[#0E1B33]"
             disabled
+            className="px-4 shadow-md"
           />
         </div>
 
-        <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-5">
           <Button
             type="button"
             text="Cancelar"
-            width="w-full"
+            width="w-full sm:w-[10rem]"
             height="h-11"
             textSize="text-base"
             bgColor="bg-white"
             textColor="text-[#121212]"
             hoverColor="hover:bg-slate-50"
             activeColor="active:bg-slate-100"
+            className="border border-slate-200 shadow-md"
             onClick={onCancelEdit}
             disabled={isSaving}
           />
           <Button
             type="button"
             text="Guardar"
-            width="w-full"
+            width="w-full sm:w-[10rem]"
             height="h-11"
             textSize="text-base"
             bgColor="bg-[#1F3664]"
             textColor="text-white"
             hoverColor="hover:bg-[#15284A]"
             activeColor="active:bg-[#0E1B33]"
+            className="shadow-md"
             onClick={onSubmitEdit}
             disabled={isSaving}
           />
@@ -245,8 +248,8 @@ const AbsenceDetail = ({
         <Button
           type="button"
           text={evidenceLabel}
-          width="w-auto min-w-[9.5rem]"
-          height="h-9"
+          width="w-auto min-w-[7.25rem]"
+          height="h-7"
           textSize="text-xs"
           bgColor="bg-[#1F3664]"
           textColor="text-white"
@@ -254,6 +257,7 @@ const AbsenceDetail = ({
           activeColor="active:bg-[#0E1B33]"
           onClick={onOpenEvidence}
           disabled={!event.link}
+          className="px-3 rounded-md shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
         />
       </div>
 
@@ -261,25 +265,26 @@ const AbsenceDetail = ({
         <Button
           type="button"
           text="Eliminar"
-          width="w-full sm:w-40"
+          width="w-full sm:w-[8.2rem]"
           height="h-10"
           textSize="text-base"
-          bgColor="bg-[#C20000]"
+          bgColor="bg-[#A20000]"
           textColor="text-white"
-          hoverColor="hover:bg-[#930000]"
-          activeColor="active:bg-[#7C0000]"
-          disabled
+          hoverColor="hover:bg-[#870000]"
+          activeColor="active:bg-[#6B0000]"
+          className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
         />
         <Button
           type="button"
           text="Editar"
-          width="w-full sm:w-40"
+          width="w-full sm:w-[8.2rem]"
           height="h-10"
           textSize="text-base"
           bgColor="bg-[#1F3664]"
           textColor="text-white"
           hoverColor="hover:bg-[#15284A]"
           activeColor="active:bg-[#0E1B33]"
+          className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
           onClick={onStartEdit}
         />
       </div>
