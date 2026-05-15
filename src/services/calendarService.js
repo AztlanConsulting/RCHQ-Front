@@ -185,9 +185,6 @@ export const updateAbsenceService = async (absenceId, payload) => {
     }
 
     const hasFile = payload?.file instanceof File;
-    const hasJsonFields = Object.entries(payload ?? {}).some(
-        ([key, value]) => key !== "file" && value !== undefined && value !== null && value !== "",
-    );
 
     let headers = {
         Authorization: `Bearer ${token}`,
@@ -197,13 +194,11 @@ export const updateAbsenceService = async (absenceId, payload) => {
     if (hasFile) {
         const formData = new FormData();
 
-        if (hasJsonFields) {
-            Object.entries(payload).forEach(([key, value]) => {
-                if (key === "file") return;
-                if (value === undefined || value === null || value === "") return;
-                formData.append(key, value);
-            });
-        }
+        Object.entries(payload ?? {}).forEach(([key, value]) => {
+            if (key === "file") return;
+            if (value === undefined || value === null) return;
+            formData.append(key, value);
+        });
 
         formData.append("file", payload.file);
         body = formData;

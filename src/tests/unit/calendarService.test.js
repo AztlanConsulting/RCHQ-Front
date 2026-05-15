@@ -84,6 +84,30 @@ describe("calendarService", () => {
     expect(requestBody.get("file")).toBe(file);
   });
 
+  it("conserva strings vacíos en FormData para permitir limpiar campos", async () => {
+    await loadService();
+    localStorage.setItem("token", "token-test");
+    secureFetch.mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        data: { absence: { absenceId: "absence-1" } },
+      }),
+    });
+
+    const file = new File(["pdf"], "evidencia.pdf", {
+      type: "application/pdf",
+    });
+
+    await updateAbsenceService("absence-1", {
+      description: "",
+      file,
+    });
+
+    const requestBody = secureFetch.mock.calls[0][1].body;
+    expect(requestBody.get("description")).toBe("");
+    expect(requestBody.get("file")).toBe(file);
+  });
+
   it("anida la URL relativa de evidencia con el API_URL", async () => {
     await loadService();
     expect(buildAbsenceEvidenceUrl("uploads/documents/test.pdf")).toBe(
