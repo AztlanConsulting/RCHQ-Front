@@ -67,14 +67,14 @@ export const useCalendarPage = ({
   }, []);
 
   const absenceEvidenceLabel = useMemo(
-    () => (selectedEvent?.link ? "Ver evidencia" : "Subir evidencia"),
+    () => (selectedEvent?.link ? "Ver evidencia" : "Sin evidencia"),
     [selectedEvent?.link],
   );
 
   const openAbsenceEvidence = useCallback(() => {
     if (!selectedEvent?.link) return;
     window.open(selectedEvent.link, "_blank", "noopener,noreferrer");
-  }, [absenceTypeOptions, selectedEvent]);
+  }, [selectedEvent]);
 
   const startAbsenceEdit = useCallback(() => {
     if (!selectedEvent) return;
@@ -136,7 +136,7 @@ export const useCalendarPage = ({
         (option) => String(option.value) === String(absenceForm.absenceTypeId),
       )
     ) {
-      setAbsenceEditError("Tipo de ausencia inválido.");
+      setAbsenceEditError("Tipo de ausencia invÃ¡lido.");
       return;
     }
 

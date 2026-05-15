@@ -63,7 +63,7 @@ const Calendario = () => {
     showVacationFilters,
     showAbscenceFilters,
     visibleEvents,
-  } = useCalendarFilters(allEvents, { isList });
+  } = useCalendarFilters(allEvents, { isList, viewerRole });
 
   const {
     selectedEvent,
@@ -182,6 +182,7 @@ const Calendario = () => {
             onCancelEdit={cancelAbsenceEdit}
             onSubmitEdit={submitAbsenceEdit}
             onAbsenceFieldChange={setAbsenceField}
+            onClose={closeDetail}
           />
         ) : (
           <EventDetail event={selectedEvent} />
