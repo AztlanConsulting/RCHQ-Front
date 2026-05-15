@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import Button from "../../atoms/button";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
@@ -45,32 +44,28 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
 
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
-  const textRef = useRef(null);
-  const [isTruncated, setIsTruncated] = useState(false);
-
-  useEffect(() => {
-    const element = textRef.current;
-    if (!element) return;
-
-    setIsTruncated(element.scrollHeight > element.clientHeight + 1);
-  }, [displayValue, lines]);
+  const shouldTruncate = displayValue.length > 200;
+  const previewValue = shouldTruncate
+    ? `${displayValue.slice(0, 200).trimEnd()}...`
+    : displayValue;
 
   return (
-    <div title={isTruncated ? displayValue : undefined}>
+    <div title={shouldTruncate ? displayValue : undefined}>
       <div
-        ref={textRef}
-        className="max-w-full overflow-hidden whitespace-pre-wrap text-[1.05rem] leading-snug text-ellipsis"
+        className={`max-w-full whitespace-pre-wrap text-[1.05rem] leading-snug ${
+          shouldTruncate ? "overflow-hidden text-ellipsis" : ""
+        }`}
         style={{
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-          WebkitLineClamp: lines,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
+          display: shouldTruncate ? "-webkit-box" : "block",
+          WebkitBoxOrient: shouldTruncate ? "vertical" : undefined,
+          WebkitLineClamp: shouldTruncate ? lines : undefined,
+          overflow: shouldTruncate ? "hidden" : "visible",
+          textOverflow: shouldTruncate ? "ellipsis" : "clip",
           wordBreak: "break-word",
         }}
       >
         <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
-          {displayValue}
+          {previewValue}
         </Type>
       </div>
     </div>
