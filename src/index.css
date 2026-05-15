@@ -61,7 +61,7 @@ svg {
 }
 
 .fc .fc-highlight {
-    background-color: #00a6ff   30;
+    background-color: #00a6ff 30;
 }
 
 .fc-button,
@@ -103,7 +103,8 @@ svg {
     /*cloudflare ssl certificates*/
 }
 
-.fc .fc-toolbar-chunk .fc-button-primary:focus, .fc .fc-toolbar-chunk .fc-button-primary:focus:active {
+.fc .fc-toolbar-chunk .fc-button-primary:focus,
+.fc .fc-toolbar-chunk .fc-button-primary:focus:active {
     box-shadow: none;
 }
 
@@ -458,4 +459,16 @@ button.outside-month-day:hover {
     background-color: #374151 !important;
 
     opacity: 0.5 !important;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(18px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }

@@ -1,16 +1,17 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
+import RegisterHouseEventModal from "./evento/agregarEvento";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 
 const Calendario = () => {
-  const calendarRef = React.useRef(null);
+  const calendarRef = useRef(null);
 
   const {
     employeeHouseName,
@@ -194,33 +195,16 @@ const Calendario = () => {
         )}
       </Modal>
 
-      <Modal
-        open={selectedDates != null}
+      <RegisterHouseEventModal
+        isOpen={selectedDates != null}
         onClose={() => closeCreationModal(calendarRef)}
-        title="Creación de evento"
-        grayBackground={false}
-        placement="center"
-        className="max-w-[25vw] max-h-[80vh]"
-      >
-        {/* Aquí añadir el modal de eventos cuando se tenga */
-          selectedDates && (
-          <p>
-            {`De ${selectedDates.startDate.getUTCDate()}/${
-              selectedDates.startDate.getUTCMonth() + 1
-            }/${selectedDates.startDate.getUTCFullYear()} ${
-              selectedDates.startDate.getUTCHours()
-            }:${selectedDates.startDate.getUTCMinutes()}:${
-              selectedDates.startDate.getUTCSeconds()
-            } a ${selectedDates.endDate.getUTCDate()}/${
-              selectedDates.endDate.getUTCMonth() + 1
-            }/${selectedDates.endDate.getUTCFullYear()} ${
-              selectedDates.endDate.getUTCHours()
-            }:${selectedDates.endDate.getUTCMinutes()}:${
-              selectedDates.endDate.getUTCSeconds()
-            }`}
-          </p>
-        )}
-      </Modal>
+        onSuccess={() => {
+          closeCreationModal(calendarRef);
+          reloadCurrentRange();
+        }}
+        initialStartDate={selectedDates?.startDate.toISOString().split("T")[0]}
+        initialEndDate={selectedDates?.endDate.toISOString().split("T")[0]}
+      />
     </div>
   );
 };
