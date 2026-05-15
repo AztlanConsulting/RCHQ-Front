@@ -68,7 +68,7 @@ const DetalleEmpleado = () => {
       )}
 
       {/* Título y tabs */}
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-3 min-w-0">
+      <div className="flex flex-nowrap items-center gap-2 min-w-0">
         <button
           type="button"
           onClick={() => navigate("/app/personal")}
@@ -79,20 +79,21 @@ const DetalleEmpleado = () => {
           </svg>
         </button>
 
-        <Type variant="page-title" as="h2" className="min-w-0 flex-1">
+        <Type variant="page-title" as="h2" className="min-w-0 flex-1 truncate">
           Gestión de Empleados
         </Type>
 
-        <NativeSelect
-          size="sm" aria-label="Tabs" value={currentTab}
-          onChange={(e) => setCurrentTab(e.target.value)}
-          options={tabs.map((t) => ({ label: t.label, value: t.id }))}
-          className="w-full min-w-0 basis-full sm:basis-auto sm:w-72 md:hidden"
-        />
+        <div className="min-w-0 shrink md:hidden max-w-[min(11rem,38%)]">
+          <NativeSelect
+            size="sm" aria-label="Tabs" value={currentTab}
+            onChange={(e) => setCurrentTab(e.target.value)}
+            options={tabs.map((t) => ({ label: t.label, value: t.id }))}
+          />
+        </div>
         <Tabs
           selectedKey={currentTab}
           onSelectionChange={(key) => setCurrentTab(key)}
-          className="w-max max-md:hidden ml-0 md:ml-6"
+          className="w-max max-md:hidden shrink-0 ml-0 md:ml-6"
         >
           <Tabs.List type="underline" >
             {tabs.map((tab) => (
