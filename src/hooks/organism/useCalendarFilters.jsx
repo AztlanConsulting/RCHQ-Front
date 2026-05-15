@@ -251,7 +251,7 @@ export const useCalendarFilters = (
 
     useEffect(() => {
         if (!canUseEmployeeCatalog) {
-            setCatalogAbsenceEmployeeOptions([]);
+            Promise.resolve().then(() => setCatalogAbsenceEmployeeOptions([]));
             return;
         }
 

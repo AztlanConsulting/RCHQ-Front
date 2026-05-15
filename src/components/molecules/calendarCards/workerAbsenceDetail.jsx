@@ -16,7 +16,7 @@ const DetailValue = ({ children, className = "" }) => (
     variant="body"
     className={`block text-[1.05rem] leading-snug text-[#121212] ${className}`}
   >
-    {children || "-"}
+    {children === null || children === undefined || children === "" ? "-" : children}
   </Type>
 );
 
