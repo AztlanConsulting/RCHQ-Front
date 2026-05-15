@@ -63,4 +63,24 @@ describe("WorkerAbsenceDetail", () => {
 
     expect(screen.getByText("0")).toBeInTheDocument();
   });
+
+  it("limita la descripción a 200 caracteres y conserva el texto completo en hover", () => {
+    const longDescription = `${"Detalle largo ".repeat(20)}
+Segunda línea completa`;
+
+    render(
+      <WorkerAbsenceDetail
+        event={{ ...baseAbsence, description: longDescription }}
+        onClose={vi.fn()}
+      />,
+    );
+
+    const preview = `${longDescription.slice(0, 200).trimEnd()}...`;
+
+    const description = screen.getByText(preview);
+
+    expect(description).toBeInTheDocument();
+    expect(description).toHaveAttribute("title", longDescription);
+    expect(screen.queryByText(longDescription)).not.toBeInTheDocument();
+  });
 });

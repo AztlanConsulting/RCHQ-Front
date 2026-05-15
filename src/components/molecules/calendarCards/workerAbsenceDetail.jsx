@@ -11,14 +11,23 @@ const DetailLabel = ({ children, className = "" }) => (
   </Type>
 );
 
-const DetailValue = ({ children, className = "" }) => (
+const MAX_DESCRIPTION_LENGTH = 200;
+
+const DetailValue = ({ children, className = "", ...props }) => (
   <Type
     variant="body"
     className={`block text-[1.05rem] leading-snug text-[#121212] ${className}`}
+    {...props}
   >
     {children === null || children === undefined || children === "" ? "-" : children}
   </Type>
 );
+
+const getDescriptionPreview = (description = "") => {
+  const text = String(description);
+  if (text.length <= MAX_DESCRIPTION_LENGTH) return text;
+  return `${text.slice(0, MAX_DESCRIPTION_LENGTH).trimEnd()}...`;
+};
 
 const EvidenceButtonIcon = () => (
   <img
@@ -36,6 +45,8 @@ const WorkerAbsenceDetail = ({
   onClose,
 }) => {
   const hasEvidence = Boolean(event?.link);
+  const fullDescription = String(event?.description ?? "");
+  const descriptionPreview = getDescriptionPreview(fullDescription);
 
   return (
     <div className="px-1 text-left sm:px-2">
@@ -70,8 +81,11 @@ const WorkerAbsenceDetail = ({
 
         <div className="sm:col-span-2">
           <DetailLabel>Descripción:</DetailLabel>
-          <DetailValue className="max-w-[29rem] whitespace-pre-wrap">
-            {event?.description}
+          <DetailValue
+            className="max-w-[29rem] whitespace-pre-line"
+            title={fullDescription || undefined}
+          >
+            {descriptionPreview}
           </DetailValue>
         </div>
 

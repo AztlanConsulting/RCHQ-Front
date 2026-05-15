@@ -3,7 +3,6 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
-import WorkerAbsenceDetail from "./workerAbsenceDetail";
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
     <div className={fullWidth ? "col-span-2" : ""}>
@@ -34,9 +33,6 @@ const EditableTextArea = ({ label, value, onChange }) => (
     </div>
 );
 
-const isManagementRole = (role) =>
-    role === "Admin" || role === "Coordinador";
-
 const AbsenceDetail = ({
     event,
     isEditing = false,
@@ -50,21 +46,8 @@ const AbsenceDetail = ({
     onCancelEdit,
     onSubmitEdit,
     onAbsenceFieldChange,
-    onClose,
-    viewerRole = "",
 }) => {
   if (!event) return null;
-
-  if (!isManagementRole(viewerRole)) {
-    return (
-      <WorkerAbsenceDetail
-        event={event}
-        evidenceLabel={evidenceLabel}
-        onOpenEvidence={onOpenEvidence}
-        onClose={onClose}
-      />
-    );
-  }
 
   if (isEditing) {
     return (

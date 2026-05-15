@@ -14,30 +14,10 @@ const absence = {
 };
 
 describe("AbsenceDetail", () => {
-  it("usa la vista de trabajador para roles no administrativos", () => {
-    render(
-      <AbsenceDetail
-        event={absence}
-        viewerRole="Mantenimiento"
-        onClose={vi.fn()}
-      />,
-    );
-
-    expect(screen.getByText("Ausencia")).toBeInTheDocument();
-    expect(screen.getByText("Médica")).toBeInTheDocument();
-    expect(screen.getByText("Sin evidencia")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /cerrar/i })).toBeInTheDocument();
-    expect(screen.queryByText("Nombre del trabajador")).not.toBeInTheDocument();
-    expect(screen.queryByText("CURP")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /editar/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /eliminar/i })).not.toBeInTheDocument();
-  });
-
   it("mantiene la vista administrativa para coordinador", () => {
     render(
       <AbsenceDetail
         event={absence}
-        viewerRole="Coordinador"
         evidenceLabel="Sin evidencia"
         onStartEdit={vi.fn()}
       />,

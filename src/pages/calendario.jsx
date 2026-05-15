@@ -5,9 +5,13 @@ import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
+import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
+
+const isManagementRole = (role) =>
+  role === "Admin" || role === "Coordinador";
 
 const Calendario = () => {
   const calendarRef = React.useRef(null);
@@ -170,22 +174,29 @@ const Calendario = () => {
         }
       >
         {selectedEvent?.focus === "ausencias" ? (
-          <AbsenceDetail
-            event={selectedEvent}
-            isEditing={isAbsenceEditing}
-            evidenceLabel={absenceEvidenceLabel}
-            absenceTypeOptions={absenceTypeOptions}
-            absenceForm={absenceForm}
-            absenceEditError={absenceEditError}
-            isSaving={isSavingAbsence}
-            onOpenEvidence={openAbsenceEvidence}
-            onStartEdit={startAbsenceEdit}
-            onCancelEdit={cancelAbsenceEdit}
-            onSubmitEdit={submitAbsenceEdit}
-            onAbsenceFieldChange={setAbsenceField}
-            onClose={closeDetail}
-            viewerRole={viewerRole}
-          />
+          isManagementRole(viewerRole) ? (
+            <AbsenceDetail
+              event={selectedEvent}
+              isEditing={isAbsenceEditing}
+              evidenceLabel={absenceEvidenceLabel}
+              absenceTypeOptions={absenceTypeOptions}
+              absenceForm={absenceForm}
+              absenceEditError={absenceEditError}
+              isSaving={isSavingAbsence}
+              onOpenEvidence={openAbsenceEvidence}
+              onStartEdit={startAbsenceEdit}
+              onCancelEdit={cancelAbsenceEdit}
+              onSubmitEdit={submitAbsenceEdit}
+              onAbsenceFieldChange={setAbsenceField}
+            />
+          ) : (
+            <WorkerAbsenceDetail
+              event={selectedEvent}
+              evidenceLabel={absenceEvidenceLabel}
+              onOpenEvidence={openAbsenceEvidence}
+              onClose={closeDetail}
+            />
+          )
         ) : (
           <EventDetail event={selectedEvent} />
         )}
