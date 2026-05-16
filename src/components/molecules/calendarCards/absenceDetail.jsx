@@ -4,42 +4,34 @@ import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import documentIcon from "/document.svg";
 
 const PlusIcon = () => (
-  <span aria-hidden="true" className="mr-1.5 inline-flex text-[1rem] leading-none text-white">
+  <span aria-hidden="true" 
+  className="mr-1.5 inline-flex text-[1rem] leading-none text-white">
     +
   </span>
 );
 
-const DocumentIcon = () => (
-  <svg
+const DocumentWhiteIcon = () => (
+  <img
+    src={documentIcon}
+    alt=""
     aria-hidden="true"
-    viewBox="0 0 24 24"
-    className="mr-1.5 h-3.5 w-3.5 shrink-0 text-white"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" />
-    <path d="M14 2v5h5" />
-    <path d="M9 13h6" />
-    <path d="M9 17h6" />
-  </svg>
+    className="mr-1.5 h-3.5 w-3.5 shrink-0 brightness-0 invert"
+  />
 );
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
-  <div className={fullWidth ? "col-span-2" : ""}>
-    <Type variant="metric-label" className="mb-1.5 block font-bold text-[#121212]">
-      {label}
-    </Type>
-    <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-      {value || "—"}
+    <div className={fullWidth ? "col-span-2" : ""}>
+        <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
+            {label}
+        </Type>
+        <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+            {value || "-"}
+        </div>
     </div>
-  </div>
 );
-
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
   const shouldTruncate = displayValue.length > 200;
@@ -256,7 +248,6 @@ const AbsenceDetail = ({
       <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
         Ausencia
       </Type>
-
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
@@ -330,7 +321,7 @@ const AbsenceDetail = ({
           activeColor="active:bg-[#0E1B33]"
           onClick={onOpenEvidence}
           disabled={!event.link}
-          icon={event.link ? <DocumentIcon /> : <PlusIcon />}
+          icon={event.link ? <DocumentWhiteIcon /> : <PlusIcon />}
           className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
         />
       </div>
