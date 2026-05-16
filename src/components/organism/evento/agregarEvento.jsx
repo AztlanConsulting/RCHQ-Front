@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-
 import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
 import ButtonGroup from "../../molecules/buttonGroup";
 import CasaForm from "./forms/casaForm";
+import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 
 const CATEGORY_OPTIONS = [
     { value: "global", label: "Global", icon: "globe" },
@@ -24,28 +23,17 @@ const RegisterEventModal = ({
     initialStartDate,
     initialEndDate,
 }) => {
-    const [name, setName] = useState("");
-    const [nameError, setNameError] = useState("");
-    const [categoryKey, setCategoryKey] = useState("casa");
-    const [validationAlert, setValidationAlert] = useState(null);
-    const [animationKey, setAnimationKey] = useState(0);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setName("");
-            setNameError("");
-            setCategoryKey("casa");
-            setValidationAlert(null);
-            setAnimationKey(0);
-        }
-    }, [isOpen]);
-
-    const handleCategoryChange = (val) => {
-        setCategoryKey(val);
-        setAnimationKey((prev) => prev + 1);
-        setNameError("");
-        setValidationAlert(null);
-    };
+    const {
+        name,
+        nameError,
+        categoryKey,
+        validationAlert,
+        animationKey,
+        setNameError,
+        setValidationAlert,
+        handleNameChange,
+        handleCategoryChange,
+    } = useRegisterEventModal(isOpen);
 
     if (!isOpen) return null;
 
@@ -101,10 +89,7 @@ const RegisterEventModal = ({
                             id="event-name"
                             placeholder="Agregar título"
                             value={name}
-                            setValue={(v) => {
-                                setName(v.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, ""));
-                                setNameError("");
-                            }}
+                            setValue={handleNameChange}
                             maxLength={70}
                         />
 
