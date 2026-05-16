@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
+import { hasRole } from "../../utils/auth/getRoleName";
 
 // ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
@@ -13,18 +14,8 @@ const Icon = ({ name, className }) => (
   />
 );
 
-const isCoordinatorUser = (user) => {
-  const roleName =
-    user?.role?.name ||
-    user?.roleName ||
-    user?.role ||
-    "";
-
-  return String(roleName).toLowerCase() === "coordinador";
-};
-
 const getNavItems = (user) => {
-  const vacationPath = isCoordinatorUser(user)
+  const vacationPath = hasRole(user, "coordinador")
     ? "/app/vacaciones/solicitudes"
     : "/app/vacaciones";
 

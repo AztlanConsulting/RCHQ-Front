@@ -101,7 +101,7 @@ const VacationRequests = () => {
                 onPrevPage={handlePrevPage}
                 onNextPage={handleNextPage}
                 loading={loading}
-                hasEmployees={requests.length > 0}
+                hasItems={requests.length > 0}
                 itemLabel="solicitudes"
             />
         </div>

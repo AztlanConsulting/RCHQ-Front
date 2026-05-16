@@ -7,10 +7,13 @@ const Pagination = ({
   onPrevPage,
   onNextPage,
   loading,
+  hasItems,
   hasEmployees,
   itemLabel = "empleados",
 }) => {
-  if (!hasEmployees) {
+  const shouldShowPagination = hasItems ?? hasEmployees;
+
+  if (!shouldShowPagination) {
     return null;
   }
 

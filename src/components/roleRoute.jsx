@@ -1,15 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-
-const getRoleName = (user) => {
-    const roleName =
-        user?.role?.name ||
-        user?.roleName ||
-        user?.role ||
-        "";
-
-    return String(roleName).toLowerCase();
-};
+import { hasRole } from "../utils/auth/getRoleName";
 
 const RoleRoute = ({ allowedRoles = [], redirectTo = "/app/calendario" }) => {
     const { user, isAuthenticated } = useAuth();
@@ -18,11 +9,7 @@ const RoleRoute = ({ allowedRoles = [], redirectTo = "/app/calendario" }) => {
         return <Navigate to="/iniciar-sesion" replace />;
     }
 
-    const userRole = getRoleName(user);
-
-    const isAllowed = allowedRoles
-        .map((role) => String(role).toLowerCase())
-        .includes(userRole);
+    const isAllowed = allowedRoles.some((role) => hasRole(user, role));
 
     if (!isAllowed) {
         return <Navigate to={redirectTo} replace />;
