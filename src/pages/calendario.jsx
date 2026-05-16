@@ -86,7 +86,7 @@ const Calendario = () => {
     isSavingAbsence,
     isDeleteAbsenceOpen,
     absenceDeleteError,
-    isDeletingAbsence,
+    isLoadingWhileDeleting,
     alert,
     absenceEvidenceFileName,
     absenceEvidenceError,
@@ -212,7 +212,7 @@ const Calendario = () => {
               absenceEvidenceError={absenceEvidenceError}
               isSaving={isSavingAbsence}
               isDeleteOpen={isDeleteAbsenceOpen}
-              isDeleting={isDeletingAbsence}
+              isLoadingWhileDeleting={isLoadingWhileDeleting}
               canManageAbsence={isManagementRole(viewerRole)}
               onOpenEvidence={openAbsenceEvidence}
               onStartEdit={startAbsenceEdit}

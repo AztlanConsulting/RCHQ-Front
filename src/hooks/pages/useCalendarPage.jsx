@@ -73,7 +73,7 @@ export const useCalendarPage = ({
   const [isSavingAbsence, setIsSavingAbsence] = useState(false);
   const [isDeleteAbsenceOpen, setIsDeleteAbsenceOpen] = useState(false);
   const [absenceDeleteError, setAbsenceDeleteError] = useState("");
-  const [isDeletingAbsence, setIsDeletingAbsence] = useState(false);
+  const [isLoadingWhileDeleting, setIsLoadingWhileDeleting] = useState(false);
   const [alert, setAlert] = useState(null);
   const {
     file: absenceEvidenceFile,
@@ -294,7 +294,7 @@ export const useCalendarPage = ({
   const confirmDeleteAbsence = useCallback(async () => {
     if (!selectedEvent?.absenceId) return;
 
-    setIsDeletingAbsence(true);
+    setIsLoadingWhileDeleting(true);
     setAbsenceDeleteError("");
 
     try {
@@ -316,7 +316,7 @@ export const useCalendarPage = ({
         error?.message || "No se pudo eliminar la ausencia.",
       );
     } finally {
-      setIsDeletingAbsence(false);
+      setIsLoadingWhileDeleting(false);
     }
   }, [closeDetail, reloadCurrentRange, selectedEvent?.absenceId]);
 
@@ -328,7 +328,7 @@ export const useCalendarPage = ({
     isSavingAbsence,
     isDeleteAbsenceOpen,
     absenceDeleteError,
-    isDeletingAbsence,
+    isLoadingWhileDeleting,
     alert,
     absenceEvidenceFileName,
     absenceEvidenceError,
