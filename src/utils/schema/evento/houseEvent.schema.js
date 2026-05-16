@@ -6,8 +6,10 @@ const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 const baseSchema = z.object({
     name: z
-        .string({ required_error: "El nombre es obligatorio" })
-        .min(1, "El nombre es obligatorio")
+        .string({ required_error: "El titulo es obligatorio" })
+        .trim()
+        .min(1, "El titulo es obligatorio")
+        .min(3, "Titulo demasiado corto")
         .max(120, "Máximo 120 caracteres"),
 
     categoryKey: z
@@ -16,7 +18,7 @@ const baseSchema = z.object({
 
     eventTypeId: z.uuid("Selecciona un tipo de evento"),
 
-    description: z.string().max(500, "Máximo 500 caracteres").optional(),
+    description: z.string().max(250, "Máximo 250 caracteres").optional(),
 
     isFreeDay: z.boolean().default(false),
 

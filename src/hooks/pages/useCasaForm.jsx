@@ -114,7 +114,7 @@ export const useCasaForm = ({
         result.error.issues.forEach((error) => {
             const key = error.path[error.path.length - 1];
 
-            if (key) {
+            if (key && !fieldErrors[key]) {
                 fieldErrors[key] = error.message;
             }
         });
