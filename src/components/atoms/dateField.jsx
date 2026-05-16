@@ -9,6 +9,7 @@ const DateField = ({
     labelColor = "text-[#6b6b6b]",
     minDate,
     maxDate,
+    placeholder = "dd / mm / yyyy",
     native = false,
     popupAlign = "left",
     popupSize = "default",
@@ -67,7 +68,7 @@ const DateField = ({
                         type="date"
                         name={name}
                         value={value ?? ""}
-                        placeholder="dd / mm / yyyy"
+                        placeholder={placeholder}
                         min={minValue}
                         max={maxValue}
                         onChange={onChange}
@@ -85,10 +86,11 @@ const DateField = ({
             </label>
 
             <Datepicker
+                key={value ?? "empty-date"}
                 language="es-ES"
-                value={dateValue}
+                value={dateValue ?? null}
                 onChange={handleDateChange}
-                label="dd / mm / yyyy"
+                placeholder={placeholder}
                 showTodayButton={false}
                 showClearButton={false}
                 minDate={minDate}
