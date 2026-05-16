@@ -2,7 +2,6 @@ import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import Button from "../atoms/button";
-import useSearch from "../../hooks/molecules/useSearch";
 
 const VacationRequestFilters = ({
     view,
@@ -16,11 +15,6 @@ const VacationRequestFilters = ({
     setStatusFilter,
     clearFilters,
 }) => {
-    const { inputValue, handleChange, handleKeyDown } = useSearch(
-        searchQuery,
-        setSearchQuery,
-    );
-
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
     };
@@ -41,9 +35,8 @@ const VacationRequestFilters = ({
                     id="vacation-search"
                     text="Buscar por nombre o CURP"
                     placeholder="Nombre, apellido o CURP"
-                    value={inputValue}
-                    setValue={handleChange}
-                    onKeyDown={handleKeyDown}
+                    value={searchQuery}
+                    setValue={setSearchQuery}
                     maxLength={100}
                     labelClassName="text-sm font-bold text-[#121212]"
                 />
@@ -78,7 +71,9 @@ const VacationRequestFilters = ({
                     value={endDate}
                     onChange={handleEndDateChange}
                     minDate={startDate ? new Date(`${startDate}T12:00:00`) : undefined}
-                    calendarStartDate={startDate ? new Date(`${startDate}T12:00:00`) : undefined}
+                    calendarStartDate={
+                        startDate ? new Date(`${startDate}T12:00:00`) : undefined
+                    }
                 />
 
                 <Button

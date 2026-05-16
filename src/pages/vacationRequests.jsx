@@ -12,8 +12,8 @@ const VacationRequests = () => {
         requests,
         pagination,
         page,
-        searchQuery,
-        setSearchQuery,
+        searchInput,
+        setSearchInput,
         startDate,
         setStartDate,
         endDate,
@@ -64,8 +64,8 @@ const VacationRequests = () => {
 
             <VacationRequestFilters
                 view={view}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
+                searchQuery={searchInput}
+                setSearchQuery={setSearchInput}
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}

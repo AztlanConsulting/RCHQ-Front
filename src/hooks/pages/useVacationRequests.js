@@ -3,6 +3,7 @@ import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
 } from "../../services/vacationRequestService";
+import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const LIMIT = 6;
 
@@ -24,7 +25,12 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
     const [page, setPage] = useState(1);
 
-    const [searchQuery, setSearchQuery] = useState("");
+    const {
+        inputValue: searchInput,
+        setInputValue: setSearchInput,
+        debouncedSearch: searchQuery,
+        clearSearch,
+    } = useDebouncedVacationSearch("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
@@ -90,6 +96,10 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         fetchRequests(1);
     }, [fetchRequests]);
 
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery, startDate, endDate, statusFilter, view]);
+
     const handleChangeView = (nextView) => {
         setView(nextView);
         setPage(1);
@@ -109,7 +119,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     };
 
     const clearFilters = () => {
-        setSearchQuery("");
+        clearSearch();
         setStartDate("");
         setEndDate("");
         setStatusFilter("all");
@@ -123,8 +133,9 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         requests,
         pagination,
         page,
+        searchInput,
+        setSearchInput,
         searchQuery,
-        setSearchQuery,
         startDate,
         setStartDate,
         endDate,
