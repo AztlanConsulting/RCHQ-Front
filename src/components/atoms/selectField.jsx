@@ -23,7 +23,8 @@ const SelectField = ({
           )}
         </label>
       )}
-      <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
+
+      <div className="relative h-[50px] w-full rounded-lg bg-neutral-50 shadow-[inset_0px_4px_4px_#00000040]">
         <select
           id={id}
           name={name || id}
@@ -32,7 +33,7 @@ const SelectField = ({
             onChange ? onChange : (e) => setValue && setValue(e.target.value)
           }
           disabled={disabled}
-          className="flex-1 min-w-0 h-full ml-[19px] mr-[13px] font-medium text-base bg-transparent border-0 outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-full w-full cursor-pointer appearance-none rounded-lg border-0 bg-transparent py-0 pl-[19px] pr-10 text-base font-medium outline-none disabled:cursor-not-allowed disabled:opacity-60"
           style={{ color: value ? "#121212" : "#aaaaaa" }}
         >
           <option value="" disabled hidden>
@@ -48,7 +49,8 @@ const SelectField = ({
             </option>
           ))}
         </select>
-        <div className="mr-[13px] pointer-events-none flex-shrink-0">
+
+        <div className="pointer-events-none absolute right-[13px] top-1/2 -translate-y-1/2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-4 h-4 text-gray-400"
