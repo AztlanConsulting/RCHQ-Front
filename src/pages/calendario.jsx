@@ -24,6 +24,7 @@ const Calendario = () => {
     setMonthView,
     setWeekView,
     setDayView,
+    openCreationModal,
     generateTitle,
     getWeekDayName,
     resizeHandler,
@@ -152,6 +153,7 @@ const Calendario = () => {
             setMonthView={setMonthView}
             setWeekView={setWeekView}
             setDayView={setDayView}
+            openCreationModal={openCreationModal}
             generateTitle={generateTitle}
             getWeekDayName={getWeekDayName}
             resizeHandler={resizeHandler}

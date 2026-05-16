@@ -43,6 +43,7 @@ const BaseCalendar = ({
     setMonthView,
     setWeekView,
     setDayView,
+    openCreationModal,
     generateTitle,
     getWeekDayName,
     resizeHandler,
@@ -80,7 +81,7 @@ const BaseCalendar = ({
             headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "toggleListButton monthButton,weekButton,dayButton",
+                right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
             }}
             titleFormat={(arg) => generateTitle(arg)}
             views={{
@@ -100,6 +101,10 @@ const BaseCalendar = ({
                 toggleListButton: {
                     text: "Lista",
                     click: () => toggleList(calendarRef),
+                },
+                createEventButton: {
+                    text: "",
+                    click: () => openCreationModal(calendarRef),
                 },
                 monthButton: {
                     text: "Mes",

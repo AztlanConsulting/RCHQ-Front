@@ -282,6 +282,24 @@ export const useBaseCalendar = () => {
         calendarApi.unselect();
     }, []);
 
+    const openCreationModal = useCallback((calendarRef) => {
+        const calendarApi = calendarRef.current.getApi();
+        const currentDate = calendarApi.getDate();
+        const selectedDate = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            currentDate.getDate(),
+        );
+
+        const startDate = normalToUTCWithOffset(selectedDate);
+        const endDate = normalToUTCWithOffset(selectedDate, {
+            days: 1,
+            seconds: -1,
+        });
+
+        setSelectedDates({ startDate, endDate });
+    }, []);
+
     const handleDateDrags = useCallback((info, calendarRef) => {
         const startDate = normalToUTCWithOffset(info.start);
         const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
@@ -315,6 +333,7 @@ export const useBaseCalendar = () => {
         setOwnCalendar,
         selectedDates,
         closeCreationModal,
+        openCreationModal,
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,

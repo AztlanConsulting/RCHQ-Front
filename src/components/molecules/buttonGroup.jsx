@@ -38,6 +38,8 @@ const ButtonGroup = ({ options = [], value, onChange, disabled = false }) => {
                         type="button"
                         role="radio"
                         aria-checked={isActive}
+                        aria-label={opt.label}
+                        title={opt.label}
                         disabled={disabled}
                         onClick={() => !disabled && onChange?.(opt.value)}
                         style={{
@@ -46,7 +48,7 @@ const ButtonGroup = ({ options = [], value, onChange, disabled = false }) => {
                             alignItems: "center",
                             justifyContent: "center",
                             gap: "5px",
-                            padding: "7px 8px",
+                            padding: "9px 8px",
                             fontSize: "12px",
                             fontWeight: isActive ? "600" : "400",
                             border: "none",
@@ -88,7 +90,7 @@ const ButtonGroup = ({ options = [], value, onChange, disabled = false }) => {
                             />
                         )}
 
-                        <span>{opt.label}</span>
+                        <span className="hidden sm:inline">{opt.label}</span>
                     </button>
                 );
             })}

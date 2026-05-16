@@ -89,6 +89,27 @@ svg {
     padding: 0;
 }
 
+.fc .fc-createEventButton-button {
+    width: 48px;
+    padding: 0;
+    background-image: url("/add.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    color: transparent;
+}
+
+.fc .fc-createEventButton-button::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin: auto;
+    background-color: #ffffff;
+    mask: url("/add.svg") center / contain no-repeat;
+    -webkit-mask: url("/add.svg") center / contain no-repeat;
+}
+
 .fc .fc-icon-chevron-left {
     position: relative;
     left: -1px;
