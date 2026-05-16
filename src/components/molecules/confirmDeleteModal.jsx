@@ -23,9 +23,9 @@ const ConfirmDeleteModal = ({
         </>
       ),
       confirmText: loading ? "Eliminando..." : "Eliminar",
-      confirmColor: "bg-[#dd4344]",
-      confirmHover: "hover:bg-red-700",
-      confirmActive: "active:bg-red-800",
+      confirmColor: "bg-[#A20000]",
+      confirmHover: "hover:bg-[#870000]",
+      confirmActive: "active:bg-[#6B0000]",
     },
     replace: {
       title: "Documento ya existe",
@@ -36,9 +36,9 @@ const ConfirmDeleteModal = ({
         </>
       ),
       confirmText: loading ? "Reemplazando..." : "Reemplazar",
-      confirmColor: "bg-[#dd4344]",
-      confirmHover: "hover:bg-red-700",
-      confirmActive: "active:bg-red-800",
+      confirmColor: "bg-[#A20000]",
+      confirmHover: "hover:bg-[#870000]",
+      confirmActive: "active:bg-[#6B0000]",
     },
   };
 

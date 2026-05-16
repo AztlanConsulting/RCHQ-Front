@@ -4,6 +4,11 @@ import {
     getEventsTypes,
     getHouseEmployees,
 } from "../../services/calendarService";
+import {
+    addDaysToDateOnly,
+    dateOnlyToLocalDate,
+    normalizeDateOnly,
+} from "../../utils/calendarEventDetail";
 import { 
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
@@ -26,11 +31,23 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
+const getAbsenceTitle = (event) => {
+    const rawName = String(event.name ?? "").trim();
+    const rawType = String(event.type ?? "").trim();
+
+    if (!rawName || rawName.toLowerCase() === "ausencia") {
+        return rawType ? `Ausencia ${rawType}` : "Ausencia";
+    }
+
+    if (rawName.toLowerCase().startsWith("ausencia")) {
+        return rawName;
+    }
+
+    return `Ausencia ${rawName}`;
+};
+
 const toDateOnly = (value) => {
-    const base = value instanceof Date ? new Date(value.getTime()) : new Date(value);
-    if (Number.isNaN(base.getTime())) return null;
-    base.setHours(0, 0, 0, 0);
-    return base;
+    return dateOnlyToLocalDate(value);
 };
 
 const expandEventsForList = (events = [], isList) => {
@@ -41,7 +58,6 @@ const expandEventsForList = (events = [], isList) => {
     events.forEach((event) => {
         if (
             event.focus !== "ausencias" ||
-            !event.lastsAllDay ||
             !event.startDate ||
             !event.endDate
         ) {
@@ -62,14 +78,13 @@ const expandEventsForList = (events = [], isList) => {
         for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
             const currentDay = new Date(start);
             currentDay.setDate(start.getDate() + dayIndex);
-
-            const nextDay = new Date(currentDay);
-            nextDay.setDate(currentDay.getDate() + 1);
+            const currentDayValue = normalizeDateOnly(currentDay);
+            const nextDayValue = addDaysToDateOnly(currentDayValue, 1);
 
             expanded.push({
                 ...event,
-                start: currentDay.toISOString(),
-                end: nextDay.toISOString(),
+                start: currentDayValue,
+                end: nextDayValue,
                 currentDayIndex: dayIndex + 1,
                 totalDays,
             });
@@ -129,48 +144,67 @@ const getFilteredEvents = (
             e.focus !== "ausencias" ||
             absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e))
         ))
-        .map((rawEvent, idx) => ({
-            id: String(idx),
-            title: rawEvent.focus === "ausencias"
-                ? `Ausencia de ${rawEvent.name}`
-                : rawEvent.name,
-            start: rawEvent.start,
-            end: rawEvent.end,
-            backgroundColor: rawEvent.focus === "ausencias"
-                ? "#EF4444"
-                : getScopeOption(rawEvent)?.color || rawEvent.color,
-            borderColor: rawEvent.focus === "ausencias"
-                ? "#DC2626"
-                : rawEvent.color,
-            allDay: Boolean(rawEvent.lastsAllDay),
-            extendedProps: {
-                absenceId: rawEvent.absenceId,
-                absenceTypeId: rawEvent.absenceTypeId,
-                employeeId: rawEvent.employeeId,
-                employeeName: rawEvent.name,
-                subtitle: rawEvent.subtitle ?? "",
-                description: rawEvent.description ?? "",
-                focus: rawEvent.focus,
-                focusLabel: getFocusOption(rawEvent)?.label ?? rawEvent.focus,
-                scope: rawEvent.scope,
-                scopeLabel: getScopeOption(rawEvent)?.label ?? rawEvent.scope,
-                eventType: rawEvent.type,
-                date: rawEvent.date ?? "",
-                icon: getFocusOption(rawEvent)?.icon ?? "",
-                status: rawEvent.status,
-                curp: rawEvent.curp ?? "",
-                usedDays: rawEvent.usedDays,
-                link: rawEvent.link ?? "",
-                startDate: rawEvent.startDate ?? rawEvent.start,
-                endDate: rawEvent.endDate ?? rawEvent.end,
-                isDeleted: Boolean(rawEvent.isDeleted),
-                currentDayIndex: rawEvent.currentDayIndex,
-                totalDays: rawEvent.totalDays,
-            },
-        }));
+        .map((rawEvent, idx) => {
+            const isAllDayAbsence = rawEvent.focus === "ausencias";
+            const normalizedStartDate = normalizeDateOnly(
+                rawEvent.startDate ?? rawEvent.start,
+            );
+            const normalizedEndDate = normalizeDateOnly(
+                rawEvent.endDate ?? rawEvent.end,
+            );
+            const eventStart = isAllDayAbsence && normalizedStartDate
+                ? normalizedStartDate
+                : rawEvent.start;
+            const eventEnd = isAllDayAbsence && normalizedEndDate
+                ? addDaysToDateOnly(normalizedEndDate, 1)
+                : rawEvent.end;
+
+            return {
+                id: String(idx),
+                title: rawEvent.focus === "ausencias"
+                    ? getAbsenceTitle(rawEvent)
+                    : rawEvent.name,
+                start: eventStart,
+                end: eventEnd,
+                backgroundColor: rawEvent.focus === "ausencias"
+                    ? "#EF4444"
+                    : getScopeOption(rawEvent)?.color || rawEvent.color,
+                borderColor: rawEvent.focus === "ausencias"
+                    ? "#DC2626"
+                    : rawEvent.color,
+                allDay: isAllDayAbsence || Boolean(rawEvent.lastsAllDay),
+                extendedProps: {
+                    absenceId: rawEvent.absenceId,
+                    absenceTypeId: rawEvent.absenceTypeId,
+                    employeeId: rawEvent.employeeId,
+                    employeeName: rawEvent.name,
+                    subtitle: rawEvent.subtitle ?? "",
+                    description: rawEvent.description ?? "",
+                    focus: rawEvent.focus,
+                    focusLabel: getFocusOption(rawEvent)?.label ?? rawEvent.focus,
+                    scope: rawEvent.scope,
+                    scopeLabel: getScopeOption(rawEvent)?.label ?? rawEvent.scope,
+                    eventType: rawEvent.type,
+                    date: rawEvent.date ?? "",
+                    icon: getFocusOption(rawEvent)?.icon ?? "",
+                    status: rawEvent.status,
+                    curp: rawEvent.curp ?? "",
+                    usedDays: rawEvent.usedDays,
+                    link: rawEvent.focus === "ausencias" ? rawEvent.link ?? "" : "",
+                    startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start,
+                    endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end,
+                    isDeleted: Boolean(rawEvent.isDeleted),
+                    currentDayIndex: rawEvent.currentDayIndex,
+                    totalDays: rawEvent.totalDays,
+                },
+            };
+        });
 }
 
-export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
+export const useCalendarFilters = (
+    allEvents = [],
+    { isList = false, viewerRole = "" } = {},
+) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
     );
@@ -194,6 +228,8 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
+    const canUseEmployeeCatalog =
+        viewerRole === "Admin" || viewerRole === "Coordinador";
 
     useEffect(() => {
         getEventsTypes()
@@ -227,6 +263,13 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
             .catch(() => {
                 setCatalogAbsenceTypeOptions([]);
             });
+    }, []);
+
+    useEffect(() => {
+        if (!canUseEmployeeCatalog) {
+            Promise.resolve().then(() => setCatalogAbsenceEmployeeOptions([]));
+            return;
+        }
 
         getHouseEmployees()
             .then((employees) => {
@@ -243,7 +286,7 @@ export const useCalendarFilters = (allEvents = [], { isList = false } = {}) => {
             .catch(() => {
                 setCatalogAbsenceEmployeeOptions([]);
             });
-    }, []);
+    }, [canUseEmployeeCatalog]);
 
     const fallbackAbsenceTypeOptions = useMemo(() => {
         const labels = new Set();

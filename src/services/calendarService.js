@@ -4,6 +4,18 @@ import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const normalizeCalendarEvent = (event) => {
+    const isAbsence = event?.focus === "ausencias" || event?.absenceId;
+    const evidencePath = isAbsence ? event?.link || event?.url || "" : "";
+
+    return {
+        ...event,
+        link: evidencePath
+            ? `${API_URL}/${String(evidencePath).replace(/^\/+/, "")}`
+            : "",
+    };
+};
+
 const parseJwtPayload = (token) => {
     if (!token) return null;
 
@@ -143,9 +155,9 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
             "No se pudieron obtener los eventos del calendario",
         );
     }
-    const rawEvents = response.data.events;
+    const rawEvents = response?.data?.events ?? [];
 
-    return rawEvents;
+    return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
 export const getHouseAbsencesInRange = async (startDate, endDate) => {
@@ -174,7 +186,9 @@ export const getHouseAbsencesInRange = async (startDate, endDate) => {
             "No se pudieron obtener las ausencias de la casa",
         );
     }
-    return response?.data?.events ?? [];
+    const rawEvents = response?.data?.events ?? [];
+
+    return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
 export const updateAbsenceService = async (absenceId, payload) => {
@@ -184,15 +198,38 @@ export const updateAbsenceService = async (absenceId, payload) => {
         throw new Error("No se encontró token de sesión");
     }
 
+    const hasFile = payload?.file instanceof File;
+
+    let headers = {
+        Authorization: `Bearer ${token}`,
+    };
+    let body;
+
+    if (hasFile) {
+        const formData = new FormData();
+
+        Object.entries(payload ?? {}).forEach(([key, value]) => {
+            if (key === "file") return;
+            if (value === undefined || value === null) return;
+            formData.append(key, value);
+        });
+
+        formData.append("file", payload.file);
+        body = formData;
+    } else {
+        headers = {
+            ...headers,
+            "Content-Type": "application/json",
+        };
+        body = JSON.stringify(payload);
+    }
+
     const rawResponse = await secureFetch(
         `${API_URL}/absence/${absenceId}`,
         {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
+            headers,
+            body,
         },
     );
 
@@ -207,6 +244,19 @@ export const updateAbsenceService = async (absenceId, payload) => {
     }
 
     return response?.data?.absence;
+};
+
+export const buildAbsenceEvidenceUrl = (link) => {
+    if (!link) return "";
+
+    if (/^https?:\/\//i.test(link)) {
+        return link;
+    }
+
+    const baseUrl = String(API_URL ?? "").replace(/\/+$/, "");
+    const normalizedLink = String(link).replace(/^\/+/, "");
+
+    return `${baseUrl}/${normalizedLink}`;
 };
 
 export const deleteAbsenceService = async (absenceId) => {

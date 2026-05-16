@@ -49,6 +49,8 @@ const BaseCalendar = ({
     visibleEvents,
     handleDatesSet,
     onEventClick,
+    onDateDrag,
+    onDateDragging,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -117,6 +119,10 @@ const BaseCalendar = ({
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
             eventClick={(info) => onEventClick?.(info)}
+            selectable={true}
+            select={(info) => onDateDrag?.(info, calendarRef)}
+            selectAllow={() => onDateDragging?.()}
+            unselectAuto={false}
         />
     );
 };

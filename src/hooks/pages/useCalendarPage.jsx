@@ -1,12 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   calendarItemToDetail,
   eventApiToDetail,
 } from "../../utils/calendarEventDetail";
 import {
   deleteAbsenceService,
+  buildAbsenceEvidenceUrl,
   updateAbsenceService,
 } from "../../services/calendarService";
+import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -15,6 +17,17 @@ const sanitizeAbsenceDescription = (value = "") =>
     .replace(/[^\p{L}\p{N}\s¿?¡!]/gu, "")
     .replace(/\s+/g, " ")
     .slice(0, 200);
+
+const canManageAbsenceEvidence = (role) =>
+  role === "Admin" || role === "Coordinador";
+
+const getAbsenceEvidenceLabel = (selectedEvent, viewerRole) => {
+  if (!selectedEvent) return "Sin evidencia";
+  if (selectedEvent.link) return "Ver evidencia";
+  return canManageAbsenceEvidence(viewerRole)
+    ? "Subir evidencia"
+    : "Sin evidencia";
+};
 
 const inferAbsenceTypeId = (selectedEvent, absenceTypeOptions) => {
   if (selectedEvent?.absenceTypeId) {
@@ -45,8 +58,10 @@ const inferAbsenceTypeId = (selectedEvent, absenceTypeOptions) => {
 export const useCalendarPage = ({
   absenceTypeOptions = [],
   reloadCurrentRange,
+  viewerRole = "",
 } = {}) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const selectedEventRef = useRef(null);
   const [isAbsenceEditing, setIsAbsenceEditing] = useState(false);
   const [absenceForm, setAbsenceForm] = useState({
     absenceTypeId: "",
@@ -60,17 +75,27 @@ export const useCalendarPage = ({
   const [absenceDeleteError, setAbsenceDeleteError] = useState("");
   const [isDeletingAbsence, setIsDeletingAbsence] = useState(false);
   const [alert, setAlert] = useState(null);
+  const {
+    file: absenceEvidenceFile,
+    fileName: absenceEvidenceFileName,
+    error: absenceEvidenceError,
+    handleFileChange: handleAbsenceEvidenceChange,
+    reset: resetAbsenceEvidence,
+  } = useDocumentFile();
 
   const closeDetail = useCallback(() => {
+    selectedEventRef.current = null;
     setSelectedEvent(null);
     setIsAbsenceEditing(false);
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setAbsenceDeleteError("");
-  }, []);
+    resetAbsenceEvidence();
+  }, [resetAbsenceEvidence]);
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
+    selectedEventRef.current = detail;
     setSelectedEvent(detail);
     setIsAbsenceEditing(false);
     setIsDeleteAbsenceOpen(false);
@@ -79,33 +104,40 @@ export const useCalendarPage = ({
   }, []);
 
   const absenceEvidenceLabel = useMemo(
-    () => (selectedEvent?.link ? "Ver evidencia" : "Subir evidencia"),
-    [selectedEvent?.link],
+    () => getAbsenceEvidenceLabel(selectedEvent, viewerRole),
+    [selectedEvent, viewerRole],
   );
 
   const openAbsenceEvidence = useCallback(() => {
     if (!selectedEvent?.link) return;
-    window.open(selectedEvent.link, "_blank", "noopener,noreferrer");
-  }, [absenceTypeOptions, selectedEvent]);
+    window.open(
+      buildAbsenceEvidenceUrl(selectedEvent.link),
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }, [selectedEvent]);
 
   const startAbsenceEdit = useCallback(() => {
-    if (!selectedEvent) return;
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    if (!currentSelectedEvent) return;
 
     setAbsenceForm({
-      absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
-      startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: sanitizeAbsenceDescription(selectedEvent.description ?? ""),
+      absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
+      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
+      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? ""),
     });
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
-  }, [absenceTypeOptions, selectedEvent]);
+    resetAbsenceEvidence();
+  }, [absenceTypeOptions, resetAbsenceEvidence, selectedEvent]);
 
   const cancelAbsenceEdit = useCallback(() => {
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
-  }, []);
+    resetAbsenceEvidence();
+  }, [resetAbsenceEvidence]);
 
   const openDeleteAbsence = useCallback(() => {
     if (!selectedEvent?.absenceId) return;
@@ -131,17 +163,18 @@ export const useCalendarPage = ({
   }, []);
 
   const submitAbsenceEdit = useCallback(async () => {
-    if (!selectedEvent?.absenceId) return;
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    if (!currentSelectedEvent?.absenceId) return;
 
     const normalizedDescription = sanitizeAbsenceDescription(
       absenceForm.description,
     ).trim();
 
     const original = {
-      absenceTypeId: inferAbsenceTypeId(selectedEvent, absenceTypeOptions),
-      startDate: String(selectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(selectedEvent.endDate ?? "").slice(0, 10),
-      description: sanitizeAbsenceDescription(selectedEvent.description ?? "").trim(),
+      absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
+      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
+      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 
     if (!absenceForm.startDate || !absenceForm.endDate) {
@@ -166,13 +199,8 @@ export const useCalendarPage = ({
       return;
     }
 
-    if (
-      normalizedDescription &&
-      !ABSENCE_DESCRIPTION_PATTERN.test(normalizedDescription)
-    ) {
-      setAbsenceEditError(
-        "La descripción solo puede contener letras, números, espacios y signos de interrogación o exclamación.",
-      );
+    if (absenceEvidenceError) {
+      setAbsenceEditError(absenceEvidenceError);
       return;
     }
 
@@ -191,9 +219,14 @@ export const useCalendarPage = ({
       payload.description = normalizedDescription;
     }
 
+    if (absenceEvidenceFile) {
+      payload.file = absenceEvidenceFile;
+    }
+
     if (Object.keys(payload).length === 0) {
       setIsAbsenceEditing(false);
       setAbsenceEditError("");
+      resetAbsenceEvidence();
       return;
     }
 
@@ -202,7 +235,7 @@ export const useCalendarPage = ({
 
     try {
       const updatedAbsence = await updateAbsenceService(
-        selectedEvent.absenceId,
+        currentSelectedEvent.absenceId,
         payload,
       );
 
@@ -210,34 +243,37 @@ export const useCalendarPage = ({
       const refreshedAbsence = refreshedEvents?.find(
         (event) =>
           event.focus === "ausencias" &&
-          String(event.absenceId) === String(selectedEvent.absenceId),
+          String(event.absenceId) === String(currentSelectedEvent.absenceId),
       );
 
-      setSelectedEvent(
+      const nextSelectedEvent =
         refreshedAbsence
           ? calendarItemToDetail(refreshedAbsence)
           : {
-              ...selectedEvent,
-              absenceId: updatedAbsence?.absenceId ?? selectedEvent.absenceId,
+              ...currentSelectedEvent,
+              absenceId: updatedAbsence?.absenceId ?? currentSelectedEvent.absenceId,
               absenceTypeId:
                 updatedAbsence?.absenceTypeId ?? absenceForm.absenceTypeId,
-              employeeName: updatedAbsence?.name ?? selectedEvent.employeeName,
-              curp: updatedAbsence?.curp ?? selectedEvent.curp,
-              eventType: updatedAbsence?.type ?? selectedEvent.eventType,
+              employeeName: updatedAbsence?.name ?? currentSelectedEvent.employeeName,
+              curp: updatedAbsence?.curp ?? currentSelectedEvent.curp,
+              eventType: updatedAbsence?.type ?? currentSelectedEvent.eventType,
               description:
                 updatedAbsence?.description ?? normalizedDescription,
-              link: updatedAbsence?.link ?? selectedEvent.link,
+              link: updatedAbsence?.link ?? currentSelectedEvent.link,
               startDate: updatedAbsence?.startDate ?? absenceForm.startDate,
               endDate: updatedAbsence?.endDate ?? absenceForm.endDate,
-              isDeleted: updatedAbsence?.isDeleted ?? selectedEvent.isDeleted,
-            },
-      );
+              isDeleted: updatedAbsence?.isDeleted ?? currentSelectedEvent.isDeleted,
+            };
+
+      selectedEventRef.current = nextSelectedEvent;
+      setSelectedEvent(nextSelectedEvent);
 
       setAlert({
         type: "success",
         message: "Ausencia actualizada correctamente",
       });
       setIsAbsenceEditing(false);
+      resetAbsenceEvidence();
     } catch (error) {
       setAbsenceEditError(
         error?.message || "No se pudo actualizar la ausencia.",
@@ -245,7 +281,15 @@ export const useCalendarPage = ({
     } finally {
       setIsSavingAbsence(false);
     }
-  }, [absenceForm, absenceTypeOptions, reloadCurrentRange, selectedEvent]);
+  }, [
+    absenceEvidenceError,
+    absenceEvidenceFile,
+    absenceForm,
+    absenceTypeOptions,
+    reloadCurrentRange,
+    resetAbsenceEvidence,
+    selectedEvent,
+  ]);
 
   const confirmDeleteAbsence = useCallback(async () => {
     if (!selectedEvent?.absenceId) return;
@@ -280,6 +324,8 @@ export const useCalendarPage = ({
     absenceDeleteError,
     isDeletingAbsence,
     alert,
+    absenceEvidenceFileName,
+    absenceEvidenceError,
     closeDetail,
     handleEventClick,
     absenceEvidenceLabel,
@@ -290,6 +336,7 @@ export const useCalendarPage = ({
     cancelDeleteAbsence,
     confirmDeleteAbsence,
     setAbsenceField,
+    handleAbsenceEvidenceChange,
     submitAbsenceEdit,
     clearCalendarAlert: () => setAlert(null),
   };

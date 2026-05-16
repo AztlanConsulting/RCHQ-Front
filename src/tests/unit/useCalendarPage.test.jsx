@@ -9,6 +9,7 @@ import {
 vi.mock("../../services/calendarService", () => ({
   deleteAbsenceService: vi.fn(),
   updateAbsenceService: vi.fn(),
+  buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
 }));
 
 const buildCalendarClickInfo = () => ({
@@ -41,6 +42,7 @@ const buildCalendarClickInfo = () => ({
 describe("useCalendarPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("open", vi.fn());
   });
 
   it("inicializa el formulario de edición con los datos de la ausencia seleccionada", () => {
@@ -66,6 +68,37 @@ describe("useCalendarPage", () => {
       endDate: "2026-05-21",
       description: "Permiso por paternidad",
     });
+  });
+
+  it.each(["Admin", "Coordinador"])(
+    "muestra subir evidencia para %s cuando la ausencia no tiene evidencia",
+    (viewerRole) => {
+      const { result } = renderHook(() =>
+        useCalendarPage({
+          viewerRole,
+        }),
+      );
+
+      act(() => {
+        result.current.handleEventClick(buildCalendarClickInfo());
+      });
+
+      expect(result.current.absenceEvidenceLabel).toBe("Subir evidencia");
+    },
+  );
+
+  it("muestra sin evidencia para roles no administrativos cuando no hay evidencia", () => {
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        viewerRole: "Mantenimiento",
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    expect(result.current.absenceEvidenceLabel).toBe("Sin evidencia");
   });
 
   it("sanitiza caracteres especiales, conserva signos permitidos y limita a 200 caracteres", () => {
@@ -229,5 +262,69 @@ describe("useCalendarPage", () => {
 
     expect(result.current.absenceDeleteError).toBe("No se pudo eliminar");
     expect(result.current.isDeleteAbsenceOpen).toBe(true);
+  });
+
+  it("permite actualizar solo la evidencia y limpia el modo edición", async () => {
+    const file = new File(["pdf"], "evidencia.pdf", {
+      type: "application/pdf",
+    });
+
+    updateAbsenceService.mockResolvedValue({
+      absenceId: "absence-1",
+      link: "uploads/documents/evidencia.pdf",
+    });
+
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        absenceTypeOptions: [{ value: "type-1", label: "Paternidad" }],
+        reloadCurrentRange: vi.fn().mockResolvedValue([]),
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+      result.current.startAbsenceEdit();
+    });
+
+    act(() => {
+      result.current.handleAbsenceEvidenceChange({
+        target: { files: [file] },
+      });
+    });
+
+    await act(async () => {
+      await result.current.submitAbsenceEdit();
+    });
+
+    expect(updateAbsenceService).toHaveBeenCalledWith("absence-1", {
+      file,
+    });
+    expect(result.current.isAbsenceEditing).toBe(false);
+  });
+
+  it("abre la evidencia usando la URL completa del API", () => {
+    const { result } = renderHook(() => useCalendarPage());
+
+    act(() => {
+      result.current.handleEventClick({
+        event: {
+          ...buildCalendarClickInfo().event,
+          extendedProps: {
+            ...buildCalendarClickInfo().event.extendedProps,
+            link: "uploads/documents/evidencia.pdf",
+          },
+        },
+      });
+    });
+
+    act(() => {
+      result.current.openAbsenceEvidence();
+    });
+
+    expect(window.open).toHaveBeenCalledWith(
+      "http://api.test/uploads/documents/evidencia.pdf",
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 });

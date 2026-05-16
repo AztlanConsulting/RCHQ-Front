@@ -6,6 +6,7 @@ import {
     getHouseAbsencesInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
+import { normalToUTCWithOffset } from "../../utils/dates";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -15,6 +16,7 @@ export const useBaseCalendar = () => {
     const [calendarMode, setCalendarMode] = useState("personal");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
+    const [selectedDates, setSelectedDates] = useState(null);
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -28,6 +30,11 @@ export const useBaseCalendar = () => {
 
     const canViewHouseAbsences = (role) =>
         role === "Admin" || role === "Coordinador";
+
+    const isCoordinator = useMemo(
+        () => effectiveViewerRole === "Coordinador",
+        [effectiveViewerRole],
+    );
 
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseAbsences(effectiveViewerRole),
@@ -43,6 +50,17 @@ export const useBaseCalendar = () => {
     );
 
     const filteredCalendarEvents = useMemo(() => {
+        if (isCoordinator) {
+            if (calendarMode === "personal") {
+                return allEvents.filter((event) => (
+                    event.focus === "ausencias" &&
+                    String(event.employeeId) === String(effectiveEmployeeId)
+                ));
+            }
+
+            return allEvents;
+        }
+
         if (!canSwitchCalendarMode || calendarMode === "personal") {
             return allEvents.filter((event) => (
                 !(event.focus === "ausencias" && event.scope === "house")
@@ -60,7 +78,13 @@ export const useBaseCalendar = () => {
 
             return false;
         });
-    }, [allEvents, calendarMode, canSwitchCalendarMode]);
+    }, [
+        allEvents,
+        calendarMode,
+        canSwitchCalendarMode,
+        effectiveEmployeeId,
+        isCoordinator,
+    ]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -78,6 +102,11 @@ export const useBaseCalendar = () => {
 
     const updateView = (calendarRef, newView) => {
         const calendarApi = calendarRef.current.getApi();
+
+        if (calendarApi.view.type == newView) return;
+
+        setSelectedDates(null);
+
         calendarApi.changeView(newView);
         updateButtons(newView);
     };
@@ -85,7 +114,7 @@ export const useBaseCalendar = () => {
     const loadButtonsAtStart = () => {
         const currentView = getCorrespondingView(isList, viewType);
         updateButtons(currentView);
-    }
+    };
 
     const updateButtons = (currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
@@ -196,7 +225,7 @@ export const useBaseCalendar = () => {
         const cellWidth = tableCell.clientWidth || 0;
 
         return cellWidth;
-    }
+    };
 
     const validateShortenedSize = () => {
         if (viewType == "Day") return false;
@@ -206,23 +235,33 @@ export const useBaseCalendar = () => {
         if (currentDayWidth < 96) return true;
 
         return false;
-    }
+    };
 
     const getWeekDayName = (currentDay) => {
         const weekDayIndex = currentDay.dow;
-        const shortenedDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        const fullDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const weekDay = validateShortenedSize() ? shortenedDays[weekDayIndex] : fullDays[weekDayIndex];
+        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        const fullDays = [
+            "Domingo",
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes",
+            "Sábado",
+        ];
+        const weekDay = validateShortenedSize()
+            ? shortenedDays[weekDayIndex]
+            : fullDays[weekDayIndex];
         return weekDay;
-    }
+    };
 
     const resizeHandler = (calendarRef) => {
         const calendarApi = calendarRef.current.getApi();
         calendarApi.render();
-    }
+    };
 
     const loadCalendarEvents = useCallback(async (startDate, endDate, employeeId, role) => {
-        const personalEventsPromise = employeeId
+        const personalEventsPromise = role !== "Coordinador" && employeeId
             ? getEventsInRange(employeeId, startDate, endDate)
             : Promise.resolve([]);
 
@@ -262,7 +301,8 @@ export const useBaseCalendar = () => {
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
-        ) return;
+        )
+            return;
         lastFetchedRange.current = { start: startStr, end: endStr };
 
         if (
@@ -293,6 +333,27 @@ export const useBaseCalendar = () => {
         setEmployeeHouseName(employeeHouseName);
     }, []);
 
+    const closeCreationModal = useCallback((calendarRef) => {
+        setSelectedDates(null);
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.unselect();
+    }, []);
+
+    const handleDateDrags = useCallback((info, calendarRef) => {
+        const startDate = normalToUTCWithOffset(info.start);
+        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+
+        setSelectedDates({startDate, endDate});
+
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.selectable = false;
+    }, []);
+
+    const handleDateDragging = () => {
+        setSelectedDates(null);
+        return true;
+    }
+
     return {
         employeeHouseName,
         allEvents: filteredCalendarEvents,
@@ -313,6 +374,10 @@ export const useBaseCalendar = () => {
         getWeekDayName,
         resizeHandler,
         setOwnCalendar,
+        selectedDates,
+        closeCreationModal,
+        handleDateDrags,
+        handleDateDragging,
         reloadCurrentRange,
-    }
-}
+    };
+};
