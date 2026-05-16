@@ -28,10 +28,6 @@ const VacationRequestRow = ({ request, view, onViewDetail }) => {
                 {getSafeText(employee.curp)}
             </td>
 
-            {/* <td className="hidden px-4 py-3 text-center text-sm font-semibold text-gray-600 lg:table-cell">
-                {getSafeText(employee.house?.name)}
-            </td> */}
-
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
                 {formatDate(request.startDate)}
             </td>
@@ -68,14 +64,17 @@ const VacationRequestRow = ({ request, view, onViewDetail }) => {
                         height="h-10"
                         className="rounded-full"
                     >
-                        <span className="text-xl font-bold text-gray-600">ojo</span>
+                        <img
+                            src="/eyeMark.svg"
+                            alt="Ver detalle"
+                            className="h-5 w-5"
+                        />
                     </Button>
 
                     {view === "pending" && (
                         <>
                             <Button
                                 title="Aprobar solicitud"
-                                disabled
                                 bgColor="bg-transparent"
                                 hoverColor="hover:bg-gray-100"
                                 activeColor="active:bg-gray-200"
@@ -83,12 +82,15 @@ const VacationRequestRow = ({ request, view, onViewDetail }) => {
                                 height="h-10"
                                 className="rounded-full"
                             >
-                                <span className="text-2xl font-bold text-gray-400">✓</span>
+                                <img
+                                    src="/checkMark.svg"
+                                    alt="Aprobar solicitud"
+                                    className="h-5 w-5"
+                                />
                             </Button>
 
                             <Button
                                 title="Rechazar solicitud"
-                                disabled
                                 bgColor="bg-transparent"
                                 hoverColor="hover:bg-gray-100"
                                 activeColor="active:bg-gray-200"
@@ -96,7 +98,11 @@ const VacationRequestRow = ({ request, view, onViewDetail }) => {
                                 height="h-10"
                                 className="rounded-full"
                             >
-                                <span className="text-2xl font-bold text-gray-400">×</span>
+                                <img
+                                    src="/crossMark.svg"
+                                    alt="Rechazar solicitud"
+                                    className="h-5 w-5"
+                                />
                             </Button>
                         </>
                     )}
