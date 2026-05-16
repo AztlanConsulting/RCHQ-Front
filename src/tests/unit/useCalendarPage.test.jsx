@@ -5,6 +5,7 @@ import { updateAbsenceService } from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
   updateAbsenceService: vi.fn(),
+  buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
 }));
 
 const buildCalendarClickInfo = () => ({
@@ -37,6 +38,7 @@ const buildCalendarClickInfo = () => ({
 describe("useCalendarPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("open", vi.fn());
   });
 
   it("inicializa el formulario de edición con los datos de la ausencia seleccionada", () => {
@@ -64,17 +66,49 @@ describe("useCalendarPage", () => {
     });
   });
 
-  it("sanitiza emojis e iconos al editar la descripción", () => {
-    const { result } = renderHook(() => useCalendarPage());
+  it.each(["Admin", "Coordinador"])(
+    "muestra subir evidencia para %s cuando la ausencia no tiene evidencia",
+    (viewerRole) => {
+      const { result } = renderHook(() =>
+        useCalendarPage({
+          viewerRole,
+        }),
+      );
+
+      act(() => {
+        result.current.handleEventClick(buildCalendarClickInfo());
+      });
+
+      expect(result.current.absenceEvidenceLabel).toBe("Subir evidencia");
+    },
+  );
+
+  it("muestra sin evidencia para roles no administrativos cuando no hay evidencia", () => {
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        viewerRole: "Mantenimiento",
+      }),
+    );
 
     act(() => {
-      result.current.setAbsenceField(
-        "description",
-        "Texto base 😀 📌 con emoji",
-      );
+      result.current.handleEventClick(buildCalendarClickInfo());
     });
 
-    expect(result.current.absenceForm.description).toBe("Texto base con emoji");
+    expect(result.current.absenceEvidenceLabel).toBe("Sin evidencia");
+  });
+
+  it("sanitiza caracteres especiales, conserva signos permitidos y limita a 200 caracteres", () => {
+    const { result } = renderHook(() => useCalendarPage());
+    const longText = `Texto base!!! 😀 📌 con emoji ¿vale? #123 ${"a".repeat(220)}`;
+
+    act(() => {
+      result.current.setAbsenceField("description", longText);
+    });
+
+    expect(result.current.absenceForm.description).toMatch(
+      /^Texto base!!! con emoji ¿vale\? 123/,
+    );
+    expect(result.current.absenceForm.description.length).toBe(200);
   });
 
   it("no manda petición si no hubo cambios al modificar la ausencia", async () => {
@@ -167,5 +201,69 @@ describe("useCalendarPage", () => {
       type: "success",
       message: "Ausencia actualizada correctamente",
     });
+  });
+
+  it("permite actualizar solo la evidencia y limpia el modo edición", async () => {
+    const file = new File(["pdf"], "evidencia.pdf", {
+      type: "application/pdf",
+    });
+
+    updateAbsenceService.mockResolvedValue({
+      absenceId: "absence-1",
+      link: "uploads/documents/evidencia.pdf",
+    });
+
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        absenceTypeOptions: [{ value: "type-1", label: "Paternidad" }],
+        reloadCurrentRange: vi.fn().mockResolvedValue([]),
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+      result.current.startAbsenceEdit();
+    });
+
+    act(() => {
+      result.current.handleAbsenceEvidenceChange({
+        target: { files: [file] },
+      });
+    });
+
+    await act(async () => {
+      await result.current.submitAbsenceEdit();
+    });
+
+    expect(updateAbsenceService).toHaveBeenCalledWith("absence-1", {
+      file,
+    });
+    expect(result.current.isAbsenceEditing).toBe(false);
+  });
+
+  it("abre la evidencia usando la URL completa del API", () => {
+    const { result } = renderHook(() => useCalendarPage());
+
+    act(() => {
+      result.current.handleEventClick({
+        event: {
+          ...buildCalendarClickInfo().event,
+          extendedProps: {
+            ...buildCalendarClickInfo().event.extendedProps,
+            link: "uploads/documents/evidencia.pdf",
+          },
+        },
+      });
+    });
+
+    act(() => {
+      result.current.openAbsenceEvidence();
+    });
+
+    expect(window.open).toHaveBeenCalledWith(
+      "http://api.test/uploads/documents/evidencia.pdf",
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 });
