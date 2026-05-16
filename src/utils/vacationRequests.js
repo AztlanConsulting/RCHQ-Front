@@ -1,9 +1,9 @@
 export const formatDate = (value) => {
-    if (!value) return "—";
+    if (!value) return "-";
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) return "—";
+    if (Number.isNaN(date.getTime())) return "-";
 
     return new Intl.DateTimeFormat("es-MX", {
         day: "2-digit",
@@ -13,7 +13,7 @@ export const formatDate = (value) => {
     }).format(date);
 };
 
-export const getSafeText = (value, fallback = "—") => {
+export const getSafeText = (value, fallback = "-") => {
     if (value === null || value === undefined) return fallback;
 
     const text = String(value).trim();
