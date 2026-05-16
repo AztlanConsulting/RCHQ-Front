@@ -93,7 +93,7 @@ const AbsenceDetail = ({
   absenceEvidenceError = "",
   isSaving = false,
   isDeleteOpen = false,
-  isDeleting = false,
+  isLoadingWhileDeleting = false,
   canManageAbsence = true,
   onOpenEvidence,
   onStartEdit,
@@ -364,7 +364,7 @@ const AbsenceDetail = ({
           label={event.employeeName || "ausencia"}
           mode="delete"
           inline
-          loading={isDeleting}
+          loading={isLoadingWhileDeleting}
           title="Eliminar ausencia"
           body={(
             <>
