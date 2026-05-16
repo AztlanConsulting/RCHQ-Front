@@ -20,13 +20,14 @@ vi.mock("../../components/atoms/alerts", () => ({
 }));
 
 vi.mock("../../components/atoms/dateField", () => ({
-    default: ({ label, value, onChange }) => (
+    default: ({ label, value, onChange, placeholder }) => (
         <label>
             {label}
             <input
                 aria-label={label}
                 type="date"
                 value={value ?? ""}
+                placeholder={placeholder}
                 onChange={onChange}
             />
         </label>
@@ -88,7 +89,7 @@ const fillRequiredFields = async () => {
 };
 
 const selectTime = async (buttonName, optionName) => {
-    fireEvent.click(screen.getByRole("button", { name: buttonName }));
+    fireEvent.click(screen.getAllByRole("button", { name: buttonName })[0]);
 
     const option = await screen.findByRole("option", { name: optionName });
     fireEvent.click(option);
@@ -141,6 +142,24 @@ describe("Integración: agregar evento de casa", () => {
         ).toBeInTheDocument();
     });
 
+    it("muestra placeholders de fecha cuando abre sin fechas iniciales", () => {
+        renderModal({
+            initialStartDate: undefined,
+            initialEndDate: undefined,
+        });
+
+        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("");
+        expect(screen.getByLabelText("Fecha de inicio")).toHaveAttribute(
+            "placeholder",
+            "dd / mm / yyyy",
+        );
+        expect(screen.getByLabelText("Fecha de fin")).toHaveValue("");
+        expect(screen.getByLabelText("Fecha de fin")).toHaveAttribute(
+            "placeholder",
+            "dd / mm / yyyy",
+        );
+    });
+
     it("crea un evento de casa con los datos del formulario", async () => {
         const { onClose, onSuccess } = renderModal();
 
@@ -150,8 +169,8 @@ describe("Integración: agregar evento de casa", () => {
 
         await fillRequiredFields();
 
-        await selectTime(/hora inicio/i, "9:00 AM");
-        await selectTime(/hora fin/i, "10:00 AM");
+        await selectTime(/-- : --/i, "9:00 AM");
+        await selectTime(/-- : --/i, "10:00 AM");
 
         await clickFormConfirm();
 
@@ -245,8 +264,8 @@ describe("Integración: agregar evento de casa", () => {
         });
 
         await fillRequiredFields();
-        await selectTime(/hora inicio/i, "9:00 AM");
-        await selectTime(/hora fin/i, "10:00 AM");
+        await selectTime(/-- : --/i, "9:00 AM");
+        await selectTime(/-- : --/i, "10:00 AM");
 
         await clickFormConfirm();
 
@@ -287,8 +306,8 @@ describe("Integración: agregar evento de casa", () => {
         });
 
         await fillRequiredFields();
-        await selectTime(/hora inicio/i, "9:00 AM");
-        await selectTime(/hora fin/i, "10:00 AM");
+        await selectTime(/-- : --/i, "9:00 AM");
+        await selectTime(/-- : --/i, "10:00 AM");
 
         await clickFormConfirm();
 
@@ -326,8 +345,8 @@ describe("Integración: agregar evento de casa", () => {
         });
 
         await fillRequiredFields();
-        await selectTime(/hora inicio/i, "9:00 AM");
-        await selectTime(/hora fin/i, "10:00 AM");
+        await selectTime(/-- : --/i, "9:00 AM");
+        await selectTime(/-- : --/i, "10:00 AM");
 
         await clickFormConfirm();
 

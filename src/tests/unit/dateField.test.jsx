@@ -5,8 +5,13 @@ import DateField from "../../components/atoms/dateField";
 import { useDateField } from "../../hooks/atoms/useDateField";
 
 vi.mock("flowbite-react", () => ({
-    Datepicker: ({ value, onChange }) => (
-        <div data-testid="mock-datepicker" data-value={value?.toISOString()}>
+    Datepicker: ({ value, onChange, label, placeholder }) => (
+        <div
+            data-testid="mock-datepicker"
+            data-value={value?.toISOString()}
+            data-label={label}
+            data-placeholder={placeholder}
+        >
             <button
                 data-testid="simulate-select-date"
                 onClick={() => onChange(new Date(2024, 4, 5))}
@@ -96,6 +101,26 @@ describe("Pruebas Unitarias: DateField y useDateField", () => {
                     value: "",
                 },
             });
+        });
+
+        it("debe pasar el placeholder al datepicker", () => {
+            render(
+                <DateField
+                    label="Fecha"
+                    name="testDate"
+                    placeholder="dd / mm / yyyy"
+                    onChange={mockOnChange}
+                />,
+            );
+
+            expect(screen.getByTestId("mock-datepicker")).toHaveAttribute(
+                "data-placeholder",
+                "dd / mm / yyyy",
+            );
+            expect(screen.getByTestId("mock-datepicker")).toHaveAttribute(
+                "data-label",
+                "dd / mm / yyyy",
+            );
         });
 
         it("debe renderizar un input nativo cuando native=true", () => {

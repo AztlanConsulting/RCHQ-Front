@@ -238,10 +238,10 @@ const Calendario = () => {
                     reloadCurrentRange();
                 }}
                 initialStartDate={
-                    selectedDates?.startDate.toISOString().split("T")[0]
+                    selectedDates?.startDate?.toISOString().split("T")[0]
                 }
                 initialEndDate={
-                    selectedDates?.endDate.toISOString().split("T")[0]
+                    selectedDates?.endDate?.toISOString().split("T")[0]
                 }
             />
         </div>

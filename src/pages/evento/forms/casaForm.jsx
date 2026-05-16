@@ -46,6 +46,7 @@ const CasaForm = (props) => {
                             label="Fecha de inicio"
                             labelColor="text-[#374151]"
                             value={form.startDate}
+                            placeholder="dd / mm / yyyy"
                             onChange={(e) =>
                                 setField("startDate", e.target.value)
                             }
@@ -60,7 +61,7 @@ const CasaForm = (props) => {
                         <TimeField
                             value={form.startTime}
                             onChange={(value) => setField("startTime", value)}
-                            placeholder="Hora inicio"
+                            placeholder="-- : --"
                             error={errors.startTime}
                             disabled={form.allDay}
                         />
@@ -79,6 +80,7 @@ const CasaForm = (props) => {
                             label="Fecha de fin"
                             labelColor="text-[#374151]"
                             value={form.endDate}
+                            placeholder="dd / mm / yyyy"
                             onChange={(e) =>
                                 setField("endDate", e.target.value)
                             }
@@ -93,7 +95,7 @@ const CasaForm = (props) => {
                         <TimeField
                             value={form.endTime}
                             onChange={(value) => setField("endTime", value)}
-                            placeholder="Hora fin"
+                            placeholder="-- : --"
                             minTime={
                                 form.startDate === form.endDate
                                     ? form.startTime

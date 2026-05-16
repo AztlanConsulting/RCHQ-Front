@@ -7,15 +7,13 @@ import {
     buildPayload,
 } from "../../utils/schema/evento/houseEvent.schema";
 
-const TODAY = new Date().toISOString().split("T")[0];
-
 const DEFAULT_FORM = {
     eventTypeId: "",
     description: "",
     allDay: false,
     isFreeDay: false,
-    startDate: TODAY,
-    endDate: TODAY,
+    startDate: "",
+    endDate: "",
     startTime: "",
     endTime: "",
 };
