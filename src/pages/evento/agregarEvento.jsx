@@ -73,8 +73,8 @@ const RegisterEventModal = ({
                     zIndex: 910,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "flex-end",
-                    paddingRight: "5vw",
+                    justifyContent: "center",
+                    padding: "16px",
                     pointerEvents: "none",
                 }}
             >
