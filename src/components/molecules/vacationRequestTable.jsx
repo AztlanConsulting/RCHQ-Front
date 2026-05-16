@@ -6,7 +6,7 @@ const VacationRequestTable = ({
     loading,
     onViewDetail,
 }) => {
-    if (loading) {
+    if (loading && !requests.length) {
         return (
             <section className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-500 shadow-sm">
                 Cargando solicitudes...
