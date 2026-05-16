@@ -17,7 +17,7 @@ const EmployeeContactCard = ({
 
   const EMPTY_LABEL = "N/A";
   return (
-    <div className="basis-1/3 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-1/3 md:shrink-0">
       <div className="flex justify-between items-start">
         <Type variant="section-title" as="h3">Contacto</Type>
 
@@ -65,7 +65,7 @@ const EmployeeContactCard = ({
             },
             { label: "Código Postal",       value: employeeAddress?.postalCode },
           ].map(({ label, value }) => (
-            <div key={label} className="min-w-[12rem] flex-1">
+            <div key={label} className="min-w-0 w-full">
               <Type variant="metric-label" as="p" className="mb-1.5">{label}</Type>
               <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
                 <Type variant="metric-value" as="p">{value ?? EMPTY_LABEL}</Type>

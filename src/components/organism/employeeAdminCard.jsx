@@ -39,7 +39,7 @@ const EmployeeAdminCard = ({
   onCancel,
 }) => {
   return (
-    <div className="basis-2/3 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
       <div className="flex justify-between items-start">
         <Type variant="section-title" as="h3">Información Administrativa</Type>
 
@@ -77,20 +77,20 @@ const EmployeeAdminCard = ({
       {/* Modo lectura */}
       {!isEditing && (
         <div className="mt-4 w-full flex flex-col gap-4">
-          <div className="w-full flex justify-between">
-            <div>
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-x-4">
+            <div className="min-w-0">
               <Type variant="metric-label" as="p">Tipo</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employee?.type ?? "N/A"}
               </Type>
             </div>
-              <div className="text-right">
+              <div className="min-w-0 sm:text-right">
               <Type variant="metric-label" as="p">Frecuencia de Pago</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employee?.frequencyOfPaymentName ?? "N/A"}
               </Type>
             </div>
-            <div className="text-right">
+            <div className="min-w-0 sm:text-right">
               <Type variant="metric-label" as="p">Salario</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {employee?.salary ? `$${employee.salary}` : "N/A"}
@@ -98,25 +98,26 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          <div className="w-full flex justify-between">
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-between sm:gap-2">
             <div>
               <Type variant="metric-label" as="p">Días Trabajados</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {countWorkdayDays(employeeWorkdays)}
               </Type>
             </div>
-            <div className="flex items-start gap-2 text-right">
-              <Drawer.Toggle
-                isOpen={workdaysDrawer.isOpen}
-                onToggle={workdaysDrawer.toggle}
-                ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
-              />
-              <div>
+            <div className="min-w-0 sm:ml-auto sm:text-right">
+              <div className="flex flex-row items-center justify-between gap-2 sm:justify-end">
                 <Type variant="metric-label" as="p">Horas Semanales</Type>
-                <Type variant="metric-value" as="p" className="mt-0.5">
-                  {countWorkdaysHours(employeeWorkdays)}
-                </Type>
+                <Drawer.Toggle
+                  isOpen={workdaysDrawer.isOpen}
+                  onToggle={workdaysDrawer.toggle}
+                  ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
+                  className="shrink-0"
+                />
               </div>
+              <Type variant="metric-value" as="p" className="mt-0.5 sm:text-right">
+                {countWorkdaysHours(employeeWorkdays)}
+              </Type>
             </div>
           </div>
 
@@ -133,14 +134,14 @@ const EmployeeAdminCard = ({
             </div>
           </Drawer>
 
-          <div className="w-full flex justify-between">
-            <div>
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-between">
+            <div className="min-w-0">
               <Type variant="metric-label" as="p">Vacaciones</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {`${employeeVacationRequests?.length ?? 0} Solicitudes`}
               </Type>
             </div>
-            <div className="text-right">
+            <div className="min-w-0 sm:text-right">
               <Type variant="metric-label" as="p">Días</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
                 {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12 Usados`}
@@ -162,7 +163,7 @@ const EmployeeAdminCard = ({
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <SelectField
                 label="Casa" id="houseId"
                 value={adminForm.houseId}

@@ -299,8 +299,14 @@ export const useCalendarPage = ({
 
     try {
       await deleteAbsenceService(selectedEvent.absenceId);
-      await reloadCurrentRange?.();
       closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn("No se pudo recargar el calendario tras eliminar la ausencia.", reloadError);
+      }
+
       setAlert({
         type: "success",
         message: "Ausencia eliminada correctamente",

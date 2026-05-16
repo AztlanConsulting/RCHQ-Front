@@ -1,20 +1,20 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
+import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 
-const isManagementRole = (role) =>
-  role === "Admin" || role === "Coordinador";
+const isManagementRole = (role) => role === "Admin" || role === "Coordinador";
 
 const Calendario = () => {
-  const calendarRef = React.useRef(null);
+  const calendarRef = useRef(null);
 
   const {
     employeeHouseName,
@@ -31,6 +31,7 @@ const Calendario = () => {
     setMonthView,
     setWeekView,
     setDayView,
+    openCreationModal,
     generateTitle,
     getWeekDayName,
     resizeHandler,
@@ -167,20 +168,21 @@ const Calendario = () => {
 
       <div className="flex-1">
         <BaseCalendar
-            loadButtonsAtStart={loadButtonsAtStart}
-            calendarRef={calendarRef}
-            toggleList={toggleList}
-            setMonthView={setMonthView}
-            setWeekView={setWeekView}
-            setDayView={setDayView}
-            generateTitle={generateTitle}
-            getWeekDayName={getWeekDayName}
-            resizeHandler={resizeHandler}
-            visibleEvents={visibleEvents}
-            handleDatesSet={handleDatesSet}
-            onEventClick={handleEventClick}
-            onDateDrag={handleDateDrags}
-            onDateDragging={handleDateDragging}
+          loadButtonsAtStart={loadButtonsAtStart}
+          calendarRef={calendarRef}
+          toggleList={toggleList}
+          setMonthView={setMonthView}
+          setWeekView={setWeekView}
+          setDayView={setDayView}
+          openCreationModal={openCreationModal}
+          generateTitle={generateTitle}
+          getWeekDayName={getWeekDayName}
+          resizeHandler={resizeHandler}
+          visibleEvents={visibleEvents}
+          handleDatesSet={handleDatesSet}
+          onEventClick={handleEventClick}
+          onDateDrag={handleDateDrags}
+          onDateDragging={handleDateDragging}
         />
       </div>
 
@@ -199,29 +201,29 @@ const Calendario = () => {
         {selectedEvent?.focus === "ausencias" ? (
           isManagementRole(viewerRole) ? (
             <AbsenceDetail
-            event={selectedEvent}
-            isEditing={isAbsenceEditing}
-            evidenceLabel={absenceEvidenceLabel}
-            absenceTypeOptions={absenceTypeOptions}
-            absenceForm={absenceForm}
-            absenceEditError={absenceEditError}
-            absenceDeleteError={absenceDeleteError}
-            absenceEvidenceFileName={absenceEvidenceFileName}
-            absenceEvidenceError={absenceEvidenceError}
-            isSaving={isSavingAbsence}
-            isDeleteOpen={isDeleteAbsenceOpen}
-            isDeleting={isDeletingAbsence}
-            canManageAbsence={["Admin", "Coordinador"].includes(viewerRole)}
-            onOpenEvidence={openAbsenceEvidence}
-            onStartEdit={startAbsenceEdit}
-            onCancelEdit={cancelAbsenceEdit}
-            onSubmitEdit={submitAbsenceEdit}
-            onOpenDelete={openDeleteAbsence}
-            onCancelDelete={cancelDeleteAbsence}
-            onConfirmDelete={confirmDeleteAbsence}
-            onAbsenceFieldChange={setAbsenceField}
-            onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
-          />
+              event={selectedEvent}
+              isEditing={isAbsenceEditing}
+              evidenceLabel={absenceEvidenceLabel}
+              absenceTypeOptions={absenceTypeOptions}
+              absenceForm={absenceForm}
+              absenceEditError={absenceEditError}
+              absenceDeleteError={absenceDeleteError}
+              absenceEvidenceFileName={absenceEvidenceFileName}
+              absenceEvidenceError={absenceEvidenceError}
+              isSaving={isSavingAbsence}
+              isDeleteOpen={isDeleteAbsenceOpen}
+              isDeleting={isDeletingAbsence}
+              canManageAbsence={isManagementRole(viewerRole)}
+              onOpenEvidence={openAbsenceEvidence}
+              onStartEdit={startAbsenceEdit}
+              onCancelEdit={cancelAbsenceEdit}
+              onSubmitEdit={submitAbsenceEdit}
+              onOpenDelete={openDeleteAbsence}
+              onCancelDelete={cancelDeleteAbsence}
+              onConfirmDelete={confirmDeleteAbsence}
+              onAbsenceFieldChange={setAbsenceField}
+              onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
+            />
           ) : (
             <WorkerAbsenceDetail
               event={selectedEvent}
@@ -235,33 +237,16 @@ const Calendario = () => {
         )}
       </Modal>
 
-      <Modal
-        open={selectedDates != null}
+      <RegisterHouseEventModal
+        isOpen={selectedDates != null}
         onClose={() => closeCreationModal(calendarRef)}
-        title="Creación de evento"
-        grayBackground={false}
-        placement="center"
-        className="max-w-[25vw] max-h-[80vh]"
-      >
-        {/* Aquí añadir el modal de eventos cuando se tenga */
-          selectedDates && (
-          <p>
-            {`De ${selectedDates.startDate.getUTCDate()}/${
-              selectedDates.startDate.getUTCMonth() + 1
-            }/${selectedDates.startDate.getUTCFullYear()} ${
-              selectedDates.startDate.getUTCHours()
-            }:${selectedDates.startDate.getUTCMinutes()}:${
-              selectedDates.startDate.getUTCSeconds()
-            } a ${selectedDates.endDate.getUTCDate()}/${
-              selectedDates.endDate.getUTCMonth() + 1
-            }/${selectedDates.endDate.getUTCFullYear()} ${
-              selectedDates.endDate.getUTCHours()
-            }:${selectedDates.endDate.getUTCMinutes()}:${
-              selectedDates.endDate.getUTCSeconds()
-            }`}
-          </p>
-        )}
-      </Modal>
+        onSuccess={() => {
+          closeCreationModal(calendarRef);
+          reloadCurrentRange();
+        }}
+        initialStartDate={selectedDates?.startDate?.toISOString().split("T")[0]}
+        initialEndDate={selectedDates?.endDate?.toISOString().split("T")[0]}
+      />
     </div>
   );
 };

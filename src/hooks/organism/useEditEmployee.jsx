@@ -2,7 +2,8 @@ import { useState, useCallback } from "react";
 import { 
   employeeBasicUpdateSchema, 
   employeeContactUpdateSchema, 
-  employeeAdminUpdateSchema 
+  employeeAdminUpdateSchema,
+  normalizeEmployeeContractType,
 } from "../../utils/schema/employee/update.schema";
 import {
   getUpdateFormService,
@@ -92,7 +93,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       setAdminFormState({
         houseId:              employee?.houseId ?? "",
         roleId:               employee?.roleId  ?? "",
-        type:                 employee?.type    ?? "",
+        type:                 normalizeEmployeeContractType(employee?.type) ?? "",
         salary:               employee?.salary  ?? "",
         frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
         selectedWorkdays:     preselected,

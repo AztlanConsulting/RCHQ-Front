@@ -9,11 +9,12 @@ const DateField = ({
     labelColor = "text-[#6b6b6b]",
     minDate,
     maxDate,
+    placeholder = "dd / mm / yyyy",
     native = false,
     popupAlign = "left",
     popupSize = "default",
 }) => {
-    const dateValue = value ? new Date(`${value}T12:00:00`) : undefined;
+    const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
 
     useDateField(!native);
@@ -29,6 +30,9 @@ const DateField = ({
             return;
         }
 
+        if (minDate && date < minDate) return;
+        if (maxDate && date > maxDate) return;
+
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
@@ -42,16 +46,20 @@ const DateField = ({
     };
 
     if (native) {
-        const minValue = minDate instanceof Date
-            ? minDate.toISOString().slice(0, 10)
-            : undefined;
-        const maxValue = maxDate instanceof Date
-            ? maxDate.toISOString().slice(0, 10)
-            : undefined;
+        const minValue =
+            minDate instanceof Date
+                ? minDate.toISOString().slice(0, 10)
+                : undefined;
+        const maxValue =
+            maxDate instanceof Date
+                ? maxDate.toISOString().slice(0, 10)
+                : undefined;
 
         return (
             <div className="date-field-wrapper flex w-full flex-col gap-1.5">
-                <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+                <label
+                    className={`text-sm font-bold sm:text-base ${labelColor}`}
+                >
                     {label}
                 </label>
 
@@ -60,6 +68,7 @@ const DateField = ({
                         type="date"
                         name={name}
                         value={value ?? ""}
+                        placeholder={placeholder}
                         min={minValue}
                         max={maxValue}
                         onChange={onChange}
@@ -77,9 +86,11 @@ const DateField = ({
             </label>
 
             <Datepicker
+                key={value ?? "empty-date"}
                 language="es-ES"
-                value={dateValue}
+                value={dateValue ?? null}
                 onChange={handleDateChange}
+                placeholder={placeholder}
                 showTodayButton={false}
                 showClearButton={false}
                 minDate={minDate}
@@ -120,7 +131,9 @@ const DateField = ({
                     views: {
                         days: {
                             items: {
-                                base: isCompactPopup ? "grid w-56 grid-cols-7" : "grid w-64 grid-cols-7",
+                                base: isCompactPopup
+                                    ? "grid w-56 grid-cols-7"
+                                    : "grid w-64 grid-cols-7",
                                 item: {
                                     base: isCompactPopup
                                         ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
@@ -132,7 +145,9 @@ const DateField = ({
                         },
                         months: {
                             items: {
-                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                base: isCompactPopup
+                                    ? "grid w-56 grid-cols-4"
+                                    : "grid w-64 grid-cols-4",
                                 item: {
                                     base: isCompactPopup
                                         ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
@@ -144,7 +159,9 @@ const DateField = ({
                         },
                         years: {
                             items: {
-                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                base: isCompactPopup
+                                    ? "grid w-56 grid-cols-4"
+                                    : "grid w-64 grid-cols-4",
                                 item: {
                                     base: isCompactPopup
                                         ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"
@@ -156,7 +173,9 @@ const DateField = ({
                         },
                         decades: {
                             items: {
-                                base: isCompactPopup ? "grid w-56 grid-cols-4" : "grid w-64 grid-cols-4",
+                                base: isCompactPopup
+                                    ? "grid w-56 grid-cols-4"
+                                    : "grid w-64 grid-cols-4",
                                 item: {
                                     base: isCompactPopup
                                         ? "block flex-1 cursor-pointer rounded-lg border-0 text-center text-xs font-semibold leading-8 text-gray-900 hover:bg-gray-100"

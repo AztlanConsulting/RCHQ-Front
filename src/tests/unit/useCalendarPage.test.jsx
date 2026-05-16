@@ -223,6 +223,9 @@ describe("useCalendarPage", () => {
 
     act(() => {
       result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    act(() => {
       result.current.openDeleteAbsence();
     });
 
@@ -253,6 +256,9 @@ describe("useCalendarPage", () => {
 
     act(() => {
       result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    act(() => {
       result.current.openDeleteAbsence();
     });
 

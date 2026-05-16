@@ -107,6 +107,8 @@ const AbsenceDetail = ({
 }) => {
   if (!event) return null;
 
+  const canModifyAbsence = canManageAbsence && !event.isDeleted;
+
   if (isEditing) {
     return (
       <div className="px-2 text-left sm:px-3">
@@ -326,7 +328,7 @@ const AbsenceDetail = ({
         />
       </div>
 
-      {canManageAbsence ? (
+      {canModifyAbsence ? (
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
           <Button
             type="button"

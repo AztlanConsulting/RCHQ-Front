@@ -58,12 +58,19 @@ const ConfirmDeleteModal = ({
   const cardClass = inline
     ? "w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-xl"
     : "w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl";
+  const resolvedTitle = title ?? defaultTitle;
+  const titleId = `confirm-delete-modal-title-${mode}`;
 
   return (
     <div className={wrapperClass}>
       {inline ? <div className="absolute inset-0 rounded-xl bg-white/65" aria-hidden /> : null}
-      <div className={`${cardClass} relative flex flex-col gap-4`}>
-        <h3 className="text-lg font-semibold text-slate-900">{title ?? defaultTitle}</h3>
+      <div
+        role="dialog"
+        aria-modal={inline ? undefined : true}
+        aria-labelledby={titleId}
+        className={`${cardClass} relative flex flex-col gap-4`}
+      >
+        <h3 id={titleId} className="text-lg font-semibold text-slate-900">{resolvedTitle}</h3>
         <div className="text-sm text-slate-500">{body ?? defaultBody}</div>
         <div className="flex gap-3 justify-end">
           <Button

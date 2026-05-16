@@ -289,9 +289,7 @@ describe("Documents — editar documento", () => {
 // ══════════════════════════════════════════════════════════════════════════════
 describe("Documents — eliminar documento", () => {
   const getConfirmButton = () => {
-    const modal = screen
-      .getByText(/esta acción no se puede revertir/i)
-      .closest("div");
+    const modal = screen.getByRole("dialog", { name: /eliminar documento/i });
     return within(modal).getByRole("button", { name: /^eliminar$/i });
   };
 
