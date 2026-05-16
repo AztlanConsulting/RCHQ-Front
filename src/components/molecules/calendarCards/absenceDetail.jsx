@@ -2,7 +2,26 @@ import Button from "../../atoms/button";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
+import documentIcon from "/document.svg";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+
+const PlusIcon = () => (
+  <span
+    aria-hidden="true"
+    className="mr-1.5 inline-flex text-[1rem] leading-none text-white"
+  >
+    +
+  </span>
+);
+
+const DocumentWhiteIcon = () => (
+  <img
+    src={documentIcon}
+    alt=""
+    aria-hidden="true"
+    className="mr-1.5 h-3.5 w-3.5 shrink-0 brightness-0 invert"
+  />
+);
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
     <div className={fullWidth ? "col-span-2" : ""}>
@@ -14,6 +33,36 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
         </div>
     </div>
 );
+
+const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
+  const displayValue = value || "—";
+  const shouldTruncate = displayValue.length > 200;
+  const previewValue = shouldTruncate
+    ? `${displayValue.slice(0, 200).trimEnd()}...`
+    : displayValue;
+
+  return (
+    <div title={shouldTruncate ? displayValue : undefined}>
+      <div
+        className={`max-w-full whitespace-pre-wrap text-[1.05rem] leading-snug ${
+          shouldTruncate ? "overflow-hidden text-ellipsis" : ""
+        }`}
+        style={{
+          display: shouldTruncate ? "-webkit-box" : "block",
+          WebkitBoxOrient: shouldTruncate ? "vertical" : undefined,
+          WebkitLineClamp: shouldTruncate ? lines : undefined,
+          overflow: shouldTruncate ? "hidden" : "visible",
+          textOverflow: shouldTruncate ? "ellipsis" : "clip",
+          wordBreak: "break-word",
+        }}
+      >
+        <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
+          {previewValue}
+        </Type>
+      </div>
+    </div>
+  );
+};
 
 const EditableTextArea = ({ label, value, onChange }) => (
   <div className="sm:col-span-2">
@@ -202,14 +251,13 @@ const AbsenceDetail = ({
       <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
         Ausencia
       </Type>
-
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Nombre del trabajador
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {event.employeeName || "-"}
+            {event.employeeName || "—"}
           </Type>
         </div>
         <div>
@@ -217,7 +265,25 @@ const AbsenceDetail = ({
             CURP
           </Type>
           <Type variant="body" className="break-all text-[1.05rem] leading-snug sm:break-normal">
-            {event.curp || "-"}
+            {event.curp || "—"}
+          </Type>
+        </div>
+
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Tipo de ausencia:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.eventType || "—"}
+          </Type>
+        </div>
+
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Días hábiles:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.usedDays ?? "—"}
           </Type>
         </div>
 
@@ -240,59 +306,40 @@ const AbsenceDetail = ({
 
         <div className="sm:col-span-2">
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Tipo de ausencia:
-          </Type>
-          <Type variant="body" className="text-[1.05rem] leading-snug">
-            {event.eventType || "-"}
-          </Type>
-        </div>
-
-        <div className="sm:col-span-2">
-          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Descripción:
           </Type>
-          <Type variant="body" className="whitespace-pre-wrap text-[1.05rem] leading-snug">
-            {event.description || "-"}
-          </Type>
-        </div>
-
-        <div className="sm:col-span-2">
-          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Días hábiles:
-          </Type>
-          <Type variant="body" className="text-[1.05rem] leading-snug">
-            {event.usedDays ?? "-"}
-          </Type>
+          <TruncatedReadOnlyText value={event.description} />
         </div>
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-3">
+      <div className="mt-7 flex flex-wrap items-center gap-2.5">
         <Type variant="metric-label" className="text-[0.9rem] font-bold text-[#121212]">
           Evidencia:
         </Type>
         <Button
           type="button"
           text={evidenceLabel}
-          width="w-auto min-w-[7.25rem]"
-          height="h-7"
-          textSize="text-xs"
+          width="w-auto"
+          height="h-8"
+          textSize="text-[0.72rem]"
           bgColor="bg-[#1F3664]"
           textColor="text-white"
           hoverColor="hover:bg-[#15284A]"
           activeColor="active:bg-[#0E1B33]"
           onClick={onOpenEvidence}
           disabled={!event.link}
-          className="px-3 rounded-md shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+          icon={event.link ? <DocumentWhiteIcon /> : <PlusIcon />}
+          className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
         />
       </div>
 
-      <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-6">
+      <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
         <Button
           type="button"
           text="Eliminar"
-          width="w-full sm:w-[8.2rem]"
-          height="h-10"
-          textSize="text-base"
+          width="w-full sm:w-[7.2rem]"
+          height="h-8"
+          textSize="text-[0.95rem]"
           bgColor="bg-[#A20000]"
           textColor="text-white"
           hoverColor="hover:bg-[#870000]"
@@ -302,9 +349,9 @@ const AbsenceDetail = ({
         <Button
           type="button"
           text="Editar"
-          width="w-full sm:w-[8.2rem]"
-          height="h-10"
-          textSize="text-base"
+          width="w-full sm:w-[7.2rem]"
+          height="h-8"
+          textSize="text-[0.95rem]"
           bgColor="bg-[#1F3664]"
           textColor="text-white"
           hoverColor="hover:bg-[#15284A]"

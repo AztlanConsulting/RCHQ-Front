@@ -68,32 +68,41 @@ const DetalleEmpleado = () => {
       )}
 
       {/* Título y tabs */}
-      <div className="flex items-baseline gap-2">
+      <div className="flex flex-nowrap items-center gap-2 min-w-0">
         <button
           type="button"
           onClick={() => navigate("/app/personal")}
-          className="rounded-lg p-2 hover:bg-slate-100 transition-colors"
+          className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
         >
           <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
 
-        <Type variant="page-title" as="h2">Gestión de Empleados</Type>
+        <Type variant="page-title" as="h2" className="min-w-0 flex-1 truncate">
+          Gestión de Empleados
+        </Type>
 
-        <NativeSelect
-          size="sm" aria-label="Tabs" value={currentTab}
-          onChange={(e) => setCurrentTab(e.target.value)}
-          options={tabs.map((t) => ({ label: t.label, value: t.id }))}
-          className="w-80 md:hidden"
-        />
+        <div className="min-w-0 shrink md:hidden max-w-[min(11rem,38%)]">
+          <NativeSelect
+            size="sm" aria-label="Tabs" value={currentTab}
+            onChange={(e) => setCurrentTab(e.target.value)}
+            options={tabs.map((t) => ({ label: t.label, value: t.id }))}
+          />
+        </div>
         <Tabs
           selectedKey={currentTab}
           onSelectionChange={(key) => setCurrentTab(key)}
-          className="w-max max-md:hidden ml-6"
+          className="w-max max-md:hidden shrink-0 ml-0 md:ml-6"
         >
-          <Tabs.List type="underline" items={tabs}>
-            {(tab) => <Tabs.Item {...tab} />}
+          <Tabs.List type="underline" >
+            {tabs.map((tab) => (
+              <Tabs.Item
+                  key={tab.id}
+                  id={tab.id}
+                  label={tab.label}
+              />
+            ))}
           </Tabs.List>
         </Tabs>
       </div>
@@ -115,7 +124,7 @@ const DetalleEmpleado = () => {
 
       {/* Contenido por tab */}
       {currentTab === "overview" && (
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-4">
           <EmployeeContactCard
             employee={employee}
             employeeAddress={employeeAddress}

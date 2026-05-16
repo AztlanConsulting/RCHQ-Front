@@ -70,8 +70,11 @@ export const employeeCreateSchema = z.object({
       if (!val) return true;
       const birthDate = new Date(val + "T00:00:00");
       const today = new Date();
+      const year = birthDate.getFullYear();
 
-      let age = today.getFullYear() - birthDate.getFullYear();
+      if (year < 1900) return false;
+
+      let age = today.getFullYear() - year;
       const monthDiff = today.getMonth() - birthDate.getMonth();
 
       if (
@@ -81,5 +84,5 @@ export const employeeCreateSchema = z.object({
         age--;
       }
       return age >= 18;
-    }, "El usuario debe tener al menos 18 años de edad"),
+    }, "El usuario debe tener al menos 18 años y la fecha debe ser posterior a 1900"),
 });

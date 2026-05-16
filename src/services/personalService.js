@@ -71,7 +71,7 @@ export const createEmployee = async (data) => {
 
 export const getEmployees = async (
   page = 1,
-  limit = 6,
+  limit = 7,
   search = "",
   active = "true",
 ) => {

@@ -22,6 +22,7 @@ export const getEmployeeDetailService = async (employeeId) => {
   );
 
   const data = await response.json();
+  
   if (!response.ok) {
     throw buildApiError(response, data, "Error al obtener los documentos");
   }

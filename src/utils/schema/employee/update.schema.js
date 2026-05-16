@@ -9,6 +9,22 @@ const TIME_REGEX         = /^\d{2}:\d{2}$/;
 
 const emptyToNull = (val) => (val === "" ? null : val);
 
+const CONTRACT_TYPE_BY_NORMALIZED = {
+  nomina: "Nomina",
+  asalariado: "Asalariado",
+  honorarios: "Honorarios",
+  voluntariado: "Voluntariado",
+};
+
+/** Maps DB/UI variants (e.g. "nomina", "Nómina") to the canonical API value "Nomina". */
+export function normalizeEmployeeContractType(val) {
+  if (val === null || val === undefined) return val;
+  const s = String(val).trim();
+  if (s === "") return val;
+  const key = s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  return CONTRACT_TYPE_BY_NORMALIZED[key] ?? s;
+}
+
 export const employeeBasicUpdateSchema = z
   .object({
     name: z.string().trim().min(2, "El nombre es obligatorio")
@@ -102,9 +118,15 @@ export const employeeAdminUpdateSchema = z
     houseId: z.string().uuid("El houseId debe ser un UUID válido").optional(),
     roleId:  z.string().uuid("El roleId debe ser un UUID válido").optional(),
 
-    type: z.enum(["Nomina", "Asalariado", "Honorarios", "Voluntariado"], {
-      errorMap: () => ({ message: "Tipo de contrato inválido" }),
-    }).nullable().optional(),
+    type: z.preprocess(
+      (val) =>
+        val === null || val === undefined || val === ""
+          ? val
+          : normalizeEmployeeContractType(val),
+      z.enum(["Nomina", "Asalariado", "Honorarios", "Voluntariado"], {
+        errorMap: () => ({ message: "Tipo de contrato inválido" }),
+      }).nullable().optional()
+    ),
 
     frequencyOfPaymentId: z.string().uuid().nullable().optional(),
 
