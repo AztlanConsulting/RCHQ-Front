@@ -5,7 +5,7 @@ export const useEmployees = () => {
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 6,
+    limit: 7,
     total: 0,
     totalPages: 0,
   });
@@ -14,7 +14,7 @@ export const useEmployees = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("true");
   const [page, setPage] = useState(1);
-  const limit = 6;
+  const limit = 7;
 
   const fetchEmployees = async (
     pageNum = 1,
