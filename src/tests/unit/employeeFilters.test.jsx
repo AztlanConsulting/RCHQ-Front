@@ -17,7 +17,26 @@ describe("EmployeeFilters Component", () => {
     vi.clearAllMocks();
   });
 
-  it("debe llamar a setSearchQuery cuando el usuario escribe en el campo de búsqueda", () => {
+  it("debe llamar a setSearchQuery automáticamente cada 3 caracteres", () => {
+    render(<EmployeeFilters {...defaultProps} />);
+
+    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
+
+    fireEvent.change(input, { target: { value: "Ju" } });
+    expect(mockSetSearchQuery).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: "Jua" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("Jua");
+
+    fireEvent.change(input, { target: { value: "Juan" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(input, { target: { value: "Juan P" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("Juan P");
+    expect(mockSetSearchQuery).toHaveBeenCalledTimes(2);
+  });
+
+  it("debe conservar la búsqueda con Enter", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
     const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
