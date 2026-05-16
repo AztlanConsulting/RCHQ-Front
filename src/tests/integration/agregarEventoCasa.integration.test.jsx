@@ -211,7 +211,7 @@ describe("Integración: agregar evento de casa", () => {
         await clickFormConfirm();
 
         expect(
-            screen.getByText("El nombre es obligatorio"),
+            screen.getByText("El titulo es obligatorio"),
         ).toBeInTheDocument();
         expect(createHouseEvent).not.toHaveBeenCalled();
     });

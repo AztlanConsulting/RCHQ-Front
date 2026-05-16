@@ -4,13 +4,16 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
+const TEXT_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]+$/;
+
 const baseSchema = z.object({
     name: z
         .string({ required_error: "El titulo es obligatorio" })
         .trim()
         .min(1, "El titulo es obligatorio")
         .min(3, "Titulo demasiado corto")
-        .max(120, "Máximo 120 caracteres"),
+        .max(120, "Máximo 120 caracteres")
+        .regex(TEXT_REGEX, "El título contiene caracteres no permitidos"),
 
     categoryKey: z
         .string({ required_error: "Selecciona una categoría" })
@@ -18,7 +21,11 @@ const baseSchema = z.object({
 
     eventTypeId: z.uuid("Selecciona un tipo de evento"),
 
-    description: z.string().max(250, "Máximo 250 caracteres").optional(),
+    description: z
+        .string()
+        .max(250, "Máximo 250 caracteres")
+        .refine((val) => !val || TEXT_REGEX.test(val), "La descripción contiene caracteres no permitidos")
+        .optional(),
 
     isFreeDay: z.boolean().default(false),
 

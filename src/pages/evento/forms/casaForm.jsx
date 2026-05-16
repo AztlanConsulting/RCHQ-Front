@@ -148,7 +148,7 @@ const CasaForm = (props) => {
                 <textarea
                     placeholder="Agregar descripción ..."
                     value={form.description}
-                    onChange={(e) => setField("description", e.target.value)}
+                    onChange={(e) => setField("description", e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, ""))}
                     maxLength={250}
                     rows={3}
                     className="w-full rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040] text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 outline-none resize-none"

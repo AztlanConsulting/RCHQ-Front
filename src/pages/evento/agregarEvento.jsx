@@ -102,7 +102,7 @@ const RegisterEventModal = ({
                             placeholder="Agregar título"
                             value={name}
                             setValue={(v) => {
-                                setName(v);
+                                setName(v.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, ""));
                                 setNameError("");
                             }}
                             maxLength={70}
