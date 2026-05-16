@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import RegisterEventModal from "../../components/organism/evento/agregarEvento";
+import RegisterEventModal from "../../components/organism/evento/registerEventModal";
 import { createHouseEvent, getEventTypes } from "../../services/eventService";
 
 vi.mock("../../services/eventService", () => ({

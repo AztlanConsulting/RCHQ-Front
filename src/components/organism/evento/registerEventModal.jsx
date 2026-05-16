@@ -1,7 +1,7 @@
 import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
 import ButtonGroup from "../../molecules/buttonGroup";
-import CasaForm from "./forms/casaForm";
+import CasaForm from "./forms/houseForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 
 const CATEGORY_OPTIONS = [
