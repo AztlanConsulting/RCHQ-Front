@@ -13,14 +13,30 @@ const Icon = ({ name, className }) => (
   />
 );
 
-const NAV_ITEMS = [
-  { to: "/app/calendario", label: "Calendario", icon: "calendar" },
-  { to: "/app/personal",   label: "Personal",   icon: "employee" },
-  { to: "/app/casas",      label: "Casas Hogares", icon: "home" },
-  { to: "/app/vacaciones", label: "Vacaciones", icon: "vacation" },
-  { to: "/app/ausencias",  label: "Ausencias",  icon: "absences" },
-  { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
-];
+const isCoordinatorUser = (user) => {
+  const roleName =
+    user?.role?.name ||
+    user?.roleName ||
+    user?.role ||
+    "";
+
+  return String(roleName).toLowerCase() === "coordinador";
+};
+
+const getNavItems = (user) => {
+  const vacationPath = isCoordinatorUser(user)
+    ? "/app/vacaciones/solicitudes"
+    : "/app/vacaciones";
+
+  return [
+    { to: "/app/calendario", label: "Calendario", icon: "calendar" },
+    { to: "/app/personal", label: "Personal", icon: "employee" },
+    { to: "/app/casas", label: "Casas Hogares", icon: "home" },
+    { to: vacationPath, label: "Vacaciones", icon: "vacation" },
+    { to: "/app/ausencias", label: "Ausencias", icon: "absences" },
+    { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
+  ];
+};
 
 // ─── Desktop NavItem ──────────────────────────────────────────────────────────
 const NavItem = ({ to, label, icon, expanded }) => (
@@ -111,7 +127,8 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
 const SideBarContent = ({ expanded, toggle }) => {
   const sideBarRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const navItems = getNavItems(user);
 
   useEffect(() => {
     if (!expanded) return;
@@ -172,7 +189,7 @@ const SideBarContent = ({ expanded, toggle }) => {
 
       <div className="h-px bg-[#FAFAFA]/25 mx-3 shrink-0" />
       <nav className="flex flex-col gap-1 flex-1 px-3 py-4 overflow-y-auto min-h-0">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavItem key={item.to} {...item} expanded={expanded} />
         ))}
       </nav>
@@ -202,7 +219,8 @@ const SideBarContent = ({ expanded, toggle }) => {
 // ─── Mobile Navbar + Dropdown ─────────────────────────────────────────────────
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const navItems = getNavItems(user);
 
   const handleLogout = () => {
     closeMobile();
@@ -236,6 +254,7 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
               </svg>
             )}
           </button>
+
           <span aria-hidden="true" className="flex-1 text-center font-['Public_Sans'] font-bold text-xl text-[#FAFAFA]">
             TOCHAN
           </span>
@@ -247,7 +266,7 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
             aria-label="Menú principal"
             className="bg-[#1F3664] border-t border-[#FAFAFA]/25 px-4 py-3 flex flex-col gap-1 max-h-[calc(100vh-56px)] overflow-y-auto"
           >
-            {NAV_ITEMS.map(({ to, label, icon }) => (
+            {navItems.map(({ to, label, icon }) => (
               <NavLink
                 key={to}
                 to={to}
