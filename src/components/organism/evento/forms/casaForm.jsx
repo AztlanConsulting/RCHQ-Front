@@ -1,11 +1,11 @@
-import Alert from "../../../components/atoms/alerts";
-import Button from "../../../components/atoms/button";
-import DateField from "../../../components/atoms/dateField";
-import SelectField from "../../../components/atoms/selectField";
-import TimeField from "../../../components/atoms/timeField";
-import OverlapModal from "../../../components/organism/overlapModal";
+import Alert from "../../../atoms/alerts";
+import Button from "../../../atoms/button";
+import DateField from "../../../atoms/dateField";
+import SelectField from "../../../atoms/selectField";
+import TimeField from "../../../atoms/timeField";
+import OverlapModal from "../../overlapModal";
 
-import { useHouseForm } from "../../../hooks/pages/useHouseForm";
+import { useHouseForm } from "../../../../hooks/pages/useHouseForm";
 
 const CasaForm = (props) => {
     const {

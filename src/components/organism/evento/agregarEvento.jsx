@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import Alert from "../../components/atoms/alerts";
-import TextField from "../../components/atoms/textField";
-import ButtonGroup from "../../components/molecules/buttonGroup";
+import Alert from "../../atoms/alerts";
+import TextField from "../../atoms/textField";
+import ButtonGroup from "../../molecules/buttonGroup";
 import CasaForm from "./forms/casaForm";
 
 const CATEGORY_OPTIONS = [
