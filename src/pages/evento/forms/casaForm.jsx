@@ -5,7 +5,7 @@ import SelectField from "../../../components/atoms/selectField";
 import TimeField from "../../../components/atoms/timeField";
 import OverlapModal from "../../../components/organism/overlapModal";
 
-import { useCasaForm } from "../../../hooks/pages/useCasaForm";
+import { useHouseForm } from "../../../hooks/pages/useHouseForm";
 
 const CasaForm = (props) => {
     const {
@@ -21,7 +21,7 @@ const CasaForm = (props) => {
         handleForceOverlap,
         handleCancelOverlap,
         getTimeContainerStyle,
-    } = useCasaForm(props);
+    } = useHouseForm(props);
 
     const isTimeVisible = !form.allDay;
 
