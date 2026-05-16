@@ -22,7 +22,7 @@ const Personal = () => {
     } = useEmployees();
 
     return (
-        <div className="p-8">
+        <div className="p-8 md:flex md:flex-col md:h-full">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">Usuarios</h1>
                 <Button
@@ -44,11 +44,13 @@ const Personal = () => {
                 setActiveFilter={setActiveFilter}
             />
 
-            <EmployeeTable
-                employees={employees}
-                loading={loading}
-                error={error}
-            />
+            <div className="md:flex-1 md:min-h-0 md:overflow-y-auto">
+                <EmployeeTable
+                    employees={employees}
+                    loading={loading}
+                    error={error}
+                />
+            </div>
 
             <Pagination
                 page={page}
