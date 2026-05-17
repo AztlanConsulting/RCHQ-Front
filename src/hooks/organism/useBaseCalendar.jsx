@@ -3,7 +3,7 @@ import {
     getCalendarViewerRole,
     getEmployeeHouseName,
     getEventsInRange,
-    getHouseAbsencesInRange,
+    getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
@@ -28,7 +28,7 @@ export const useBaseCalendar = () => {
         [viewerRole],
     );
 
-    const canViewHouseAbsences = (role) =>
+    const canViewHouseEvents = (role) =>
         role === "Admin" || role === "Coordinador";
 
     const isCoordinator = useMemo(
@@ -37,7 +37,7 @@ export const useBaseCalendar = () => {
     );
 
     const canSwitchCalendarMode = useMemo(
-        () => canViewHouseAbsences(effectiveViewerRole),
+        () => canViewHouseEvents(effectiveViewerRole),
         [effectiveViewerRole],
     );
 
@@ -296,16 +296,16 @@ export const useBaseCalendar = () => {
                 ? getEventsInRange(employeeId, startDate, endDate)
                 : Promise.resolve([]);
 
-            const houseAbsencesPromise = canViewHouseAbsences(role)
-                ? getHouseAbsencesInRange(startDate, endDate)
+            const sameHouseEventsPromise = canViewHouseEvents(role)
+                ? getHouseEventsInRange(startDate, endDate)
                 : Promise.resolve([]);
 
-            const [personalEvents, houseAbsences] = await Promise.all([
+            const [personalEvents, houseEvents] = await Promise.all([
                 personalEventsPromise,
-                houseAbsencesPromise,
+                sameHouseEventsPromise,
             ]);
 
-            return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
+            return [...(personalEvents ?? []), ...(houseEvents ?? [])];
         },
         [],
     );
@@ -314,7 +314,7 @@ export const useBaseCalendar = () => {
         if (!lastFetchedRange.current) return [];
         if (
             effectiveEmployeeId == "" &&
-            !canViewHouseAbsences(effectiveViewerRole)
+            !canViewHouseEvents(effectiveViewerRole)
         )
             return [];
 
@@ -341,7 +341,7 @@ export const useBaseCalendar = () => {
 
         if (
             effectiveEmployeeId == "" &&
-            !canViewHouseAbsences(effectiveViewerRole)
+            !canViewHouseEvents(effectiveViewerRole)
         )
             return;
 

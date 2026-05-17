@@ -52,6 +52,7 @@ const BaseCalendar = ({
     onEventClick,
     onDateDrag,
     onDateDragging,
+    initialDate,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -76,6 +77,7 @@ const BaseCalendar = ({
             ]}
             locales={[esLocale]}
             locale="es"
+            initialDate={initialDate || new Date()}
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={{
