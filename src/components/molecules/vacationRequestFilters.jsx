@@ -79,10 +79,10 @@ const VacationRequestFilters = ({
                 <Button
                     text="Limpiar"
                     onClick={clearFilters}
-                    bgColor="bg-gray-100"
-                    hoverColor="hover:bg-gray-200"
-                    activeColor="active:bg-gray-300"
-                    textColor="text-[#24375e]"
+                    bgColor="bg-[#24375e]"
+                    hoverColor="hover:bg-[#162d4a]"
+                    activeColor="active:bg-[#0f2035]"
+                    textColor="text-white"
                     width="w-full lg:w-28"
                     height="h-[50px]"
                     textSize="text-sm"
