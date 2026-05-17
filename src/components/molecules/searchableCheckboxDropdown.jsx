@@ -11,6 +11,9 @@ const SearchableCheckboxDropdown = ({
   onSearchChange,
   onToggleValue,
   onClearSelection,
+  searchPlaceholder = "Buscar",
+  triggerClassName = "",
+  menuClassName = "",
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -29,11 +32,11 @@ const SearchableCheckboxDropdown = ({
         renderTrigger={() => (
           <button
             type="button"
-            className="inline-flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20"
+            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg border border-slate-200 bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-slate-700 shadow-[inset_0px_4px_4px_#00000020] transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
           >
-            <span className="truncate">{selectedLabel}</span>
+            <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
             <svg
-              className="ms-2 h-4 w-4 shrink-0"
+              className="h-4 w-4 shrink-0 text-slate-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -50,10 +53,10 @@ const SearchableCheckboxDropdown = ({
           </button>
         )}
       >
-        <div className="w-full min-w-[17rem]">
+        <div className={`w-[min(22rem,calc(100vw-2rem))] max-w-full sm:min-w-[17rem] ${menuClassName}`}>
           <div className="px-2 pt-2">
             <label htmlFor={`${name}-search`} className="sr-only">
-              Buscar trabajador
+              {searchPlaceholder}
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
@@ -79,7 +82,7 @@ const SearchableCheckboxDropdown = ({
                 onChange={(event) => onSearchChange?.(event.target.value)}
                 onKeyDown={(event) => event.stopPropagation()}
                 onClick={(event) => event.stopPropagation()}
-                placeholder="Buscar trabajador"
+                placeholder={searchPlaceholder}
                 className="block w-full rounded-md border border-slate-300 bg-slate-50 py-2 pe-3 ps-9 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1F3664] focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20"
               />
             </div>

@@ -10,16 +10,17 @@ const Icon = ({ name, className }) => (
     src={`/${name}.svg`}
     alt=""
     aria-hidden="true"
-    className={className}
+    className={`${className} ${name === "document" ? "brightness-0 invert" : ""}`}
   />
 );
 
 const getNavItems = (user) => {
-  const vacationPath = hasRole(user, "coordinador")
+  const isCoordinator = hasRole(user, "coordinador");
+  const vacationPath = isCoordinator
     ? "/app/vacaciones/solicitudes"
     : "/app/vacaciones";
 
-  return [
+  const navItems = [
     { to: "/app/calendario", label: "Calendario", icon: "calendar" },
     { to: "/app/personal", label: "Personal", icon: "employee" },
     { to: "/app/casas", label: "Casas Hogares", icon: "home" },
@@ -27,6 +28,16 @@ const getNavItems = (user) => {
     { to: "/app/ausencias", label: "Ausencias", icon: "absences" },
     { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
   ];
+
+  if (isCoordinator) {
+    navItems.push({
+      to: "/app/logs",
+      label: "Acciones Registradas",
+      icon: "document",
+    });
+  }
+
+  return navItems;
 };
 
 // ─── Desktop NavItem ──────────────────────────────────────────────────────────
