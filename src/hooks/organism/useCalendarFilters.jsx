@@ -135,7 +135,9 @@ const getFilteredEvents = (
             selectedAbsenceTypeNames.has(String(e.type).toLowerCase())
         ))
         .filter((e) => (
-            e.focus !== "ausencias" ||
+            (e.focus !== "ausencias" &&
+            e.focus !== "vacaciones" &&
+            e.scope !== "personal") ||
             absenceEmployeeFilters.includes(String(e.employeeId))
         ))
         .filter((e) => (
@@ -311,7 +313,7 @@ export const useCalendarFilters = (
         const employees = new Map();
 
         allEvents
-            .filter((event) => event.focus === "ausencias")
+            .filter((event) => event.focus === "ausencias" || event.focus === "vacaciones" || event.scope === "personal")
             .forEach((event) => {
                 if (!event.employeeId) return;
                 employees.set(String(event.employeeId), {
