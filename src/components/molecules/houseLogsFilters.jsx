@@ -1,6 +1,7 @@
 import DateField from "../atoms/dateField";
 import TextField from "../atoms/textField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
+import { sanitizeSearchInput } from "../../utils/searchInput";
 
 const HouseLogsFilters = ({
   responsibleQuery,
@@ -17,24 +18,34 @@ const HouseLogsFilters = ({
   dateFilter,
   setDateFilter,
 }) => {
+  const handleResponsibleChange = (value) => {
+    setResponsibleQuery(sanitizeSearchInput(value));
+  };
+
+  const handleAffectedChange = (value) => {
+    setAffectedQuery(sanitizeSearchInput(value));
+  };
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
         <TextField
           id="house-logs-responsible"
           text="Buscar por Nombre del responsable"
-          placeholder="Ingresa un nombre"
+          placeholder="Ingresa nombre completo o CURP"
           value={responsibleQuery}
-          setValue={setResponsibleQuery}
+          setValue={handleResponsibleChange}
+          maxLength={100}
           labelClassName="text-sm font-bold text-[#121212]"
         />
 
         <TextField
           id="house-logs-affected"
           text="Buscar por Nombre del afectado"
-          placeholder="Ingresa un nombre"
+          placeholder="Ingresa nombre completo o CURP"
           value={affectedQuery}
-          setValue={setAffectedQuery}
+          setValue={handleAffectedChange}
+          maxLength={100}
           labelClassName="text-sm font-bold text-[#121212]"
         />
 
