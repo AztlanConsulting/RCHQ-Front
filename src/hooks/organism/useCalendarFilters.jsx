@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getAbsenceTypes,
     getEventsTypes,
@@ -219,8 +219,8 @@ export const useCalendarFilters = (
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
-    const [absenceTypeFilters, setAbsenceTypeFilters] = useState([]);
-    const [hasInitializedAbsenceTypeFilters, setHasInitializedAbsenceTypeFilters] = useState(false);
+    const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState([]);
+    const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
     const [absenceEmployeeFilters, setAbsenceEmployeeFilters] = useState([]);
     const [absenceEmployeeSearch, setAbsenceEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
@@ -335,22 +335,32 @@ export const useCalendarFilters = (
             : fallbackAbsenceEmployeeOptions
     ), [catalogAbsenceEmployeeOptions, fallbackAbsenceEmployeeOptions]);
 
-    useEffect(() => {
-        if (hasInitializedAbsenceTypeFilters) return;
-        if (absenceTypeOptions.length === 0) return;
+    const setAbsenceTypeFilters = useCallback((nextValue) => {
+        setHasCustomizedAbsenceTypeFilters(true);
+        setAbsenceTypeFiltersState((previousValue) => (
+            typeof nextValue === "function"
+                ? nextValue(previousValue)
+                : nextValue
+        ));
+    }, []);
 
-        setAbsenceTypeFilters(absenceTypeOptions.map((option) => option.value));
-        setHasInitializedAbsenceTypeFilters(true);
-    }, [absenceTypeOptions, hasInitializedAbsenceTypeFilters]);
+    useEffect(() => {
+        if (absenceTypeOptions.length === 0) return;
+        if (hasCustomizedAbsenceTypeFilters) return;
+
+        // Default behavior: while the user has not touched the filter,
+        // keep every currently available absence type selected.
+        setAbsenceTypeFiltersState(absenceTypeOptions.map((option) => option.value));
+    }, [absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
 
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
 
+        if (!hasCustomizedAbsenceTypeFilters) return nextValues;
         if (absenceTypeFilters.length === 0) return [];
 
-        const kept = absenceTypeFilters.filter((value) => nextValues.includes(value));
-        return kept.length > 0 ? kept : nextValues;
-    }, [absenceTypeFilters, absenceTypeOptions]);
+        return absenceTypeFilters.filter((value) => nextValues.includes(value));
+    }, [absenceTypeFilters, absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
 
     const effectiveAbsenceEmployeeFilters = useMemo(() => {
         const nextValues = absenceEmployeeOptions.map((opt) => opt.value);
