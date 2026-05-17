@@ -114,6 +114,8 @@ const clickLastConfirm = async () => {
 describe("Integración: agregar evento de casa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorage.clear();
+        localStorage.setItem("user", JSON.stringify({ role: "Coordinador" }));
 
         getEventTypes.mockResolvedValue(mockEventTypes);
 
