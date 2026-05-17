@@ -105,7 +105,7 @@ const getFilteredEvents = (
     vacationStatusFilters,
     absenceTypeOptions,
     absenceTypeFilters,
-    absenceEmployeeFilters,
+    employeeFilters,
     absenceStatusFilters,
     absenceEvidenceFilters,
 ) => {
@@ -138,7 +138,7 @@ const getFilteredEvents = (
             (e.focus !== "ausencias" &&
             e.focus !== "vacaciones" &&
             e.scope !== "personal") ||
-            absenceEmployeeFilters.includes(String(e.employeeId))
+            employeeFilters.includes(String(e.employeeId))
         ))
         .filter((e) => (
             e.focus !== "ausencias" ||
@@ -220,13 +220,13 @@ export const useCalendarFilters = (
     const [eventTypeOptions, setEventTypeOptions] = useState([]);
     const [eventTypeFilters, setEventTypeFilters] = useState([]);
     const [catalogAbsenceTypeOptions, setCatalogAbsenceTypeOptions] = useState([]);
-    const [catalogAbsenceEmployeeOptions, setCatalogAbsenceEmployeeOptions] = useState([]);
+    const [catalogEmployeeOptions, setCatalogEmployeeOptions] = useState([]);
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
     const [absenceTypeFilters, setAbsenceTypeFilters] = useState([]);
-    const [absenceEmployeeFilters, setAbsenceEmployeeFilters] = useState([]);
-    const [absenceEmployeeSearch, setAbsenceEmployeeSearch] = useState("");
+    const [employeeFilters, setEmployeeFilters] = useState([]);
+    const [employeeSearch, setEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
         ["no_eliminadas"],
     );
@@ -272,7 +272,7 @@ export const useCalendarFilters = (
 
     useEffect(() => {
         if (!canUseEmployeeCatalog) {
-            Promise.resolve().then(() => setCatalogAbsenceEmployeeOptions([]));
+            Promise.resolve().then(() => setCatalogEmployeeOptions([]));
             return;
         }
 
@@ -280,7 +280,7 @@ export const useCalendarFilters = (
             .then((employees) => {
                 if (!Array.isArray(employees)) return;
 
-                setCatalogAbsenceEmployeeOptions(
+                setCatalogEmployeeOptions(
                     employees.map((employee) => ({
                         value: String(employee.employeeId),
                         label: employee.name,
@@ -289,7 +289,7 @@ export const useCalendarFilters = (
                 );
             })
             .catch(() => {
-                setCatalogAbsenceEmployeeOptions([]);
+                setCatalogEmployeeOptions([]);
             });
     }, [canUseEmployeeCatalog]);
 
@@ -309,7 +309,7 @@ export const useCalendarFilters = (
         }));
     }, [allEvents]);
 
-    const fallbackAbsenceEmployeeOptions = useMemo(() => {
+    const fallbackEmployeeOptions = useMemo(() => {
         const employees = new Map();
 
         allEvents
@@ -333,11 +333,11 @@ export const useCalendarFilters = (
             : fallbackAbsenceTypeOptions
     ), [catalogAbsenceTypeOptions, fallbackAbsenceTypeOptions]);
 
-    const absenceEmployeeOptions = useMemo(() => (
-        catalogAbsenceEmployeeOptions.length > 0
-            ? catalogAbsenceEmployeeOptions
-            : fallbackAbsenceEmployeeOptions
-    ), [catalogAbsenceEmployeeOptions, fallbackAbsenceEmployeeOptions]);
+    const employeeOptions = useMemo(() => (
+        catalogEmployeeOptions.length > 0
+            ? catalogEmployeeOptions
+            : fallbackEmployeeOptions
+    ), [catalogEmployeeOptions, fallbackEmployeeOptions]);
 
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
@@ -348,60 +348,60 @@ export const useCalendarFilters = (
         return kept.length > 0 ? kept : nextValues;
     }, [absenceTypeFilters, absenceTypeOptions]);
 
-    const effectiveAbsenceEmployeeFilters = useMemo(() => {
-        const nextValues = absenceEmployeeOptions.map((opt) => opt.value);
+    const effectiveEmployeeFilters = useMemo(() => {
+        const nextValues = employeeOptions.map((opt) => opt.value);
 
-        if (absenceEmployeeFilters.length === 0) return nextValues;
+        if (employeeFilters.length === 0) return nextValues;
 
-        const kept = absenceEmployeeFilters.filter((value) =>
+        const kept = employeeFilters.filter((value) =>
             nextValues.includes(value),
         );
         return kept.length > 0 ? kept : nextValues;
-    }, [absenceEmployeeFilters, absenceEmployeeOptions]);
+    }, [employeeFilters, employeeOptions]);
 
-    const filteredAbsenceEmployeeOptions = useMemo(() => {
-        const normalizedSearch = absenceEmployeeSearch.trim().toLowerCase();
+    const filteredEmployeeOptions = useMemo(() => {
+        const normalizedSearch = employeeSearch.trim().toLowerCase();
 
-        if (!normalizedSearch) return absenceEmployeeOptions;
+        if (!normalizedSearch) return employeeOptions;
 
-        return absenceEmployeeOptions.filter((option) =>
+        return employeeOptions.filter((option) =>
             String(option.label).toLowerCase().includes(normalizedSearch),
         );
-    }, [absenceEmployeeOptions, absenceEmployeeSearch]);
+    }, [employeeOptions, employeeSearch]);
 
-    const selectedAbsenceEmployeeLabel = useMemo(() => {
-        if (absenceEmployeeOptions.length === 0) return "Sin trabajadores";
-        if (effectiveAbsenceEmployeeFilters.length === absenceEmployeeOptions.length) {
+    const selectedEmployeeLabel = useMemo(() => {
+        if (employeeOptions.length === 0) return "Sin trabajadores";
+        if (effectiveEmployeeFilters.length === employeeOptions.length) {
             return "Todos";
         }
-        if (effectiveAbsenceEmployeeFilters.length === 0) return "Ninguno";
-        if (effectiveAbsenceEmployeeFilters.length === 1) {
-            return absenceEmployeeOptions.find(
-                (option) => option.value === effectiveAbsenceEmployeeFilters[0],
+        if (effectiveEmployeeFilters.length === 0) return "Ninguno";
+        if (effectiveEmployeeFilters.length === 1) {
+            return employeeOptions.find(
+                (option) => option.value === effectiveEmployeeFilters[0],
             )?.label ?? "1 seleccionado";
         }
 
-        return `${effectiveAbsenceEmployeeFilters.length} seleccionados`;
-    }, [absenceEmployeeOptions, effectiveAbsenceEmployeeFilters]);
+        return `${effectiveEmployeeFilters.length} seleccionados`;
+    }, [employeeOptions, effectiveEmployeeFilters]);
 
-    const toggleAbsenceEmployeeValue = (optionValue, checked) => {
+    const toggleEmployeeValue = (optionValue, checked) => {
         if (checked) {
-            if (!effectiveAbsenceEmployeeFilters.includes(optionValue)) {
-                setAbsenceEmployeeFilters([
-                    ...effectiveAbsenceEmployeeFilters,
+            if (!effectiveEmployeeFilters.includes(optionValue)) {
+                setEmployeeFilters([
+                    ...effectiveEmployeeFilters,
                     optionValue,
                 ]);
             }
             return;
         }
 
-        setAbsenceEmployeeFilters(
-            effectiveAbsenceEmployeeFilters.filter((value) => value !== optionValue),
+        setEmployeeFilters(
+            effectiveEmployeeFilters.filter((value) => value !== optionValue),
         );
     };
 
-    const clearAbsenceEmployeeSelection = () => {
-        setAbsenceEmployeeFilters([]);
+    const clearEmployeeSelection = () => {
+        setEmployeeFilters([]);
     };
 
     const showEventFilters = focusFilters.includes("eventos");
@@ -418,7 +418,7 @@ export const useCalendarFilters = (
             vacationStatusFilters,
             absenceTypeOptions,
             effectiveAbsenceTypeFilters,
-            effectiveAbsenceEmployeeFilters,
+            effectiveEmployeeFilters,
             absenceStatusFilters,
             absenceEvidenceFilters,
         ),
@@ -431,7 +431,7 @@ export const useCalendarFilters = (
             vacationStatusFilters,
             absenceTypeOptions,
             effectiveAbsenceTypeFilters,
-            effectiveAbsenceEmployeeFilters,
+            effectiveEmployeeFilters,
             absenceStatusFilters,
             absenceEvidenceFilters,
         ],
@@ -443,15 +443,15 @@ export const useCalendarFilters = (
         eventTypeFilters, setEventTypeFilters, eventTypeOptions,
         vacationStatusFilters, setVacationStatusFilters, vacationStatusOptions: STATUS_OPTIONS,
         absenceTypeFilters: effectiveAbsenceTypeFilters, setAbsenceTypeFilters, absenceTypeOptions,
-        absenceEmployeeFilters: effectiveAbsenceEmployeeFilters,
-        filteredAbsenceEmployeeOptions,
-        absenceEmployeeSearch,
-        selectedAbsenceEmployeeLabel,
-        setAbsenceEmployeeFilters,
-        setAbsenceEmployeeSearch,
-        toggleAbsenceEmployeeValue,
-        clearAbsenceEmployeeSelection,
-        absenceEmployeeOptions,
+        employeeFilters: effectiveEmployeeFilters,
+        filteredEmployeeOptions,
+        employeeSearch,
+        selectedEmployeeLabel,
+        setEmployeeFilters,
+        setEmployeeSearch,
+        toggleEmployeeValue,
+        clearEmployeeSelection,
+        employeeOptions,
         absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
         absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
         showEventFilters, showVacationFilters, showAbscenceFilters,

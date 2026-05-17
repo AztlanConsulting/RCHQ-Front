@@ -59,13 +59,13 @@ const Calendario = () => {
         absenceTypeFilters,
         setAbsenceTypeFilters,
         absenceTypeOptions,
-        absenceEmployeeFilters,
-        filteredAbsenceEmployeeOptions,
-        absenceEmployeeSearch,
-        selectedAbsenceEmployeeLabel,
-        setAbsenceEmployeeSearch,
-        toggleAbsenceEmployeeValue,
-        clearAbsenceEmployeeSelection,
+        employeeFilters,
+        filteredEmployeeOptions,
+        employeeSearch,
+        selectedEmployeeLabel,
+        setEmployeeSearch,
+        toggleEmployeeValue,
+        clearEmployeeSelection,
         absenceStatusFilters,
         setAbsenceStatusFilters,
         absenceStatusOptions,
@@ -143,13 +143,13 @@ const Calendario = () => {
         absenceTypeFilters={absenceTypeFilters}
         setAbsenceTypeFilters={setAbsenceTypeFilters}
         absenceTypeOptions={absenceTypeOptions}
-        absenceEmployeeFilters={absenceEmployeeFilters}
-        filteredAbsenceEmployeeOptions={filteredAbsenceEmployeeOptions}
-        absenceEmployeeSearch={absenceEmployeeSearch}
-        selectedAbsenceEmployeeLabel={selectedAbsenceEmployeeLabel}
-        setAbsenceEmployeeSearch={setAbsenceEmployeeSearch}
-        toggleAbsenceEmployeeValue={toggleAbsenceEmployeeValue}
-        clearAbsenceEmployeeSelection={clearAbsenceEmployeeSelection}
+        employeeFilters={employeeFilters}
+        filteredEmployeeOptions={filteredEmployeeOptions}
+        employeeSearch={employeeSearch}
+        selectedEmployeeLabel={selectedEmployeeLabel}
+        setEmployeeSearch={setEmployeeSearch}
+        toggleEmployeeValue={toggleEmployeeValue}
+        clearEmployeeSelection={clearEmployeeSelection}
         absenceStatusFilters={absenceStatusFilters}
         setAbsenceStatusFilters={setAbsenceStatusFilters}
         absenceStatusOptions={absenceStatusOptions}

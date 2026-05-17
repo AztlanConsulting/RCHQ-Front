@@ -47,13 +47,13 @@ const CalendarFilters = ({
   absenceTypeFilters,
   setAbsenceTypeFilters,
   absenceTypeOptions,
-  absenceEmployeeFilters,
-  filteredAbsenceEmployeeOptions,
-  absenceEmployeeSearch,
-  selectedAbsenceEmployeeLabel,
-  setAbsenceEmployeeSearch,
-  toggleAbsenceEmployeeValue,
-  clearAbsenceEmployeeSelection,
+  employeeFilters,
+  filteredEmployeeOptions,
+  employeeSearch,
+  selectedEmployeeLabel,
+  setEmployeeSearch,
+  toggleEmployeeValue,
+  clearEmployeeSelection,
   absenceStatusFilters,
   setAbsenceStatusFilters,
   absenceStatusOptions,
@@ -116,14 +116,14 @@ const CalendarFilters = ({
           <>
             <SearchableCheckboxDropdown
               label="TRABAJADOR"
-              name="absence-employee"
-              filteredOptions={filteredAbsenceEmployeeOptions}
-              values={absenceEmployeeFilters}
-              search={absenceEmployeeSearch}
-              selectedLabel={selectedAbsenceEmployeeLabel}
-              onSearchChange={setAbsenceEmployeeSearch}
-              onToggleValue={toggleAbsenceEmployeeValue}
-              onClearSelection={clearAbsenceEmployeeSelection}
+              name="employee"
+              filteredOptions={filteredEmployeeOptions}
+              values={employeeFilters}
+              search={employeeSearch}
+              selectedLabel={selectedEmployeeLabel}
+              onSearchChange={setEmployeeSearch}
+              onToggleValue={toggleEmployeeValue}
+              onClearSelection={clearEmployeeSelection}
             />
             <div className="border border-b border-[#EAEAEA]"></div>
           </>
