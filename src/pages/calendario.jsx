@@ -220,7 +220,7 @@ const Calendario = () => {
         className={
           selectedEvent?.focus === "ausencias"
             ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
-            : "max-w-[25vw] max-h-[80vh]"
+            : "w-[92vw] max-w-[400px] max-h-[80vh]"
         }
       >
         {selectedEvent?.focus === "ausencias" ? (
