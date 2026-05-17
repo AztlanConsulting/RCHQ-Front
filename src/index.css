@@ -115,6 +115,72 @@ svg {
     }
 }
 
+@media (max-width: 640px) {
+    .fc .fc-header-toolbar {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk {
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Left side */
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        grid-column: 1;
+        grid-row: 1;
+        justify-content: flex-start;
+    }
+
+    /* Right side */
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        grid-column: 2;
+        grid-row: 1;
+        justify-content: flex-end;
+    }
+
+    /* Bottom row */
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+        justify-content: flex-end;
+    }
+}
+
+/* @media (max-width: 640px) {
+    .fc .fc-header-toolbar {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-auto-flow: row !important;
+        gap: 0.5rem;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk {
+        grid-column: 1 !important;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        grid-row: 1;
+        justify-content: start;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        grid-row: 1;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        grid-row: 3;
+        justify-content: start;
+    }
+} */
+
 .fc .fc-toolbar-chunk {
     display: flex;
     flex-wrap: wrap;
@@ -128,6 +194,20 @@ svg {
     line-height: 1.2;
     padding-inline: 0.25rem;
 }
+
+/* @media (max-width: 640px) {
+    .fc .fc-button {
+        height: auto;
+        height: 20px;
+        min-height: 2rem;
+        font-weight: 600;
+        font-size: clamp(0.75rem, 0.35vw + 0.7rem, 0.8125rem);
+        line-height: 1.2;
+        box-shadow: 0 1px 2px rgb(0 47 142 / 0.2);
+        padding: 0.35rem 0.65rem;
+        border: none;
+    }   
+} */
 
 .fc .fc-button {
     height: auto;
@@ -177,6 +257,41 @@ svg {
 .fc .fc-calendarFiltersButton-button {
     min-width: 2rem;
     padding-inline: 0.45rem;
+}
+
+/* Lista — icon-only; match size/padding to calendar filter button */
+.fc .fc-toggleListButton-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding-inline: 0.45rem;
+}
+
+.fc .fc-toggleListButton-button .fc-button-text {
+    display: none;
+}
+
+.fc .fc-icon-list {
+    font-family: inherit;
+    font-size: 1em;
+    line-height: 1;
+    opacity: 1;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
+
+.fc .fc-icon-list::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: relative;
+    background-color: #fafafa;
+    mask: url("/list.svg") no-repeat center / contain;
+    -webkit-mask: url("/list.svg") no-repeat center / contain;
 }
 
 @media (min-width: 1024px) {

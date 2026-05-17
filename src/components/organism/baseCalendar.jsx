@@ -64,7 +64,9 @@ const BaseCalendar = ({
     const customButtons = useMemo(
         () => ({
             toggleListButton: {
-                text: "Lista",
+                text: "",
+                icon: "list",
+                hint: "Lista",
                 click: () => toggleList(calendarRef),
             },
             createEventButton: {
