@@ -2,6 +2,7 @@ import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import Button from "../atoms/button";
+import { sanitizeSearchInput } from "../../utils/searchInput";
 
 const VacationRequestFilters = ({
     view,
@@ -15,6 +16,10 @@ const VacationRequestFilters = ({
     setStatusFilter,
     clearFilters,
 }) => {
+    const handleSearchChange = (value) => {
+        setSearchQuery(sanitizeSearchInput(value));
+    };
+
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
     };
@@ -36,7 +41,7 @@ const VacationRequestFilters = ({
                     text="Buscar por nombre o CURP"
                     placeholder="Nombre, apellido o CURP"
                     value={searchQuery}
-                    setValue={setSearchQuery}
+                    setValue={handleSearchChange}
                     maxLength={100}
                     labelClassName="text-sm font-bold text-[#121212]"
                 />
