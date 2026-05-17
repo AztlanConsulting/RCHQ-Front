@@ -16,7 +16,6 @@ const isManagementRole = (role) => role === "Admin" || role === "Coordinador";
 
 const Calendario = () => {
   const calendarRef = useRef(null);
-  // const [filtersModalOpen, setFiltersModalOpen] = React.useState(false);
 
     const {
         employeeHouseName,
