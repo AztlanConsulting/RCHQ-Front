@@ -348,8 +348,6 @@ export const useCalendarFilters = (
         if (absenceTypeOptions.length === 0) return;
         if (hasCustomizedAbsenceTypeFilters) return;
 
-        // Default behavior: while the user has not touched the filter,
-        // keep every currently available absence type selected.
         setAbsenceTypeFiltersState(absenceTypeOptions.map((option) => option.value));
     }, [absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
 
