@@ -220,6 +220,7 @@ export const useCalendarFilters = (
         STATUS_OPTIONS.map((o) => o.value),
     );
     const [absenceTypeFilters, setAbsenceTypeFilters] = useState([]);
+    const [hasInitializedAbsenceTypeFilters, setHasInitializedAbsenceTypeFilters] = useState(false);
     const [absenceEmployeeFilters, setAbsenceEmployeeFilters] = useState([]);
     const [absenceEmployeeSearch, setAbsenceEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
@@ -334,10 +335,18 @@ export const useCalendarFilters = (
             : fallbackAbsenceEmployeeOptions
     ), [catalogAbsenceEmployeeOptions, fallbackAbsenceEmployeeOptions]);
 
+    useEffect(() => {
+        if (hasInitializedAbsenceTypeFilters) return;
+        if (absenceTypeOptions.length === 0) return;
+
+        setAbsenceTypeFilters(absenceTypeOptions.map((option) => option.value));
+        setHasInitializedAbsenceTypeFilters(true);
+    }, [absenceTypeOptions, hasInitializedAbsenceTypeFilters]);
+
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
 
-        if (absenceTypeFilters.length === 0) return nextValues;
+        if (absenceTypeFilters.length === 0) return [];
 
         const kept = absenceTypeFilters.filter((value) => nextValues.includes(value));
         return kept.length > 0 ? kept : nextValues;
