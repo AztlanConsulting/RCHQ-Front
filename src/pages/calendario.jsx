@@ -193,11 +193,6 @@ const Calendario = () => {
         title={selectedEvent?.focus === "ausencias" ? null : "Detalle del evento"}
         grayBackground={isAbsenceDetailOpen}
         placement={isAbsenceDetailOpen ? "center" : "right"}
-        backdropClassName={
-          isAbsenceDetailOpen
-            ? "bg-black/50"
-            : "bg-black/50"
-        }
         className={
           selectedEvent?.focus === "ausencias"
             ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
