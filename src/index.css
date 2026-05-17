@@ -80,8 +80,9 @@ svg {
 }
 
 /*
- * <768px: title chunk (2) on its own row above; chunks 1 & 3 stay one flex row
- * and wrap naturally (chunk 3 drops below chunk 1 when space runs out).
+ * <768px: title on row 1; chunks 1 & 3 flex-wrap on row 2.
+ * 493–767px: space-between (nav left, actions right) while they share a row.
+ * ≤492px: flex-start so when chunk 3 wraps, the new row is flush left.
  */
 @media (max-width: 767px) {
     .fc .fc-header-toolbar {
@@ -103,7 +104,7 @@ svg {
         min-width: 0;
         box-sizing: border-box;
         text-align: left;
-        justify-content: initial;
+        justify-content: flex-start;
     }
 
     .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
@@ -118,6 +119,17 @@ svg {
         min-width: 0;
         max-width: 100%;
         justify-content: flex-end;
+    }
+}
+
+@media (max-width: 492px) {
+    .fc .fc-header-toolbar {
+        justify-content: flex-start;
+        column-gap: 0.5rem;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        justify-content: flex-start;
     }
 }
 
