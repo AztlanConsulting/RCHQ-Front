@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import DayGridCard from "../molecules/calendarCards/dayGridCard";
 import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard";
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
@@ -52,12 +52,68 @@ const BaseCalendar = ({
     onEventClick,
     onDateDrag,
     onDateDragging,
+    onOpenCalendarFilters,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
     const moreLinkContent = useCallback(
         (arg) => <DayGridOverflowCard count={arg.num} />,
         [],
+    );
+
+    const customButtons = useMemo(
+        () => ({
+            toggleListButton: {
+                text: "Lista",
+                click: () => toggleList(calendarRef),
+            },
+            createEventButton: {
+                text: "",
+                hint: "Crear evento",
+                click: () => openCreationModal?.(calendarRef),
+            },
+            monthButton: {
+                text: "Mes",
+                click: () => setMonthView(calendarRef),
+            },
+            weekButton: {
+                text: "Semana",
+                click: () => setWeekView(calendarRef),
+            },
+            dayButton: {
+                text: "Día",
+                click: () => setDayView(calendarRef),
+            },
+            ...(onOpenCalendarFilters
+                ? {
+                      calendarFiltersButton: {
+                          icon: "calendar-filter",
+                          hint: "Filtros del calendario",
+                          click: () => onOpenCalendarFilters(),
+                      },
+                  }
+                : {}),
+        }),
+        [
+            calendarRef,
+            toggleList,
+            openCreationModal,
+            setMonthView,
+            setWeekView,
+            setDayView,
+            onOpenCalendarFilters,
+        ],
+    );
+
+    const headerToolbar = useMemo(
+        () => ({
+            left: onOpenCalendarFilters
+                ? "prev,next today calendarFiltersButton"
+                : "prev,next today",
+            center: "title",
+            right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
+        }),
+        [onOpenCalendarFilters],
     );
 
     useEffect(() => {
@@ -78,11 +134,7 @@ const BaseCalendar = ({
             locale="es"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
-            headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
-            }}
+            headerToolbar={headerToolbar}
             titleFormat={(arg) => generateTitle(arg)}
             views={{
                 timeGridDay: {
@@ -97,28 +149,7 @@ const BaseCalendar = ({
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}
-            customButtons={{
-                toggleListButton: {
-                    text: "Lista",
-                    click: () => toggleList(calendarRef),
-                },
-                createEventButton: {
-                    text: "",
-                    click: () => openCreationModal(calendarRef),
-                },
-                monthButton: {
-                    text: "Mes",
-                    click: () => setMonthView(calendarRef),
-                },
-                weekButton: {
-                    text: "Semana",
-                    click: () => setWeekView(calendarRef),
-                },
-                dayButton: {
-                    text: "Día",
-                    click: () => setDayView(calendarRef),
-                },
-            }}
+            customButtons={customButtons}
             events={visibleEvents}
             datesSet={handleDatesSet}
             eventContent={eventContent}

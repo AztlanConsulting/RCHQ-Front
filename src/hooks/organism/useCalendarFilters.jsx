@@ -228,6 +228,7 @@ export const useCalendarFilters = (
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
+    const [filtersModalOpen, setFiltersModalOpen] = useState(false);
     const canUseEmployeeCatalog =
         viewerRole === "Admin" || viewerRole === "Coordinador";
 
@@ -450,6 +451,7 @@ export const useCalendarFilters = (
         absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
         absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
         showEventFilters, showVacationFilters, showAbscenceFilters,
+        filtersModalOpen, setFiltersModalOpen,
         visibleEvents, 
     };
 };

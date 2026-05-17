@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
+import CalendarFiltersModal from "../components/molecules/calendarFiltersModal";
 import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
@@ -14,7 +15,8 @@ import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 const isManagementRole = (role) => role === "Admin" || role === "Coordinador";
 
 const Calendario = () => {
-    const calendarRef = useRef(null);
+  const calendarRef = useRef(null);
+  // const [filtersModalOpen, setFiltersModalOpen] = React.useState(false);
 
     const {
         employeeHouseName,
@@ -75,6 +77,8 @@ const Calendario = () => {
         showEventFilters,
         showVacationFilters,
         showAbscenceFilters,
+        filtersModalOpen,
+        setFiltersModalOpen,
         visibleEvents,
     } = useCalendarFilters(allEvents, { isList, viewerRole });
 
@@ -113,8 +117,48 @@ const Calendario = () => {
       setOwnCalendar();
     }, [setOwnCalendar]);
 
+  const calendarFiltersProps = {
+    houseName: employeeHouseName,
+    focusFilters,
+    setFocusFilters,
+    focusOptions,
+    scopeFilters,
+    setScopeFilters,
+    scopeOptions,
+    eventTypeFilters,
+    setEventTypeFilters,
+    eventTypeOptions,
+    vacationStatusFilters,
+    setVacationStatusFilters,
+    vacationStatusOptions,
+    absenceTypeFilters,
+    setAbsenceTypeFilters,
+    absenceTypeOptions,
+    absenceEmployeeFilters,
+    filteredAbsenceEmployeeOptions,
+    absenceEmployeeSearch,
+    selectedAbsenceEmployeeLabel,
+    setAbsenceEmployeeSearch,
+    toggleAbsenceEmployeeValue,
+    clearAbsenceEmployeeSelection,
+    absenceStatusFilters,
+    setAbsenceStatusFilters,
+    absenceStatusOptions,
+    absenceEvidenceFilters,
+    setAbsenceEvidenceFilters,
+    absenceEvidenceOptions,
+    showEventFilters,
+    showVacationFilters,
+    showAbscenceFilters,
+    viewerRole,
+    calendarMode,
+    onCalendarModeChange: setCalendarMode,
+    calendarModeOptions,
+    canSwitchCalendarMode,
+  };
+
   return (
-    <div className="flex items-center gap-4">
+    <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
       {alert?.message ? (
         <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2">
           <Alert
@@ -125,48 +169,18 @@ const Calendario = () => {
         </div>
       ) : null}
 
-      <CalendarFilters
-        className="basis-1/6 min-w-40 "
-        houseName={employeeHouseName}
-        focusFilters={focusFilters}
-        setFocusFilters={setFocusFilters}
-        focusOptions={focusOptions}
-        scopeFilters={scopeFilters}
-        setScopeFilters={setScopeFilters}
-        scopeOptions={scopeOptions}
-        eventTypeFilters={eventTypeFilters}
-        setEventTypeFilters={setEventTypeFilters}
-        eventTypeOptions={eventTypeOptions}
-        vacationStatusFilters={vacationStatusFilters}
-        setVacationStatusFilters={setVacationStatusFilters}
-        vacationStatusOptions={vacationStatusOptions}
-        absenceTypeFilters={absenceTypeFilters}
-        setAbsenceTypeFilters={setAbsenceTypeFilters}
-        absenceTypeOptions={absenceTypeOptions}
-        absenceEmployeeFilters={absenceEmployeeFilters}
-        filteredAbsenceEmployeeOptions={filteredAbsenceEmployeeOptions}
-        absenceEmployeeSearch={absenceEmployeeSearch}
-        selectedAbsenceEmployeeLabel={selectedAbsenceEmployeeLabel}
-        setAbsenceEmployeeSearch={setAbsenceEmployeeSearch}
-        toggleAbsenceEmployeeValue={toggleAbsenceEmployeeValue}
-        clearAbsenceEmployeeSelection={clearAbsenceEmployeeSelection}
-        absenceStatusFilters={absenceStatusFilters}
-        setAbsenceStatusFilters={setAbsenceStatusFilters}
-        absenceStatusOptions={absenceStatusOptions}
-        absenceEvidenceFilters={absenceEvidenceFilters}
-        setAbsenceEvidenceFilters={setAbsenceEvidenceFilters}
-        absenceEvidenceOptions={absenceEvidenceOptions}
-        showEventFilters={showEventFilters}
-        showVacationFilters={showVacationFilters}
-        showAbscenceFilters={showAbscenceFilters}
-        viewerRole={viewerRole}
-        calendarMode={calendarMode}
-        onCalendarModeChange={setCalendarMode}
-        calendarModeOptions={calendarModeOptions}
-        canSwitchCalendarMode={canSwitchCalendarMode}
+      <CalendarFiltersModal
+        open={filtersModalOpen}
+        onClose={() => setFiltersModalOpen(false)}
+        {...calendarFiltersProps}
       />
 
-      <div className="flex-1">
+      <CalendarFilters
+        {...calendarFiltersProps}
+        className="mb-auto hidden w-full shrink-0 sm:min-w-0 lg:flex lg:basis-64 lg:max-w-xs xl:basis-1/6"
+      />
+
+      <div className="min-w-0 flex-1">
         <BaseCalendar
           loadButtonsAtStart={loadButtonsAtStart}
           calendarRef={calendarRef}
@@ -183,6 +197,7 @@ const Calendario = () => {
           onEventClick={handleEventClick}
           onDateDrag={handleDateDrags}
           onDateDragging={handleDateDragging}
+          onOpenCalendarFilters={() => setFiltersModalOpen(true)}
         />
       </div>
 
