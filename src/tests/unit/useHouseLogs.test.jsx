@@ -3,11 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../services/logsService", () => ({
   getHouseLogsService: vi.fn(),
-  getLogsActionsService: vi.fn().mockResolvedValue([]),
   downloadHouseLogsReportService: vi.fn(),
 }));
 
-import { getHouseLogsService, getLogsActionsService } from "../../services/logsService";
+import { getHouseLogsService } from "../../services/logsService";
 import { useHouseLogs } from "../../hooks/pages/useHouseLogs";
 
 const baseLogs = [
@@ -43,10 +42,9 @@ const baseLogs = [
 describe("useHouseLogs", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getLogsActionsService.mockResolvedValue([]);
   });
 
-  it("carga los logs y deja vacío el catálogo de acciones cuando no hay datos", async () => {
+  it("carga los logs con paginación base", async () => {
     getHouseLogsService.mockResolvedValue({
       logs: baseLogs,
       pagination: {
@@ -70,9 +68,13 @@ describe("useHouseLogs", () => {
     expect(result.current.logs).toHaveLength(3);
     expect(result.current.actionOptions).toEqual([]);
     expect(result.current.selectedActionLabel).toBe("Todas las acciones");
+    expect(getHouseLogsService).toHaveBeenCalledWith({
+      page: 1,
+      limit: 6,
+    });
   });
 
-  it("mantiene el estado base de filtros sin afectar la carga", async () => {
+  it("mantiene el estado visual de filtros sin volver a cargar", async () => {
     getHouseLogsService.mockResolvedValue({
       data: baseLogs,
       logs: baseLogs,
@@ -96,14 +98,13 @@ describe("useHouseLogs", () => {
     act(() => {
       result.current.setResponsibleQuery("carla");
       result.current.setAffectedQuery("ana");
-      result.current.setActionFilter("ausn-001");
       result.current.setDateFilter("2026-04-11");
     });
 
     expect(result.current.responsibleQuery).toBe("carla");
     expect(result.current.affectedQuery).toBe("ana");
-    expect(result.current.actionFilter).toBe("ausn-001");
     expect(result.current.dateFilter).toBe("2026-04-11");
+    expect(getHouseLogsService).toHaveBeenCalledTimes(1);
   });
 
   it("pagina los resultados desde el servidor", async () => {
@@ -186,39 +187,4 @@ describe("useHouseLogs", () => {
     expect(result.current.logs).toEqual([]);
   });
 
-  it("manda responsible y affected al backend después del debounce", async () => {
-    getHouseLogsService.mockResolvedValue({
-      logs: baseLogs,
-      pagination: {
-        page: 1,
-        limit: 6,
-        total: 3,
-        totalPages: 1,
-      },
-      data: baseLogs,
-      totalPages: 1,
-      currentPage: 1,
-      totalRecords: 3,
-    });
-
-    const { result } = renderHook(() => useHouseLogs());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    act(() => {
-      result.current.setResponsibleQuery("Carla");
-      result.current.setAffectedQuery("Luis");
-    });
-
-    await waitFor(() => {
-      expect(getHouseLogsService).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          responsible: "Carla",
-          affected: "Luis",
-        }),
-      );
-    });
-  });
 });

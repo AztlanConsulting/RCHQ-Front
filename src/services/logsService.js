@@ -8,34 +8,10 @@ const DEFAULT_LIMIT = 6;
 const buildQuery = ({
   page = 1,
   limit = DEFAULT_LIMIT,
-  search = "",
-  responsible = "",
-  affected = "",
-  actionIds = [],
-  startDate = "",
-  endDate = "",
 } = {}) => {
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
-
-  const trimmedSearch = String(search).trim();
-  const trimmedResponsible = String(responsible).trim();
-  const trimmedAffected = String(affected).trim();
-  const trimmedStartDate = String(startDate).trim();
-  const trimmedEndDate = String(endDate).trim();
-  const normalizedActionIds = Array.isArray(actionIds)
-    ? actionIds.map((value) => String(value).trim()).filter(Boolean)
-    : [String(actionIds).trim()].filter(Boolean);
-
-  if (trimmedSearch) params.set("search", trimmedSearch);
-  if (trimmedResponsible) params.set("responsible", trimmedResponsible);
-  if (trimmedAffected) params.set("affected", trimmedAffected);
-  if (normalizedActionIds.length > 0) {
-    params.set("actionIds", normalizedActionIds.join(","));
-  }
-  if (trimmedStartDate) params.set("startDate", trimmedStartDate);
-  if (trimmedEndDate) params.set("endDate", trimmedEndDate);
 
   return params.toString();
 };
@@ -58,12 +34,6 @@ const formatMoment = (momentValue) => {
 export const getHouseLogsService = async ({
   page = 1,
   limit = DEFAULT_LIMIT,
-  search = "",
-  responsible = "",
-  affected = "",
-  actionIds = [],
-  startDate = "",
-  endDate = "",
 } = {}) => {
   const token = getToken();
 
@@ -74,12 +44,6 @@ export const getHouseLogsService = async ({
   const query = buildQuery({
     page,
     limit,
-    search,
-    responsible,
-    affected,
-    actionIds,
-    startDate,
-    endDate,
   });
   const response = await secureFetch(`${API_URL}/logs/house?${query}`, {
     method: "GET",
@@ -117,30 +81,6 @@ export const getHouseLogsService = async ({
     currentPage: pagination.page,
     totalRecords: pagination.total,
   };
-};
-
-export const getLogsActionsService = async () => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
-
-  const response = await secureFetch(`${API_URL}/logs/actions`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw buildApiError(response, data, "Error al obtener las acciones disponibles");
-  }
-
-  return Array.isArray(data?.data) ? data.data : [];
 };
 
 export const downloadHouseLogsReportService = async ({ month, year }) => {

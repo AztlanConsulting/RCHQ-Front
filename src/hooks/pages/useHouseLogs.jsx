@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   downloadHouseLogsReportService,
   getHouseLogsService,
-  getLogsActionsService,
 } from "../../services/logsService";
-import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const LIMIT = 6;
 const DEFAULT_PAGINATION = {
@@ -48,38 +46,12 @@ export const useHouseLogs = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [responsibleQuery, setResponsibleQuery] = useState("");
+  const [affectedQuery, setAffectedQuery] = useState("");
   const [actionOptions, setActionOptions] = useState([]);
   const [selectedActionIds, setSelectedActionIds] = useState([]);
   const [actionSearch, setActionSearch] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [actionFilter, setActionFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
-
-  const {
-    inputValue: searchInput,
-    setInputValue: setSearchInput,
-    debouncedSearch: searchQuery,
-  } = useDebouncedVacationSearch("", {
-    minSearchLength: 3,
-    debounceMs: 400,
-  });
-  const {
-    inputValue: responsibleInput,
-    setInputValue: setResponsibleQuery,
-    debouncedSearch: responsibleSearch,
-  } = useDebouncedVacationSearch("", {
-    minSearchLength: 3,
-    debounceMs: 400,
-  });
-  const {
-    inputValue: affectedInput,
-    setInputValue: setAffectedQuery,
-    debouncedSearch: affectedSearch,
-  } = useDebouncedVacationSearch("", {
-    minSearchLength: 3,
-    debounceMs: 400,
-  });
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
@@ -112,14 +84,6 @@ export const useHouseLogs = () => {
     return `${selectedActionIds.length} acciones seleccionadas`;
   }, [actionOptions, selectedActionIds]);
 
-  const effectiveSelectedActionIds = useMemo(() => {
-    if (actionFilter !== "all") return [actionFilter];
-    return selectedActionIds;
-  }, [actionFilter, selectedActionIds]);
-
-  const effectiveStartDate = dateFilter || startDate;
-  const effectiveEndDate = dateFilter || endDate;
-
   const fetchLogs = async (pageToFetch = 1) => {
     setLoading(true);
     setError("");
@@ -128,12 +92,6 @@ export const useHouseLogs = () => {
       const result = await getHouseLogsService({
         page: pageToFetch,
         limit: LIMIT,
-        search: searchQuery,
-        responsible: responsibleSearch,
-        affected: affectedSearch,
-        actionIds: effectiveSelectedActionIds,
-        startDate: effectiveStartDate,
-        endDate: effectiveEndDate,
       });
 
       setServerLogs(result.logs);
@@ -149,30 +107,8 @@ export const useHouseLogs = () => {
   };
 
   useEffect(() => {
-    const fetchActions = async () => {
-      try {
-        const actions = await getLogsActionsService();
-        setActionOptions(
-          actions.map((action) => ({
-            value: action.actionId,
-            label: action.description,
-          })),
-        );
-      } catch (err) {
-        setError(err.message || "No se pudieron cargar las acciones");
-      }
-    };
-
-    fetchActions();
-  }, []);
-
-  useEffect(() => {
     fetchLogs(page);
-  }, [page, searchQuery, responsibleSearch, affectedSearch, effectiveSelectedActionIds, effectiveStartDate, effectiveEndDate]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [searchQuery, responsibleSearch, affectedSearch, effectiveSelectedActionIds, effectiveStartDate, effectiveEndDate]);
+  }, [page]);
 
   const handleNextPage = () => {
     if (page < pagination.totalPages) {
@@ -201,15 +137,6 @@ export const useHouseLogs = () => {
   const clearActionSelection = () => {
     setSelectedActionIds([]);
     setActionSearch("");
-    setActionFilter("all");
-  };
-
-  const handleStartDateChange = (event) => {
-    setStartDate(event.target.value);
-  };
-
-  const handleEndDateChange = (event) => {
-    setEndDate(event.target.value);
   };
 
   const clearError = () => setError("");
@@ -259,16 +186,10 @@ export const useHouseLogs = () => {
     clearError,
     handleNextPage,
     handlePrevPage,
-    searchInput,
-    setSearchInput,
     filteredActionOptions,
     selectedActionIds,
     actionSearch,
     setActionSearch,
-    startDate,
-    endDate,
-    handleStartDateChange,
-    handleEndDateChange,
     selectedActionLabel,
     toggleActionValue,
     clearActionSelection,
@@ -282,12 +203,10 @@ export const useHouseLogs = () => {
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
-    responsibleQuery: responsibleInput,
+    responsibleQuery,
     setResponsibleQuery,
-    affectedQuery: affectedInput,
+    affectedQuery,
     setAffectedQuery,
-    actionFilter,
-    setActionFilter,
     dateFilter,
     setDateFilter,
     actionOptions,
