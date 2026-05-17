@@ -39,6 +39,10 @@ vi.mock("../../utils/schema/employee/update.schema", () => ({
   employeeBasicUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeContactUpdateSchema: { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeAdminUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
+  normalizeEmployeeContractType: vi.fn((value) => {
+    if (value === "tiempo_completo") return "Nomina";
+    return value;
+  }),
 }));
 
 import {
@@ -85,7 +89,14 @@ const mockAddress = {
 };
 
 const mockHouse    = { houseId: "h1", name: "Desarrollo" };
-const mockWorkdays = [];
+const mockWorkdays = [
+  {
+    workdayId: "wd1",
+    name: "Lunes",
+    start: "2026-05-16T08:00:00.000Z",
+    end: "2026-05-16T17:00:00.000Z",
+  },
+];
 
 // ── setupEmployeeDetail con setAlert reactivo ──────────────────────────────
 const setupEmployeeDetail = (overrides = {}) => {
@@ -422,8 +433,6 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     const salaryInput = screen.getByPlaceholderText(/Ej: 15000/i);
     fireEvent.change(salaryInput, { target: { value: "20000" } });
 
-    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
-
     await act(async () => {
       fireEvent.click(saveBtn);
     });
@@ -443,13 +452,11 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
-    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
-    fireEvent.change(salaryInput, { target: { value: "20000" } });
-
-    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
-
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
     await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "20000" } });
 
     await act(async () => {
       fireEvent.click(saveBtn);
@@ -470,13 +477,11 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
-    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
-    fireEvent.change(salaryInput, { target: { value: "1" } });
-
-    fireEvent.click(screen.getByRole("checkbox", { name: /lunes/i }));
-
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
     await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "1" } });
 
     await act(async () => {
       fireEvent.click(saveBtn);

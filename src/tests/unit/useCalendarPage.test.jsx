@@ -1,9 +1,13 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useCalendarPage } from "../../hooks/pages/useCalendarPage";
-import { updateAbsenceService } from "../../services/calendarService";
+import {
+  deleteAbsenceService,
+  updateAbsenceService,
+} from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
+  deleteAbsenceService: vi.fn(),
   updateAbsenceService: vi.fn(),
   buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
 }));
@@ -201,6 +205,69 @@ describe("useCalendarPage", () => {
       type: "success",
       message: "Ausencia actualizada correctamente",
     });
+  });
+
+  it("elimina la ausencia, recarga el rango y cierra el detalle", async () => {
+    const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+    deleteAbsenceService.mockResolvedValue({
+      absenceId: "absence-1",
+      isDeleted: true,
+    });
+
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        absenceTypeOptions: [{ value: "type-1", label: "Paternidad" }],
+        reloadCurrentRange,
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    act(() => {
+      result.current.openDeleteAbsence();
+    });
+
+    expect(result.current.isDeleteAbsenceOpen).toBe(true);
+
+    await act(async () => {
+      await result.current.confirmDeleteAbsence();
+    });
+
+    expect(deleteAbsenceService).toHaveBeenCalledWith("absence-1");
+    expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+    expect(result.current.selectedEvent).toBe(null);
+    expect(result.current.alert).toEqual({
+      type: "success",
+      message: "Ausencia eliminada correctamente",
+    });
+  });
+
+  it("muestra error si falla la eliminación", async () => {
+    deleteAbsenceService.mockRejectedValue(new Error("No se pudo eliminar"));
+
+    const { result } = renderHook(() =>
+      useCalendarPage({
+        absenceTypeOptions: [{ value: "type-1", label: "Paternidad" }],
+        reloadCurrentRange: vi.fn(),
+      }),
+    );
+
+    act(() => {
+      result.current.handleEventClick(buildCalendarClickInfo());
+    });
+
+    act(() => {
+      result.current.openDeleteAbsence();
+    });
+
+    await act(async () => {
+      await result.current.confirmDeleteAbsence();
+    });
+
+    expect(result.current.absenceDeleteError).toBe("No se pudo eliminar");
+    expect(result.current.isDeleteAbsenceOpen).toBe(true);
   });
 
   it("permite actualizar solo la evidencia y limpia el modo edición", async () => {

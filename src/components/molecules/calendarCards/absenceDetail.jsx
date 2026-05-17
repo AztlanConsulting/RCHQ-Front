@@ -2,14 +2,13 @@ import Button from "../../atoms/button";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import documentIcon from "/document.svg";
+import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import documentIcon from "/document.svg";
 
 const PlusIcon = () => (
-  <span
-    aria-hidden="true"
-    className="mr-1.5 inline-flex text-[1rem] leading-none text-white"
-  >
+  <span aria-hidden="true" 
+  className="mr-1.5 inline-flex text-[1rem] leading-none text-white">
     +
   </span>
 );
@@ -33,7 +32,6 @@ const ReadOnlyField = ({ label, value, fullWidth = false }) => (
         </div>
     </div>
 );
-
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
   const shouldTruncate = displayValue.length > 200;
@@ -66,10 +64,7 @@ const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
 
 const EditableTextArea = ({ label, value, onChange }) => (
   <div className="sm:col-span-2">
-    <Type
-      variant="metric-label"
-      className="mb-1.5 block font-bold text-[#121212]"
-    >
+    <Type variant="metric-label" className="mb-1.5 block font-bold text-[#121212]">
       {label}
     </Type>
     <textarea
@@ -93,21 +88,30 @@ const AbsenceDetail = ({
   absenceTypeOptions = [],
   absenceForm,
   absenceEditError = "",
+  absenceDeleteError = "",
   absenceEvidenceFileName = "",
   absenceEvidenceError = "",
   isSaving = false,
+  isDeleteOpen = false,
+  isLoadingWhileDeleting = false,
+  canManageAbsence = true,
   onOpenEvidence,
   onStartEdit,
   onCancelEdit,
   onSubmitEdit,
+  onOpenDelete,
+  onCancelDelete,
+  onConfirmDelete,
   onAbsenceFieldChange,
   onAbsenceEvidenceChange,
 }) => {
   if (!event) return null;
 
+  const canModifyAbsence = canManageAbsence && !event.isDeleted;
+
   if (isEditing) {
     return (
-      <div className="px-2 sm:px-3 text-left">
+      <div className="px-2 text-left sm:px-3">
         <Type variant="page-title" className="mb-3" as="h2">
           Ausencia
         </Type>
@@ -166,10 +170,7 @@ const AbsenceDetail = ({
         </div>
 
         <div className="sm:col-span-2">
-          <Type
-            variant="metric-label"
-            className="mb-1.5 block font-bold text-[#121212]"
-          >
+          <Type variant="metric-label" className="mb-1.5 block font-bold text-[#121212]">
             Evidencia
           </Type>
           <label
@@ -201,9 +202,7 @@ const AbsenceDetail = ({
             onChange={onAbsenceEvidenceChange}
             className="hidden"
           />
-          <p className="mt-1 text-xs text-slate-400">
-            Máximo 10 MB · PDF, PNG o JPG
-          </p>
+          <p className="mt-1 text-xs text-slate-400">Máximo 10 MB · PDF, PNG o JPG</p>
         </div>
 
         {absenceEditError || absenceEvidenceError ? (
@@ -268,7 +267,6 @@ const AbsenceDetail = ({
             {event.curp || "—"}
           </Type>
         </div>
-
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Tipo de ausencia:
@@ -277,7 +275,6 @@ const AbsenceDetail = ({
             {event.eventType || "—"}
           </Type>
         </div>
-
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Días hábiles:
@@ -286,7 +283,6 @@ const AbsenceDetail = ({
             {event.usedDays ?? "—"}
           </Type>
         </div>
-
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Fecha de inicio:
@@ -303,7 +299,6 @@ const AbsenceDetail = ({
             {formatEventDate(event.endDate)}
           </Type>
         </div>
-
         <div className="sm:col-span-2">
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Descripción:
@@ -333,33 +328,62 @@ const AbsenceDetail = ({
         />
       </div>
 
-      <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-        <Button
-          type="button"
-          text="Eliminar"
-          width="w-full sm:w-[7.2rem]"
-          height="h-8"
-          textSize="text-[0.95rem]"
-          bgColor="bg-[#A20000]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#870000]"
-          activeColor="active:bg-[#6B0000]"
-          className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+      {canModifyAbsence ? (
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+          <Button
+            type="button"
+            text="Eliminar"
+            width="w-full sm:w-[7.2rem]"
+            height="h-8"
+            textSize="text-[0.95rem]"
+            bgColor="bg-[#A20000]"
+            textColor="text-white"
+            hoverColor="hover:bg-[#870000]"
+            activeColor="active:bg-[#6B0000]"
+            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+            onClick={onOpenDelete}
+          />
+          <Button
+            type="button"
+            text="Editar"
+            width="w-full sm:w-[7.2rem]"
+            height="h-8"
+            textSize="text-[0.95rem]"
+            bgColor="bg-[#1F3664]"
+            textColor="text-white"
+            hoverColor="hover:bg-[#15284A]"
+            activeColor="active:bg-[#0E1B33]"
+            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+            onClick={onStartEdit}
+          />
+        </div>
+      ) : null}
+
+      {isDeleteOpen ? (
+        <ConfirmDeleteModal
+          label={event.employeeName || "ausencia"}
+          mode="delete"
+          inline
+          loading={isLoadingWhileDeleting}
+          title="Eliminar ausencia"
+          body={(
+            <>
+              Está a punto de eliminar la ausencia de{" "}
+              <span className="font-semibold text-slate-700">
+                {event.employeeName || "este trabajador"}
+              </span>
+              {event.curp ? ` — ${event.curp}` : ""}. Esta acción no se puede revertir.
+              {absenceDeleteError ? (
+                <span className="mt-2 block rounded-md bg-red-50 px-3 py-2 text-red-600">
+                  {absenceDeleteError}
+                </span>
+              ) : null}
+            </>
+          )}
+          onCancel={onCancelDelete}
+          onConfirm={onConfirmDelete}
         />
-        <Button
-          type="button"
-          text="Editar"
-          width="w-full sm:w-[7.2rem]"
-          height="h-8"
-          textSize="text-[0.95rem]"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-          onClick={onStartEdit}
-        />
-      </div>
+      ) : null}
     </div>
   );
 };
