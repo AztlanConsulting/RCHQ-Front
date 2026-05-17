@@ -161,7 +161,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar por nombre o CURP"), {
+        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
             target: { value: "ana" },
         });
 
@@ -190,7 +190,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar por nombre o CURP"), {
+        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
             target: { value: "  ana    pendiente  " },
         });
 
@@ -213,7 +213,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar por nombre o CURP");
+        const input = screen.getByLabelText("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "us9" },
@@ -331,7 +331,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar por nombre o CURP");
+        const input = screen.getByLabelText("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "ana" },

@@ -33,7 +33,7 @@ describe("VacationRequestFilters", () => {
     it("renderiza búsqueda y fechas en vista pending", () => {
         render(<VacationRequestFilters {...defaultProps} />);
 
-        expect(screen.getByLabelText("Buscar por nombre o CURP")).toBeInTheDocument();
+        expect(screen.getByLabelText("Buscar empleado")).toBeInTheDocument();
         expect(screen.getByLabelText("Fecha de inicio")).toBeInTheDocument();
         expect(screen.getByLabelText("Fecha de término")).toBeInTheDocument();
         expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
@@ -49,7 +49,7 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Buscar por nombre o CURP"), {
+        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
             target: { value: "ana" },
         });
 
