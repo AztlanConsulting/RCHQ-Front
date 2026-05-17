@@ -4,6 +4,7 @@ import LogsHouse from "../../pages/logsHouse";
 
 vi.mock("../../hooks/pages/useHouseLogs", () => ({
   useHouseLogs: vi.fn(),
+  formatLogMoment: vi.fn(() => "10/04/2026 a las 12:00 pm"),
 }));
 
 import { useHouseLogs } from "../../hooks/pages/useHouseLogs";

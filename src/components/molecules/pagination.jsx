@@ -8,7 +8,7 @@ const Pagination = ({
   onNextPage,
   loading,
   hasEmployees,
-  entityLabel = "",
+  entityLabel = "empleados",
 }) => {
   if (loading || !hasEmployees) {
     return null;
