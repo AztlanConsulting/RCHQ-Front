@@ -61,7 +61,7 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
-  stackMaxHeightClass = "max-h-[75vh]",
+  stackMaxHeightClass = "max-h-[70vh]",
 }) => {
   return (
     <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
