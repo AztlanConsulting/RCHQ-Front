@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getAbsenceTypes,
     getEventsTypes,
@@ -219,7 +219,8 @@ export const useCalendarFilters = (
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
-    const [absenceTypeFilters, setAbsenceTypeFilters] = useState([]);
+    const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState([]);
+    const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
     const [absenceEmployeeFilters, setAbsenceEmployeeFilters] = useState([]);
     const [absenceEmployeeSearch, setAbsenceEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
@@ -334,14 +335,30 @@ export const useCalendarFilters = (
             : fallbackAbsenceEmployeeOptions
     ), [catalogAbsenceEmployeeOptions, fallbackAbsenceEmployeeOptions]);
 
+    const setAbsenceTypeFilters = useCallback((nextValue) => {
+        setHasCustomizedAbsenceTypeFilters(true);
+        setAbsenceTypeFiltersState((previousValue) => (
+            typeof nextValue === "function"
+                ? nextValue(previousValue)
+                : nextValue
+        ));
+    }, []);
+
+    useEffect(() => {
+        if (absenceTypeOptions.length === 0) return;
+        if (hasCustomizedAbsenceTypeFilters) return;
+
+        setAbsenceTypeFiltersState(absenceTypeOptions.map((option) => option.value));
+    }, [absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
+
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
 
-        if (absenceTypeFilters.length === 0) return nextValues;
+        if (!hasCustomizedAbsenceTypeFilters) return nextValues;
+        if (absenceTypeFilters.length === 0) return [];
 
-        const kept = absenceTypeFilters.filter((value) => nextValues.includes(value));
-        return kept.length > 0 ? kept : nextValues;
-    }, [absenceTypeFilters, absenceTypeOptions]);
+        return absenceTypeFilters.filter((value) => nextValues.includes(value));
+    }, [absenceTypeFilters, absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
 
     const effectiveAbsenceEmployeeFilters = useMemo(() => {
         const nextValues = absenceEmployeeOptions.map((opt) => opt.value);
