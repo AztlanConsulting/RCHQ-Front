@@ -78,6 +78,43 @@ svg {
     padding-inline: 0.125rem;
 }
 
+/*
+ * Narrow screens: FC toolbar is 3 sibling chunks (nav | title | actions).
+ * Default flex + wrap puts title beside the first chunk and looks scrambled.
+ * Grid: row 1 = title, row 2 = nav (start) and actions (end), space-between effect.
+ */
+@media (max-width: 1023px) {
+    .fc .fc-header-toolbar {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        justify-content: initial;
+        align-items: center;
+        column-gap: 0.5rem;
+        row-gap: 0.5rem;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        justify-self: center;
+        width: 100%;
+        text-align: center;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        grid-row: 2;
+        grid-column: 1;
+        justify-self: start;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        grid-row: 2;
+        grid-column: 2;
+        justify-self: end;
+    }
+}
+
 .fc .fc-toolbar-chunk {
     display: flex;
     flex-wrap: wrap;
