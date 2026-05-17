@@ -8,13 +8,14 @@ const Pagination = ({
   onNextPage,
   loading,
   hasEmployees,
+  entityLabel = "",
 }) => {
   if (loading || !hasEmployees) {
     return null;
   }
 
   return (
-    <div className="flex items-center justify-between mt-6">
+    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Button
         text="Anterior"
         onClick={onPrevPage}
@@ -23,13 +24,14 @@ const Pagination = ({
         hoverColor="hover:bg-[#162d4a]"
         activeColor="active:bg-[#0f2035]"
         textColor="text-white"
-        width="w-32"
+        width="w-full sm:w-32"
         className="disabled:opacity-50 disabled:cursor-not-allowed"
       />
 
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center px-2 text-center">
         <span className="text-sm text-gray-600">
-          Página {page} de {totalPages} | Total: {total} empleados
+          Página {page} de {totalPages} | Total: {total}
+          {entityLabel ? ` ${entityLabel}` : ""}
         </span>
       </div>
 
@@ -41,7 +43,7 @@ const Pagination = ({
         hoverColor="hover:bg-[#162d4a]"
         activeColor="active:bg-[#0f2035]"
         textColor="text-white"
-        width="w-32"
+        width="w-full sm:w-32"
         className="disabled:opacity-50 disabled:cursor-not-allowed"
       />
     </div>

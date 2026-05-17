@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
+import { getStoredUser, getToken } from "../../utils/authStorage";
 
 // ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
@@ -9,9 +10,35 @@ const Icon = ({ name, className }) => (
     src={`/${name}.svg`}
     alt=""
     aria-hidden="true"
-    className={className}
+    className={`${className} ${name === "document" ? "brightness-0 invert" : ""}`}
   />
 );
+
+const parseJwtPayload = (token) => {
+  if (!token) return null;
+
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      "=",
+    );
+
+    return JSON.parse(atob(padded));
+  } catch {
+    return null;
+  }
+};
+
+const getCurrentUserRole = () => {
+  const storedUser = getStoredUser();
+  const tokenPayload = parseJwtPayload(getToken());
+
+  return storedUser?.role ?? storedUser?.roleName ?? tokenPayload?.role ?? "";
+};
 
 const NAV_ITEMS = [
   { to: "/app/calendario", label: "Calendario", icon: "calendar" },
@@ -112,6 +139,13 @@ const SideBarContent = ({ expanded, toggle }) => {
   const sideBarRef = useRef(null);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const viewerRole = getCurrentUserRole();
+  const navItems = viewerRole === "Coordinador"
+    ? [
+        ...NAV_ITEMS,
+        { to: "/app/logs/house", label: "Registros", icon: "document" },
+      ]
+    : NAV_ITEMS;
 
   useEffect(() => {
     if (!expanded) return;
@@ -172,7 +206,7 @@ const SideBarContent = ({ expanded, toggle }) => {
 
       <div className="h-px bg-[#FAFAFA]/25 mx-3 shrink-0" />
       <nav className="flex flex-col gap-1 flex-1 px-3 py-4 overflow-y-auto min-h-0">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavItem key={item.to} {...item} expanded={expanded} />
         ))}
       </nav>
@@ -203,6 +237,13 @@ const SideBarContent = ({ expanded, toggle }) => {
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const viewerRole = getCurrentUserRole();
+  const navItems = viewerRole === "Coordinador"
+    ? [
+        ...NAV_ITEMS,
+        { to: "/app/logs/house", label: "Registros", icon: "document" },
+      ]
+    : NAV_ITEMS;
 
   const handleLogout = () => {
     closeMobile();
@@ -247,7 +288,7 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
             aria-label="Menú principal"
             className="bg-[#1F3664] border-t border-[#FAFAFA]/25 px-4 py-3 flex flex-col gap-1 max-h-[calc(100vh-56px)] overflow-y-auto"
           >
-            {NAV_ITEMS.map(({ to, label, icon }) => (
+            {navItems.map(({ to, label, icon }) => (
               <NavLink
                 key={to}
                 to={to}

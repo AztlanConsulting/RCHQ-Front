@@ -18,6 +18,7 @@ import TwoFactorAuth from "./pages/auth/twoFactorAuth";
 import MoreOptions from "./pages/moreOptions";
 import Documents from "./pages/documents";
 import DetalleEmpleado from "./pages/detalleEmpleado";
+import LogsHouse from "./pages/logsHouse";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
             <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
             <Route path="personal" element={<Personal />} />
             <Route path="personal/ver/:employeeId" element={<DetalleEmpleado />} />
+            <Route path="logs/house" element={<LogsHouse />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
           </Route>

@@ -30,8 +30,17 @@ const renderSideBar = () =>
     </MemoryRouter>
   );
 
+const makeToken = (role = "Admin") => {
+  const payload = btoa(JSON.stringify({ id: "emp-1", role }));
+  return `header.${payload}.signature`;
+};
+
 // ─── Tests colapsado (default) ────────────────────────────────────────────────
 describe("SideBar", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("renderiza el título TOCHAN", () => {
     renderSideBar();
     expect(screen.getAllByText("TOCHAN").length).toBeGreaterThan(0);
@@ -59,6 +68,22 @@ describe("SideBar", () => {
   it("el botón hamburguesa mobile tiene aria-label correcto", () => {
     renderSideBar();
     expect(screen.getByRole("button", { name: "Abrir menú" })).toBeTruthy();
+  });
+
+  it("muestra Registros para Coordinador", () => {
+    localStorage.setItem("token", makeToken("Coordinador"));
+    renderSideBar();
+
+    expect(
+      screen.getAllByRole("link", { name: "Registros" }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("no muestra Registros para roles distintos de Coordinador", () => {
+    localStorage.setItem("token", makeToken("Admin"));
+    renderSideBar();
+
+    expect(screen.queryByRole("link", { name: "Registros" })).toBeNull();
   });
 });
 
