@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   downloadHouseLogsReportService,
   getHouseLogsService,
+  getLogsActionsService,
 } from "../../services/logsService";
+import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const LIMIT = 6;
 const DEFAULT_PAGINATION = {
@@ -46,12 +48,27 @@ export const useHouseLogs = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [responsibleQuery, setResponsibleQuery] = useState("");
-  const [affectedQuery, setAffectedQuery] = useState("");
   const [actionOptions, setActionOptions] = useState([]);
   const [selectedActionIds, setSelectedActionIds] = useState([]);
   const [actionSearch, setActionSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+
+  const {
+    inputValue: responsibleInput,
+    setInputValue: setResponsibleQuery,
+    debouncedSearch: responsibleSearch,
+  } = useDebouncedVacationSearch("", {
+    minSearchLength: 3,
+    debounceMs: 400,
+  });
+  const {
+    inputValue: affectedInput,
+    setInputValue: setAffectedQuery,
+    debouncedSearch: affectedSearch,
+  } = useDebouncedVacationSearch("", {
+    minSearchLength: 3,
+    debounceMs: 400,
+  });
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
@@ -84,6 +101,9 @@ export const useHouseLogs = () => {
     return `${selectedActionIds.length} acciones seleccionadas`;
   }, [actionOptions, selectedActionIds]);
 
+  const effectiveStartDate = dateFilter || "";
+  const effectiveEndDate = dateFilter || "";
+
   const fetchLogs = async (pageToFetch = 1) => {
     setLoading(true);
     setError("");
@@ -92,6 +112,11 @@ export const useHouseLogs = () => {
       const result = await getHouseLogsService({
         page: pageToFetch,
         limit: LIMIT,
+        responsible: responsibleSearch,
+        affected: affectedSearch,
+        actionIds: selectedActionIds,
+        startDate: effectiveStartDate,
+        endDate: effectiveEndDate,
       });
 
       setServerLogs(result.logs);
@@ -107,8 +132,30 @@ export const useHouseLogs = () => {
   };
 
   useEffect(() => {
+    const fetchActions = async () => {
+      try {
+        const actions = await getLogsActionsService();
+        setActionOptions(
+          actions.map((action) => ({
+            value: action.actionId,
+            label: action.description,
+          })),
+        );
+      } catch (err) {
+        setError(err.message || "No se pudieron cargar las acciones");
+      }
+    };
+
+    fetchActions();
+  }, []);
+
+  useEffect(() => {
     fetchLogs(page);
-  }, [page]);
+  }, [page, responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
 
   const handleNextPage = () => {
     if (page < pagination.totalPages) {
@@ -203,9 +250,9 @@ export const useHouseLogs = () => {
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
-    responsibleQuery,
+    responsibleQuery: responsibleInput,
     setResponsibleQuery,
-    affectedQuery,
+    affectedQuery: affectedInput,
     setAffectedQuery,
     dateFilter,
     setDateFilter,
