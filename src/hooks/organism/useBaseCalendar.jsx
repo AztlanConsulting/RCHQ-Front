@@ -54,9 +54,15 @@ export const useBaseCalendar = () => {
             if (calendarMode === "personal") {
                 return allEvents.filter(
                     (event) =>
-                        event.focus === "ausencias" &&
-                        String(event.employeeId) ===
-                            String(effectiveEmployeeId),
+                        (event.focus === "ausencias" &&
+                            String(event.employeeId) ===
+                                String(effectiveEmployeeId)) ||
+                        (event.focus === "eventos" &&
+                            (event.scope === "house" ||
+                                event.scope === "global")) ||
+                        (event.scope === "personal" &&
+                            String(event.employeeId) ===
+                                String(effectiveEmployeeId)),
                 );
             }
 
@@ -293,10 +299,9 @@ export const useBaseCalendar = () => {
 
     const loadCalendarEvents = useCallback(
         async (startDate, endDate, employeeId, role) => {
-            const personalEventsPromise =
-                role !== "Coordinador" && employeeId
-                    ? getEventsInRange(employeeId, startDate, endDate)
-                    : Promise.resolve([]);
+            const personalEventsPromise = employeeId
+                ? getEventsInRange(employeeId, startDate, endDate)
+                : Promise.resolve([]);
 
             const houseAbsencesPromise = canViewHouseAbsences(role)
                 ? getHouseAbsencesInRange(startDate, endDate)
