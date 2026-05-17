@@ -32,19 +32,13 @@ const VacationRequests = () => {
     const isPendingView = view === "pending";
 
     return (
-        <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
-            <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-[#121212] sm:text-3xl lg:text-4xl">
-                        {isPendingView
-                            ? "Solicitudes de vacaciones pendientes"
-                            : "Solicitudes de vacaciones revisadas"}
-                    </h1>
-
-                    <p className="mt-2 text-sm text-gray-600">
-                        Consulta las solicitudes de vacaciones de empleados de tu casa hogar.
-                    </p>
-                </div>
+        <div className="p-8 bg-white min-h-screen">
+            <div className="flex items-center justify-between mb-8">
+                <h1 className="font-bold text-4xl text-[#121212]">
+                    {isPendingView
+                        ? "Solicitudes de vacaciones pendientes"
+                        : "Solicitudes de vacaciones revisadas"}
+                </h1>
 
                 <Button
                     text={
@@ -57,10 +51,10 @@ const VacationRequests = () => {
                     hoverColor="hover:bg-[#162d4a]"
                     activeColor="active:bg-[#0f2035]"
                     textColor="text-white"
-                    width="w-full md:w-auto"
+                    width="w-auto"
                     className="px-6"
                 />
-            </header>
+            </div>
 
             <VacationRequestFilters
                 view={view}
@@ -101,7 +95,7 @@ const VacationRequests = () => {
                 onPrevPage={handlePrevPage}
                 onNextPage={handleNextPage}
                 loading={loading}
-                hasItems={requests.length > 0}
+                hasEmployees={requests.length > 0}
                 itemLabel="solicitudes"
             />
         </div>

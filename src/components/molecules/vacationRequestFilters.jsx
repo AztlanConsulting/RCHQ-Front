@@ -34,12 +34,12 @@ const VacationRequestFilters = ({
             : "lg:grid-cols-[1.4fr_1fr_1fr_auto]";
 
     return (
-        <section className="mb-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
-            <div className={`grid grid-cols-1 items-end gap-4 ${gridColumns}`}>
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
+            <div className={`grid grid-cols-1 gap-6 ${gridColumns}`}>
                 <TextField
                     id="vacation-search"
-                    text="Buscar por nombre o CURP"
-                    placeholder="Nombre, apellido o CURP"
+                    text="Buscar empleado"
+                    placeholder="Ingresa nombre, apellido o CURP"
                     value={searchQuery}
                     setValue={handleSearchChange}
                     maxLength={100}
@@ -81,20 +81,22 @@ const VacationRequestFilters = ({
                     }
                 />
 
-                <Button
-                    text="Limpiar"
-                    onClick={clearFilters}
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    width="w-full lg:w-28"
-                    height="h-[50px]"
-                    textSize="text-sm"
-                    className="px-4"
-                />
+                <div className="flex flex-col justify-end">
+                    <Button
+                        text="Limpiar"
+                        onClick={clearFilters}
+                        bgColor="bg-[#24375e]"
+                        hoverColor="hover:bg-[#162d4a]"
+                        activeColor="active:bg-[#0f2035]"
+                        textColor="text-white"
+                        width="w-full lg:w-28"
+                        height="h-[50px]"
+                        textSize="text-sm"
+                        className="px-4"
+                    />
+                </div>
             </div>
-        </section>
+        </div>
     );
 };
 
