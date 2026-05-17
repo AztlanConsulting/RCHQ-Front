@@ -15,7 +15,16 @@ const focusTrailing = (opt) =>
 const scopeTrailing = (opt) =>
   opt.color ? (
     <span
-      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200"
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200/30"
+      style={{ backgroundColor: opt.color }}
+      aria-hidden
+    />
+  ) : null;
+
+const vacationTrailing = (opt) =>
+  opt.color ? (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200/30"
       style={{ backgroundColor: opt.color }}
       aria-hidden
     />
@@ -133,6 +142,7 @@ const CalendarFilters = ({
               options={vacationStatusOptions}
               values={vacationStatusFilters}
               setValues={setVacationStatusFilters}
+              renderTrailing={vacationTrailing}
             />
             <div className="border border-b border-[#EAEAEA]"></div>
           </>

@@ -57,6 +57,9 @@ export const useBaseCalendar = () => {
                         (event.focus === "ausencias" &&
                             String(event.employeeId) ===
                                 String(effectiveEmployeeId)) ||
+                        (event.focus === "vacaciones" &&
+                            String(event.employeeId) ===
+                                String(effectiveEmployeeId)) ||
                         (event.focus === "eventos" &&
                             (event.scope === "house" ||
                                 event.scope === "global")) ||
@@ -76,17 +79,7 @@ export const useBaseCalendar = () => {
             );
         }
 
-        return allEvents.filter((event) => {
-            if (event.focus === "ausencias") {
-                return event.scope === "house";
-            }
-
-            if (event.focus === "eventos") {
-                return event.scope === "house" || event.scope === "global";
-            }
-
-            return false;
-        });
+        return allEvents;
     }, [
         allEvents,
         calendarMode,
