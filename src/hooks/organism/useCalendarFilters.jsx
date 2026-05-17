@@ -31,19 +31,21 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
-const getAbsenceTitle = (event) => {
+const getPersonalEventTitle = (event, scope) => {
     const rawName = String(event.name ?? "").trim();
     const rawType = String(event.type ?? "").trim();
 
-    if (!rawName || rawName.toLowerCase() === "ausencia") {
-        return rawType ? `Ausencia ${rawType}` : "Ausencia";
+    const capitalLetterScope = scope.charAt(0).toUpperCase() + scope.slice(1).toLowerCase();
+
+    if (!rawName || rawName.toLowerCase() === scope) {
+        return rawType ? `${capitalLetterScope} de ${rawType}` : capitalLetterScope;
     }
 
-    if (rawName.toLowerCase().startsWith("ausencia")) {
+    if (rawName.toLowerCase().startsWith(scope)) {
         return rawName;
     }
 
-    return `Ausencia ${rawName}`;
+    return `${capitalLetterScope} de ${rawName}`;
 };
 
 const toDateOnly = (value) => {
@@ -145,37 +147,38 @@ const getFilteredEvents = (
             absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e))
         ))
         .map((rawEvent, idx) => {
-            const isAllDayAbsence = rawEvent.focus === "ausencias";
+            const isAllDay = rawEvent.focus === "ausencias" || rawEvent.lastsAllDay;
             const normalizedStartDate = normalizeDateOnly(
                 rawEvent.startDate ?? rawEvent.start,
             );
             const normalizedEndDate = normalizeDateOnly(
                 rawEvent.endDate ?? rawEvent.end,
             );
-            const eventStart = isAllDayAbsence && normalizedStartDate
+            const eventStart = isAllDay && normalizedStartDate
                 ? normalizedStartDate
                 : rawEvent.start;
-            const eventEnd = isAllDayAbsence && normalizedEndDate
+            const eventEnd = isAllDay && normalizedEndDate
                 ? addDaysToDateOnly(normalizedEndDate, 1)
                 : rawEvent.end;
 
             return {
                 id: String(idx),
-                title: rawEvent.focus === "ausencias"
-                    ? getAbsenceTitle(rawEvent)
+                title: rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones"
+                    ? getPersonalEventTitle(rawEvent, rawEvent.focus)
                     : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,
                 backgroundColor: rawEvent.focus === "ausencias"
                     ? "#EF4444"
-                    : getScopeOption(rawEvent)?.color || rawEvent.color,
-                borderColor: rawEvent.focus === "ausencias"
-                    ? "#DC2626"
                     : rawEvent.color,
-                allDay: isAllDayAbsence || Boolean(rawEvent.lastsAllDay),
+                borderColor: rawEvent.color,
+                allDay: isAllDay || Boolean(rawEvent.lastsAllDay),
                 extendedProps: {
                     absenceId: rawEvent.absenceId,
                     absenceTypeId: rawEvent.absenceTypeId,
+                    vacationId: rawEvent.vacationId,
+                    vacationStatus: rawEvent.status,
+                    vacationFeedback: rawEvent.feedback,
                     employeeId: rawEvent.employeeId,
                     employeeName: rawEvent.name,
                     subtitle: rawEvent.subtitle ?? "",

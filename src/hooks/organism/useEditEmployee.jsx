@@ -254,8 +254,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 
-      console.log("frequencyOfPaymentId:", adminForm.frequencyOfPaymentId);
-
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
       if (selectedWorkdays.length === 0) {
         throw new Error("Debes seleccionar al menos un día de trabajo.");

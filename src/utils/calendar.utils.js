@@ -13,7 +13,6 @@ export const SCOPE_OPTIONS = [
 export const STATUS_OPTIONS = [
     { value: "aprobadas",  label: "Aprobadas" },
     { value: "en_espera",  label: "En espera" },
-    { value: "rechazadas", label: "Rechazadas" },
 ];
 
 export const ABSENCE_STATUS_OPTIONS = [
