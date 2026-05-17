@@ -110,10 +110,10 @@ const BaseCalendar = ({
     const headerToolbar = useMemo(
         () => ({
             left: onOpenCalendarFilters
-                ? "prev,next today calendarFiltersButton"
-                : "prev,next today",
+                ? "prev,next today calendarFiltersButton createEventButton"
+                : "prev,next today createEventButton",
             center: "title",
-            right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
+            right: "toggleListButton monthButton,weekButton,dayButton",
         }),
         [onOpenCalendarFilters],
     );
