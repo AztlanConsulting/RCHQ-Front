@@ -108,6 +108,7 @@ const Calendario = () => {
         reloadCurrentRange,
         viewerRole,
     });
+    const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
 
     useEffect(() => {
       setOwnCalendar();
@@ -190,8 +191,13 @@ const Calendario = () => {
         open={selectedEvent != null}
         onClose={closeDetail}
         title={selectedEvent?.focus === "ausencias" ? null : "Detalle del evento"}
-        grayBackground={false}
-        placement="right"
+        grayBackground={isAbsenceDetailOpen}
+        placement={isAbsenceDetailOpen ? "center" : "right"}
+        backdropClassName={
+          isAbsenceDetailOpen
+            ? "bg-black/50"
+            : "bg-black/50"
+        }
         className={
           selectedEvent?.focus === "ausencias"
             ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
