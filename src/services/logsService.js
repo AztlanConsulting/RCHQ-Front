@@ -4,7 +4,7 @@ import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export const getHouseLogsService = async (page = 1, limit = 50) => {
+export const getHouseLogsService = async (page = 1, limit = 10) => {
   const token = getToken();
 
   if (!token) {

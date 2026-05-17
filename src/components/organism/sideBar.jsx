@@ -28,7 +28,7 @@ const getNavItems = (user) => {
 
   if (isCoordinator) {
     navItems.push({
-      to: "/app/logs/house",
+      to: "/app/acciones/casa",
       label: "Acciones registradas",
       icon: "document",
     });

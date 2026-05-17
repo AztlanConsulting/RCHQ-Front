@@ -1,12 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getHouseLogsService } from "../../services/logsService";
 
-const SERVER_LIMIT = 50;
-const UI_PAGE_SIZE = 6;
-
-const normalizeText = (value) => String(value ?? "").trim().toLowerCase();
-
-const getLogDateValue = (momentValue) => String(momentValue ?? "").slice(0, 10);
+const PAGE_SIZE = 6;
 
 export const formatLogMoment = (momentValue) => {
   if (!momentValue) return "—";
@@ -37,7 +32,12 @@ export const formatLogMoment = (momentValue) => {
 };
 
 export const useHouseLogs = () => {
-  const [logs, setLogs] = useState([]);
+  const [serverLogs, setServerLogs] = useState([]);
+  const actionOptions = useMemo(() => ([
+    { value: "all", label: "Todas las acciones" },
+  ]), []);
+  const [totalLogs, setTotalLogs] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
@@ -46,104 +46,29 @@ export const useHouseLogs = () => {
   const [actionFilter, setActionFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
 
-  useEffect(() => {
-    let isCancelled = false;
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-    const fetchAllLogs = async () => {
-      setLoading(true);
-      setError("");
+    try {
+      const response = await getHouseLogsService(page, PAGE_SIZE);
 
-      try {
-        const firstPage = await getHouseLogsService(1, SERVER_LIMIT);
-        const pageRequests = [];
-
-        for (let currentPage = 2; currentPage <= firstPage.totalPages; currentPage += 1) {
-          pageRequests.push(getHouseLogsService(currentPage, SERVER_LIMIT));
-        }
-
-        const extraPages = pageRequests.length > 0 ? await Promise.all(pageRequests) : [];
-        const nextLogs = [
-          ...firstPage.data,
-          ...extraPages.flatMap((result) => result.data),
-        ];
-
-        if (!isCancelled) {
-          setLogs(nextLogs);
-        }
-      } catch (fetchError) {
-        if (!isCancelled) {
-          setError(fetchError?.message || "No se pudieron obtener los registros.");
-          setLogs([]);
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchAllLogs();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  const actionOptions = useMemo(() => {
-    const uniqueActions = [...new Set(logs.map((log) => String(log.action ?? "").trim()).filter(Boolean))];
-
-    return [
-      { value: "all", label: "Todas las acciones" },
-      ...uniqueActions
-        .sort((a, b) => a.localeCompare(b, "es"))
-        .map((action) => ({ value: action, label: action })),
-    ];
-  }, [logs]);
-
-  const filteredLogs = useMemo(() => {
-    const normalizedResponsibleQuery = normalizeText(responsibleQuery);
-    const normalizedAffectedQuery = normalizeText(affectedQuery);
-
-    return logs.filter((log) => {
-      const matchesResponsible =
-        normalizedResponsibleQuery === "" ||
-        normalizeText(log.responsibleName).includes(normalizedResponsibleQuery);
-
-      const matchesAffected =
-        normalizedAffectedQuery === "" ||
-        normalizeText(log.affectedName).includes(normalizedAffectedQuery);
-
-      const matchesAction =
-        actionFilter === "all" || String(log.action ?? "") === actionFilter;
-
-      const matchesDate =
-        dateFilter === "" || getLogDateValue(log.moment) === dateFilter;
-
-      return matchesResponsible && matchesAffected && matchesAction && matchesDate;
-    });
-  }, [logs, responsibleQuery, affectedQuery, actionFilter, dateFilter]);
-
-  const totalPages = Math.ceil(filteredLogs.length / UI_PAGE_SIZE);
-
-  useEffect(() => {
-    setPage(1);
-  }, [responsibleQuery, affectedQuery, actionFilter, dateFilter]);
-
-  useEffect(() => {
-    if (totalPages === 0 && page !== 1) {
-      setPage(1);
-      return;
+      setServerLogs(response.data);
+      setTotalLogs(response.totalRecords);
+      setTotalPages(response.totalPages);
+    } catch (fetchError) {
+      setError(fetchError?.message || "No se pudieron obtener los registros.");
+      setServerLogs([]);
+      setTotalLogs(0);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
     }
+  }, [page]);
 
-    if (page > totalPages && totalPages > 0) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
-
-  const paginatedLogs = useMemo(() => {
-    const startIndex = (page - 1) * UI_PAGE_SIZE;
-    return filteredLogs.slice(startIndex, startIndex + UI_PAGE_SIZE);
-  }, [filteredLogs, page]);
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   const handleNextPage = () => {
     if (page < totalPages) {
@@ -158,8 +83,8 @@ export const useHouseLogs = () => {
   };
 
   return {
-    logs: paginatedLogs,
-    totalLogs: filteredLogs.length,
+    logs: serverLogs,
+    totalLogs,
     totalPages,
     page,
     loading,

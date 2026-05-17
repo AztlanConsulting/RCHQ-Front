@@ -52,11 +52,11 @@ function App() {
             <Route path="personal/nuevo" element={<AltaNuevoUsuarioPage />} />
             <Route path="personal" element={<Personal />} />
             <Route path="personal/ver/:employeeId" element={<DetalleEmpleado />} />
-            <Route path="logs/house" element={<LogsHouse />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
             
             <Route element={<RoleRoute allowedRoles={["Coordinador"]} />}>
+              <Route path="acciones/casa" element={<LogsHouse />} />
               <Route path="vacaciones/solicitudes" element={<VacationRequests />} />
             </Route>
           </Route>

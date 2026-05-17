@@ -54,7 +54,7 @@ const LogsHouse = () => {
           onPrevPage={handlePrevPage}
           onNextPage={handleNextPage}
           loading={loading}
-          hasEmployees={logs.length > 0}
+          hasEmployees={totalLogs > 0}
           entityLabel="registros"
         />
       </div>

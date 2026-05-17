@@ -117,6 +117,10 @@ describe("SideBar", () => {
     expect(
       screen.getAllByRole("link", { name: "Acciones registradas" }).length,
     ).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "Acciones registradas" })[0]).toHaveAttribute(
+      "href",
+      "/app/acciones/casa",
+    );
   });
 
   it("no muestra Registros para roles distintos de Coordinador", () => {

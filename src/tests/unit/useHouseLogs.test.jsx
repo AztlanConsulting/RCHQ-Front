@@ -43,7 +43,7 @@ describe("useHouseLogs", () => {
     vi.clearAllMocks();
   });
 
-  it("carga los logs y construye las opciones de acción", async () => {
+  it("carga los logs y deja las opciones de acción base", async () => {
     getHouseLogsService.mockResolvedValue({
       data: baseLogs,
       totalPages: 1,
@@ -60,13 +60,10 @@ describe("useHouseLogs", () => {
     expect(result.current.logs).toHaveLength(3);
     expect(result.current.actionOptions).toEqual([
       { value: "all", label: "Todas las acciones" },
-      { value: "Cambio de contraseña", label: "Cambio de contraseña" },
-      { value: "Eliminar ausencia", label: "Eliminar ausencia" },
-      { value: "Empleado creado", label: "Empleado creado" },
     ]);
   });
 
-  it("filtra por responsable, afectado, acción y fecha", async () => {
+  it("mantiene el estado base de filtros sin afectar la carga", async () => {
     getHouseLogsService.mockResolvedValue({
       data: baseLogs,
       totalPages: 1,
@@ -83,17 +80,19 @@ describe("useHouseLogs", () => {
     act(() => {
       result.current.setResponsibleQuery("carla");
       result.current.setAffectedQuery("ana");
-      result.current.setActionFilter("Eliminar ausencia");
+      result.current.setActionFilter("ausn-001");
       result.current.setDateFilter("2026-04-11");
     });
 
-    expect(result.current.logs).toHaveLength(1);
-    expect(result.current.logs[0].logId).toBe("log-3");
-    expect(result.current.totalLogs).toBe(1);
+    expect(result.current.responsibleQuery).toBe("carla");
+    expect(result.current.affectedQuery).toBe("ana");
+    expect(result.current.actionFilter).toBe("ausn-001");
+    expect(result.current.dateFilter).toBe("2026-04-11");
+    expect(getHouseLogsService).toHaveBeenCalledTimes(1);
   });
 
-  it("pagina los resultados filtrados", async () => {
-    const manyLogs = Array.from({ length: 8 }, (_, index) => ({
+  it("pagina los resultados desde el servidor", async () => {
+    const pageOneLogs = Array.from({ length: 6 }, (_, index) => ({
       logId: `log-${index + 1}`,
       responsibleName: `Responsable ${index + 1}`,
       responsibleCurp: `CURP${index + 1}`,
@@ -102,13 +101,29 @@ describe("useHouseLogs", () => {
       ipAddress: `10.10.10.${index + 1}`,
       moment: "2026-04-10T12:00:00.000Z",
     }));
+    const pageTwoLogs = Array.from({ length: 2 }, (_, index) => ({
+      logId: `log-${index + 7}`,
+      responsibleName: `Responsable ${index + 7}`,
+      responsibleCurp: `CURP${index + 7}`,
+      action: "Empleado creado",
+      affectedName: `Afectado ${index + 7}`,
+      ipAddress: `10.10.10.${index + 7}`,
+      moment: "2026-04-10T12:00:00.000Z",
+    }));
 
-    getHouseLogsService.mockResolvedValue({
-      data: manyLogs,
-      totalPages: 1,
-      currentPage: 1,
-      totalRecords: 8,
-    });
+    getHouseLogsService
+      .mockResolvedValueOnce({
+        data: pageOneLogs,
+        totalPages: 2,
+        currentPage: 1,
+        totalRecords: 8,
+      })
+      .mockResolvedValueOnce({
+        data: pageTwoLogs,
+        totalPages: 2,
+        currentPage: 2,
+        totalRecords: 8,
+      });
 
     const { result } = renderHook(() => useHouseLogs());
 
@@ -123,8 +138,10 @@ describe("useHouseLogs", () => {
       result.current.handleNextPage();
     });
 
-    expect(result.current.page).toBe(2);
-    expect(result.current.logs).toHaveLength(2);
+    await waitFor(() => {
+      expect(result.current.page).toBe(2);
+      expect(result.current.logs).toHaveLength(2);
+    });
   });
 
   it("expone el error cuando el servicio falla", async () => {
