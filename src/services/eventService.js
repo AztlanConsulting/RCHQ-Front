@@ -42,6 +42,56 @@ export async function getEventTypes() {
     return json?.data?.eventTypes ?? [];
 }
 
+export async function getEmployeesForSelector(params = {}) {
+    const token = getAuthToken();
+
+    const query = new URLSearchParams(params).toString();
+    const url = `${BASE_URL}/event/personal/employees${query ? `?${query}` : ""}`;
+
+    const response = await fetch(url, {
+        headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw new APIError(
+            json?.message ?? "Error al cargar empleados",
+            response.status,
+            json,
+        );
+    }
+
+    return json?.data?.employees ?? [];
+}
+
+export async function createPersonalEvent(payload) {
+    const token = getAuthToken();
+
+    const response = await fetch(`${BASE_URL}/event/personal/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok && response.status !== 409) {
+        throw new APIError(
+            json?.message ?? "Error al registrar el evento personal",
+            response.status,
+            json,
+        );
+    }
+
+    return json;
+}
+
 function getAuthToken() {
     return (
         localStorage.getItem("token") ?? sessionStorage.getItem("token") ?? null
