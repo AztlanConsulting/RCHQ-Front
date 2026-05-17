@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
-import { getStoredUser, getToken } from "../../utils/authStorage";
+import { hasRole } from "../../utils/auth/getRoleName";
 
 // ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
@@ -14,40 +14,28 @@ const Icon = ({ name, className }) => (
   />
 );
 
-const parseJwtPayload = (token) => {
-  if (!token) return null;
+const getNavItems = (user) => {
+  const isCoordinator = hasRole(user, "coordinador");
+  const vacationPath = isCoordinator ? "/app/vacaciones/solicitudes" : "/app/vacaciones";
+  const navItems = [
+    { to: "/app/calendario", label: "Calendario", icon: "calendar" },
+    { to: "/app/personal", label: "Personal", icon: "employee" },
+    { to: "/app/casas", label: "Casas Hogares", icon: "home" },
+    { to: vacationPath, label: "Vacaciones", icon: "vacation" },
+    { to: "/app/ausencias", label: "Ausencias", icon: "absences" },
+    { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
+  ];
 
-  try {
-    const [, payload] = token.split(".");
-    if (!payload) return null;
-
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = normalized.padEnd(
-      normalized.length + ((4 - (normalized.length % 4)) % 4),
-      "=",
-    );
-
-    return JSON.parse(atob(padded));
-  } catch {
-    return null;
+  if (isCoordinator) {
+    navItems.push({
+      to: "/app/logs/house",
+      label: "Acciones registradas",
+      icon: "document",
+    });
   }
+
+  return navItems;
 };
-
-const getCurrentUserRole = () => {
-  const storedUser = getStoredUser();
-  const tokenPayload = parseJwtPayload(getToken());
-
-  return storedUser?.role ?? storedUser?.roleName ?? tokenPayload?.role ?? "";
-};
-
-const NAV_ITEMS = [
-  { to: "/app/calendario", label: "Calendario", icon: "calendar" },
-  { to: "/app/personal",   label: "Personal",   icon: "employee" },
-  { to: "/app/casas",      label: "Casas Hogares", icon: "home" },
-  { to: "/app/vacaciones", label: "Vacaciones", icon: "vacation" },
-  { to: "/app/ausencias",  label: "Ausencias",  icon: "absences" },
-  { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
-];
 
 // ─── Desktop NavItem ──────────────────────────────────────────────────────────
 const NavItem = ({ to, label, icon, expanded }) => (
@@ -138,14 +126,8 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
 const SideBarContent = ({ expanded, toggle }) => {
   const sideBarRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuth();
-  const viewerRole = getCurrentUserRole();
-  const navItems = viewerRole === "Coordinador"
-    ? [
-        ...NAV_ITEMS,
-        { to: "/app/logs/house", label: "Registros", icon: "document" },
-      ]
-    : NAV_ITEMS;
+  const { logout, user } = useAuth();
+  const navItems = getNavItems(user);
 
   useEffect(() => {
     if (!expanded) return;
@@ -236,14 +218,8 @@ const SideBarContent = ({ expanded, toggle }) => {
 // ─── Mobile Navbar + Dropdown ─────────────────────────────────────────────────
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
-  const viewerRole = getCurrentUserRole();
-  const navItems = viewerRole === "Coordinador"
-    ? [
-        ...NAV_ITEMS,
-        { to: "/app/logs/house", label: "Registros", icon: "document" },
-      ]
-    : NAV_ITEMS;
+  const { logout, user } = useAuth();
+  const navItems = getNavItems(user);
 
   const handleLogout = () => {
     closeMobile();
@@ -277,6 +253,7 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
               </svg>
             )}
           </button>
+
           <span aria-hidden="true" className="flex-1 text-center font-['Public_Sans'] font-bold text-xl text-[#FAFAFA]">
             TOCHAN
           </span>

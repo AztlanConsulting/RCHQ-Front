@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import Pagination from "../../components/molecules/pagination";
 
 describe("Pagination Component", () => {
@@ -14,19 +14,11 @@ describe("Pagination Component", () => {
     onPrevPage: mockOnPrev,
     onNextPage: mockOnNext,
     loading: false,
-    hasEmployees: true,
+    hasItems: true,
   };
 
-  it("no debe renderizar nada si está cargando o no hay empleados", () => {
-    const { container: containerLoading } = render(
-      <Pagination {...defaultProps} loading={true} />,
-    );
-    expect(containerLoading.firstChild).toBeNull();
-
-    const { container: containerNoEmployees } = render(
-      <Pagination {...defaultProps} hasEmployees={false} />,
-    );
-    expect(containerNoEmployees.firstChild).toBeNull();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   it("debe mostrar la información de página y total correctamente", () => {
@@ -69,8 +61,82 @@ describe("Pagination Component", () => {
     expect(
       screen.getByRole("button", { name: /anterior/i }),
     ).not.toBeDisabled();
+
     expect(
       screen.getByRole("button", { name: /siguiente/i }),
     ).not.toBeDisabled();
+  });
+
+  it("no renderiza nada cuando hasItems=false aunque loading=true", () => {
+    const { container } = render(
+      <Pagination
+        page={1}
+        totalPages={1}
+        total={0}
+        onPrevPage={() => { }}
+        onNextPage={() => { }}
+        loading={true}
+        hasItems={false}
+        itemLabel="solicitudes"
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("mantiene visible la paginación durante loading si hay resultados", () => {
+    render(
+      <Pagination
+        page={1}
+        totalPages={2}
+        total={8}
+        onPrevPage={() => { }}
+        onNextPage={() => { }}
+        loading={true}
+        hasItems={true}
+        itemLabel="solicitudes"
+      />,
+    );
+
+    expect(
+      screen.getByText("Página 1 de 2 | Total: 8 solicitudes"),
+    ).toBeInTheDocument();
+  });
+
+  it("deshabilita botones durante loading", () => {
+    render(
+      <Pagination
+        page={1}
+        totalPages={2}
+        total={8}
+        onPrevPage={() => { }}
+        onNextPage={() => { }}
+        loading={true}
+        hasItems={true}
+        itemLabel="solicitudes"
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+  });
+
+  it("mantiene compatibilidad temporal con hasEmployees", () => {
+    render(
+      <Pagination
+        page={1}
+        totalPages={2}
+        total={8}
+        onPrevPage={() => { }}
+        onNextPage={() => { }}
+        loading={false}
+        hasEmployees={true}
+        itemLabel="solicitudes"
+      />,
+    );
+
+    expect(
+      screen.getByText("Página 1 de 2 | Total: 8 solicitudes"),
+    ).toBeInTheDocument();
   });
 });
