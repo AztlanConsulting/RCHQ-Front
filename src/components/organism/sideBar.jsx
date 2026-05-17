@@ -16,10 +16,7 @@ const Icon = ({ name, className }) => (
 
 const getNavItems = (user) => {
   const isCoordinator = hasRole(user, "coordinador");
-  const vacationPath = isCoordinator
-    ? "/app/vacaciones/solicitudes"
-    : "/app/vacaciones";
-
+  const vacationPath = isCoordinator ? "/app/vacaciones/solicitudes" : "/app/vacaciones";
   const navItems = [
     { to: "/app/calendario", label: "Calendario", icon: "calendar" },
     { to: "/app/personal", label: "Personal", icon: "employee" },
@@ -31,8 +28,8 @@ const getNavItems = (user) => {
 
   if (isCoordinator) {
     navItems.push({
-      to: "/app/logs",
-      label: "Acciones Registradas",
+      to: "/app/acciones/casa",
+      label: "Acciones registradas",
       icon: "document",
     });
   }

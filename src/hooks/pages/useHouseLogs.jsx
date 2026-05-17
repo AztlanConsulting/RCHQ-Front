@@ -14,8 +14,36 @@ const DEFAULT_PAGINATION = {
   totalPages: 0,
 };
 
+export const formatLogMoment = (momentValue) => {
+  if (!momentValue) return "—";
+
+  const date = new Date(momentValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(momentValue);
+  }
+
+  const datePart = new Intl.DateTimeFormat("es-MX", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+
+  const timePart = new Intl.DateTimeFormat("es-MX", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(date)
+    .replace(/\s+/g, " ")
+    .replace(/\b(a\. m\.|a. m.|AM)\b/i, "am")
+    .replace(/\b(p\. m\.|p. m.|PM)\b/i, "pm");
+
+  return `${datePart} a las ${timePart}`;
+};
+
 export const useHouseLogs = () => {
-  const [logs, setLogs] = useState([]);
+  const [serverLogs, setServerLogs] = useState([]);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -25,11 +53,29 @@ export const useHouseLogs = () => {
   const [actionSearch, setActionSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [actionFilter, setActionFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
   const {
     inputValue: searchInput,
     setInputValue: setSearchInput,
     debouncedSearch: searchQuery,
+  } = useDebouncedVacationSearch("", {
+    minSearchLength: 3,
+    debounceMs: 400,
+  });
+  const {
+    inputValue: responsibleInput,
+    setInputValue: setResponsibleQuery,
+    debouncedSearch: responsibleSearch,
+  } = useDebouncedVacationSearch("", {
+    minSearchLength: 3,
+    debounceMs: 400,
+  });
+  const {
+    inputValue: affectedInput,
+    setInputValue: setAffectedQuery,
+    debouncedSearch: affectedSearch,
   } = useDebouncedVacationSearch("", {
     minSearchLength: 3,
     debounceMs: 400,
@@ -49,6 +95,7 @@ export const useHouseLogs = () => {
 
   const filteredActionOptions = useMemo(() => {
     const normalizedSearch = actionSearch.trim().toLowerCase();
+
     if (!normalizedSearch) return actionOptions;
 
     return actionOptions.filter((option) =>
@@ -61,8 +108,17 @@ export const useHouseLogs = () => {
     if (selectedActionIds.length === 1) {
       return actionOptions.find((option) => option.value === selectedActionIds[0])?.label || "1 accion";
     }
+
     return `${selectedActionIds.length} acciones seleccionadas`;
   }, [actionOptions, selectedActionIds]);
+
+  const effectiveSelectedActionIds = useMemo(() => {
+    if (actionFilter !== "all") return [actionFilter];
+    return selectedActionIds;
+  }, [actionFilter, selectedActionIds]);
+
+  const effectiveStartDate = dateFilter || startDate;
+  const effectiveEndDate = dateFilter || endDate;
 
   const fetchLogs = async (pageToFetch = 1) => {
     setLoading(true);
@@ -73,15 +129,18 @@ export const useHouseLogs = () => {
         page: pageToFetch,
         limit: LIMIT,
         search: searchQuery,
-        actionIds: selectedActionIds,
-        startDate,
-        endDate,
+        responsible: responsibleSearch,
+        affected: affectedSearch,
+        actionIds: effectiveSelectedActionIds,
+        startDate: effectiveStartDate,
+        endDate: effectiveEndDate,
       });
-      setLogs(result.logs);
+
+      setServerLogs(result.logs);
       setPagination(result.pagination);
       setPage(result.pagination.page || pageToFetch);
     } catch (err) {
-      setLogs([]);
+      setServerLogs([]);
       setPagination(DEFAULT_PAGINATION);
       setError(err.message || "No se pudieron cargar los logs");
     } finally {
@@ -109,11 +168,11 @@ export const useHouseLogs = () => {
 
   useEffect(() => {
     fetchLogs(page);
-  }, [page, searchQuery, selectedActionIds, startDate, endDate]);
+  }, [page, searchQuery, responsibleSearch, affectedSearch, effectiveSelectedActionIds, effectiveStartDate, effectiveEndDate]);
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, selectedActionIds, startDate, endDate]);
+  }, [searchQuery, responsibleSearch, affectedSearch, effectiveSelectedActionIds, effectiveStartDate, effectiveEndDate]);
 
   const handleNextPage = () => {
     if (page < pagination.totalPages) {
@@ -142,6 +201,7 @@ export const useHouseLogs = () => {
   const clearActionSelection = () => {
     setSelectedActionIds([]);
     setActionSearch("");
+    setActionFilter("all");
   };
 
   const handleStartDateChange = (event) => {
@@ -189,8 +249,10 @@ export const useHouseLogs = () => {
   };
 
   return {
-    logs,
+    logs: serverLogs,
     pagination,
+    totalLogs: pagination.total,
+    totalPages: pagination.totalPages,
     page,
     loading,
     error,
@@ -220,5 +282,14 @@ export const useHouseLogs = () => {
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
+    responsibleQuery: responsibleInput,
+    setResponsibleQuery,
+    affectedQuery: affectedInput,
+    setAffectedQuery,
+    actionFilter,
+    setActionFilter,
+    dateFilter,
+    setDateFilter,
+    actionOptions,
   };
 };
