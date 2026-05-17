@@ -20,6 +20,8 @@ const Calendario = () => {
         employeeHouseName,
         allEvents,
         isList,
+        viewType,
+        currentCalendarView,
         handleDatesSet,
         loadButtonsAtStart,
         viewerRole,
@@ -168,6 +170,8 @@ const Calendario = () => {
 
       <div className="flex-1">
         <BaseCalendar
+          key={`${viewType}-${isList}`}
+          initialView={currentCalendarView}
           loadButtonsAtStart={loadButtonsAtStart}
           calendarRef={calendarRef}
           toggleList={toggleList}
