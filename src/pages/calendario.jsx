@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import Type from "../components/atoms/type";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import CalendarFiltersModal from "../components/molecules/calendarFiltersModal";
@@ -179,7 +180,17 @@ const Calendario = () => {
         className="mb-auto hidden w-full shrink-0 sm:min-w-0 lg:flex lg:basis-64 lg:max-w-xs xl:basis-1/6"
       />
 
-      <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {employeeHouseName ? (
+          <Type
+            variant="page-title"
+            as="h2"
+            className="mb-0 w-full min-w-0 text-center md:text-left lg:hidden"
+          >
+            {employeeHouseName}
+          </Type>
+        ) : null}
+
         <BaseCalendar
           loadButtonsAtStart={loadButtonsAtStart}
           calendarRef={calendarRef}
