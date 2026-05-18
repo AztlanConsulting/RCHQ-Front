@@ -1,4 +1,4 @@
-import { REASON_REGEX } from "../../utils/schema/employee/deactivate.schema";
+import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/employee/deactivate.schema";
 
 const MAX_CHARS = 250;
 
@@ -39,9 +39,8 @@ const ReasonCard = ({
               rows={5}
               value={reason}
             onChange={(e) => {
-              if (REASON_REGEX.test(e.target.value)) {
-                onReasonChange(e.target.value);
-              }
+              const sanitizedValue = e.target.value.replace(INVALID_REASON_CHARS_REGEX, "");
+              onReasonChange(sanitizedValue);
             }}
               disabled={isSubmitting}
               maxLength={MAX_CHARS}

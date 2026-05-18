@@ -36,13 +36,13 @@ describe("Prueba Unitaria: ReasonCard", () => {
     expect(defaultProps.onReasonChange).toHaveBeenCalledWith("Nueva razón");
   });
 
-  it("no llama a onReasonChange si se escriben caracteres no permitidos", () => {
+  it("filtra los caracteres no permitidos al escribir en el textarea", () => {
     render(<ReasonCard {...defaultProps} />);
     const textarea = screen.getByPlaceholderText("Escribe la razón de la baja...");
     
     fireEvent.change(textarea, { target: { value: "<script>XSS</script>" } });
     
-    expect(defaultProps.onReasonChange).not.toHaveBeenCalled();
+    expect(defaultProps.onReasonChange).toHaveBeenCalledWith("scriptXSS/script");
   });
 
   it("llama a onBlacklistChange al hacer clic en la opción de lista negra", () => {

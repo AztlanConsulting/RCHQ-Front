@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const REASON_REGEX = /^[a-zA-Z0-9\s.,!?áéíóúÁÉÍÓÚñÑ-]*$/;
+export const INVALID_REASON_CHARS_REGEX = /[^a-zA-Z0-9\s.,!?áéíóúÁÉÍÓÚñÑ-]/g;
 
 export const deactivateEmployeeSchema = z.object({
   reason: z
