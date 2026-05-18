@@ -245,7 +245,7 @@ export const useCalendarFilters = (
     );
     const [filtersModalOpen, setFiltersModalOpen] = useState(false);
     const canUseEmployeeCatalog =
-        viewerRole === "Admin" || viewerRole === "Coordinador";
+        viewerRole === "Administrador" || viewerRole === "Coordinador";
 
     useEffect(() => {
         getEventsTypes()

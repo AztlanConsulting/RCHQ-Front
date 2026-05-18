@@ -19,7 +19,7 @@ const sanitizeAbsenceDescription = (value = "") =>
     .slice(0, 200);
 
 const canManageAbsenceEvidence = (role) =>
-  role === "Admin" || role === "Coordinador";
+  role === "Administrador" || role === "Coordinador";
 
 const getAbsenceEvidenceLabel = (selectedEvent, viewerRole) => {
   if (!selectedEvent) return "Sin evidencia";

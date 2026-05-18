@@ -27,7 +27,7 @@ const canViewCategory = (option, role) => {
     }
 
     if (option.value === "global") {
-        return normalizedRole === "admin";
+        return normalizedRole === "Administrador";
     }
 
     return true;

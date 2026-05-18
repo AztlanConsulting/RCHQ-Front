@@ -68,7 +68,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
-    setEditSection("admin");
+    setEditSection("Administrador");
     setLoadingCatalogues(true);
     try {
       const formData = await getUpdateFormService();

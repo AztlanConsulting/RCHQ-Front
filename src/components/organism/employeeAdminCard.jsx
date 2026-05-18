@@ -22,7 +22,7 @@ const isAdminRole = (roleName = "") =>
     .normalize("NFD")
     .replace(/\p{M}/gu, "")
     .toLowerCase()
-    .includes("admin");
+    .includes("Administrador");
 
 const EmployeeAdminCard = ({
   employee,

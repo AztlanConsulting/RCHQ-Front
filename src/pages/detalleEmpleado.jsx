@@ -144,7 +144,7 @@ const DetalleEmpleado = () => {
             employeeVacationRequests={employeeVacationRequests}
             employeeFaults={employeeFaults}
             workdaysDrawer={workdaysDrawer}
-            isEditing={editSection === "admin"}
+            isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
             roles={roles}
@@ -153,7 +153,7 @@ const DetalleEmpleado = () => {
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
             saving={saving}
-            saveError={editSection === "admin" ? saveError : null}
+            saveError={editSection === "Administrador" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
