@@ -4,7 +4,7 @@ import {
   getHouseLogsService,
 } from "../../services/logsService";
 
-const LIMIT = 6;
+const LIMIT = 10;
 const DEFAULT_PAGINATION = {
   page: 1,
   limit: LIMIT,

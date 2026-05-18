@@ -29,43 +29,45 @@ const LogsHouse = () => {
   } = useHouseLogs();
 
   return (
-    <div className="flex min-h-full flex-col gap-6 p-4 sm:gap-8 sm:p-8">
-      <h1 className="text-3xl font-bold text-[#121212] sm:text-4xl">
-        Acciones registradas dentro de app de la casa
-      </h1>
+    <div className="p-8 md:flex md:h-full md:flex-col">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-[#121212]">
+          Acciones registradas dentro de app de la casa
+        </h1>
+      </div>
 
-      <HouseLogsFilters
-        responsibleQuery={responsibleQuery}
-        setResponsibleQuery={setResponsibleQuery}
-        affectedQuery={affectedQuery}
-        setAffectedQuery={setAffectedQuery}
-        filteredActionOptions={filteredActionOptions}
-        selectedActionIds={selectedActionIds}
-        actionSearch={actionSearch}
-        setActionSearch={setActionSearch}
-        selectedActionLabel={selectedActionLabel}
-        toggleActionValue={toggleActionValue}
-        clearActionSelection={clearActionSelection}
-        dateFilter={dateFilter}
-        setDateFilter={setDateFilter}
-      />
+      <div className="mb-6">
+        <HouseLogsFilters
+          responsibleQuery={responsibleQuery}
+          setResponsibleQuery={setResponsibleQuery}
+          affectedQuery={affectedQuery}
+          setAffectedQuery={setAffectedQuery}
+          filteredActionOptions={filteredActionOptions}
+          selectedActionIds={selectedActionIds}
+          actionSearch={actionSearch}
+          setActionSearch={setActionSearch}
+          selectedActionLabel={selectedActionLabel}
+          toggleActionValue={toggleActionValue}
+          clearActionSelection={clearActionSelection}
+          dateFilter={dateFilter}
+          setDateFilter={setDateFilter}
+        />
+      </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="md:min-h-0 md:flex-1 md:overflow-y-auto">
         <HouseLogsTable logs={logs} loading={loading} error={error} />
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          total={totalLogs}
-          onPrevPage={handlePrevPage}
-          onNextPage={handleNextPage}
-          loading={loading}
-          hasEmployees={totalLogs > 0}
-          entityLabel="registros"
-        />
-      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={totalLogs}
+        onPrevPage={handlePrevPage}
+        onNextPage={handleNextPage}
+        loading={loading}
+        hasEmployees={totalLogs > 0}
+        entityLabel="registros"
+      />
     </div>
   );
 };

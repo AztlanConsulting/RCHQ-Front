@@ -28,30 +28,36 @@ const HouseLogsTable = ({ logs, loading, error }) => {
 
   if (loading && !hasLogs) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-500 shadow-sm">
-        Cargando registros...
+      <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-8 text-center text-gray-500">
+          Cargando registros...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-red-500 shadow-sm">
-        Error: {error}
+      <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-8 text-center text-red-500">
+          Error: {error}
+        </div>
       </div>
     );
   }
 
   if (!hasLogs) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-500 shadow-sm">
-        No hay registros para los filtros seleccionados
+      <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-8 text-center text-gray-500">
+          No hay registros para los filtros seleccionados
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="relative overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
       {loading ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
           <div className="rounded-lg bg-white/95 px-4 py-3 text-sm font-semibold text-[#24375e] shadow-sm">
@@ -59,25 +65,25 @@ const HouseLogsTable = ({ logs, loading, error }) => {
           </div>
         </div>
       ) : null}
-      <table className="w-full min-w-[980px]">
-        <thead className="bg-gray-100">
+      <table className="w-full">
+        <thead className="border-b border-gray-200 bg-gray-100">
           <tr>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
               Nombre del responsable
             </th>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
               CURP del responsable
             </th>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
               Acción
             </th>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
-              Persona afectada
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
+              Afectado
             </th>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
               Fecha
             </th>
-            <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
+            <th className="px-7 py-5 text-center text-sm font-bold text-[#121212]">
               IP
             </th>
           </tr>
@@ -85,22 +91,22 @@ const HouseLogsTable = ({ logs, loading, error }) => {
         <tbody>
           {logs.map((log) => (
             <tr key={log.logId} className="border-t border-gray-200 align-top">
-              <td className="px-4 py-6 text-sm font-semibold text-[#666666]">
-                <TruncatedCell value={log.responsibleName} widthClassName="max-w-[18rem]" />
+              <td className="px-7 py-5 text-center text-sm font-semibold text-[#666666]">
+                <TruncatedCell value={log.responsibleName} widthClassName="mx-auto w-full" />
               </td>
-              <td className="px-4 py-6 text-sm font-semibold uppercase text-[#8C8C8C]">
+              <td className="px-7 py-5 text-center text-sm font-semibold uppercase text-[#8C8C8C]">
                 {renderCellValue(log.responsibleCurp)}
               </td>
-              <td className="max-w-[18rem] px-4 py-6 text-sm font-semibold text-[#8C8C8C]">
-                <TruncatedCell value={log.action} widthClassName="max-w-[18rem]" />
+              <td className="px-7 py-5 text-center text-sm font-semibold text-[#8C8C8C]">
+                <TruncatedCell value={log.action} widthClassName="mx-auto w-full" />
               </td>
-              <td className="max-w-[12rem] px-4 py-6 text-sm font-semibold text-[#8C8C8C]">
-                <TruncatedCell value={log.affectedName} widthClassName="max-w-[12rem]" />
+              <td className="px-7 py-5 text-center text-sm font-semibold text-[#8C8C8C]">
+                <TruncatedCell value={log.affectedName} widthClassName="mx-auto w-full" />
               </td>
-              <td className="px-4 py-6 text-sm font-semibold text-[#8C8C8C]">
+              <td className="px-7 py-5 text-center text-sm font-semibold text-[#8C8C8C]">
                 {formatLogMoment(log.moment)}
               </td>
-              <td className="px-4 py-6 text-sm font-semibold text-[#8C8C8C]">
+              <td className="px-7 py-5 text-center text-sm font-semibold text-[#8C8C8C]">
                 {renderCellValue(log.ipAddress)}
               </td>
             </tr>
