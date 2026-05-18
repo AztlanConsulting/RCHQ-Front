@@ -69,12 +69,16 @@ const CalendarFilters = ({
   calendarModeOptions = [],
   canSwitchCalendarMode = false,
   className = "",
+  showPageHeading = true,
+  stackMaxHeightClass = "max-h-[65vh]",
 }) => {
   return (
     <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
-      <Type variant="page-title" as="h2">
-        Calendario
-      </Type>
+      {showPageHeading ? (
+        <Type variant="page-title" as="h2">
+          Calendario
+        </Type>
+      ) : null}
       {houseName && (
         <Type variant="section-title" as="h2" className="mb-2">
           {houseName}
@@ -102,7 +106,7 @@ const CalendarFilters = ({
           })}
         </div>
       ) : null}
-      <div className="flex flex-col gap-4 mt-4 max-h-[75vh]">
+      <div className={`flex flex-col gap-4 mt-4 ${stackMaxHeightClass}`}>
         <FilterGroup
           label="ENFOQUE"
           name="focus"

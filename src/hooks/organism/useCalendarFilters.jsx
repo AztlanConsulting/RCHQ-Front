@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getAbsenceTypes,
     getEventsTypes,
@@ -226,7 +226,8 @@ export const useCalendarFilters = (
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
-    const [absenceTypeFilters, setAbsenceTypeFilters] = useState([]);
+    const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState([]);
+    const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
     const [employeeFilters, setEmployeeFilters] = useState([]);
     const [employeeSearch, setEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
@@ -235,6 +236,7 @@ export const useCalendarFilters = (
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
+    const [filtersModalOpen, setFiltersModalOpen] = useState(false);
     const canUseEmployeeCatalog =
         viewerRole === "Admin" || viewerRole === "Coordinador";
 
@@ -341,14 +343,30 @@ export const useCalendarFilters = (
             : fallbackEmployeeOptions
     ), [catalogEmployeeOptions, fallbackEmployeeOptions]);
 
+    const setAbsenceTypeFilters = useCallback((nextValue) => {
+        setHasCustomizedAbsenceTypeFilters(true);
+        setAbsenceTypeFiltersState((previousValue) => (
+            typeof nextValue === "function"
+                ? nextValue(previousValue)
+                : nextValue
+        ));
+    }, []);
+
+    useEffect(() => {
+        if (absenceTypeOptions.length === 0) return;
+        if (hasCustomizedAbsenceTypeFilters) return;
+
+        setAbsenceTypeFiltersState(absenceTypeOptions.map((option) => option.value));
+    }, [absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
+
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
 
-        if (absenceTypeFilters.length === 0) return nextValues;
+        if (!hasCustomizedAbsenceTypeFilters) return nextValues;
+        if (absenceTypeFilters.length === 0) return [];
 
-        const kept = absenceTypeFilters.filter((value) => nextValues.includes(value));
-        return kept.length > 0 ? kept : nextValues;
-    }, [absenceTypeFilters, absenceTypeOptions]);
+        return absenceTypeFilters.filter((value) => nextValues.includes(value));
+    }, [absenceTypeFilters, absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
 
     const effectiveEmployeeFilters = useMemo(() => {
         const nextValues = employeeOptions.map((opt) => opt.value);
@@ -457,6 +475,7 @@ export const useCalendarFilters = (
         absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
         absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
         showEventFilters, showVacationFilters, showAbscenceFilters,
+        filtersModalOpen, setFiltersModalOpen,
         visibleEvents, 
     };
 };
