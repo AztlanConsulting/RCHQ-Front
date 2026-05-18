@@ -487,4 +487,31 @@ describe("Integración: VacationRequests", () => {
 
         expect(screen.queryByRole("alert")).toBeNull();
     });
+
+    it("muestra mensaje de éxito al aprobar una solicitud", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
+
+        expect(
+            await screen.findByText("Solicitud de vacaciones aprobada con éxito"),
+        ).toBeInTheDocument();
+
+        expect(approveVacationRequest).toHaveBeenCalledWith("vac-001");
+    });
 });
