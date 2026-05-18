@@ -6,13 +6,22 @@ import {
 } from "../../services/logsService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
-const LIMIT = 10;
-const DEFAULT_PAGINATION = {
+const MOBILE_BREAKPOINT = 640;
+const MOBILE_LIMIT = 6;
+const DESKTOP_LIMIT = 10;
+
+const getResponsiveLimit = () => (
+  typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT
+    ? MOBILE_LIMIT
+    : DESKTOP_LIMIT
+);
+
+const buildDefaultPagination = (limit) => ({
   page: 1,
-  limit: LIMIT,
+  limit,
   total: 0,
   totalPages: 0,
-};
+});
 
 export const formatLogMoment = (momentValue) => {
   if (!momentValue) return "—";
@@ -44,7 +53,10 @@ export const formatLogMoment = (momentValue) => {
 
 export const useHouseLogs = () => {
   const [serverLogs, setServerLogs] = useState([]);
-  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [limit, setLimit] = useState(() => getResponsiveLimit());
+  const [pagination, setPagination] = useState(() =>
+    buildDefaultPagination(getResponsiveLimit()),
+  );
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -111,7 +123,7 @@ export const useHouseLogs = () => {
     try {
       const result = await getHouseLogsService({
         page: pageToFetch,
-        limit: LIMIT,
+        limit,
         responsible: responsibleSearch,
         affected: affectedSearch,
         actionIds: selectedActionIds,
@@ -124,7 +136,7 @@ export const useHouseLogs = () => {
       setPage(result.pagination.page || pageToFetch);
     } catch (err) {
       setServerLogs([]);
-      setPagination(DEFAULT_PAGINATION);
+      setPagination(buildDefaultPagination(limit));
       setError(err.message || "No se pudieron cargar los logs");
     } finally {
       setLoading(false);
@@ -150,8 +162,31 @@ export const useHouseLogs = () => {
   }, []);
 
   useEffect(() => {
+    const handleResize = () => {
+      const nextLimit = getResponsiveLimit();
+
+      setLimit((currentLimit) => (
+        currentLimit === nextLimit ? currentLimit : nextLimit
+      ));
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setPagination((currentPagination) => (
+      currentPagination.limit === limit
+        ? currentPagination
+        : buildDefaultPagination(limit)
+    ));
+    setPage(1);
+  }, [limit]);
+
+  useEffect(() => {
     fetchLogs(page);
-  }, [page, responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
+  }, [page, limit, responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
 
   useEffect(() => {
     setPage(1);

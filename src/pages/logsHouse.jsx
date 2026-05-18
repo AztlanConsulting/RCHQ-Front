@@ -1,6 +1,8 @@
+import Button from "../components/atoms/button";
 import Pagination from "../components/molecules/pagination";
 import HouseLogsFilters from "../components/molecules/houseLogsFilters";
 import HouseLogsTable from "../components/molecules/houseLogsTable";
+import LogReportModal from "../components/organism/logReportModal";
 import { useHouseLogs } from "../hooks/pages/useHouseLogs";
 
 const LogsHouse = () => {
@@ -24,16 +26,39 @@ const LogsHouse = () => {
     clearActionSelection,
     dateFilter,
     setDateFilter,
+    isReportModalOpen,
+    openReportModal,
+    closeReportModal,
+    reportMonth,
+    setReportMonth,
+    reportYear,
+    setReportYear,
+    yearOptions,
+    isDownloadingReport,
+    handleDownloadReport,
     handleNextPage,
     handlePrevPage,
   } = useHouseLogs();
 
   return (
     <div className="p-8 md:flex md:h-full md:flex-col">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-[#121212]">
-          Acciones registradas dentro de app de la casa
-        </h1>
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-[#121212]">
+            Acciones registradas dentro de app de la casa
+          </h1>
+        </div>
+
+        <Button
+          text="Generar reporte"
+          onClick={openReportModal}
+          bgColor="bg-[#24375e]"
+          hoverColor="hover:bg-[#162d4a]"
+          activeColor="active:bg-[#0f2035]"
+          textColor="text-white"
+          width="w-full md:w-56"
+          className="px-6"
+        />
       </div>
 
       <div className="mb-6">
@@ -67,6 +92,18 @@ const LogsHouse = () => {
         loading={loading}
         hasEmployees={totalLogs > 0}
         entityLabel="registros"
+      />
+
+      <LogReportModal
+        open={isReportModalOpen}
+        onClose={closeReportModal}
+        month={reportMonth}
+        onMonthChange={setReportMonth}
+        year={reportYear}
+        onYearChange={setReportYear}
+        yearOptions={yearOptions}
+        onConfirm={handleDownloadReport}
+        loading={isDownloadingReport}
       />
     </div>
   );

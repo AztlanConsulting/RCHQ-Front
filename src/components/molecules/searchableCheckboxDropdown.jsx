@@ -12,16 +12,25 @@ const SearchableCheckboxDropdown = ({
   onToggleValue,
   onClearSelection,
   searchPlaceholder = "Buscar",
+  labelClassName = "",
   triggerClassName = "",
   menuClassName = "",
 }) => {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <Type variant="metric-label" className="text-sm" as="p">
-          {label}
-        </Type>
-      </div>
+    <div className="flex w-full flex-col gap-1.5">
+      {labelClassName ? (
+        <label className={labelClassName}>{label}</label>
+      ) : (
+        <div className="flex items-center justify-between">
+          <Type
+            variant="metric-label"
+            className="text-sm"
+            as="p"
+          >
+            {label}
+          </Type>
+        </div>
+      )}
 
       <Dropdown
         inline
@@ -32,11 +41,11 @@ const SearchableCheckboxDropdown = ({
         renderTrigger={() => (
           <button
             type="button"
-            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg border border-slate-200 bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-slate-700 shadow-[inset_0px_4px_4px_#00000020] transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
+            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
           >
             <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
             <svg
-              className="h-4 w-4 shrink-0 text-slate-400"
+              className="h-4 w-4 shrink-0 text-[#6b7280]"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
