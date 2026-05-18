@@ -4,38 +4,10 @@ import ButtonGroup from "../../molecules/buttonGroup";
 import CasaForm from "./forms/houseForm";
 import PersonalForm from "./forms/personalForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
-import { getCalendarViewerRole } from "../../../services/calendarService";
-
-const CATEGORY_OPTIONS = [
-    { value: "global", label: "Global", icon: "globe" },
-    { value: "casa", label: "Casa", icon: "home" },
-    { value: "personal", label: "Personal", icon: "user" },
-    { value: "vacaciones", label: "Vacaciones", icon: "plane" },
-    { value: "ausencias", label: "Ausencias", icon: "flag" },
-];
 
 const CATEGORY_FORMS = {
     casa: CasaForm,
     personal: PersonalForm,
-};
-
-const normalizeRole = (role) =>
-    String(role ?? "")
-        .trim()
-        .toLowerCase();
-
-const canViewCategory = (option, role) => {
-    const normalizedRole = normalizeRole(role);
-
-    if (option.value === "casa" || option.value === "ausencias") {
-        return normalizedRole === "coordinador";
-    }
-
-    if (option.value === "global") {
-        return normalizedRole === "admin";
-    }
-
-    return true;
 };
 
 const RegisterEventModal = ({
@@ -45,33 +17,21 @@ const RegisterEventModal = ({
     initialStartDate,
     initialEndDate,
 }) => {
-    const viewerRole = getCalendarViewerRole();
-    const visibleCategoryOptions = CATEGORY_OPTIONS.filter((option) =>
-        canViewCategory(option, viewerRole),
-    );
-    const defaultCategory = visibleCategoryOptions[0]?.value ?? "personal";
-
     const {
         name,
         nameError,
-        categoryKey,
         validationAlert,
         animationKey,
         setNameError,
         setValidationAlert,
         handleNameChange,
         handleCategoryChange,
-    } = useRegisterEventModal(isOpen);
+        visibleCategoryOptions,
+        effectiveCategoryKey,
+        SubForm,
+    } = useRegisterEventModal(isOpen, CATEGORY_FORMS);
 
     if (!isOpen) return null;
-
-    const visibleCategoryValues = visibleCategoryOptions.map(
-        ({ value }) => value,
-    );
-    const effectiveCategoryKey = visibleCategoryValues.includes(categoryKey)
-        ? categoryKey
-        : defaultCategory;
-    const SubForm = CATEGORY_FORMS[effectiveCategoryKey] ?? null;
 
     return (
         <>
@@ -119,7 +79,6 @@ const RegisterEventModal = ({
                         gap: "16px",
                     }}
                 >
-                    {/* Encabezado fijo — nunca hace scroll */}
                     <div style={{ flexShrink: 0 }}>
                         <TextField
                             id="event-name"
