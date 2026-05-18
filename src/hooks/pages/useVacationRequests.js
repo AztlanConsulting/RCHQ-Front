@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
+    approveVacationRequest,
 } from "../../services/vacationRequestService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
@@ -38,6 +39,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [approvingRequestId, setApprovingRequestId] = useState(null);
 
     const clearError = () => {
         setError("");
@@ -127,6 +129,29 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         setPage(1);
     };
 
+    const handleApproveRequest = async (vacationRequestId) => {
+        if (!vacationRequestId || approvingRequestId) return;
+
+        setApprovingRequestId(vacationRequestId);
+        setError("");
+
+        try {
+            await approveVacationRequest(vacationRequestId);
+
+            const nextPage =
+                requests.length === 1 && page > 1
+                    ? page - 1
+                    : page;
+
+            await fetchRequests(nextPage);
+        } catch (err) {
+            setError(err.message || "No se pudo aprobar la solicitud");
+            throw err;
+        } finally {
+            setApprovingRequestId(null);
+        }
+    };
+
     return {
         view,
         setView: handleChangeView,
@@ -147,6 +172,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         loading,
         error,
         clearError,
+        approvingRequestId,
+        handleApproveRequest,
         handleNextPage,
         handlePrevPage,
         clearFilters,

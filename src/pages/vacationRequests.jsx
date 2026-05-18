@@ -1,7 +1,9 @@
+import { useState } from "react";
 import Button from "../components/atoms/button";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
+import ConfirmApproveVacationModal from "../components/molecules/confirmApproveVacationModal";
 import { useVacationRequests } from "../hooks/pages/useVacationRequests";
 import Alert from "../components/atoms/alerts";
 
@@ -24,12 +26,43 @@ const VacationRequests = () => {
         loading,
         error,
         clearError,
+        approvingRequestId,
+        handleApproveRequest,
         handleNextPage,
         handlePrevPage,
         clearFilters,
     } = useVacationRequests();
 
+    const [requestToApprove, setRequestToApprove] = useState(null);
+    const [approveModalError, setApproveModalError] = useState("");
+
     const isPendingView = view === "pending";
+
+    const handleOpenApproveModal = (request) => {
+        clearError();
+        setApproveModalError("");
+        setRequestToApprove(request);
+    };
+
+    const handleCloseApproveModal = () => {
+        if (approvingRequestId) return;
+
+        setApproveModalError("");
+        setRequestToApprove(null);
+    };
+
+    const handleConfirmApprove = async () => {
+        if (!requestToApprove?.vacationRequestId) return;
+
+        setApproveModalError("");
+
+        try {
+            await handleApproveRequest(requestToApprove.vacationRequestId);
+            setRequestToApprove(null);
+        } catch (err) {
+            setApproveModalError(err.message || "No se pudo aprobar la solicitud");
+        }
+    };
 
     return (
         <div className="p-8 bg-white min-h-screen">
@@ -69,7 +102,7 @@ const VacationRequests = () => {
                 clearFilters={clearFilters}
             />
 
-            {error && (
+            {error && !requestToApprove && (
                 <div className="mb-5">
                     <Alert
                         type="error"
@@ -83,9 +116,11 @@ const VacationRequests = () => {
                 requests={requests}
                 view={view}
                 loading={loading}
+                approvingRequestId={approvingRequestId}
                 onViewDetail={(request) => {
                     setSelectedRequest(request);
                 }}
+                onOpenApproveModal={handleOpenApproveModal}
             />
 
             <Pagination
@@ -97,6 +132,14 @@ const VacationRequests = () => {
                 loading={loading}
                 hasEmployees={requests.length > 0}
                 itemLabel="solicitudes"
+            />
+
+            <ConfirmApproveVacationModal
+                request={requestToApprove}
+                loading={Boolean(approvingRequestId)}
+                error={approveModalError}
+                onCancel={handleCloseApproveModal}
+                onConfirm={handleConfirmApprove}
             />
         </div>
     );
