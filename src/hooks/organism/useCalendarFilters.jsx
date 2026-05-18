@@ -149,18 +149,32 @@ const getFilteredEvents = (
             absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e))
         ))
         .map((rawEvent, idx) => {
-            const isAllDay = rawEvent.focus === "ausencias" || rawEvent.lastsAllDay;
+            const isAllDay = rawEvent.focus === "ausencias";
+            const isExpandedListAbsence = Boolean(
+                isList
+                && rawEvent.focus === "ausencias"
+                && rawEvent.currentDayIndex
+                && rawEvent.totalDays,
+            );
             const normalizedStartDate = normalizeDateOnly(
-                rawEvent.startDate ?? rawEvent.start,
+                isExpandedListAbsence
+                    ? rawEvent.start
+                    : rawEvent.startDate ?? rawEvent.start,
             );
             const normalizedEndDate = normalizeDateOnly(
-                rawEvent.endDate ?? rawEvent.end,
+                isExpandedListAbsence
+                    ? rawEvent.end
+                    : rawEvent.endDate ?? rawEvent.end,
             );
             const eventStart = isAllDay && normalizedStartDate
                 ? normalizedStartDate
                 : rawEvent.start;
             const eventEnd = isAllDay && normalizedEndDate
-                ? addDaysToDateOnly(normalizedEndDate, 1)
+                ? (
+                    isExpandedListAbsence
+                        ? normalizedEndDate
+                        : addDaysToDateOnly(normalizedEndDate, 1)
+                )
                 : rawEvent.end;
 
             return {
@@ -226,7 +240,7 @@ export const useCalendarFilters = (
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
-    const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState([]);
+    const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState(null);
     const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
     const [employeeFilters, setEmployeeFilters] = useState([]);
     const [employeeSearch, setEmployeeSearch] = useState("");
@@ -345,24 +359,23 @@ export const useCalendarFilters = (
 
     const setAbsenceTypeFilters = useCallback((nextValue) => {
         setHasCustomizedAbsenceTypeFilters(true);
-        setAbsenceTypeFiltersState((previousValue) => (
-            typeof nextValue === "function"
-                ? nextValue(previousValue)
-                : nextValue
-        ));
-    }, []);
+        setAbsenceTypeFiltersState((previousValue) => {
+            const resolvedPreviousValue = previousValue ?? absenceTypeOptions.map(
+                (option) => option.value,
+            );
 
-    useEffect(() => {
-        if (absenceTypeOptions.length === 0) return;
-        if (hasCustomizedAbsenceTypeFilters) return;
-
-        setAbsenceTypeFiltersState(absenceTypeOptions.map((option) => option.value));
-    }, [absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
+            return typeof nextValue === "function"
+                ? nextValue(resolvedPreviousValue)
+                : nextValue;
+        });
+    }, [absenceTypeOptions]);
 
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
 
-        if (!hasCustomizedAbsenceTypeFilters) return nextValues;
+        if (!hasCustomizedAbsenceTypeFilters || absenceTypeFilters === null) {
+            return nextValues;
+        }
         if (absenceTypeFilters.length === 0) return [];
 
         return absenceTypeFilters.filter((value) => nextValues.includes(value));

@@ -2,18 +2,12 @@ import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
 import ButtonGroup from "../../molecules/buttonGroup";
 import CasaForm from "./forms/houseForm";
+import PersonalForm from "./forms/personalForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
-
-const CATEGORY_OPTIONS = [
-    { value: "global", label: "Global", icon: "globe" },
-    { value: "casa", label: "Casa", icon: "home" },
-    { value: "personal", label: "Personal", icon: "user" },
-    { value: "vacaciones", label: "Vacaciones", icon: "plane" },
-    { value: "ausencias", label: "Ausencias", icon: "flag" },
-];
 
 const CATEGORY_FORMS = {
     casa: CasaForm,
+    personal: PersonalForm,
 };
 
 const RegisterEventModal = ({
@@ -26,18 +20,18 @@ const RegisterEventModal = ({
     const {
         name,
         nameError,
-        categoryKey,
         validationAlert,
         animationKey,
         setNameError,
         setValidationAlert,
         handleNameChange,
         handleCategoryChange,
-    } = useRegisterEventModal(isOpen);
+        visibleCategoryOptions,
+        effectiveCategoryKey,
+        SubForm,
+    } = useRegisterEventModal(isOpen, CATEGORY_FORMS);
 
     if (!isOpen) return null;
-
-    const SubForm = CATEGORY_FORMS[categoryKey] ?? null;
 
     return (
         <>
@@ -69,6 +63,7 @@ const RegisterEventModal = ({
                 <div
                     style={{
                         pointerEvents: "all",
+                        position: "relative",
                         background: "#ffffff",
                         borderRadius: "12px",
                         border: "1px solid #e5e7eb",
@@ -78,13 +73,13 @@ const RegisterEventModal = ({
                         maxWidth: "560px",
                         boxSizing: "border-box",
                         maxHeight: "90vh",
-                        overflowY: "auto",
+                        overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
                     }}
                 >
-                    <div>
+                    <div style={{ flexShrink: 0 }}>
                         <TextField
                             id="event-name"
                             placeholder="Agregar título"
@@ -106,56 +101,61 @@ const RegisterEventModal = ({
                         )}
                     </div>
 
-                    <ButtonGroup
-                        options={CATEGORY_OPTIONS}
-                        value={categoryKey}
-                        onChange={handleCategoryChange}
-                    />
+                    <div style={{ flexShrink: 0 }}>
+                        <ButtonGroup
+                            options={visibleCategoryOptions}
+                            value={effectiveCategoryKey}
+                            onChange={handleCategoryChange}
+                        />
+                    </div>
 
                     <div
                         style={{
-                            position: "relative",
-                            height: 0,
-                            overflow: "visible",
-                            zIndex: 20,
-                            marginTop: "-8px",
+                            flex: 1,
+                            overflowY: "auto",
+                            minHeight: 0,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "16px",
                         }}
                     >
-                        {validationAlert && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                }}
-                            >
-                                <Alert
-                                    type="error"
-                                    message={validationAlert}
-                                    onClose={() => setValidationAlert(null)}
+                        <div
+                            key={animationKey}
+                            className="animate-[fadeSlideIn_220ms_ease-in-out]"
+                            style={{ paddingBottom: "4px" }}
+                        >
+                            {SubForm && (
+                                <SubForm
+                                    name={name}
+                                    isOpen={isOpen}
+                                    onClose={onClose}
+                                    onSuccess={onSuccess}
+                                    initialStartDate={initialStartDate}
+                                    initialEndDate={initialEndDate}
+                                    onNameError={setNameError}
+                                    onValidationAlert={setValidationAlert}
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
-                    <div
-                        key={animationKey}
-                        className="animate-[fadeSlideIn_220ms_ease-in-out]"
-                    >
-                        {SubForm && (
-                            <SubForm
-                                name={name}
-                                isOpen={isOpen}
-                                onClose={onClose}
-                                onSuccess={onSuccess}
-                                initialStartDate={initialStartDate}
-                                initialEndDate={initialEndDate}
-                                onNameError={setNameError}
-                                onValidationAlert={setValidationAlert}
+                    {validationAlert && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "130px",
+                                left: "24px",
+                                right: "24px",
+                                zIndex: 30,
+                            }}
+                        >
+                            <Alert
+                                type="error"
+                                message={validationAlert}
+                                onClose={() => setValidationAlert(null)}
                             />
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

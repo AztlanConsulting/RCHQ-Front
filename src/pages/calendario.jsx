@@ -116,8 +116,6 @@ const Calendario = () => {
     viewerRole,
   });
 
-  const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
-
   useEffect(() => {
     setOwnCalendar();
   }, [setOwnCalendar]);
@@ -233,8 +231,8 @@ const Calendario = () => {
               return "Detalle del evento";
           }
         })()}
-        grayBackground={isAbsenceDetailOpen}
-        placement={isAbsenceDetailOpen ? "center" : "right"}
+        grayBackground={true}
+        placement="center"
         className={() => {
           switch (selectedEvent?.focus) {
             case "ausencias":
