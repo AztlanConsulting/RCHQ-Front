@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import DayGridCard from "../molecules/calendarCards/dayGridCard";
 import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard";
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
@@ -12,6 +12,16 @@ import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 
 const MONTH_DAY_EVENT_CAP = 3;
+
+/** Left axis for time grids: "12am", "1am", … "12pm", "1pm" (locale "es" omits meridiem by default). */
+const formatTimeGridSlotLabel = (date) => {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+    const h24 = date.getHours();
+    const isAm = h24 < 12;
+    let h12 = h24 % 12;
+    if (h12 === 0) h12 = 12;
+    return `${h12}${isAm ? "am" : "pm"}`;
+};
 
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
@@ -35,6 +45,15 @@ const renderEventContent = (arg) => {
 
     return <DayGridCard arg={arg} />;
 };
+
+const FULL_CALENDAR_PLUGINS = [
+    dayGridPlugin,
+    interactionPlugin,
+    timeGridPlugin,
+    listPlugin,
+];
+
+const CALENDAR_LOCALES = [esLocale];
 
 const BaseCalendar = ({
     initialView,
@@ -64,71 +83,117 @@ const BaseCalendar = ({
     useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
-    });
+    }, [calendarRef, loadButtonsAtStart, resizeHandler]);
+
+    const titleFormatFn = useCallback(
+        (arg) => generateTitle(arg),
+        [generateTitle],
+    );
+
+    const viewsConfig = useMemo(
+        () => ({
+            timeGridDay: {
+                dayHeaderContent: (arg) => getWeekDayName(arg),
+                slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+            },
+            timeGridWeek: {
+                dayHeaderContent: (arg) => getWeekDayName(arg),
+                slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+            },
+            dayGridMonth: {
+                dayHeaderContent: (arg) => getWeekDayName(arg),
+                dayMaxEvents: MONTH_DAY_EVENT_CAP,
+            },
+        }),
+        [getWeekDayName],
+    );
+
+    const customButtonsConfig = useMemo(
+        () => ({
+            toggleListButton: {
+                text: "Lista",
+                click: () => toggleList(calendarRef),
+            },
+            createEventButton: {
+                text: "",
+                click: () => openCreationModal(calendarRef),
+            },
+            monthButton: {
+                text: "Mes",
+                click: () => setMonthView(calendarRef),
+            },
+            weekButton: {
+                text: "Semana",
+                click: () => setWeekView(calendarRef),
+            },
+            dayButton: {
+                text: "Día",
+                click: () => setDayView(calendarRef),
+            },
+        }),
+        [
+            calendarRef,
+            toggleList,
+            openCreationModal,
+            setMonthView,
+            setWeekView,
+            setDayView,
+        ],
+    );
+
+    const onWindowResize = useCallback(() => {
+        resizeHandler(calendarRef);
+    }, [calendarRef, resizeHandler]);
+
+    const headerToolbarConfig = useMemo(
+        () => ({
+            left: "prev,next today",
+            center: "title",
+            right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
+        }),
+        [],
+    );
+
+    const handleFcEventClick = useCallback(
+        (info) => {
+            onEventClick?.(info);
+        },
+        [onEventClick],
+    );
+
+    const handleSelect = useCallback(
+        (info) => {
+            onDateDrag?.(info, calendarRef);
+        },
+        [onDateDrag, calendarRef],
+    );
+
+    const handleSelectAllow = useCallback(() => {
+        return onDateDragging?.();
+    }, [onDateDragging]);
 
     return (
         <FullCalendar
             ref={calendarRef}
             initialView={initialView}
-            plugins={[
-                dayGridPlugin,
-                interactionPlugin,
-                timeGridPlugin,
-                listPlugin,
-            ]}
-            locales={[esLocale]}
+            plugins={FULL_CALENDAR_PLUGINS}
+            locales={CALENDAR_LOCALES}
             locale="es"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
-            headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
-            }}
-            titleFormat={(arg) => generateTitle(arg)}
-            views={{
-                timeGridDay: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                },
-                timeGridWeek: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                },
-                dayGridMonth: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
-                },
-            }}
-            windowResize={() => resizeHandler(calendarRef)}
-            customButtons={{
-                toggleListButton: {
-                    text: "Lista",
-                    click: () => toggleList(calendarRef),
-                },
-                createEventButton: {
-                    text: "",
-                    click: () => openCreationModal(calendarRef),
-                },
-                monthButton: {
-                    text: "Mes",
-                    click: () => setMonthView(calendarRef),
-                },
-                weekButton: {
-                    text: "Semana",
-                    click: () => setWeekView(calendarRef),
-                },
-                dayButton: {
-                    text: "Día",
-                    click: () => setDayView(calendarRef),
-                },
-            }}
+            headerToolbar={headerToolbarConfig}
+            titleFormat={titleFormatFn}
+            views={viewsConfig}
+            windowResize={onWindowResize}
+            customButtons={customButtonsConfig}
             events={visibleEvents}
             datesSet={handleDatesSet}
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
-            eventClick={(info) => onEventClick?.(info)}
+            eventClick={handleFcEventClick}
             selectable={true}
-            select={(info) => onDateDrag?.(info, calendarRef)}
-            selectAllow={() => onDateDragging?.()}
+            select={handleSelect}
+            selectAllow={handleSelectAllow}
             unselectAuto={false}
         />
     );
