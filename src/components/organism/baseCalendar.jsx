@@ -10,6 +10,7 @@ import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard"
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
+import { widenTimeGridWeekEventHarness } from "@/utils/weekTimeGridHarnessWidth";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
@@ -234,6 +235,12 @@ const BaseCalendar = ({
         return onDateDragging?.();
     }, [onDateDragging]);
 
+    const handleTimedEventDidMount = useCallback((info) => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => widenTimeGridWeekEventHarness(info));
+        });
+    }, []);
+
     return (
         <FullCalendar
             ref={calendarRef}
@@ -267,6 +274,7 @@ const BaseCalendar = ({
             datesSet={handleDatesSet}
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
+            eventDidMount={handleTimedEventDidMount}
             eventClick={handleFcEventClick}
             selectable={true}
             select={handleSelect}
