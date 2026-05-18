@@ -8,15 +8,16 @@ import { secureFetch } from "../../utils/secureFetchWrapper";
 
 describe("logsService", () => {
   let getHouseLogsService;
+  let getLogsActionsService;
 
   beforeEach(async () => {
     vi.clearAllMocks();
     localStorage.clear();
     vi.stubEnv("VITE_API_URL", "http://api.test");
-    ({ getHouseLogsService } = await import("../../services/logsService"));
+    ({ getHouseLogsService, getLogsActionsService } = await import("../../services/logsService"));
   });
 
-  it("obtiene los logs de casa con paginación", async () => {
+  it("obtiene los logs de casa con paginación y filtros", async () => {
     localStorage.setItem("token", "token-test");
     secureFetch.mockResolvedValue({
       ok: true,
@@ -32,10 +33,15 @@ describe("logsService", () => {
     const result = await getHouseLogsService({
       page: 2,
       limit: 10,
+      responsible: "Carla",
+      affected: "Luis",
+      actionIds: ["empl-001"],
+      startDate: "2026-05-10",
+      endDate: "2026-05-10",
     });
 
     expect(secureFetch).toHaveBeenCalledWith(
-      "http://api.test/logs/house?page=2&limit=10",
+      "http://api.test/logs/house?page=2&limit=10&responsible=Carla&affected=Luis&actionIds=empl-001&startDate=2026-05-10&endDate=2026-05-10",
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
@@ -90,5 +96,32 @@ describe("logsService", () => {
     await expect(getHouseLogsService({ page: 0, limit: 10 })).rejects.toThrow(
       "Parámetros inválidos",
     );
+  });
+
+  it("obtiene las acciones disponibles para el filtro", async () => {
+    localStorage.setItem("token", "token-test");
+    secureFetch.mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        success: true,
+        data: [{ actionId: "empl-001", description: "Empleado creado" }],
+      }),
+    });
+
+    const result = await getLogsActionsService();
+
+    expect(secureFetch).toHaveBeenCalledWith(
+      "http://api.test/logs/actions",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: "Bearer token-test",
+          "Content-Type": "application/json",
+        }),
+      }),
+    );
+    expect(result).toEqual([
+      { actionId: "empl-001", description: "Empleado creado" },
+    ]);
   });
 });
