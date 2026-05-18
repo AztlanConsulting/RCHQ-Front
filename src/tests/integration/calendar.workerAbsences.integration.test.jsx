@@ -18,6 +18,7 @@ vi.mock("../../services/calendarService", () => ({
   getEventsTypes: vi.fn(),
   getHouseEmployees: vi.fn(),
   updateAbsenceService: vi.fn(),
+  getCalendarViewerRole: vi.fn(),
   buildAbsenceEvidenceUrl: vi.fn((link) => link),
 }));
 

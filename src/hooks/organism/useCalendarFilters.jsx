@@ -31,21 +31,21 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
-const getPersonalEventTitle = (event, scope) => {
+const getPersonalEventTitle = (event, focus) => {
     const rawName = String(event.name ?? "").trim();
     const rawType = String(event.type ?? "").trim();
 
-    const capitalLetterScope = scope.toLowerCase() === "ausencias" ? "Ausencia" : "Vacación"
+    const capitalLetterFocus = focus.toLowerCase() === "ausencias" ? "Ausencia" : "Vacación"
 
-    if (!rawName || rawName.toLowerCase() === scope) {
-        return rawType ? `${capitalLetterScope} ${rawType}` : capitalLetterScope;
+    if (!rawName || rawName.toLowerCase() === focus.toLowerCase() || capitalLetterFocus === rawName) {
+        return rawType ? `${capitalLetterFocus} ${rawType}` : capitalLetterFocus;
     }
 
-    if (rawName.toLowerCase().startsWith(scope)) {
+    if (rawName.toLowerCase().startsWith(focus)) {
         return rawName;
     }
 
-    return `${capitalLetterScope} ${rawType}`;
+    return `${capitalLetterFocus} ${rawType} de ${rawName}`;
 };
 
 const toDateOnly = (value) => {
@@ -179,7 +179,7 @@ const getFilteredEvents = (
 
             return {
                 id: String(idx),
-                title: rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones"
+                title: (rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones")
                     ? getPersonalEventTitle(rawEvent, rawEvent.focus)
                     : rawEvent.name,
                 start: eventStart,

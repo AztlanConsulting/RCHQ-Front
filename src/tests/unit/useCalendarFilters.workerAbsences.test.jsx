@@ -59,6 +59,8 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       },
     ];
 
+    console.log(events);
+
     const { result } = renderHook(() =>
       useCalendarFilters(events, {
         isList: false,

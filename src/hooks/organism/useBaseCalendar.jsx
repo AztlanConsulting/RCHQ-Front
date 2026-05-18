@@ -50,32 +50,21 @@ export const useBaseCalendar = () => {
     );
 
     const filteredCalendarEvents = useMemo(() => {
-        if (isCoordinator) {
-            if (calendarMode === "personal") {
-                return allEvents.filter(
-                    (event) =>
-                        (event.focus === "ausencias" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)) ||
-                        (event.focus === "vacaciones" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)) ||
-                        (event.focus === "eventos" &&
-                            (event.scope === "house" ||
-                                event.scope === "global")) ||
-                        (event.scope === "personal" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)),
-                );
-            }
-
-            return allEvents;
-        }
-
-        if (!canSwitchCalendarMode || calendarMode === "personal") {
+        if (calendarMode === "personal") {
             return allEvents.filter(
                 (event) =>
-                    !(event.focus === "ausencias" && event.scope === "house"),
+                    (event.focus === "ausencias" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "vacaciones" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "eventos" &&
+                        (event.scope === "house" ||
+                            event.scope === "global")) ||
+                    (event.scope === "personal" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)),
             );
         }
 
@@ -83,9 +72,7 @@ export const useBaseCalendar = () => {
     }, [
         allEvents,
         calendarMode,
-        canSwitchCalendarMode,
         effectiveEmployeeId,
-        isCoordinator,
     ]);
 
     const getCorrespondingView = (isList, viewType) => {
