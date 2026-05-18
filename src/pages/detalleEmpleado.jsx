@@ -141,8 +141,8 @@ const DetalleEmpleado = () => {
           <button
             type="button"
             onClick={openModal}
-            className="ml-auto shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold
-              text-white hover:bg-red-700 active:bg-red-800 transition-colors"
+            className="ml-auto shrink-0 rounded-lg bg-[#9b1c1c] px-4 py-2 text-sm font-semibold
+              text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
           >
             Dar de baja
           </button>
