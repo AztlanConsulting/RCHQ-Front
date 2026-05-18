@@ -19,13 +19,16 @@ const ButtonGroup = ({ options = [], value, onChange, disabled = false }) => {
             aria-label="Seleccionar categoría"
             style={{
                 display: "flex",
-                overflow: "hidden",
+                overflowX: "auto",
+                overflowY: "hidden",
                 background: "#f8fafc",
                 borderRadius: "16px",
                 border: "1px solid #d1d5db",
                 width: "100%",
                 boxSizing: "border-box",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.18)",
+                scrollbarWidth: "thin",
+                WebkitOverflowScrolling: "touch",
             }}
         >
             {options.map((opt, index) => {
@@ -43,7 +46,7 @@ const ButtonGroup = ({ options = [], value, onChange, disabled = false }) => {
                         disabled={disabled}
                         onClick={() => !disabled && onChange?.(opt.value)}
                         style={{
-                            flex: "1 1 0",
+                            flex: "1 0 64px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",

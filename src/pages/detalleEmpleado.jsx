@@ -32,7 +32,7 @@ const DetalleEmpleado = () => {
   const {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses,
+    roles,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
@@ -144,17 +144,16 @@ const DetalleEmpleado = () => {
             employeeVacationRequests={employeeVacationRequests}
             employeeFaults={employeeFaults}
             workdaysDrawer={workdaysDrawer}
-            isEditing={editSection === "admin"}
+            isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
             roles={roles}
-            houses={houses}
             frecuentPaymentTypes={frecuentPaymentTypes}
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
             saving={saving}
-            saveError={editSection === "admin" ? saveError : null}
+            saveError={editSection === "Administrador" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}

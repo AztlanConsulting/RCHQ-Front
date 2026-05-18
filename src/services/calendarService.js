@@ -95,6 +95,36 @@ export const getAbsenceTypes = async () => {
     return response?.data?.absenceTypes ?? [];
 };
 
+export const getAbsenceAddData = async () => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(`${API_URL}/absence/add`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const response = await rawResponse.json().catch(() => ({}));
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener los datos para registrar ausencias",
+        );
+    }
+
+    return {
+        employees: response?.data?.employees ?? [],
+        absenceTypes: response?.data?.absenceTypes ?? [],
+    };
+};
+
 export const getHouseEmployees = async () => {
     const token = getToken();
 
@@ -189,6 +219,69 @@ export const getHouseEventsInRange = async (startDate, endDate) => {
     const rawEvents = response?.data?.events ?? [];
 
     return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
+};
+
+export const createAbsenceService = async (employeeId, payload) => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const hasFile =
+        typeof File !== "undefined" && payload?.file instanceof File;
+    let headers = {
+        Authorization: `Bearer ${token}`,
+    };
+    let body;
+
+    if (hasFile) {
+        const formData = new FormData();
+
+        Object.entries(payload ?? {}).forEach(([key, value]) => {
+            if (key === "file") return;
+            if (value === undefined || value === null) return;
+            formData.append(key, value);
+        });
+
+        formData.append("file", payload.file);
+        body = formData;
+    } else {
+        headers = {
+            ...headers,
+            "Content-Type": "application/json",
+        };
+        body = JSON.stringify({
+            absenceTypeId: payload.absenceTypeId,
+            startDate: payload.startDate,
+            endDate: payload.endDate,
+            description: payload.description,
+        });
+    }
+
+    const rawResponse = await secureFetch(
+        `${API_URL}/absence/${employeeId}/add`,
+        {
+            method: "POST",
+            headers,
+            body,
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            {
+                ...response,
+                message: response?.message || response?.error,
+            },
+            "No se pudo registrar la ausencia",
+        );
+    }
+
+    return response?.data?.absence;
 };
 
 export const updateAbsenceService = async (absenceId, payload) => {

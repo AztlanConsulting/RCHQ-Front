@@ -28,8 +28,8 @@ export const useBaseCalendar = () => {
         [viewerRole],
     );
 
-    const canViewHouseEvents = (role) =>
-        role === "Admin" || role === "Coordinador";
+    const canViewHouseAbsences = (role) =>
+        role === "Administrador" || role === "Coordinador";
 
     const isCoordinator = useMemo(
         () => effectiveViewerRole === "Coordinador",

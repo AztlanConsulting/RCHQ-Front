@@ -4,6 +4,7 @@ import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
 import {
   getAbsenceTypes,
+  getCalendarViewerRole,
   getEventsTypes,
   getHouseEmployees,
   updateAbsenceService,
@@ -15,6 +16,7 @@ vi.mock("../../hooks/organism/useBaseCalendar", () => ({
 
 vi.mock("../../services/calendarService", () => ({
   getAbsenceTypes: vi.fn(),
+  getCalendarViewerRole: vi.fn(() => "Trabajador"),
   getEventsTypes: vi.fn(),
   getHouseEmployees: vi.fn(),
   updateAbsenceService: vi.fn(),
@@ -105,6 +107,7 @@ const setWorkerCalendar = ({
 describe("Integración: trabajador consulta sus ausencias", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getCalendarViewerRole.mockReturnValue("Trabajador");
     getEventsTypes.mockResolvedValue([{ name: "General" }]);
     getAbsenceTypes.mockResolvedValue([
       { absenceTypeId: "type-medica", name: "Médica" },
