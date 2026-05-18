@@ -330,6 +330,7 @@ export const useCalendarPage = ({
     absenceDeleteError,
     isLoadingWhileDeleting,
     alert,
+    setAlert,
     absenceEvidenceFileName,
     absenceEvidenceError,
     closeDetail,
