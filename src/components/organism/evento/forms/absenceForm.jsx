@@ -4,7 +4,7 @@ import Alert from "../../../atoms/alerts";
 import Button from "../../../atoms/button";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
-import { DocumentFileField } from "../../../molecules/documentsUploads";
+import DocumentFileField from "../../../molecules/documentFileField";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useAbsenceForm } from "../../../../hooks/pages/useAbsenceForm";
