@@ -75,7 +75,9 @@ export const usePersonalForm = ({
                     query ? { search: query } : {},
                 );
                 setEmployees(results);
-            } catch {}
+            } catch (error) {
+                console.error(error);
+            }
         },
         [isCoordinator],
     );
@@ -168,7 +170,10 @@ export const usePersonalForm = ({
         try {
             const response = await createPersonalEvent(payload);
 
-            if (!response.success && response.data?.overlappedEmployees?.length) {
+            if (
+                !response.success &&
+                response.data?.overlappedEmployees?.length
+            ) {
                 setOverlapState({
                     show: true,
                     overlappedEmployees: response.data.overlappedEmployees,
@@ -196,7 +201,9 @@ export const usePersonalForm = ({
         const validated = validate();
         if (!validated) return;
 
-        await submitPayload(buildPersonalPayload({ ...validated, forceOverlap: false }));
+        await submitPayload(
+            buildPersonalPayload({ ...validated, forceOverlap: false }),
+        );
     };
 
     const handleForceOverlap = async () => {
