@@ -1,6 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import { formatEventDate } from "../../../utils/dates";
 
 const DetailLabel = ({ children, className = "" }) => (
   <Type

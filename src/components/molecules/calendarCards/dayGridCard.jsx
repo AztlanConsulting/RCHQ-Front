@@ -1,15 +1,4 @@
-const DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
-
-const getStartHour = (timestamp) => {
-  if (timestamp == null) return "";
-  const base =
-    timestamp instanceof Date ? new Date(timestamp.getTime()) : new Date(timestamp);
-  if (Number.isNaN(base.getTime())) return "";
-  const shifted = new Date(base.getTime() + DISPLAY_OFFSET_MS);
-  const h = shifted.getHours();
-  const m = shifted.getMinutes();
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-};
+import { getStartHour } from "@/utils/dates";
 
 const DayGridCard = ({ arg }) => {
   const start = arg.event.start;

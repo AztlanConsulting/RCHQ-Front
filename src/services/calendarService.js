@@ -1,6 +1,7 @@
 import { getToken, getStoredUser } from "../utils/authStorage";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
+import { shiftCalendarApiInstantForFullCalendar } from "../utils/dates";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -8,12 +9,28 @@ const normalizeCalendarEvent = (event) => {
     const isAbsence = event?.focus === "ausencias" || event?.absenceId;
     const evidencePath = isAbsence ? event?.link || event?.url || "" : "";
 
-    return {
+    const base = {
         ...event,
         link: evidencePath
             ? `${API_URL}/${String(evidencePath).replace(/^\/+/, "")}`
             : "",
     };
+
+    if (!event?.lastsAllDay) {
+        return {
+            ...base,
+            start:
+                base.start != null
+                    ? shiftCalendarApiInstantForFullCalendar(base.start)
+                    : base.start,
+            end:
+                base.end != null
+                    ? shiftCalendarApiInstantForFullCalendar(base.end)
+                    : base.end,
+        };
+    }
+
+    return base;
 };
 
 const parseJwtPayload = (token) => {
