@@ -8,7 +8,10 @@ const ALLOWED_TYPES = [
 ];
 const MAX_SIZE = 10 * 1024 * 1024;
 
-export const useDocumentFile = () => {
+export const useDocumentFile = ({
+  invalidTypeMessage = "Solo se permiten archivos PDF, PNG o JPG.",
+  maxSizeMessage = "El archivo no puede superar los 10 MB.",
+} = {}) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
@@ -18,13 +21,13 @@ export const useDocumentFile = () => {
     if (!selected) return;
 
     if (!ALLOWED_TYPES.includes(selected.type)) {
-      setError("Solo se permiten archivos PDF, PNG o JPG.");
+      setError(invalidTypeMessage);
       setFile(null);
       setFileName("");
       return;
     }
     if (selected.size > MAX_SIZE) {
-      setError("El archivo no puede superar los 10 MB.");
+      setError(maxSizeMessage);
       setFile(null);
       setFileName("");
       return;
@@ -33,7 +36,7 @@ export const useDocumentFile = () => {
     setError("");
     setFile(selected);
     setFileName(selected.name);
-  }, []);
+  }, [invalidTypeMessage, maxSizeMessage]);
 
   const reset = useCallback(() => {
     setFile(null);
