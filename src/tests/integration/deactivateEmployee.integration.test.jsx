@@ -68,15 +68,17 @@ describe("Integración: Dar de baja a un empleado", () => {
     expect(await screen.findByText(/Estás a punto de dar de baja a "María Gómez"/i)).toBeInTheDocument();
   };
 
-  it("valida el formulario y muestra error si la razón está vacía", async () => {
+  it("permite enviar el formulario con la razón vacía delegando la validación al backend", async () => {
+    deactivateEmployeeService.mockResolvedValueOnce({ success: true });
     await renderAndOpenModal();
     
     // Clic en enviar sin escribir razón
-    fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
+    });
 
-    // Zod debería fallar y mostrar el error
-    expect(await screen.findByText('El campo "Razón" no debe estar vacío.')).toBeInTheDocument();
-    expect(deactivateEmployeeService).not.toHaveBeenCalled();
+    // Al quitar la restricción min(1), el servicio se debe llamar correctamente
+    expect(deactivateEmployeeService).toHaveBeenCalledWith(employeeId, "", false);
   });
 
   it("envía la petición correctamente sin activar lista negra", async () => {

@@ -48,7 +48,7 @@ describe("Prueba Unitaria: ReasonCard", () => {
   it("muestra los errores de validación si existen", () => {
     render(<ReasonCard {...defaultProps} fieldError="La razón es obligatoria" />);
     expect(screen.getByText("La razón es obligatoria")).toBeInTheDocument();
-    expect(screen.getByText("La razón es obligatoria")).toHaveClass("text-red-500");
+    expect(screen.getByText("La razón es obligatoria")).toHaveClass("text-[#9b1c1c]");
   });
 
   it("llama a onSubmit al hacer clic en 'Dar de baja'", () => {
