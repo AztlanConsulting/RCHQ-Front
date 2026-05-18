@@ -40,6 +40,22 @@ describe("Modal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("aplica una clase personalizada al backdrop", () => {
+    render(
+      <Modal
+        open
+        onClose={vi.fn()}
+        title="Detalle"
+        backdropClassName="bg-slate-900/35"
+      >
+        <div>Contenido</div>
+      </Modal>,
+    );
+
+    const overlay = document.querySelector(".bg-slate-900\\/35");
+    expect(overlay).toBeInTheDocument();
+  });
+
   it("llama a onClose cuando se presiona Escape", () => {
     const onClose = vi.fn();
 

@@ -153,4 +153,50 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
     expect(result.current.visibleEvents[0].extendedProps.absenceId)
       .toBe("with-evidence");
   });
+
+  it("mantiene seleccionados por defecto los nuevos tipos de ausencia mientras el usuario no cambie el filtro", async () => {
+    getAbsenceTypes.mockResolvedValue([]);
+
+    const initialEvents = [
+      buildAbsence({
+        absenceId: "medica",
+        absenceTypeId: "type-medica",
+        type: "Médica",
+      }),
+    ];
+
+    const nextEvents = [
+      ...initialEvents,
+      buildAbsence({
+        absenceId: "personal",
+        absenceTypeId: "type-personal",
+        type: "Personal",
+        startDate: "2026-05-12",
+        endDate: "2026-05-12",
+      }),
+    ];
+
+    const { result, rerender } = renderHook(
+      ({ events }) =>
+        useCalendarFilters(events, {
+          isList: false,
+          viewerRole: "Psicóloga",
+        }),
+      { initialProps: { events: initialEvents } },
+    );
+
+    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+    expect(result.current.absenceTypeFilters).toEqual(["médica"]);
+
+    rerender({ events: nextEvents });
+
+    await waitFor(() => {
+      expect(result.current.absenceTypeFilters).toEqual(["médica", "personal"]);
+    });
+    await waitFor(() => {
+      expect(
+        result.current.visibleEvents.map((event) => event.extendedProps.absenceId),
+      ).toEqual(expect.arrayContaining(["medica", "personal"]));
+    });
+  });
 });
