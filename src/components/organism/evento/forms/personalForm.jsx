@@ -104,9 +104,7 @@ const PersonalForm = (props) => {
                 options={eventTypes}
             />
 
-            {errors.eventTypeId && (
-                <ErrorText>{errors.eventTypeId}</ErrorText>
-            )}
+            {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
 
             {isCoordinator && (
                 <EmployeeSearchSelect
@@ -155,7 +153,13 @@ const PersonalForm = (props) => {
                 />
             )}
 
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "8px",
+                }}
+            >
                 <Button
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}

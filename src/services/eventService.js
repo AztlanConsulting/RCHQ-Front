@@ -1,9 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
+import { secureFetch } from "../utils/secureFetchWrapper";
 
 export async function createHouseEvent(payload) {
     const token = getAuthToken();
 
-    const response = await fetch(`${BASE_URL}/event/house/add`, {
+    const response = await secureFetch(`${BASE_URL}/event/house/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -28,7 +29,7 @@ export async function createHouseEvent(payload) {
 export async function getEventTypes() {
     const token = getAuthToken();
 
-    const response = await fetch(`${BASE_URL}/event/getAllTypes`, {
+    const response = await secureFetch(`${BASE_URL}/event/getAllTypes`, {
         headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
@@ -48,7 +49,7 @@ export async function getEmployeesForSelector(params = {}) {
     const query = new URLSearchParams(params).toString();
     const url = `${BASE_URL}/event/personal/employees${query ? `?${query}` : ""}`;
 
-    const response = await fetch(url, {
+    const response = await secureFetch(url, {
         headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
@@ -70,7 +71,7 @@ export async function getEmployeesForSelector(params = {}) {
 export async function createPersonalEvent(payload) {
     const token = getAuthToken();
 
-    const response = await fetch(`${BASE_URL}/event/personal/add`, {
+    const response = await secureFetch(`${BASE_URL}/event/personal/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
