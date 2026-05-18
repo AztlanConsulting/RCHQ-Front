@@ -65,7 +65,7 @@ const VacationRequests = () => {
     };
 
     return (
-        <div className="p-8 bg-white min-h-screen">
+        <div className="p-8 md:flex md:flex-col md:h-full">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
                     {isPendingView
