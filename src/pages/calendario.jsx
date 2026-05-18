@@ -16,7 +16,7 @@ import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 const isManagementRole = (role) => role === "Administrador" || role === "Coordinador";
 
 const Calendario = () => {
-  const calendarRef = useRef(null);
+    const calendarRef = useRef(null);
 
     const {
         employeeHouseName,
@@ -94,6 +94,7 @@ const Calendario = () => {
         absenceDeleteError,
         isLoadingWhileDeleting,
         alert,
+        setAlert,
         absenceEvidenceFileName,
         absenceEvidenceError,
         closeDetail,
@@ -110,7 +111,7 @@ const Calendario = () => {
         submitAbsenceEdit,
         showCalendarAlert,
         clearCalendarAlert,
-      } = useCalendarPage({
+    } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
         viewerRole,
@@ -118,169 +119,182 @@ const Calendario = () => {
     const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
 
     useEffect(() => {
-      setOwnCalendar();
+        setOwnCalendar();
     }, [setOwnCalendar]);
 
-  const calendarFiltersProps = {
-    houseName: employeeHouseName,
-    focusFilters,
-    setFocusFilters,
-    focusOptions,
-    scopeFilters,
-    setScopeFilters,
-    scopeOptions,
-    eventTypeFilters,
-    setEventTypeFilters,
-    eventTypeOptions,
-    vacationStatusFilters,
-    setVacationStatusFilters,
-    vacationStatusOptions,
-    absenceTypeFilters,
-    setAbsenceTypeFilters,
-    absenceTypeOptions,
-    absenceEmployeeFilters,
-    filteredAbsenceEmployeeOptions,
-    absenceEmployeeSearch,
-    selectedAbsenceEmployeeLabel,
-    setAbsenceEmployeeSearch,
-    toggleAbsenceEmployeeValue,
-    clearAbsenceEmployeeSelection,
-    absenceStatusFilters,
-    setAbsenceStatusFilters,
-    absenceStatusOptions,
-    absenceEvidenceFilters,
-    setAbsenceEvidenceFilters,
-    absenceEvidenceOptions,
-    showEventFilters,
-    showVacationFilters,
-    showAbscenceFilters,
-    viewerRole,
-    calendarMode,
-    onCalendarModeChange: setCalendarMode,
-    calendarModeOptions,
-    canSwitchCalendarMode,
-  };
+    const calendarFiltersProps = {
+        houseName: employeeHouseName,
+        focusFilters,
+        setFocusFilters,
+        focusOptions,
+        scopeFilters,
+        setScopeFilters,
+        scopeOptions,
+        eventTypeFilters,
+        setEventTypeFilters,
+        eventTypeOptions,
+        vacationStatusFilters,
+        setVacationStatusFilters,
+        vacationStatusOptions,
+        absenceTypeFilters,
+        setAbsenceTypeFilters,
+        absenceTypeOptions,
+        absenceEmployeeFilters,
+        filteredAbsenceEmployeeOptions,
+        absenceEmployeeSearch,
+        selectedAbsenceEmployeeLabel,
+        setAbsenceEmployeeSearch,
+        toggleAbsenceEmployeeValue,
+        clearAbsenceEmployeeSelection,
+        absenceStatusFilters,
+        setAbsenceStatusFilters,
+        absenceStatusOptions,
+        absenceEvidenceFilters,
+        setAbsenceEvidenceFilters,
+        absenceEvidenceOptions,
+        showEventFilters,
+        showVacationFilters,
+        showAbscenceFilters,
+        viewerRole,
+        calendarMode,
+        onCalendarModeChange: setCalendarMode,
+        calendarModeOptions,
+        canSwitchCalendarMode,
+    };
 
-  return (
-    <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
-      {alert?.message ? (
-        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2">
-          <Alert
-            type={alert.type}
-            message={alert.message}
-            onClose={clearCalendarAlert}
-          />
+    return (
+        <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
+            {alert?.message ? (
+                <div className="fixed top-30 left-[5%] right-0 z-50 px-4">
+                    <Alert
+                        type={alert.type}
+                        message={alert.message}
+                        onClose={clearCalendarAlert}
+                    />
+                </div>
+            ) : null}
+
+            <CalendarFiltersModal
+                open={filtersModalOpen}
+                onClose={() => setFiltersModalOpen(false)}
+                {...calendarFiltersProps}
+            />
+
+            <CalendarFilters
+                {...calendarFiltersProps}
+                className="mb-auto hidden w-full shrink-0 sm:min-w-0 lg:flex lg:basis-64 lg:max-w-xs xl:basis-1/6"
+            />
+
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+                {employeeHouseName ? (
+                    <Type
+                        variant="page-title"
+                        as="h2"
+                        className="mb-0 w-full min-w-0 text-center md:text-left lg:hidden"
+                    >
+                        {employeeHouseName}
+                    </Type>
+                ) : null}
+
+                <BaseCalendar
+                    key={`${viewType}-${isList}`}
+                    initialView={currentCalendarView}
+                    loadButtonsAtStart={loadButtonsAtStart}
+                    calendarRef={calendarRef}
+                    toggleList={toggleList}
+                    setMonthView={setMonthView}
+                    setWeekView={setWeekView}
+                    setDayView={setDayView}
+                    openCreationModal={openCreationModal}
+                    generateTitle={generateTitle}
+                    getWeekDayName={getWeekDayName}
+                    resizeHandler={resizeHandler}
+                    visibleEvents={visibleEvents}
+                    handleDatesSet={handleDatesSet}
+                    onEventClick={handleEventClick}
+                    onDateDrag={handleDateDrags}
+                    onDateDragging={handleDateDragging}
+                    onOpenCalendarFilters={() => setFiltersModalOpen(true)}
+                />
+            </div>
+
+            <Modal
+                open={selectedEvent != null}
+                onClose={closeDetail}
+                title={
+                    selectedEvent?.focus === "ausencias"
+                        ? null
+                        : "Detalle del evento"
+                }
+                grayBackground={isAbsenceDetailOpen}
+                placement={isAbsenceDetailOpen ? "center" : "right"}
+                className={
+                    selectedEvent?.focus === "ausencias"
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        : "w-[92vw] max-w-[400px] max-h-[80vh]"
+                }
+            >
+                {selectedEvent?.focus === "ausencias" ? (
+                    isManagementRole(viewerRole) ? (
+                        <AbsenceDetail
+                            event={selectedEvent}
+                            isEditing={isAbsenceEditing}
+                            evidenceLabel={absenceEvidenceLabel}
+                            absenceTypeOptions={absenceTypeOptions}
+                            absenceForm={absenceForm}
+                            absenceEditError={absenceEditError}
+                            absenceDeleteError={absenceDeleteError}
+                            absenceEvidenceFileName={absenceEvidenceFileName}
+                            absenceEvidenceError={absenceEvidenceError}
+                            isSaving={isSavingAbsence}
+                            isDeleteOpen={isDeleteAbsenceOpen}
+                            isLoadingWhileDeleting={isLoadingWhileDeleting}
+                            canManageAbsence={isManagementRole(viewerRole)}
+                            onOpenEvidence={openAbsenceEvidence}
+                            onStartEdit={startAbsenceEdit}
+                            onCancelEdit={cancelAbsenceEdit}
+                            onSubmitEdit={submitAbsenceEdit}
+                            onOpenDelete={openDeleteAbsence}
+                            onCancelDelete={cancelDeleteAbsence}
+                            onConfirmDelete={confirmDeleteAbsence}
+                            onAbsenceFieldChange={setAbsenceField}
+                            onAbsenceEvidenceChange={
+                                handleAbsenceEvidenceChange
+                            }
+                        />
+                    ) : (
+                        <WorkerAbsenceDetail
+                            event={selectedEvent}
+                            evidenceLabel={absenceEvidenceLabel}
+                            onOpenEvidence={openAbsenceEvidence}
+                            onClose={closeDetail}
+                        />
+                    )
+                ) : (
+                    <EventDetail event={selectedEvent} />
+                )}
+            </Modal>
+
+            <RegisterHouseEventModal
+                isOpen={selectedDates != null}
+                onClose={() => closeCreationModal(calendarRef)}
+                onSuccess={() => {
+                    closeCreationModal(calendarRef);
+                    reloadCurrentRange();
+                    setAlert({
+                        type: "success",
+                        message: "Evento creado exitosamente",
+                    });
+                }}
+                initialStartDate={
+                    selectedDates?.startDate?.toISOString().split("T")[0]
+                }
+                initialEndDate={
+                    selectedDates?.endDate?.toISOString().split("T")[0]
+                }
+            />
         </div>
-      ) : null}
-
-      <CalendarFiltersModal
-        open={filtersModalOpen}
-        onClose={() => setFiltersModalOpen(false)}
-        {...calendarFiltersProps}
-      />
-
-      <CalendarFilters
-        {...calendarFiltersProps}
-        className="mb-auto hidden w-full shrink-0 sm:min-w-0 lg:flex lg:basis-64 lg:max-w-xs xl:basis-1/6"
-      />
-
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        {employeeHouseName ? (
-          <Type
-            variant="page-title"
-            as="h2"
-            className="mb-0 w-full min-w-0 text-center md:text-left lg:hidden"
-          >
-            {employeeHouseName}
-          </Type>
-        ) : null}
-
-        <BaseCalendar
-          key={`${viewType}-${isList}`}
-          initialView={currentCalendarView}
-          loadButtonsAtStart={loadButtonsAtStart}
-          calendarRef={calendarRef}
-          toggleList={toggleList}
-          setMonthView={setMonthView}
-          setWeekView={setWeekView}
-          setDayView={setDayView}
-          openCreationModal={openCreationModal}
-          generateTitle={generateTitle}
-          getWeekDayName={getWeekDayName}
-          resizeHandler={resizeHandler}
-          visibleEvents={visibleEvents}
-          handleDatesSet={handleDatesSet}
-          onEventClick={handleEventClick}
-          onDateDrag={handleDateDrags}
-          onDateDragging={handleDateDragging}
-          onOpenCalendarFilters={() => setFiltersModalOpen(true)}
-        />
-      </div>
-
-      <Modal
-        open={selectedEvent != null}
-        onClose={closeDetail}
-        title={selectedEvent?.focus === "ausencias" ? null : "Detalle del evento"}
-        grayBackground={isAbsenceDetailOpen}
-        placement={isAbsenceDetailOpen ? "center" : "right"}
-        className={
-          selectedEvent?.focus === "ausencias"
-            ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
-            : "w-[92vw] max-w-[400px] max-h-[80vh]"
-        }
-      >
-        {selectedEvent?.focus === "ausencias" ? (
-          isManagementRole(viewerRole) ? (
-            <AbsenceDetail
-              event={selectedEvent}
-              isEditing={isAbsenceEditing}
-              evidenceLabel={absenceEvidenceLabel}
-              absenceTypeOptions={absenceTypeOptions}
-              absenceForm={absenceForm}
-              absenceEditError={absenceEditError}
-              absenceDeleteError={absenceDeleteError}
-              absenceEvidenceFileName={absenceEvidenceFileName}
-              absenceEvidenceError={absenceEvidenceError}
-              isSaving={isSavingAbsence}
-              isDeleteOpen={isDeleteAbsenceOpen}
-              isLoadingWhileDeleting={isLoadingWhileDeleting}
-              canManageAbsence={isManagementRole(viewerRole)}
-              onOpenEvidence={openAbsenceEvidence}
-              onStartEdit={startAbsenceEdit}
-              onCancelEdit={cancelAbsenceEdit}
-              onSubmitEdit={submitAbsenceEdit}
-              onOpenDelete={openDeleteAbsence}
-              onCancelDelete={cancelDeleteAbsence}
-              onConfirmDelete={confirmDeleteAbsence}
-              onAbsenceFieldChange={setAbsenceField}
-              onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
-            />
-          ) : (
-            <WorkerAbsenceDetail
-              event={selectedEvent}
-              evidenceLabel={absenceEvidenceLabel}
-              onOpenEvidence={openAbsenceEvidence}
-              onClose={closeDetail}
-            />
-          )
-        ) : (
-          <EventDetail event={selectedEvent} />
-        )}
-      </Modal>
-
-      <RegisterHouseEventModal
-        isOpen={selectedDates != null}
-        onClose={() => closeCreationModal(calendarRef)}
-        onSuccess={() => {
-          closeCreationModal(calendarRef);
-          reloadCurrentRange();
-        }}
-        onFeedback={showCalendarAlert}
-        initialStartDate={selectedDates?.startDate?.toISOString().split("T")[0]}
-        initialEndDate={selectedDates?.endDate?.toISOString().split("T")[0]}
-      />
-    </div>
-  );
+    );
 };
 
 export default Calendario;
