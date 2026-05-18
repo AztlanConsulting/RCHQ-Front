@@ -8,9 +8,11 @@ import ChangePasswordModal from "../components/organism/changePasswordModal";
 import eye from "/showEye.svg";
 import hideEye from "/hideEye.svg";
 import { useTwoFactorAuthOptions } from "../hooks/organism/useMoreOptions";
+import { useAuthContext } from "../context/authContext";
 
 const MoreOptions = () => {
   const navigate = useNavigate();
+  const { user } = useAuthContext();
   const {
     showTwoFactorAuthModal,
     showDisableModal,
@@ -82,7 +84,7 @@ const MoreOptions = () => {
               />
             }
             label="Documentos"
-            onClick={() => navigate("/app/documentos")}
+            onClick={() => navigate(`/app/${user?.id}/documentos`)}
           />
           <OptionCard
             icon={
