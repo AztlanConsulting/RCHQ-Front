@@ -1,11 +1,13 @@
 import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
 import ButtonGroup from "../../molecules/buttonGroup";
+import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
 import PersonalForm from "./forms/personalForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 
 const CATEGORY_FORMS = {
+    ausencias: AusenciaForm,
     casa: CasaForm,
     personal: PersonalForm,
 };
@@ -14,6 +16,7 @@ const RegisterEventModal = ({
     isOpen,
     onClose,
     onSuccess,
+    onFeedback,
     initialStartDate,
     initialEndDate,
 }) => {
@@ -32,6 +35,8 @@ const RegisterEventModal = ({
     } = useRegisterEventModal(isOpen, CATEGORY_FORMS);
 
     if (!isOpen) return null;
+
+    const shouldShowNameField = effectiveCategoryKey !== "ausencias";
 
     return (
         <>
@@ -56,8 +61,9 @@ const RegisterEventModal = ({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "16px",
+                    padding: "12px",
                     pointerEvents: "none",
+                    overflowY: "auto",
                 }}
             >
                 <div
@@ -79,27 +85,41 @@ const RegisterEventModal = ({
                         gap: "16px",
                     }}
                 >
-                    <div style={{ flexShrink: 0 }}>
-                        <TextField
-                            id="event-name"
-                            placeholder="Agregar título"
-                            value={name}
-                            setValue={handleNameChange}
-                            maxLength={70}
-                        />
+                    {shouldShowNameField ? (
+                        <div>
+                            <TextField
+                                id="event-name"
+                                placeholder="Agregar título"
+                                value={name}
+                                setValue={handleNameChange}
+                                maxLength={70}
+                            />
 
-                        {nameError && (
-                            <p
-                                style={{
-                                    margin: "4px 0 0",
-                                    fontSize: "12px",
-                                    color: "#dc2626",
-                                }}
-                            >
-                                {nameError}
-                            </p>
-                        )}
-                    </div>
+                            {nameError && (
+                                <p
+                                    style={{
+                                        margin: "4px 0 0",
+                                        fontSize: "12px",
+                                        color: "#dc2626",
+                                    }}
+                                >
+                                    {nameError}
+                                </p>
+                            )}
+                        </div>
+                    ) : (
+                        <h2
+                            style={{
+                                margin: 0,
+                                color: "#121212",
+                                fontSize: "28px",
+                                fontWeight: 800,
+                                lineHeight: 1.15,
+                            }}
+                        >
+                            Ausencias
+                        </h2>
+                    )}
 
                     <div style={{ flexShrink: 0 }}>
                         <ButtonGroup
@@ -130,6 +150,7 @@ const RegisterEventModal = ({
                                     isOpen={isOpen}
                                     onClose={onClose}
                                     onSuccess={onSuccess}
+                                    onFeedback={onFeedback}
                                     initialStartDate={initialStartDate}
                                     initialEndDate={initialEndDate}
                                     onNameError={setNameError}

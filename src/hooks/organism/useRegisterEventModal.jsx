@@ -43,10 +43,12 @@ export const useRegisterEventModal = (isOpen, categoryForms) => {
     const viewerRole = getCalendarViewerRole();
 
     const visibleCategoryOptions = useMemo(() => {
-        return CATEGORY_OPTIONS.filter((option) =>
-            canViewCategory(option, viewerRole),
+        return CATEGORY_OPTIONS.filter(
+            (option) =>
+                categoryForms?.[option.value] &&
+                canViewCategory(option, viewerRole),
         );
-    }, [viewerRole]);
+    }, [categoryForms, viewerRole]);
 
     const visibleCategoryValues = visibleCategoryOptions.map(
         ({ value }) => value,

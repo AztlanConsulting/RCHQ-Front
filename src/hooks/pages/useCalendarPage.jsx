@@ -93,6 +93,14 @@ export const useCalendarPage = ({
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
+  const showCalendarAlert = useCallback((nextAlert) => {
+    setAlert(nextAlert);
+  }, []);
+
+  const clearCalendarAlert = useCallback(() => {
+    setAlert(null);
+  }, []);
+
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
     selectedEventRef.current = detail;
@@ -318,7 +326,7 @@ export const useCalendarPage = ({
     } finally {
       setIsLoadingWhileDeleting(false);
     }
-  }, [closeDetail, reloadCurrentRange, selectedEvent?.absenceId]);
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
 
   return {
     selectedEvent,
@@ -344,6 +352,7 @@ export const useCalendarPage = ({
     setAbsenceField,
     handleAbsenceEvidenceChange,
     submitAbsenceEdit,
-    clearCalendarAlert: () => setAlert(null),
+    showCalendarAlert,
+    clearCalendarAlert,
   };
 };
