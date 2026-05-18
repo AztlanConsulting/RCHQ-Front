@@ -84,7 +84,7 @@ const MoreOptions = () => {
               />
             }
             label="Documentos"
-            onClick={() => navigate(`/app/${user?.id}/documentos`)}
+            onClick={() => navigate(`/app/${user?.employeeId}/documentos`)}
           />
           <OptionCard
             icon={
