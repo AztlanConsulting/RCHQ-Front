@@ -285,6 +285,74 @@ svg {
     color: #fff;
 }
 
+.fc-dayTimeCard {
+    width: 100%;
+    min-width: 0;
+    cursor: pointer;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    color: #fff;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+}
+
+.fc-dayTimeCard-titleRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 0.125rem;
+}
+
+.fc-dayTimeCard-title {
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.fc-dayTimeCard-meta {
+    font-weight: 500;
+    opacity: 0.9;
+    min-width: 0;
+}
+
+.fc-dayTimeCard-subtitle {
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    opacity: 0.85;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.fc-dayTimeCard-description {
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    opacity: 0.92;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.fc-dayTimeCard span,
+.fc-dayTimeCard .fc-dayTimeCard-meta,
+.fc-dayTimeCard .fc-dayTimeCard-subtitle,
+.fc-dayTimeCard .fc-dayTimeCard-description {
+    color: #fff;
+}
+
 .fc .fc-daygrid-more-link .fc-dayGridOverflowCard {
     display: block;
     box-sizing: border-box;
