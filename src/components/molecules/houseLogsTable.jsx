@@ -24,7 +24,9 @@ const TruncatedCell = ({ value, widthClassName = "" }) => {
 };
 
 const HouseLogsTable = ({ logs, loading, error }) => {
-  if (loading) {
+  const hasLogs = logs.length > 0;
+
+  if (loading && !hasLogs) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-8 text-center text-gray-500">
@@ -44,7 +46,7 @@ const HouseLogsTable = ({ logs, loading, error }) => {
     );
   }
 
-  if (logs.length === 0) {
+  if (!hasLogs) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-8 text-center text-gray-500">
@@ -55,7 +57,14 @@ const HouseLogsTable = ({ logs, loading, error }) => {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="relative overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+      {loading ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
+          <div className="rounded-lg bg-white/95 px-4 py-3 text-sm font-semibold text-[#24375e] shadow-sm">
+            Actualizando registros...
+          </div>
+        </div>
+      ) : null}
       <table className="w-full">
         <thead className="border-b border-gray-200 bg-gray-100">
           <tr>
