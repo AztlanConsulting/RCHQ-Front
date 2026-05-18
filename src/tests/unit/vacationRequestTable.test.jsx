@@ -1,11 +1,33 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import VacationRequestTable from "../../components/molecules/vacationRequestTable";
 
 vi.mock("../../components/molecules/vacationRequestRow", () => ({
-    default: ({ request }) => (
+    default: ({
+        request,
+        view,
+        approvingRequestId,
+        onViewDetail,
+        onOpenApproveModal,
+    }) => (
         <tr>
             <td>{request.employee.fullName}</td>
+            <td>{view}</td>
+            <td>{approvingRequestId || "sin-aprobacion"}</td>
+            <td>
+                <button
+                    type="button"
+                    onClick={() => onViewDetail(request)}
+                >
+                    Ver mock
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onOpenApproveModal(request)}
+                >
+                    Aprobar mock
+                </button>
+            </td>
         </tr>
     ),
 }));
@@ -26,7 +48,9 @@ describe("VacationRequestTable", () => {
                 requests={[]}
                 view="pending"
                 loading={true}
+                approvingRequestId={null}
                 onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
             />,
         );
 
@@ -39,7 +63,9 @@ describe("VacationRequestTable", () => {
                 requests={requests}
                 view="pending"
                 loading={true}
+                approvingRequestId={null}
                 onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
             />,
         );
 
@@ -53,7 +79,9 @@ describe("VacationRequestTable", () => {
                 requests={[]}
                 view="pending"
                 loading={false}
+                approvingRequestId={null}
                 onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
             />,
         );
 
@@ -68,7 +96,9 @@ describe("VacationRequestTable", () => {
                 requests={requests}
                 view="pending"
                 loading={false}
+                approvingRequestId={null}
                 onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
             />,
         );
 
@@ -88,10 +118,50 @@ describe("VacationRequestTable", () => {
                 requests={requests}
                 view="reviewed"
                 loading={false}
+                approvingRequestId={null}
                 onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
             />,
         );
 
         expect(screen.getByText("Estado")).toBeInTheDocument();
+    });
+
+    it("pasa view y approvingRequestId al row", () => {
+        render(
+            <VacationRequestTable
+                requests={requests}
+                view="pending"
+                loading={false}
+                approvingRequestId="vac-001"
+                onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
+            />,
+        );
+
+        expect(screen.getByText("pending")).toBeInTheDocument();
+        expect(screen.getByText("vac-001")).toBeInTheDocument();
+    });
+
+    it("pasa onViewDetail y onOpenApproveModal al row", () => {
+        const onViewDetail = vi.fn();
+        const onOpenApproveModal = vi.fn();
+
+        render(
+            <VacationRequestTable
+                requests={requests}
+                view="pending"
+                loading={false}
+                approvingRequestId={null}
+                onViewDetail={onViewDetail}
+                onOpenApproveModal={onOpenApproveModal}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: "Ver mock" }));
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar mock" }));
+
+        expect(onViewDetail).toHaveBeenCalledWith(requests[0]);
+        expect(onOpenApproveModal).toHaveBeenCalledWith(requests[0]);
     });
 });
