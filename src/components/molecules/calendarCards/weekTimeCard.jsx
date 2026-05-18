@@ -10,7 +10,7 @@ const WeekTimeCard = ({ arg }) => {
   let timeLine = "";
 
   if (ev.allDay) {
-    timeLine = "Todo el Día";
+    timeLine = "";
   } else if (arg.timeText) {
     timeLine = arg.timeText;
   } else if (start != null && end != null) {
