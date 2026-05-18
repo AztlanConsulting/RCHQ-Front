@@ -37,6 +37,7 @@ const renderEventContent = (arg) => {
 };
 
 const BaseCalendar = ({
+    initialView,
     loadButtonsAtStart,
     calendarRef,
     toggleList,
@@ -68,6 +69,7 @@ const BaseCalendar = ({
     return (
         <FullCalendar
             ref={calendarRef}
+            initialView={initialView}
             plugins={[
                 dayGridPlugin,
                 interactionPlugin,
