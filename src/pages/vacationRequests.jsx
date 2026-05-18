@@ -35,12 +35,14 @@ const VacationRequests = () => {
 
     const [requestToApprove, setRequestToApprove] = useState(null);
     const [approveModalError, setApproveModalError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const isPendingView = view === "pending";
 
     const handleOpenApproveModal = (request) => {
         clearError();
         setApproveModalError("");
+        setSuccessMessage("");
         setRequestToApprove(request);
     };
 
@@ -55,10 +57,12 @@ const VacationRequests = () => {
         if (!requestToApprove?.vacationRequestId) return;
 
         setApproveModalError("");
+        setSuccessMessage("");
 
         try {
             await handleApproveRequest(requestToApprove.vacationRequestId);
             setRequestToApprove(null);
+            setSuccessMessage("Solicitud de vacaciones aprobada con éxito");
         } catch (err) {
             setApproveModalError(err.message || "No se pudo aprobar la solicitud");
         }
@@ -66,6 +70,15 @@ const VacationRequests = () => {
 
     return (
         <div className="p-8 md:flex md:flex-col md:h-full">
+            {successMessage && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+                    <Alert
+                        type="success"
+                        message={successMessage}
+                        onClose={() => setSuccessMessage("")}
+                    />
+                </div>
+            )}
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
                     {isPendingView
