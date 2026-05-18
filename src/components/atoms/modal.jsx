@@ -15,6 +15,7 @@ const Modal = ({
     grayBackground = true,
     placement = "center",
     className = "",
+    backdropClassName = "bg-black/50",
 }) => {
     useEffect(() => {
         if (!open) return;
@@ -47,7 +48,7 @@ const Modal = ({
         >
             {grayBackground ? (
                 <div
-                    className="absolute inset-0 bg-black/50 pointer-events-auto"
+                    className={`absolute inset-0 pointer-events-auto ${backdropClassName}`}
                     onClick={onClose}
                     aria-hidden
                 />
