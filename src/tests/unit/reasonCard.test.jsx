@@ -27,13 +27,22 @@ describe("Prueba Unitaria: ReasonCard", () => {
     expect(screen.getByPlaceholderText("Escribe la razón de la baja...")).toBeInTheDocument();
   });
 
-  it("llama a onReasonChange al escribir en el textarea", () => {
+  it("llama a onReasonChange al escribir texto válido en el textarea", () => {
     render(<ReasonCard {...defaultProps} />);
     const textarea = screen.getByPlaceholderText("Escribe la razón de la baja...");
     
     fireEvent.change(textarea, { target: { value: "Nueva razón" } });
     
     expect(defaultProps.onReasonChange).toHaveBeenCalledWith("Nueva razón");
+  });
+
+  it("no llama a onReasonChange si se escriben caracteres no permitidos", () => {
+    render(<ReasonCard {...defaultProps} />);
+    const textarea = screen.getByPlaceholderText("Escribe la razón de la baja...");
+    
+    fireEvent.change(textarea, { target: { value: "<script>XSS</script>" } });
+    
+    expect(defaultProps.onReasonChange).not.toHaveBeenCalled();
   });
 
   it("llama a onBlacklistChange al hacer clic en la opción de lista negra", () => {

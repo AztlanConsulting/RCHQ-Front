@@ -4,7 +4,7 @@ import {
   deactivateEmployeeService,
 } from "@/services/deactivateEmployeeService";
 
-export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
+export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [addToBlacklist, setAddToBlacklist] = useState(false);
@@ -12,6 +12,13 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openModal = () => {
+    if (!isActive) {
+      setAlert({
+        type: "error",
+        message: "El empleado ya ha sido dado de baja previamente.",
+      });
+      return;
+    }
     setReason("");
     setAddToBlacklist(false);
     setFieldError(null);
@@ -29,6 +36,8 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
     const parsed = deactivateEmployeeSchema.pick({ reason: true }).safeParse({ reason: value });
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0].message);
+    } else if (isActive && !value.trim()) {
+      setFieldError('El campo "Razón" es obligatorio.');
     } else {
       setFieldError(null);
     }
@@ -38,6 +47,11 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
     const parsed = deactivateEmployeeSchema.safeParse({ reason, addToBlacklist });
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0].message);
+      return;
+    }
+
+    if (isActive && !reason.trim()) {
+      setFieldError('El campo "Razón" es obligatorio.');
       return;
     }
 
@@ -51,6 +65,9 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
         type: "success",
         message: `"${employeeName}" ha sido dado de baja${addToBlacklist ? " y agregado a la lista negra." : "."}`,
       });
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       setIsModalOpen(false);
       setAlert({

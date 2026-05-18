@@ -77,6 +77,8 @@ const DetalleEmpleado = () => {
     employeeId,
     employeeFullName,
     setAlert,
+    employee?.isActive !== false,
+    getEmployeeDetail
   );
 
   if (isLoading) return <Loader />;
