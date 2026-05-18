@@ -16,6 +16,16 @@ import {
     STATUS_OPTIONS,
     getFocusOption, getScopeOption,
 } from "../../utils/calendar.utils";
+import { getPersonalEventTitle } from "../../utils/titleGenerator"
+
+const daysBetweenDays = (startDate, endDate) => {
+    const start = toDateOnly(startDate);
+    const end = toDateOnly(endDate);
+
+    const totalDays = Math.round((end - start) / 86400000) + 1;
+
+    return totalDays;
+}
 
 const getVacationStatusValue = (status) => {
     if (status === 1) return "aprobadas";
@@ -31,23 +41,6 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
-const getPersonalEventTitle = (event, focus) => {
-    const rawName = String(event.name ?? "").trim();
-    const rawType = String(event.type ?? "").trim();
-
-    const capitalLetterFocus = focus.toLowerCase() === "ausencias" ? "Ausencia" : "Vacación"
-
-    if (!rawName || rawName.toLowerCase() === focus.toLowerCase() || capitalLetterFocus === rawName) {
-        return rawType ? `${capitalLetterFocus} ${rawType}` : capitalLetterFocus;
-    }
-
-    if (rawName.toLowerCase().startsWith(focus)) {
-        return rawName;
-    }
-
-    return `${capitalLetterFocus} ${rawType} de ${rawName}`;
-};
-
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
@@ -59,7 +52,6 @@ const expandEventsForList = (events = [], isList) => {
 
     events.forEach((event) => {
         if (
-            event.focus !== "ausencias" ||
             !event.startDate ||
             !event.endDate
         ) {
@@ -75,7 +67,7 @@ const expandEventsForList = (events = [], isList) => {
             return;
         }
 
-        const totalDays = Math.round((end - start) / 86400000) + 1;
+        const totalDays = daysBetweenDays(start, end);
 
         for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
             const currentDay = new Date(start);
@@ -149,10 +141,10 @@ const getFilteredEvents = (
             absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e))
         ))
         .map((rawEvent, idx) => {
-            const isAllDay = rawEvent.focus === "ausencias";
+            const isAllDay = rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones";
             const isExpandedListAbsence = Boolean(
                 isList
-                && rawEvent.focus === "ausencias"
+                &&( rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones")
                 && rawEvent.currentDayIndex
                 && rawEvent.totalDays,
             );
@@ -180,7 +172,7 @@ const getFilteredEvents = (
             return {
                 id: String(idx),
                 title: (rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones")
-                    ? getPersonalEventTitle(rawEvent, rawEvent.focus)
+                    ? getPersonalEventTitle(rawEvent)
                     : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,
@@ -212,11 +204,13 @@ const getFilteredEvents = (
                     curp: rawEvent.curp ?? "",
                     usedDays: rawEvent.usedDays,
                     link: rawEvent.focus === "ausencias" ? rawEvent.link ?? "" : "",
-                    startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start,
-                    endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end,
+                    startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start || eventStart,
+                    endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || eventStart,
                     isDeleted: Boolean(rawEvent.isDeleted),
                     currentDayIndex: rawEvent.currentDayIndex,
-                    totalDays: rawEvent.totalDays,
+                    totalDays: rawEvent.totalDays || rawEvent.startDate ? daysBetweenDays(rawEvent.startDate, rawEvent.endDate) : "",
+                    manyDaysStartReadableDate: rawEvent.startDate,
+                    manyDaysEndReadableDate: rawEvent.endDate,
                 },
             };
         });

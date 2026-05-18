@@ -71,12 +71,12 @@ const WorkerAbsenceDetail = ({
 
         <div>
           <DetailLabel>Fecha de inicio:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.startDate)}</DetailValue>
+          <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
         <div>
           <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.endDate)}</DetailValue>
+          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
         </div>
 
         <div className="sm:col-span-2">
