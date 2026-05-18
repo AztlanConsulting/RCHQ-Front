@@ -16,11 +16,7 @@ const DEFAULT_FORM = {
 
 const DATE_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
 const DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!,.\-+#"_]+$/u;
-
-const sanitizeDescription = (value = "") =>
-    String(value)
-        .replace(/[^\p{L}\p{N}\s¿?¡!,.\-+#"_]/gu, "")
-        .slice(0, 200);
+const REQUIRED_FIELD_MESSAGE = "Campo obligatorio";
 
 const normalizeInitialDate = (value) =>
     value ? String(value).slice(0, 10) : "";
@@ -77,11 +73,9 @@ const getSubmitErrorMessage = (error) => {
     }
 
     if (error?.status === 404) {
-        if (message.toLowerCase().includes("tipo")) {
-            return "El tipo de ausencia seleccionado ya no está disponible.";
-        }
+        if (message) return message;
 
-        return "El empleado seleccionado ya no está disponible.";
+        return "usuario no encontrado";
     }
 
     if (error?.status === 406) {
@@ -130,16 +124,19 @@ export const useAbsenceForm = ({
         error: evidenceError,
         handleFileChange: handleEvidenceChange,
         reset: resetEvidence,
-    } = useDocumentFile();
+    } = useDocumentFile({
+        invalidTypeMessage: "Formato invalido de ausencias",
+        maxSizeMessage: "tamaño superior a 10mb",
+    });
 
     useEffect(() => {
         if (!isOpen) return;
 
-        let isEffectActive  = true;
+        let isEffectActive = true;
 
         getAbsenceAddData()
             .then(({ employees = [], absenceTypes = [] }) => {
-                if (!isEffectActive ) return;
+                if (!isEffectActive) return;
 
                 setEmployeeOptions(
                     employees.map((employee) => ({
@@ -158,20 +155,20 @@ export const useAbsenceForm = ({
                 );
             })
             .catch((error) => {
-                if (!isEffectActive ) return;
+                if (!isEffectActive) return;
                 setServerError(
                     error?.message ||
                         "No se pudieron cargar los datos de ausencias",
                 );
             })
             .finally(() => {
-                if (isEffectActive ) {
+                if (isEffectActive) {
                     setIsLoadingOptions(false);
                 }
             });
 
         return () => {
-            isEffectActive  = false;
+            isEffectActive = false;
         };
     }, [isOpen]);
 
@@ -208,7 +205,7 @@ export const useAbsenceForm = ({
     const setField = useCallback(
         (field, value) => {
             const nextValue =
-                field === "description" ? sanitizeDescription(value) : value;
+                field === "description" ? String(value ?? "") : value;
 
             setForm((prev) => ({
                 ...prev,
@@ -228,25 +225,33 @@ export const useAbsenceForm = ({
 
     const validate = useCallback(() => {
         const fieldErrors = {};
-        const description = sanitizeDescription(form.description).trim();
+        const description = String(form.description ?? "").trim();
 
         if (!form.employeeId) {
-            fieldErrors.employeeId = "Selecciona un empleado.";
+            fieldErrors.employeeId = REQUIRED_FIELD_MESSAGE;
         }
 
         if (!form.absenceTypeId) {
-            fieldErrors.absenceTypeId = "Selecciona un tipo de ausencia.";
+            fieldErrors.absenceTypeId = REQUIRED_FIELD_MESSAGE;
         }
 
-        if (!DATE_FORMAT.test(form.startDate)) {
-            fieldErrors.startDate = "Fecha de inicio inválida.";
+        if (!form.startDate) {
+            fieldErrors.startDate = REQUIRED_FIELD_MESSAGE;
+        } else if (String(form.startDate).length !== 10) {
+            fieldErrors.startDate = "El tamaño de la fecha debe ser de 10 caracteres";
+        } else if (!DATE_FORMAT.test(form.startDate)) {
+            fieldErrors.startDate = "Fecha solo puede tener un formato YYYY-MM-DD";
         } else if (form.startDate < dateLimits.minStartDateValue) {
-            fieldErrors.startDate =
+            fieldErrors.startDate = 
                 "Fecha de inicio no puede ser menor a un mes antes del día actual.";
         }
 
-        if (!DATE_FORMAT.test(form.endDate)) {
-            fieldErrors.endDate = "Fecha de fin inválida.";
+        if (!form.endDate) {
+            fieldErrors.endDate = REQUIRED_FIELD_MESSAGE;
+        } else if (String(form.endDate).length !== 10) {
+            fieldErrors.endDate = "El tamaño de la fecha debe ser de 10 caracteres";
+        } else if (!DATE_FORMAT.test(form.endDate)) {
+            fieldErrors.endDate = "Fecha solo puede tener un formato YYYY-MM-DD";
         } else if (form.endDate > dateLimits.maxEndDateValue) {
             fieldErrors.endDate = "Fecha de fin no puede ser mayor a un año.";
         }
@@ -256,15 +261,18 @@ export const useAbsenceForm = ({
             !fieldErrors.endDate &&
             form.endDate < form.startDate
         ) {
-            fieldErrors.endDate =
-                "La fecha de fin no puede ser menor a la fecha de inicio.";
+            fieldErrors.startDate =
+                "Fecha de inicio no puede ser mayor a la de fin";
         }
 
         if (!description) {
-            fieldErrors.description = "La descripción es obligatoria.";
+            fieldErrors.description = REQUIRED_FIELD_MESSAGE;
+        } else if (description.length > 200) {
+            fieldErrors.description =
+                "Descripción no puede ser mayor a 200 caracteres";
         } else if (!DESCRIPTION_PATTERN.test(description)) {
             fieldErrors.description =
-                "La descripción contiene caracteres no permitidos.";
+                "Descripción no permite caracteres especiales";
         }
 
         if (evidenceError) {
