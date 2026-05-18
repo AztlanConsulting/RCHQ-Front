@@ -32,7 +32,7 @@ const DetalleEmpleado = () => {
   const {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses,
+    roles,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
@@ -148,7 +148,6 @@ const DetalleEmpleado = () => {
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
             roles={roles}
-            houses={houses}
             frecuentPaymentTypes={frecuentPaymentTypes}
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}

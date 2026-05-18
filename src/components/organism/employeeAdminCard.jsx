@@ -17,6 +17,13 @@ const TIPOS = [
   { value: "Voluntariado",    label: "Voluntariado" },
 ];
 
+const isAdminRole = (roleName = "") =>
+  String(roleName)
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .includes("admin");
+
 const EmployeeAdminCard = ({
   employee,
   employeeWorkdays,
@@ -27,7 +34,6 @@ const EmployeeAdminCard = ({
   loadingCatalogues,
   adminForm,
   roles,
-  houses,
   frecuentPaymentTypes,
   setAdminField,
   toggleWorkday,
@@ -38,6 +44,30 @@ const EmployeeAdminCard = ({
   onSubmit,
   onCancel,
 }) => {
+  const currentRoleOption = roles.find(
+    (role) => String(role.roleId) === String(adminForm.originalRoleId),
+  );
+
+  const editableRoles = roles.filter((role) => {
+    const isCurrentRole = String(role.roleId) === String(adminForm.originalRoleId);
+    return isCurrentRole || !isAdminRole(role.name);
+  });
+
+  const roleOptions = editableRoles.map((role) => ({
+    value: role.roleId,
+    label: role.name,
+  }));
+
+  if (
+    currentRoleOption &&
+    !roleOptions.some((option) => String(option.value) === String(currentRoleOption.roleId))
+  ) {
+    roleOptions.unshift({
+      value: currentRoleOption.roleId,
+      label: currentRoleOption.name,
+    });
+  }
+
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
       <div className="flex justify-between items-start">
@@ -47,13 +77,13 @@ const EmployeeAdminCard = ({
           <div className="flex gap-2 shrink-0">
             <button
               type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="button" onClick={onSubmit} disabled={saving || loadingCatalogues}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
             >
               {saving && <Loader size="sm" />}
               Guardar
@@ -165,18 +195,10 @@ const EmployeeAdminCard = ({
           <div className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <SelectField
-                label="Casa" id="houseId"
-                value={adminForm.houseId}
-                onChange={(e) => setAdminField("houseId", e.target.value)}
-                options={houses.map((h) => ({ value: h.houseId, label: h.name }))}
-                placeholder="Selecciona una casa"
-                labelColor="text-slate-500"
-              />
-              <SelectField
                 label="Puesto" id="roleId"
                 value={adminForm.roleId}
                 onChange={(e) => setAdminField("roleId", e.target.value)}
-                options={roles.map((r) => ({ value: r.roleId, label: r.name }))}
+                options={roleOptions}
                 placeholder="Selecciona un puesto"
                 labelColor="text-slate-500"
               />

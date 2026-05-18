@@ -19,7 +19,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [loadingCatalogues, setLoadingCatalogues] = useState(false);
 
   const [roles, setRoles]       = useState([]);
-  const [houses, setHouses]     = useState([]);
   const [allWorkdays, setAllWorkdays] = useState([]);
   const [frecuentPaymentTypes, setFrecuentPaymentTypes] = useState([]);
 
@@ -34,7 +33,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   });
 
   const [adminForm, setAdminFormState] = useState({
-    houseId: "", roleId: "", type: "", salary: "",
+    roleId: "", originalRoleId: "", type: "", salary: "",
     frequencyOfPaymentId: "",
     selectedWorkdays: [],
   });
@@ -74,7 +73,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     try {
       const formData = await getUpdateFormService();
       setRoles(formData?.roles ?? []);
-      setHouses(formData?.houses ?? []);
       setAllWorkdays(formData?.workdays ?? []);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
 
@@ -91,8 +89,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       });
 
       setAdminFormState({
-        houseId:              employee?.houseId ?? "",
         roleId:               employee?.roleId  ?? "",
+        originalRoleId:       employee?.roleId  ?? "",
         type:                 normalizeEmployeeContractType(employee?.type) ?? "",
         salary:               employee?.salary  ?? "",
         frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
@@ -234,8 +232,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setSaving(true);
     setSaveError(null);
     try {
-      if (!adminForm.houseId || !adminForm.roleId || !adminForm.type || adminForm.salary === "") {
-        throw new Error("Debes llenar todos los campos administrativos (Casa, Puesto, Tipo y Salario).");
+      if (!adminForm.roleId || !adminForm.type || adminForm.salary === "") {
+        throw new Error("Debes llenar todos los campos administrativos (Puesto, Tipo y Salario).");
       }
 
       const salaryNum = Number(adminForm.salary);
@@ -247,12 +245,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       }
 
       const payload = {
-        houseId:              adminForm.houseId,
-        roleId:               adminForm.roleId,
         type:                 adminForm.type,
         salary:               Number(adminForm.salary),
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
+
+      if (adminForm.roleId !== adminForm.originalRoleId) {
+        payload.roleId = adminForm.roleId;
+      }
 
       console.log("frequencyOfPaymentId:", adminForm.frequencyOfPaymentId);
 
@@ -305,7 +305,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   return {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses, allWorkdays, frecuentPaymentTypes,
+    roles, allWorkdays, frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
