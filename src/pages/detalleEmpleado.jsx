@@ -139,16 +139,14 @@ const DetalleEmpleado = () => {
           </Tabs.List>
         </Tabs>
 
-        {currentTab === "overview" && (
-          <button
-            type="button"
-            onClick={openModal}
-            className="ml-auto shrink-0 rounded-lg bg-[#9b1c1c] px-4 py-2 text-sm font-semibold
-              text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
-          >
-            Dar de baja
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={openModal}
+          className="ml-auto shrink-0 rounded-lg bg-[#9b1c1c] px-4 py-2 text-sm font-semibold
+            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+        >
+          Dar de baja
+        </button>
       </div>
 
       <EmployeeBasicCard
