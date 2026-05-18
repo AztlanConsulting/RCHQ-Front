@@ -1,6 +1,7 @@
 import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
 import ButtonGroup from "../../molecules/buttonGroup";
+import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 
@@ -13,6 +14,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 const CATEGORY_FORMS = {
+    ausencias: AusenciaForm,
     casa: CasaForm,
 };
 
@@ -38,6 +40,7 @@ const RegisterEventModal = ({
     if (!isOpen) return null;
 
     const SubForm = CATEGORY_FORMS[categoryKey] ?? null;
+    const shouldShowNameField = categoryKey !== "ausencias";
 
     return (
         <>
@@ -60,10 +63,11 @@ const RegisterEventModal = ({
                     inset: 0,
                     zIndex: 910,
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     justifyContent: "center",
-                    padding: "16px",
+                    padding: "12px",
                     pointerEvents: "none",
+                    overflowY: "auto",
                 }}
             >
                 <div
@@ -77,34 +81,48 @@ const RegisterEventModal = ({
                         width: "100%",
                         maxWidth: "560px",
                         boxSizing: "border-box",
-                        maxHeight: "90vh",
+                        maxHeight: "calc(100dvh - 24px)",
                         overflowY: "auto",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
                     }}
                 >
-                    <div>
-                        <TextField
-                            id="event-name"
-                            placeholder="Agregar título"
-                            value={name}
-                            setValue={handleNameChange}
-                            maxLength={70}
-                        />
+                    {shouldShowNameField ? (
+                        <div>
+                            <TextField
+                                id="event-name"
+                                placeholder="Agregar título"
+                                value={name}
+                                setValue={handleNameChange}
+                                maxLength={70}
+                            />
 
-                        {nameError && (
-                            <p
-                                style={{
-                                    margin: "4px 0 0",
-                                    fontSize: "12px",
-                                    color: "#dc2626",
-                                }}
-                            >
-                                {nameError}
-                            </p>
-                        )}
-                    </div>
+                            {nameError && (
+                                <p
+                                    style={{
+                                        margin: "4px 0 0",
+                                        fontSize: "12px",
+                                        color: "#dc2626",
+                                    }}
+                                >
+                                    {nameError}
+                                </p>
+                            )}
+                        </div>
+                    ) : (
+                        <h2
+                            style={{
+                                margin: 0,
+                                color: "#121212",
+                                fontSize: "28px",
+                                fontWeight: 800,
+                                lineHeight: 1.15,
+                            }}
+                        >
+                            Ausencias
+                        </h2>
+                    )}
 
                     <ButtonGroup
                         options={CATEGORY_OPTIONS}
