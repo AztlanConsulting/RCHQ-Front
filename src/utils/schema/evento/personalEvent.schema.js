@@ -4,7 +4,7 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const TEXT_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]+$/;
 
-const baseSchema = z.object({
+export const baseSchema = z.object({
     name: z
         .string({ required_error: "El titulo es obligatorio" })
         .trim()
@@ -37,11 +37,11 @@ const baseSchema = z.object({
     employeeIds: z.array(z.string().uuid()).optional(),
 });
 
-const allDaySchema = baseSchema.extend({
+export const allDaySchema = baseSchema.extend({
     allDay: z.literal(true),
 });
 
-const timedSchema = baseSchema
+export const timedSchema = baseSchema
     .extend({
         allDay: z.literal(false),
         startTime: z
