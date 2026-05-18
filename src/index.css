@@ -237,7 +237,9 @@ svg {
 
 .fc-weekTimeCard {
     width: 100%;
-    min-width: 0;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     cursor: pointer;
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
@@ -250,6 +252,7 @@ svg {
     color: #fff;
     border: 1px solid transparent;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .fc-weekTimeCard-titleRow {
@@ -259,35 +262,80 @@ svg {
     gap: 0.25rem;
     min-width: 0;
     width: 100%;
+    flex-shrink: 0;
 }
 
 .fc-weekTimeCard-title {
     flex: 1;
     min-width: 0;
-    white-space: normal;
     overflow-wrap: break-word;
     word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
-.fc .fc-timegrid-event .fc-event-main,
 .fc .fc-list-event-title {
     white-space: normal;
+}
+
+/* Keep timed events inside FullCalendar slot height (week/day); clip custom HTML overflow */
+.fc-timeGridWeek-view .fc-timegrid-event,
+.fc-timeGridDay-view .fc-timegrid-event {
+    overflow: hidden;
+}
+
+.fc-timeGridWeek-view .fc-timegrid-event .fc-event-main,
+.fc-timeGridDay-view .fc-timegrid-event .fc-event-main {
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.fc-timeGridWeek-view .fc-v-event .fc-event-main-frame,
+.fc-timeGridDay-view .fc-v-event .fc-event-main-frame {
+    min-height: 0;
+    height: 100%;
 }
 
 .fc-weekTimeCard-meta {
     font-weight: 500;
     opacity: 0.9;
     min-width: 0;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+}
+
+.fc-weekTimeCard-subtitle {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    opacity: 0.85;
+    min-width: 0;
+    flex-shrink: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
 .fc-weekTimeCard span,
-.fc-weekTimeCard .fc-weekTimeCard-meta {
+.fc-weekTimeCard .fc-weekTimeCard-meta,
+.fc-weekTimeCard .fc-weekTimeCard-subtitle {
     color: #fff;
 }
 
 .fc-dayTimeCard {
     width: 100%;
-    min-width: 0;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     cursor: pointer;
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
@@ -300,6 +348,7 @@ svg {
     color: #fff;
     border: 1px solid transparent;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .fc-dayTimeCard-titleRow {
@@ -310,20 +359,29 @@ svg {
     min-width: 0;
     width: 100%;
     margin-bottom: 0.125rem;
+    flex-shrink: 0;
 }
 
 .fc-dayTimeCard-title {
     flex: 1;
     min-width: 0;
-    white-space: normal;
     overflow-wrap: break-word;
     word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
 .fc-dayTimeCard-meta {
     font-weight: 500;
     opacity: 0.9;
     min-width: 0;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
 }
 
 .fc-dayTimeCard-subtitle {
@@ -334,6 +392,11 @@ svg {
     min-width: 0;
     overflow-wrap: break-word;
     word-break: break-word;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
 }
 
 .fc-dayTimeCard-description {
@@ -341,9 +404,15 @@ svg {
     font-size: 0.6875rem;
     font-weight: 400;
     opacity: 0.92;
-    white-space: pre-wrap;
     overflow-wrap: break-word;
     word-break: break-word;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
 }
 
 .fc-dayTimeCard span,

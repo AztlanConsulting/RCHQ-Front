@@ -39,7 +39,7 @@ const DayTimeCard = ({ arg }) => {
       </div>
 
       {ev.allDay || timeLine ? (
-        <span className="fc-dayTimeCard-meta truncate block">
+        <span className="fc-dayTimeCard-meta block">
           {showDayLabel ? "Día" : timeLine}
         </span>
       ) : null}

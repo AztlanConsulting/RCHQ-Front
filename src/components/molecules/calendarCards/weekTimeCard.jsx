@@ -27,26 +27,24 @@ const WeekTimeCard = ({ arg }) => {
     >
       <div className="fc-weekTimeCard-titleRow">
         <span className="fc-weekTimeCard-title font-medium">{ev.title}</span>
-        {icon ? (
+        {/* {icon ? (
           <img
             src={`/${icon}.svg`}
             alt=""
             className="h-3.5 w-3.5 shrink-0 object-contain brightness-0 invert"
             loading="lazy"
           />
-        ) : null}
+        ) : null} */}
       </div>
 
       {ev.allDay || timeLine ? (
-        <span className="fc-weekTimeCard-meta truncate block">
+        <span className="fc-weekTimeCard-meta block">
           {showDayLabel ? "Día" : timeLine}
         </span>
       ) : null}
 
       {subtitle ? (
-        <span className="fc-weekTimeCard-meta truncate block text-[0.6875rem] opacity-85">
-          {subtitle}
-        </span>
+        <span className="fc-weekTimeCard-subtitle block">{subtitle}</span>
       ) : null}
     </div>
   );
