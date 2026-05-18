@@ -84,8 +84,11 @@ export const useEmployeeSearchSelect = ({
         );
     }, [employees, selectedIds]);
 
+    const sanitizeQuery = (value) =>
+        value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]/g, "");
+
     const handleInputChange = (value) => {
-        setQuery(value);
+        setQuery(sanitizeQuery(value));
         updatePosition();
         setIsOpen(true);
     };
