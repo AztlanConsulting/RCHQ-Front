@@ -25,12 +25,13 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
 
   const handleReasonChange = (value) => {
     if (value.length > 250) return;
+    if (/[<>]/.test(value)) return; // Bloquear caracteres potencialmente peligrosos (XSS) en tiempo real
     setReason(value);
     if (fieldError) setFieldError(null);
   };
 
   const handleSubmit = async () => {
-    const parsed = deactivateEmployeeSchema.safeParse({ reason });
+    const parsed = deactivateEmployeeSchema.safeParse({ reason, addToBlacklist });
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0].message);
       return;
