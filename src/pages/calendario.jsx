@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import Alert from "../components/atoms/alerts";
@@ -15,6 +15,7 @@ const isManagementRole = (role) => role === "Admin" || role === "Coordinador";
 
 const Calendario = () => {
     const calendarRef = useRef(null);
+    const prevFullCalendarViewTypeRef = useRef(null);
 
     const {
         employeeHouseName,
@@ -112,6 +113,24 @@ const Calendario = () => {
     });
     const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
 
+    const handleDatesSetAndCloseDetailOnViewChange = useCallback(
+        async (dateInfo) => {
+            const nextViewType = dateInfo?.view?.type;
+            if (
+                prevFullCalendarViewTypeRef.current != null &&
+                nextViewType != null &&
+                prevFullCalendarViewTypeRef.current !== nextViewType
+            ) {
+                closeDetail();
+            }
+            if (nextViewType != null) {
+                prevFullCalendarViewTypeRef.current = nextViewType;
+            }
+            await handleDatesSet(dateInfo);
+        },
+        [closeDetail, handleDatesSet],
+    );
+
     useEffect(() => {
       setOwnCalendar();
     }, [setOwnCalendar]);
@@ -184,7 +203,7 @@ const Calendario = () => {
           getWeekDayName={getWeekDayName}
           resizeHandler={resizeHandler}
           visibleEvents={visibleEvents}
-          handleDatesSet={handleDatesSet}
+          handleDatesSet={handleDatesSetAndCloseDetailOnViewChange}
           onEventClick={handleEventClick}
           onDateDrag={handleDateDrags}
           onDateDragging={handleDateDragging}
