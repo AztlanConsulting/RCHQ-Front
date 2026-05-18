@@ -13,7 +13,8 @@ import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 
-const isManagementRole = (role) => role === "Administrador" || role === "Coordinador";
+const isManagementRole = (role) =>
+    role === "Administrador" || role === "Coordinador";
 
 const Calendario = () => {
     const calendarRef = useRef(null);
@@ -286,6 +287,7 @@ const Calendario = () => {
                         message: "Evento creado exitosamente",
                     });
                 }}
+                onFeedback={showCalendarAlert}
                 initialStartDate={
                     selectedDates?.startDate?.toISOString().split("T")[0]
                 }
@@ -294,72 +296,7 @@ const Calendario = () => {
                 }
             />
         </div>
-
-        <Modal
-            open={selectedEvent != null}
-            onClose={closeDetail}
-            title={selectedEvent?.focus === "ausencias" ? null : "Detalle del evento"}
-            grayBackground={isAbsenceDetailOpen}
-            placement={isAbsenceDetailOpen ? "center" : "right"}
-            className={
-                selectedEvent?.focus === "ausencias"
-                    ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
-                    : "w-[92vw] max-w-[400px] max-h-[80vh]"
-            }
-        >
-            {selectedEvent?.focus === "ausencias" ? (
-                isManagementRole(viewerRole) ? (
-                    <AbsenceDetail
-                        event={selectedEvent}
-                        isEditing={isAbsenceEditing}
-                        evidenceLabel={absenceEvidenceLabel}
-                        absenceTypeOptions={absenceTypeOptions}
-                        absenceForm={absenceForm}
-                        absenceEditError={absenceEditError}
-                        absenceDeleteError={absenceDeleteError}
-                        absenceEvidenceFileName={absenceEvidenceFileName}
-                        absenceEvidenceError={absenceEvidenceError}
-                        isSaving={isSavingAbsence}
-                        isDeleteOpen={isDeleteAbsenceOpen}
-                        isLoadingWhileDeleting={isLoadingWhileDeleting}
-                        canManageAbsence={isManagementRole(viewerRole)}
-                        onOpenEvidence={openAbsenceEvidence}
-                        onStartEdit={startAbsenceEdit}
-                        onCancelEdit={cancelAbsenceEdit}
-                        onSubmitEdit={submitAbsenceEdit}
-                        onOpenDelete={openDeleteAbsence}
-                        onCancelDelete={cancelDeleteAbsence}
-                        onConfirmDelete={confirmDeleteAbsence}
-                        onAbsenceFieldChange={setAbsenceField}
-                        onAbsenceEvidenceChange={handleAbsenceEvidenceChange}
-                    />
-                ) : (
-                    <WorkerAbsenceDetail
-                        event={selectedEvent}
-                        evidenceLabel={absenceEvidenceLabel}
-                        onOpenEvidence={openAbsenceEvidence}
-                        onClose={closeDetail}
-                    />
-                )
-            ) : (
-                <EventDetail event={selectedEvent} />
-            )}
-        </Modal>
-
-        <RegisterHouseEventModal
-            isOpen={selectedDates != null}
-            onClose={() => closeCreationModal(calendarRef)}
-            onSuccess={() => {
-                closeCreationModal(calendarRef);
-                reloadCurrentRange();
-            }}
-            onFeedback={showCalendarAlert}
-            initialStartDate={selectedDates?.startDate?.toISOString().split("T")[0]}
-            initialEndDate={selectedDates?.endDate?.toISOString().split("T")[0]}
-        />
-    </div>
     );
-}
 };
 
 export default Calendario;
