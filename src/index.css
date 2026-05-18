@@ -211,6 +211,12 @@ svg {
     vertical-align: middle;
 }
 
+/* Weekly time grid: default 30m slots stay tall; hide minor-slot divider hairline */
+.fc-timeGridWeek-view .fc-timegrid-slot-minor {
+    border-top-color: transparent !important;
+    box-shadow: none !important;
+}
+
 .fc-dayGridCard {
     width: 100%;
     min-width: 0;
