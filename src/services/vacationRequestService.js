@@ -136,3 +136,18 @@ export const approveVacationRequest = async (vacationRequestId) => {
 
     return parseVacationRequestActionResponse(res);
 };
+
+export const rejectVacationRequest = async (vacationRequestId) => {
+    const res = await secureFetch(
+        `${API_URL}/vacation/request/${vacationRequestId}/reject`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        },
+    );
+
+    return parseVacationRequestActionResponse(res);
+};

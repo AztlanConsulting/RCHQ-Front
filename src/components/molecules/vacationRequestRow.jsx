@@ -10,12 +10,15 @@ const VacationRequestRow = ({
     request,
     view,
     approvingRequestId,
+    rejectingRequestId,
     onViewDetail,
     onOpenApproveModal,
+    onOpenRejectModal,
 }) => {
     const employee = request.employee || {};
     const fullName = getSafeText(employee.fullName);
     const isApproving = approvingRequestId === request.vacationRequestId;
+    const isRejecting = rejectingRequestId === request.vacationRequestId;
 
     return (
         <tr className="border-b border-gray-200 last:border-b-0">
@@ -107,17 +110,27 @@ const VacationRequestRow = ({
                             </Button>
 
                             <Button
-                                title="Rechazar solicitud"
+                                title={
+                                    isRejecting
+                                        ? "Rechazando solicitud"
+                                        : "Rechazar solicitud"
+                                }
+                                onClick={() => onOpenRejectModal(request)}
+                                disabled={isRejecting}
                                 bgColor="bg-transparent"
                                 hoverColor="hover:bg-gray-100"
                                 activeColor="active:bg-gray-200"
                                 width="w-10"
                                 height="h-10"
-                                className="rounded-full"
+                                className="rounded-full disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <img
                                     src="/crossMark.svg"
-                                    alt="Rechazar solicitud"
+                                    alt={
+                                        isRejecting
+                                            ? "Rechazando solicitud"
+                                            : "Rechazar solicitud"
+                                    }
                                     className="h-5 w-5"
                                 />
                             </Button>
