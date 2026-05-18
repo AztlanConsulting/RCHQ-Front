@@ -64,7 +64,7 @@ const CalendarFilters = ({
   stackMaxHeightClass = "max-h-[65vh]",
 }) => {
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
+    <div className={`flex flex-col gap-1 mb-auto ${className}`}>
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario
