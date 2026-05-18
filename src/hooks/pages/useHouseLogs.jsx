@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getHouseLogsService } from "../../services/logsService";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 export const formatLogMoment = (momentValue) => {
   if (!momentValue) return "—";
