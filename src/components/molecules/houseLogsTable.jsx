@@ -63,7 +63,7 @@ const HouseLogsTable = ({ logs, loading, error }) => {
               Acción
             </th>
             <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
-              Persona afectada
+              Afectado
             </th>
             <th className="px-4 py-4 text-left text-sm font-bold text-[#121212]">
               Fecha
