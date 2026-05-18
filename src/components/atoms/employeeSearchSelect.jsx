@@ -1,6 +1,8 @@
 import { createPortal } from "react-dom";
 import EmployeeAvatar from "./employeeAvatar";
 import { useEmployeeSearchSelect } from "../../hooks/atoms/useEmployeeSearchSelect";
+import search from "/search.svg";
+import close from "/close.svg";
 
 const EmployeeSearchSelect = ({
     employees = [],
@@ -34,20 +36,12 @@ const EmployeeSearchSelect = ({
 
             <div ref={containerRef} className="relative">
                 <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="ml-3 w-4 h-4 text-gray-400 flex-shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-                        />
-                    </svg>
+                    <img
+                        src={search}
+                        alt=""
+                        aria-hidden="true"
+                        className="ml-3 w-4 h-4 flex-shrink-0 opacity-50"
+                    />
 
                     <input
                         type="text"
@@ -120,7 +114,11 @@ const EmployeeSearchSelect = ({
             {selected.length > 0 && (
                 <div
                     className="flex flex-col gap-1.5"
-                    style={selected.length > 3 ? { maxHeight: "162px", overflowY: "auto" } : undefined}
+                    style={
+                        selected.length > 3
+                            ? { maxHeight: "162px", overflowY: "auto" }
+                            : undefined
+                    }
                 >
                     {selected.map((emp) => (
                         <div
@@ -142,9 +140,14 @@ const EmployeeSearchSelect = ({
                                 type="button"
                                 onClick={() => onRemove(emp.employeeId)}
                                 aria-label={`Remover a ${emp.fullName}`}
-                                className="w-5 h-5 flex items-center justify-center rounded-full bg-[#d1d5db] hover:bg-[#9ca3af] flex-shrink-0 transition-colors ml-auto"
+                                className="w-5 h-5 rounded-full bg-[#d1d5db] hover:bg-[#9ca3af] flex-shrink-0 transition-colors ml-auto flex items-center justify-center p-0"
                             >
-                                ×
+                                <img
+                                    src={close}
+                                    alt=""
+                                    aria-hidden="true"
+                                    className="w-3 h-3"
+                                />
                             </button>
                         </div>
                     ))}
