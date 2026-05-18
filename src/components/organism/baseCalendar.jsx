@@ -95,10 +95,14 @@ const BaseCalendar = ({
             timeGridDay: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+                slotMinTime: "08:00:00",
+                slotMaxTime: "18:00:00",
             },
             timeGridWeek: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+                slotMinTime: "08:00:00",
+                slotMaxTime: "18:00:00",
             },
             dayGridMonth: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
