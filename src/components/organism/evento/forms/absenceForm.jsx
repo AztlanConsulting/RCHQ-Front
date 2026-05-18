@@ -95,31 +95,40 @@ const AusenciaForm = (props) => {
                 <FormErrorText>{errors.absenceTypeId}</FormErrorText>
             )}
 
-            <DateField
-                label="Fecha de inicio"
-                labelColor="text-[#374151]"
-                value={form.startDate}
-                placeholder="dd / mm / yyyy"
-                minDate={minStartDate}
-                maxDate={maxEndDate}
-                onChange={(e) => setField("startDate", e.target.value)}
-            />
-            {errors.startDate && (
-                <FormErrorText>{errors.startDate}</FormErrorText>
-            )}
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="min-w-0">
+                    <DateField
+                        label="Fecha de inicio"
+                        labelColor="text-[#374151]"
+                        value={form.startDate}
+                        placeholder="dd / mm / yyyy"
+                        minDate={minStartDate}
+                        maxDate={maxEndDate}
+                        popupSize="compact"
+                        onChange={(e) => setField("startDate", e.target.value)}
+                    />
+                    {errors.startDate && (
+                        <FormErrorText>{errors.startDate}</FormErrorText>
+                    )}
+                </div>
 
-            <DateField
-                label="Fecha de fin"
-                labelColor="text-[#374151]"
-                value={form.endDate}
-                placeholder="dd / mm / yyyy"
-                minDate={minStartDate}
-                maxDate={maxEndDate}
-                onChange={(e) => setField("endDate", e.target.value)}
-            />
-            {errors.endDate && (
-                <FormErrorText>{errors.endDate}</FormErrorText>
-            )}
+                <div className="min-w-0">
+                    <DateField
+                        label="Fecha de fin"
+                        labelColor="text-[#374151]"
+                        value={form.endDate}
+                        placeholder="dd / mm / yyyy"
+                        minDate={minStartDate}
+                        maxDate={maxEndDate}
+                        popupAlign="right"
+                        popupSize="compact"
+                        onChange={(e) => setField("endDate", e.target.value)}
+                    />
+                    {errors.endDate && (
+                        <FormErrorText>{errors.endDate}</FormErrorText>
+                    )}
+                </div>
+            </div>
 
             <div className="flex w-full flex-col gap-1.5">
                 <label className="text-sm font-bold text-[#374151]">
@@ -133,7 +142,7 @@ const AusenciaForm = (props) => {
                     }
                     maxLength={200}
                     rows={4}
-                    className="w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
+                    className="w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-2 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
                 />
                 <div className="mt-1 text-right text-xs font-medium text-slate-500">
                     {`${descriptionLength}/200`}
