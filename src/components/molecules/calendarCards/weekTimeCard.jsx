@@ -7,18 +7,16 @@ const WeekTimeCard = ({ arg }) => {
   const x = ev.extendedProps ?? {};
   const icon = x.icon;
   const subtitle = String(x.subtitle ?? "").trim();
-  let timeLine = "";
 
-  if (ev.allDay) {
-    timeLine = "";
-  } else if (arg.timeText) {
-    timeLine = arg.timeText;
-  } else if (start != null && end != null) {
+  let timeLine = "";
+  if (!ev.allDay && start != null && end != null) {
     const a = getStartHour(start);
     const b = getStartHour(end);
     if (a && b) timeLine = `${a} – ${b}`;
   }
 
+  const startHm = start != null ? getStartHour(start) : "";
+  const showDayLabel = ev.allDay || startHm === "00:00";
   return (
     <div
       className="fc-weekTimeCard"
@@ -39,8 +37,10 @@ const WeekTimeCard = ({ arg }) => {
         ) : null}
       </div>
 
-      {timeLine ? (
-        <span className="fc-weekTimeCard-meta truncate block">{timeLine}</span>
+      {ev.allDay || timeLine ? (
+        <span className="fc-weekTimeCard-meta truncate block">
+          {showDayLabel ? "Día" : timeLine}
+        </span>
       ) : null}
 
       {subtitle ? (

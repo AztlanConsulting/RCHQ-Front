@@ -19,22 +19,30 @@ export const normalToUTCWithOffset = (
 
 const MEXICO_TZ = "America/Mexico_City";
 
-/** API / FullCalendar display: recover intended local time (+6h vs naive UTC parse). */
+/** API / legacy payloads: timestamps marked Z but representing México wall time (+6h vs naive UTC). */
 export const CALENDAR_DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
+
+/** Align scheduled API instants so FullCalendar and Date getters match México wall clock. */
+export function shiftCalendarApiInstantForFullCalendar(value) {
+  if (value == null || value === "") return value;
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+    return value;
+  }
+  const d = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return new Date(d.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
+}
 
 const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
 
-// Convierte timestamp en hora de inicio
-// input: Date o ISO
-// output: "03:00" (tras compensación FullCalendar)
+/** Hour:minute in the user's local TZ (use after shiftCalendarApiInstantForFullCalendar for API-derived datetimes). */
 export const getStartHour = (timestamp) => {
   if (timestamp == null) return "";
   const base =
     timestamp instanceof Date ? new Date(timestamp.getTime()) : new Date(timestamp);
   if (Number.isNaN(base.getTime())) return "";
-  const shifted = new Date(base.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
-  const h = shifted.getHours();
-  const m = shifted.getMinutes();
+  const h = base.getHours();
+  const m = base.getMinutes();
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 
@@ -155,24 +163,23 @@ export function formatEventCalendarDate(value) {
   return `${weekday} ${dayNum} de ${month} ${year}`;
 }
 
-/** Inicio/filas: “1 de Mayo, 5:00pm” (+ compensación FullCalendar). */
+/** Inicio/fil en zona México (usa el instante UTC ya normalizado en el cliente). */
 export function formatEventDateTime(value) {
   if (!value) return "—";
   const raw = value instanceof Date ? value : new Date(String(value));
   if (Number.isNaN(raw.getTime())) return "—";
-  const shifted = new Date(raw.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
   const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: MEXICO_TZ }).format(
-    shifted,
+    raw,
   );
   const month = capitalizeEs(
-    new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: MEXICO_TZ }).format(shifted),
+    new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: MEXICO_TZ }).format(raw),
   );
   const timeRaw = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
     timeZone: MEXICO_TZ,
-  }).format(shifted);
+  }).format(raw);
   return `${dayNum} de ${month}, ${timeRaw.toLowerCase().replace(/\s/g, "")}`;
 }
 
