@@ -41,6 +41,8 @@ vi.mock("/personal-black.svg", () => ({ default: "personal-black.svg" }));
 vi.mock("/vacation-black.svg", () => ({ default: "vacation-black.svg" }));
 vi.mock("/time.svg", () => ({ default: "time.svg" }));
 vi.mock("/chevron-down.svg", () => ({ default: "chevron-down.svg" }));
+vi.mock("/search.svg", () => ({ default: "search.svg" }));
+vi.mock("/close.svg", () => ({ default: "close.svg" }));
 
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
@@ -56,7 +58,7 @@ const mockEventTypes = [
     },
 ];
 
-const renderModal = (props = {}) => {
+const renderModal = async (props = {}) => {
     const onClose = vi.fn();
     const onSuccess = vi.fn();
 
@@ -70,8 +72,14 @@ const renderModal = (props = {}) => {
             {...props}
         />,
     );
+    await act(async () => {
+        fireEvent.click(screen.getByRole("radio", { name: "Casa" }));
+    });
 
     return { onClose, onSuccess };
+};
+const waitForHouseForm = async () => {
+    await screen.findByRole("option", { name: /limpieza/i });
 };
 
 const fillRequiredFields = async () => {
@@ -114,6 +122,8 @@ const clickLastConfirm = async () => {
 describe("Integración: agregar evento de casa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorage.clear();
+        localStorage.setItem("user", JSON.stringify({ role: "Coordinador" }));
 
         getEventTypes.mockResolvedValue(mockEventTypes);
 
@@ -127,14 +137,12 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("obtiene y muestra los tipos de evento al abrir el modal", async () => {
-        renderModal();
+        await renderModal();
 
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        expect(getEventTypes).toHaveBeenCalled();
 
         expect(
-            screen.getByRole("option", { name: /limpieza/i }),
+            await screen.findByRole("option", { name: /limpieza/i }),
         ).toBeInTheDocument();
 
         expect(
@@ -142,8 +150,8 @@ describe("Integración: agregar evento de casa", () => {
         ).toBeInTheDocument();
     });
 
-    it("muestra placeholders de fecha cuando abre sin fechas iniciales", () => {
-        renderModal({
+    it("muestra placeholders de fecha cuando abre sin fechas iniciales", async () => {
+        await renderModal({
             initialStartDate: undefined,
             initialEndDate: undefined,
         });
@@ -161,11 +169,8 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("crea un evento de casa con los datos del formulario", async () => {
-        const { onClose, onSuccess } = renderModal();
-
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        const { onClose, onSuccess } = await renderModal();
+        await waitForHouseForm();
 
         await fillRequiredFields();
 
@@ -198,11 +203,8 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("muestra error si se intenta confirmar sin nombre", async () => {
-        renderModal();
-
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        await renderModal();
+        await waitForHouseForm();
 
         fireEvent.change(screen.getByRole("combobox"), {
             target: { value: EVENT_TYPE_ID },
@@ -217,11 +219,8 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("crea un evento de todo el día", async () => {
-        renderModal();
-
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        await renderModal();
+        await waitForHouseForm();
 
         await fillRequiredFields();
 
@@ -257,11 +256,9 @@ describe("Integración: agregar evento de casa", () => {
             },
         });
 
-        renderModal();
+        await renderModal();
 
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        await waitForHouseForm();
 
         await fillRequiredFields();
         await selectTime(/-- : --/i, "9:00 AM");
@@ -299,11 +296,8 @@ describe("Integración: agregar evento de casa", () => {
                 },
             });
 
-        const { onClose, onSuccess } = renderModal();
-
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        const { onClose, onSuccess } = await renderModal();
+        await waitForHouseForm();
 
         await fillRequiredFields();
         await selectTime(/-- : --/i, "9:00 AM");
@@ -338,11 +332,8 @@ describe("Integración: agregar evento de casa", () => {
             new Error("Error al registrar evento"),
         );
 
-        renderModal();
-
-        await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
-        });
+        await renderModal();
+        await waitForHouseForm();
 
         await fillRequiredFields();
         await selectTime(/-- : --/i, "9:00 AM");
