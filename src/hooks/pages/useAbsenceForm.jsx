@@ -64,17 +64,45 @@ const getSubmitErrorMessage = (error) => {
                 .filter(Boolean)
         : [];
 
-    return (
-        detailedErrors[0] ||
-        error?.message ||
-        "No se pudo registrar la ausencia"
-    );
+    if (detailedErrors[0]) return detailedErrors[0];
+
+    const message = error?.message || "";
+
+    if (error?.status === 401) {
+        return "Tu sesión expiró. Inicia sesión nuevamente.";
+    }
+
+    if (error?.status === 403) {
+        return "No tienes permisos para registrar ausencias.";
+    }
+
+    if (error?.status === 404) {
+        if (message.toLowerCase().includes("tipo")) {
+            return "El tipo de ausencia seleccionado ya no está disponible.";
+        }
+
+        return "El empleado seleccionado ya no está disponible.";
+    }
+
+    if (error?.status === 406) {
+        return (
+            message ||
+            "No se pudo registrar la ausencia por un conflicto de fechas."
+        );
+    }
+
+    if (error?.status === 422) {
+        return message || "Revisa los datos de la ausencia.";
+    }
+
+    return message || "No se pudo registrar la ausencia";
 };
 
 export const useAbsenceForm = ({
     isOpen,
     onClose,
     onSuccess,
+    onFeedback,
     initialStartDate,
     initialEndDate,
     onNameError,
@@ -276,6 +304,10 @@ export const useAbsenceForm = ({
             });
 
             resetEvidence();
+            onFeedback?.({
+                type: "success",
+                message: "Ausencia registrada correctamente",
+            });
             onSuccess?.(absence);
             onClose?.();
         } catch (error) {
@@ -283,7 +315,7 @@ export const useAbsenceForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [evidenceFile, onClose, onSuccess, resetEvidence, validate]);
+    }, [evidenceFile, onClose, onFeedback, onSuccess, resetEvidence, validate]);
 
     return {
         form,

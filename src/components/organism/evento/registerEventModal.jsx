@@ -23,6 +23,7 @@ const RegisterEventModal = ({
     isOpen,
     onClose,
     onSuccess,
+    onFeedback,
     initialStartDate,
     initialEndDate,
 }) => {
@@ -175,6 +176,7 @@ const RegisterEventModal = ({
                                 isOpen={isOpen}
                                 onClose={onClose}
                                 onSuccess={onSuccess}
+                                onFeedback={onFeedback}
                                 initialStartDate={initialStartDate}
                                 initialEndDate={initialEndDate}
                                 onNameError={setNameError}

@@ -28,6 +28,7 @@ const AusenciaForm = (props) => {
         handleSubmit,
     } = useAbsenceForm(props);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const descriptionLength = String(form.description ?? "").length;
 
     return (
         <>
@@ -134,6 +135,9 @@ const AusenciaForm = (props) => {
                     rows={4}
                     className="w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
                 />
+                <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                    {`${descriptionLength}/200`}
+                </div>
                 {errors.description && (
                     <FormErrorText>{errors.description}</FormErrorText>
                 )}

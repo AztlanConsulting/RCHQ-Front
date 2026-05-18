@@ -102,6 +102,7 @@ const Calendario = () => {
         setAbsenceField,
         handleAbsenceEvidenceChange,
         submitAbsenceEdit,
+        showCalendarAlert,
         clearCalendarAlert,
       } = useCalendarPage({
         absenceTypeOptions,
@@ -245,6 +246,7 @@ const Calendario = () => {
           closeCreationModal(calendarRef);
           reloadCurrentRange();
         }}
+        onFeedback={showCalendarAlert}
         initialStartDate={selectedDates?.startDate?.toISOString().split("T")[0]}
         initialEndDate={selectedDates?.endDate?.toISOString().split("T")[0]}
       />
