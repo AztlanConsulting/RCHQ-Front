@@ -4,6 +4,7 @@ import ButtonGroup from "../../molecules/buttonGroup";
 import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
+import { getCalendarViewerRole } from "../../../services/calendarService";
 
 const CATEGORY_OPTIONS = [
     { value: "global", label: "Global", icon: "globe" },
@@ -39,6 +40,13 @@ const RegisterEventModal = ({
 
     if (!isOpen) return null;
 
+    const viewerRole = getCalendarViewerRole();
+    const canRegisterAbsences =
+        viewerRole === "Coordinador" ||
+        viewerRole === "Admin";
+    const categoryOptions = canRegisterAbsences
+        ? CATEGORY_OPTIONS
+        : CATEGORY_OPTIONS.filter((option) => option.value !== "ausencias");
     const SubForm = CATEGORY_FORMS[categoryKey] ?? null;
     const shouldShowNameField = categoryKey !== "ausencias";
 
@@ -125,7 +133,7 @@ const RegisterEventModal = ({
                     )}
 
                     <ButtonGroup
-                        options={CATEGORY_OPTIONS}
+                        options={categoryOptions}
                         value={categoryKey}
                         onChange={handleCategoryChange}
                     />

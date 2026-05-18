@@ -1,5 +1,9 @@
+import { useEffect, useRef } from "react";
+
 const SingleSelectDropdown = ({
     id,
+    label,
+    labelColor = "text-[#374151]",
     placeholder,
     value,
     options,
@@ -8,15 +12,39 @@ const SingleSelectDropdown = ({
     emptyText = "Sin opciones",
     onToggle,
     onChange,
+    onClose,
     renderOption,
     renderSelected,
 }) => {
+    const dropdownRef = useRef(null);
     const selectedOption = options.find(
         (option) => String(option.value) === String(value),
     );
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleOutsideClick = (event) => {
+            if (!dropdownRef.current?.contains(event.target)) {
+                onClose?.();
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+        };
+    }, [isOpen, onClose]);
+
     return (
-        <div className="relative w-full">
+        <div ref={dropdownRef} className="relative flex w-full flex-col gap-1.5">
+            {label ? (
+                <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+                    {label}
+                </label>
+            ) : null}
+
             <button
                 type="button"
                 id={id}

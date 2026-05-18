@@ -5,13 +5,16 @@ import SelectField from "../atoms/selectField";
 export const DocumentFileField = ({
     id = "doc-file-input",
     label = "Archivo",
+    labelColor = "text-slate-700",
     fileName,
     handleFileChange,
     placeholder = "Selecciona un archivo (PDF, PNG, JPG)",
 }) => (
     <div className="flex flex-col gap-1.5">
         {label ? (
-            <label className="text-sm font-bold text-slate-700">{label}</label>
+            <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+                {label}
+            </label>
         ) : null}
         <label
             htmlFor={id}
@@ -55,8 +58,14 @@ const DocumentUploadModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 flex flex-col gap-6">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 flex flex-col gap-6"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900">
             {isEditing ? "Editar documento" : "Subir documento"}

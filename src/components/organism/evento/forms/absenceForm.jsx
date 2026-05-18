@@ -33,6 +33,7 @@ const AusenciaForm = (props) => {
         <>
             <SingleSelectDropdown
                 id="absence-employee"
+                label="Empleado"
                 placeholder={
                     isLoadingOptions
                         ? "Cargando empleados ..."
@@ -47,6 +48,7 @@ const AusenciaForm = (props) => {
                         current === "employee" ? null : "employee",
                     )
                 }
+                onClose={() => setOpenDropdown(null)}
                 onChange={(value) => {
                     setField("employeeId", value);
                     setOpenDropdown(null);
@@ -67,6 +69,7 @@ const AusenciaForm = (props) => {
 
             <SingleSelectDropdown
                 id="absence-type"
+                label="Tipo de ausencia"
                 placeholder={
                     isLoadingOptions
                         ? "Cargando tipos de ausencia ..."
@@ -81,6 +84,7 @@ const AusenciaForm = (props) => {
                         current === "absenceType" ? null : "absenceType",
                     )
                 }
+                onClose={() => setOpenDropdown(null)}
                 onChange={(value) => {
                     setField("absenceTypeId", value);
                     setOpenDropdown(null);
@@ -137,7 +141,8 @@ const AusenciaForm = (props) => {
 
             <DocumentFileField
                 id="absence-evidence"
-                label=""
+                label="Documento"
+                labelColor="text-[#374151]"
                 fileName={evidenceFileName}
                 handleFileChange={handleEvidenceChange}
                 placeholder="Subir un documento ..."
