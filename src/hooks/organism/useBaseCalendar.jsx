@@ -396,11 +396,17 @@ export const useBaseCalendar = () => {
         return true;
     };
 
+    const currentCalendarView = useMemo(
+        () => getCorrespondingView(isList, viewType),
+        [isList, viewType],
+    );
+
     return {
         employeeHouseName,
         allEvents: filteredCalendarEvents,
         isList,
         viewType,
+        currentCalendarView,
         viewerRole,
         calendarMode,
         setCalendarMode,
