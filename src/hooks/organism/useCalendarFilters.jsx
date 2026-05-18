@@ -35,17 +35,17 @@ const getPersonalEventTitle = (event, scope) => {
     const rawName = String(event.name ?? "").trim();
     const rawType = String(event.type ?? "").trim();
 
-    const capitalLetterScope = scope.charAt(0).toUpperCase() + scope.slice(1).toLowerCase();
+    const capitalLetterScope = scope.toLowerCase() === "ausencias" ? "Ausencia" : "Vacación"
 
     if (!rawName || rawName.toLowerCase() === scope) {
-        return rawType ? `${capitalLetterScope} de ${rawType}` : capitalLetterScope;
+        return rawType ? `${capitalLetterScope} ${rawType}` : capitalLetterScope;
     }
 
     if (rawName.toLowerCase().startsWith(scope)) {
         return rawName;
     }
 
-    return `${capitalLetterScope} de ${rawName}`;
+    return `${capitalLetterScope} ${rawType}`;
 };
 
 const toDateOnly = (value) => {
@@ -173,7 +173,9 @@ const getFilteredEvents = (
                 backgroundColor: rawEvent.focus === "ausencias"
                     ? "#EF4444"
                     : rawEvent.color,
-                borderColor: rawEvent.color,
+                borderColor: rawEvent.focus === "ausencias"
+                    ? "#DC2626"
+                    : rawEvent.color || rawEvent.backgroundColor || "#000",
                 allDay: isAllDay || Boolean(rawEvent.lastsAllDay),
                 extendedProps: {
                     absenceId: rawEvent.absenceId,
