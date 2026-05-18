@@ -1,5 +1,4 @@
-/** Target width (% of day column) when FC splits overlapping timed events ~50/50. */
-export const WEEK_TIMEGRID_OVERLAP_TARGET_WIDTH_PCT = 66;
+export const TIMEGRID_COLUMN_OVERLAP_TARGET_WIDTH_PCT = 66;
 
 const parsePct = (value) => {
     if (value == null || value === "") return 0;
@@ -10,13 +9,9 @@ const parsePct = (value) => {
     return Number.isFinite(n) ? n : null;
 };
 
-/**
- * FullCalendar time grid positions overlaps with equal horizontal slices (~50%, ~33%, …).
- * Widen each harness toward WEEK_TIMEGRID_OVERLAP_TARGET_WIDTH_PCT % so cards stay readable on narrow weeks.
- * @param {{ view: { type: string }; el: HTMLElement }} info - EventMountArg
- */
-export function widenTimeGridWeekEventHarness(info) {
-    if (info.view.type !== "timeGridWeek") return;
+export function widenTimeGridColumnEventHarness(info) {
+    const vt = info.view.type;
+    if (vt !== "timeGridWeek" && vt !== "timeGridDay") return;
 
     const harness = info.el.closest(".fc-timegrid-event-harness");
     if (!harness?.style) return;
@@ -26,8 +21,7 @@ export function widenTimeGridWeekEventHarness(info) {
     if (L === null || R === null) return;
 
     const w = 100 - L - R;
-    const target = WEEK_TIMEGRID_OVERLAP_TARGET_WIDTH_PCT;
-    /** Only adjust ~50/50 (and similar) splits; leave tighter triple stacks on FC defaults. */
+    const target = TIMEGRID_COLUMN_OVERLAP_TARGET_WIDTH_PCT;
     const nearHalfWidth = w >= 36 && w <= 54;
     if (!(w > 0 && w < target - 0.25 && nearHalfWidth)) return;
 

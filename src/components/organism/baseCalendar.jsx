@@ -10,7 +10,7 @@ import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard"
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
-import { widenTimeGridWeekEventHarness } from "@/utils/weekTimeGridHarnessWidth";
+import { widenTimeGridColumnEventHarness } from "@/utils/weekTimeGridHarnessWidth";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
@@ -153,15 +153,21 @@ const BaseCalendar = ({
         () => ({
             timeGridDay: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
-                slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+                slotLabelContent: (arg) =>
+                    formatTimeGridSlotLabel(arg.date),
                 slotMinTime: "08:00:00",
                 slotMaxTime: "18:00:00",
+                slotDuration: "00:30:00",
+                slotLabelInterval: "01:00:00",
             },
             timeGridWeek: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
-                slotLabelContent: (arg) => formatTimeGridSlotLabel(arg.date),
+                slotLabelContent: (arg) =>
+                    formatTimeGridSlotLabel(arg.date),
                 slotMinTime: "08:00:00",
                 slotMaxTime: "18:00:00",
+                slotDuration: "00:30:00",
+                slotLabelInterval: "01:00:00",
             },
             dayGridMonth: {
                 dayHeaderContent: (arg) => getWeekDayName(arg),
@@ -171,51 +177,9 @@ const BaseCalendar = ({
         [getWeekDayName],
     );
 
-    const customButtonsConfig = useMemo(
-        () => ({
-            toggleListButton: {
-                text: "Lista",
-                click: () => toggleList(calendarRef),
-            },
-            createEventButton: {
-                text: "",
-                click: () => openCreationModal(calendarRef),
-            },
-            monthButton: {
-                text: "Mes",
-                click: () => setMonthView(calendarRef),
-            },
-            weekButton: {
-                text: "Semana",
-                click: () => setWeekView(calendarRef),
-            },
-            dayButton: {
-                text: "Día",
-                click: () => setDayView(calendarRef),
-            },
-        }),
-        [
-            calendarRef,
-            toggleList,
-            openCreationModal,
-            setMonthView,
-            setWeekView,
-            setDayView,
-        ],
-    );
-
     const onWindowResize = useCallback(() => {
         resizeHandler(calendarRef);
     }, [calendarRef, resizeHandler]);
-
-    const headerToolbarConfig = useMemo(
-        () => ({
-            left: "prev,next today",
-            center: "title",
-            right: "createEventButton toggleListButton monthButton,weekButton,dayButton",
-        }),
-        [],
-    );
 
     const handleFcEventClick = useCallback(
         (info) => {
@@ -237,7 +201,9 @@ const BaseCalendar = ({
 
     const handleTimedEventDidMount = useCallback((info) => {
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => widenTimeGridWeekEventHarness(info));
+            requestAnimationFrame(() => {
+                widenTimeGridColumnEventHarness(info);
+            });
         });
     }, []);
 
@@ -251,24 +217,9 @@ const BaseCalendar = ({
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}
-            titleFormat={(arg) => generateTitle(arg)}
-            views={{
-                timeGridDay: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                    slotMinTime: "08:00:00",
-                    slotMaxTime: "18:00:00",
-                },
-                timeGridWeek: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                    slotMinTime: "08:00:00",
-                    slotMaxTime: "18:00:00",
-                },
-                dayGridMonth: {
-                    dayHeaderContent: (arg) => getWeekDayName(arg),
-                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
-                },
-            }}
-            windowResize={() => resizeHandler(calendarRef)}
+            titleFormat={titleFormatFn}
+            views={viewsConfig}
+            windowResize={onWindowResize}
             customButtons={customButtons}
             events={visibleEvents}
             datesSet={handleDatesSet}

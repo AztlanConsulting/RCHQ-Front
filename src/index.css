@@ -358,8 +358,9 @@ svg {
     vertical-align: middle;
 }
 
-/* Weekly time grid: default 30m slots stay tall; hide minor-slot divider hairline */
-.fc-timeGridWeek-view .fc-timegrid-slot-minor {
+/* Time grid (week + day): 30m slot rows; hide minor-slot divider hairline */
+.fc-timeGridWeek-view .fc-timegrid-slot-minor,
+.fc-timeGridDay-view .fc-timegrid-slot-minor {
     border-top-color: transparent !important;
     box-shadow: none !important;
 }
