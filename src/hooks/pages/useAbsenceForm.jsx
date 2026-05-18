@@ -69,7 +69,7 @@ const getSubmitErrorMessage = (error) => {
     }
 
     if (error?.status === 403) {
-        return "No tienes permisos para registrar ausencias.";
+        return "Permisos insuficientes";
     }
 
     if (error?.status === 404) {
