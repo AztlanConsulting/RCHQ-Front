@@ -25,12 +25,14 @@ const LogsHouse = () => {
   } = useHouseLogs();
 
   return (
-    <div className="p-4 sm:p-8 md:flex md:h-full md:flex-col">
-      <h1 className="text-3xl font-bold text-[#121212] sm:text-4xl">
-        Acciones registradas dentro de app de la casa
-      </h1>
+    <div className="p-8 md:flex md:h-full md:flex-col">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-[#121212]">
+          Acciones registradas dentro de app de la casa
+        </h1>
+      </div>
 
-      <div className="mt-6">
+      <div className="mb-6">
         <HouseLogsFilters
           responsibleQuery={responsibleQuery}
           setResponsibleQuery={setResponsibleQuery}
@@ -44,7 +46,7 @@ const LogsHouse = () => {
         />
       </div>
 
-      <div className="mt-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
+      <div className="md:min-h-0 md:flex-1 md:overflow-y-auto">
         <HouseLogsTable logs={logs} loading={loading} error={error} />
       </div>
 
