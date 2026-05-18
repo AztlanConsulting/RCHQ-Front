@@ -70,10 +70,10 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
-  stackMaxHeightClass = "max-h-[65vh]",
+  stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
 }) => {
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
+    <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario
@@ -106,7 +106,7 @@ const CalendarFilters = ({
           })}
         </div>
       ) : null}
-      <div className={`flex flex-col gap-4 mt-4 ${stackMaxHeightClass}`}>
+      <div className={`flex flex-col gap-4 mt-4`}>
         <FilterGroup
           label="ENFOQUE"
           name="focus"
