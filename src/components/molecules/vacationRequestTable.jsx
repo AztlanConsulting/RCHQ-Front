@@ -4,7 +4,9 @@ const VacationRequestTable = ({
     requests,
     view,
     loading,
+    approvingRequestId,
     onViewDetail,
+    onOpenApproveModal,
 }) => {
     if (loading && !requests.length) {
         return (
@@ -62,7 +64,9 @@ const VacationRequestTable = ({
                             key={request.vacationRequestId}
                             request={request}
                             view={view}
+                            approvingRequestId={approvingRequestId}
                             onViewDetail={onViewDetail}
+                            onOpenApproveModal={onOpenApproveModal}
                         />
                     ))}
                 </tbody>

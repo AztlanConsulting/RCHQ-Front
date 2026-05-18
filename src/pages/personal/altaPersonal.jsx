@@ -1,5 +1,4 @@
 import UserInfoSection from "../../components/organism/userInfoSection";
-import Alert from "../../components/atoms/alerts";
 import useEmployeeCreateForm from "../../hooks/pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
@@ -8,9 +7,10 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         roles,
         photo,
         errors,
+        serverError,
         isLoading,
         isLoadingData,
-        setErrors,
+        setServerError,
         setPhoto,
         handleChange,
         handleSubmit,
@@ -31,28 +31,19 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                         </span>
                     </div>
                 ) : (
-                    <div className="relative w-full">
-                        {errors && (
-                            <div className="absolute left-1/2 top-0 z-50 w-full -translate-x-1/2 px-2 sm:-top-6 sm:w-[calc(100%+6rem)] md:w-[calc(100%+12rem)]">
-                                <Alert
-                                    type="error"
-                                    message={errors}
-                                    onClose={() => setErrors(null)}
-                                />
-                            </div>
-                        )}
-
-                        <UserInfoSection
-                            form={form}
-                            handleChange={handleChange}
-                            roles={roles}
-                            photo={photo}
-                            onPhotoChange={setPhoto}
-                            onSubmit={handleSubmit}
-                            onCancel={onCancel || (() => navigate(-1))}
-                            isLoading={isLoading}
-                        />
-                    </div>
+                    <UserInfoSection
+                        form={form}
+                        errors={errors}
+                        serverError={serverError}
+                        onServerErrorClose={() => setServerError(null)}
+                        handleChange={handleChange}
+                        roles={roles}
+                        photo={photo}
+                        onPhotoChange={setPhoto}
+                        onSubmit={handleSubmit}
+                        onCancel={onCancel || (() => navigate(-1))}
+                        isLoading={isLoading}
+                    />
                 )}
             </div>
         </div>

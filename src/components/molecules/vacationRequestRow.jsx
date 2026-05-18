@@ -6,9 +6,16 @@ import {
     getStatusClassName,
 } from "../../utils/vacationRequests";
 
-const VacationRequestRow = ({ request, view, onViewDetail }) => {
+const VacationRequestRow = ({
+    request,
+    view,
+    approvingRequestId,
+    onViewDetail,
+    onOpenApproveModal,
+}) => {
     const employee = request.employee || {};
     const fullName = getSafeText(employee.fullName);
+    const isApproving = approvingRequestId === request.vacationRequestId;
 
     return (
         <tr className="border-b border-gray-200 last:border-b-0">
@@ -74,17 +81,27 @@ const VacationRequestRow = ({ request, view, onViewDetail }) => {
                     {view === "pending" && (
                         <>
                             <Button
-                                title="Aprobar solicitud"
+                                title={
+                                    isApproving
+                                        ? "Aprobando solicitud"
+                                        : "Aprobar solicitud"
+                                }
+                                onClick={() => onOpenApproveModal(request)}
+                                disabled={isApproving}
                                 bgColor="bg-transparent"
                                 hoverColor="hover:bg-gray-100"
                                 activeColor="active:bg-gray-200"
                                 width="w-10"
                                 height="h-10"
-                                className="rounded-full"
+                                className="rounded-full disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <img
                                     src="/checkMark.svg"
-                                    alt="Aprobar solicitud"
+                                    alt={
+                                        isApproving
+                                            ? "Aprobando solicitud"
+                                            : "Aprobar solicitud"
+                                    }
                                     className="h-5 w-5"
                                 />
                             </Button>
