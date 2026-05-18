@@ -246,18 +246,29 @@ describe("useAbsenceForm", () => {
         expect(createAbsenceService).not.toHaveBeenCalled();
     });
 
-    it("rechaza emojis en la descripcion", async () => {
+    it("no inserta emojis ni caracteres especiales en la descripcion", async () => {
         const { result } = await setupHook();
 
-        fillAbsenceForm(result, {
-            description: "Reposo medico \u{1f600}",
+        const form = fillAbsenceForm(result);
+
+        act(() => {
+            result.current.setField(
+                "description",
+                `${form.description} @$😀`,
+            );
         });
+
+        expect(result.current.form.description).toBe(form.description);
+
         await submitForm(result);
 
-        expect(result.current.errors.description).toBe(
-            "Descripci\u00f3n no permite caracteres especiales",
-        );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+            absenceTypeId: form.absenceTypeId,
+            startDate: form.startDate,
+            endDate: form.endDate,
+            description: form.description,
+            file: undefined,
+        });
     });
 
     it("rechaza evidencia con formato invalido", async () => {

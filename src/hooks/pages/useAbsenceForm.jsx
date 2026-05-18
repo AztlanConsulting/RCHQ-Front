@@ -4,6 +4,10 @@ import {
     createAbsenceService,
     getAbsenceAddData,
 } from "../../services/calendarService";
+import {
+    buildAbsenceFormSchema,
+    sanitizeAbsenceDescription,
+} from "../../utils/schema/evento/absence.schema";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const DEFAULT_FORM = {
@@ -13,10 +17,6 @@ const DEFAULT_FORM = {
     endDate: "",
     description: "",
 };
-
-const DATE_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
-const DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!,.\-+#"_]+$/u;
-const REQUIRED_FIELD_MESSAGE = "Campo obligatorio";
 
 const normalizeInitialDate = (value) =>
     value ? String(value).slice(0, 10) : "";
@@ -204,12 +204,12 @@ export const useAbsenceForm = ({
 
     const setField = useCallback(
         (field, value) => {
-            const nextValue =
-                field === "description" ? String(value ?? "") : value;
-
             setForm((prev) => ({
                 ...prev,
-                [field]: nextValue,
+                [field]:
+                    field === "description"
+                        ? sanitizeAbsenceDescription(value, prev.description)
+                        : value,
             }));
 
             setErrors((prev) => ({
@@ -224,59 +224,22 @@ export const useAbsenceForm = ({
     );
 
     const validate = useCallback(() => {
+        const schema = buildAbsenceFormSchema(dateLimits);
+        const result = schema.safeParse(form);
         const fieldErrors = {};
-        const description = String(form.description ?? "").trim();
-
-        if (!form.employeeId) {
-            fieldErrors.employeeId = REQUIRED_FIELD_MESSAGE;
-        }
-
-        if (!form.absenceTypeId) {
-            fieldErrors.absenceTypeId = REQUIRED_FIELD_MESSAGE;
-        }
-
-        if (!form.startDate) {
-            fieldErrors.startDate = REQUIRED_FIELD_MESSAGE;
-        } else if (String(form.startDate).length !== 10) {
-            fieldErrors.startDate = "El tamaño de la fecha debe ser de 10 caracteres";
-        } else if (!DATE_FORMAT.test(form.startDate)) {
-            fieldErrors.startDate = "Fecha solo puede tener un formato YYYY-MM-DD";
-        } else if (form.startDate < dateLimits.minStartDateValue) {
-            fieldErrors.startDate = 
-                "Fecha de inicio no puede ser menor a un mes antes del día actual.";
-        }
-
-        if (!form.endDate) {
-            fieldErrors.endDate = REQUIRED_FIELD_MESSAGE;
-        } else if (String(form.endDate).length !== 10) {
-            fieldErrors.endDate = "El tamaño de la fecha debe ser de 10 caracteres";
-        } else if (!DATE_FORMAT.test(form.endDate)) {
-            fieldErrors.endDate = "Fecha solo puede tener un formato YYYY-MM-DD";
-        } else if (form.endDate > dateLimits.maxEndDateValue) {
-            fieldErrors.endDate = "Fecha de fin no puede ser mayor a un año.";
-        }
-
-        if (
-            !fieldErrors.startDate &&
-            !fieldErrors.endDate &&
-            form.endDate < form.startDate
-        ) {
-            fieldErrors.startDate =
-                "Fecha de inicio no puede ser mayor a la de fin";
-        }
-
-        if (!description) {
-            fieldErrors.description = REQUIRED_FIELD_MESSAGE;
-        } else if (description.length > 200) {
-            fieldErrors.description =
-                "Descripción no puede ser mayor a 200 caracteres";
-        } else if (!DESCRIPTION_PATTERN.test(description)) {
-            fieldErrors.description =
-                "Descripción no permite caracteres especiales";
-        }
 
         if (evidenceError) {
             fieldErrors.file = evidenceError;
+        }
+
+        if (!result.success) {
+            result.error.issues.forEach((issue) => {
+                const key = issue.path[issue.path.length - 1];
+
+                if (key && !fieldErrors[key]) {
+                    fieldErrors[key] = issue.message;
+                }
+            });
         }
 
         setErrors(fieldErrors);
@@ -288,10 +251,7 @@ export const useAbsenceForm = ({
 
         if (messages.length > 0) return null;
 
-        return {
-            ...form,
-            description,
-        };
+        return result.data;
     }, [dateLimits, evidenceError, form, onValidationAlert]);
 
     const handleSubmit = useCallback(async () => {
