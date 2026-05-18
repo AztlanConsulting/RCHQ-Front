@@ -27,7 +27,6 @@ const EmployeeAdminCard = ({
   loadingCatalogues,
   adminForm,
   roles,
-  houses,
   frecuentPaymentTypes,
   setAdminField,
   toggleWorkday,
@@ -164,14 +163,6 @@ const EmployeeAdminCard = ({
         ) : (
           <div className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Casa" id="houseId"
-                value={adminForm.houseId}
-                onChange={(e) => setAdminField("houseId", e.target.value)}
-                options={houses.map((h) => ({ value: h.houseId, label: h.name }))}
-                placeholder="Selecciona una casa"
-                labelColor="text-slate-500"
-              />
               <SelectField
                 label="Puesto" id="roleId"
                 value={adminForm.roleId}

@@ -109,26 +109,6 @@ describe("SideBar", () => {
       screen.getByRole("button", { name: "Abrir menú" }),
     ).toBeInTheDocument();
   });
-
-  it("muestra Registros para Coordinador", () => {
-    setupSideBar({ user: { role: { name: "Coordinador" } } });
-    renderSideBar();
-
-    expect(
-      screen.getAllByRole("link", { name: "Acciones registradas" }).length,
-    ).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Acciones registradas" })[0]).toHaveAttribute(
-      "href",
-      "/app/acciones/casa",
-    );
-  });
-
-  it("no muestra Registros para roles distintos de Coordinador", () => {
-    setupSideBar({ user: { role: { name: "Admin" } } });
-    renderSideBar();
-
-    expect(screen.queryByRole("link", { name: "Acciones registradas" })).toBeNull();
-  });
 });
 
 describe("SideBar expandida", () => {

@@ -1,6 +1,8 @@
 import Alert from "../../../atoms/alerts";
 import Button from "../../../atoms/button";
+import CheckboxField from "../../../atoms/checkboxField";
 import DateField from "../../../atoms/dateField";
+import ErrorText from "../../../atoms/errorText";
 import SelectField from "../../../atoms/selectField";
 import TimeField from "../../../atoms/timeField";
 import OverlapModal from "../../overlapModal";
@@ -194,48 +196,5 @@ const CasaForm = (props) => {
         </>
     );
 };
-
-const ErrorText = ({ children }) => (
-    <p
-        style={{
-            margin: "4px 0 0",
-            fontSize: "12px",
-            color: "#dc2626",
-        }}
-    >
-        {children}
-    </p>
-);
-
-const CheckboxField = ({ id, label, checked, onChange }) => (
-    <label
-        htmlFor={id}
-        style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: "13px",
-            color: "#111827",
-            cursor: "pointer",
-            userSelect: "none",
-        }}
-    >
-        <input
-            type="checkbox"
-            id={id}
-            checked={checked}
-            onChange={(e) => onChange(e.target.checked)}
-            style={{
-                width: "15px",
-                height: "15px",
-                accentColor: "#1E3A5F",
-                cursor: "pointer",
-                flexShrink: 0,
-            }}
-        />
-
-        {label}
-    </label>
-);
 
 export default CasaForm;

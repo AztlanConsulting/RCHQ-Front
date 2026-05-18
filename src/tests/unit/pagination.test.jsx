@@ -10,7 +10,6 @@ describe("Pagination Component", () => {
     page: 2,
     totalPages: 5,
     total: 50,
-    entityLabel: "empleados",
     onPrevPage: mockOnPrev,
     onNextPage: mockOnNext,
     loading: false,

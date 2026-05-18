@@ -1,8 +1,10 @@
 import FormField from "./formField";
-import SelectField from "../atoms/selectField";
-import PhotoUploader from "../atoms/photoUploader";
-import Button from "../atoms/button";
+import Alert from "../atoms/alerts";
 import DateField from "../atoms/dateField";
+import ErrorText from "../atoms/errorText";
+import PhotoUploader from "../atoms/photoUploader";
+import SelectField from "../atoms/selectField";
+import Button from "../atoms/button";
 
 const UserIcon = () => (
     <svg
@@ -25,6 +27,9 @@ const LABEL_COLOR = "text-[#6b6b6b]";
 
 const UserInfoSection = ({
     form,
+    errors = {},
+    serverError,
+    onServerErrorClose,
     handleChange,
     roles = [],
     photo,
@@ -39,7 +44,7 @@ const UserInfoSection = ({
     }));
 
     return (
-        <section className="bg-white rounded-xl p-8 flex flex-col gap-6 shadow-sm border border-[#e0e0e0]">
+        <section className="relative bg-white rounded-xl p-8 flex flex-col gap-6 shadow-sm border border-[#e0e0e0]">
             <div className="flex items-center gap-3">
                 <UserIcon />
 
@@ -48,95 +53,148 @@ const UserInfoSection = ({
                 </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                <FormField
-                    label="Nombre"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    maxLength={50}
-                    labelColor={LABEL_COLOR}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
+                <div>
+                    <FormField
+                        label="Nombre"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                        maxLength={50}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.name && <ErrorText>{errors.name}</ErrorText>}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Registro Federal de Contribuyentes (RFC)"
-                    name="rfc"
-                    value={form.rfc}
-                    onChange={handleChange}
-                    maxLength={13}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Registro Federal de Contribuyentes (RFC)"
+                        name="rfc"
+                        value={form.rfc}
+                        onChange={handleChange}
+                        maxLength={13}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.rfc && <ErrorText>{errors.rfc}</ErrorText>}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Apellidos"
-                    name="surname"
-                    value={form.surname}
-                    onChange={handleChange}
-                    required
-                    maxLength={50}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Apellidos"
+                        name="surname"
+                        value={form.surname}
+                        onChange={handleChange}
+                        required
+                        maxLength={50}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.surname && (
+                            <ErrorText>{errors.surname}</ErrorText>
+                        )}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Número de seguro social (NSS)"
-                    name="nss"
-                    value={form.nss}
-                    onChange={handleChange}
-                    maxLength={11}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Número de seguro social (NSS)"
+                        name="nss"
+                        value={form.nss}
+                        onChange={handleChange}
+                        maxLength={11}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.nss && <ErrorText>{errors.nss}</ErrorText>}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Correo"
-                    name="email"
-                    type="text"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    maxLength={60}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Correo"
+                        name="email"
+                        type="text"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                        maxLength={60}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.email && <ErrorText>{errors.email}</ErrorText>}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Clave Bancaria Estandarizada (CLABE)"
-                    name="bankAccount"
-                    value={form.bankAccount}
-                    onChange={handleChange}
-                    maxLength={18}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Clave Bancaria Estandarizada (CLABE)"
+                        name="bankAccount"
+                        value={form.bankAccount}
+                        onChange={handleChange}
+                        maxLength={18}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.bankAccount && (
+                            <ErrorText>{errors.bankAccount}</ErrorText>
+                        )}
+                    </div>
+                </div>
 
-                <FormField
-                    label="Clave Única de Registro de Población (CURP)"
-                    name="curp"
-                    value={form.curp}
-                    onChange={handleChange}
-                    required
-                    maxLength={18}
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <FormField
+                        label="Clave Única de Registro de Población (CURP)"
+                        name="curp"
+                        value={form.curp}
+                        onChange={handleChange}
+                        required
+                        maxLength={18}
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div className="h-5">
+                        {errors.curp && <ErrorText>{errors.curp}</ErrorText>}
+                    </div>
+                </div>
 
-                <DateField
-                    label="Fecha de Nacimiento"
-                    name="birthDate"
-                    value={form.birthDate}
-                    onChange={handleChange}
-                    labelColor={LABEL_COLOR}
-                    minDate={new Date("1900-01-01")}
-                    maxDate={new Date()}
-                />
+                <div>
+                    <DateField
+                        label="Fecha de Nacimiento"
+                        name="birthDate"
+                        value={form.birthDate}
+                        onChange={handleChange}
+                        labelColor={LABEL_COLOR}
+                        minDate={new Date("1900-01-01")}
+                        maxDate={new Date()}
+                    />
+                    <div className="h-5">
+                        {errors.birthDate && (
+                            <ErrorText>{errors.birthDate}</ErrorText>
+                        )}
+                    </div>
+                </div>
 
-                <SelectField
-                    label="Puesto"
-                    name="roleId"
-                    value={form.roleId}
-                    onChange={handleChange}
-                    options={roleOptions}
-                    placeholder="Selecciona un puesto"
-                    required
-                    labelColor={LABEL_COLOR}
-                />
+                <div>
+                    <SelectField
+                        label="Puesto"
+                        name="roleId"
+                        value={form.roleId}
+                        onChange={handleChange}
+                        options={roleOptions}
+                        placeholder="Selecciona un puesto"
+                        required
+                        labelColor={LABEL_COLOR}
+                    />
+                    <div>
+                        {errors.roleId && (
+                            <ErrorText>{errors.roleId}</ErrorText>
+                        )}
+                    </div>
+                </div>
 
                 <div className="row-span-2">
                     <PhotoUploader
@@ -147,6 +205,16 @@ const UserInfoSection = ({
                     />
                 </div>
             </div>
+
+            {serverError && (
+                <div className="absolute left-1/2 top-4 z-50 w-full -translate-x-1/2 px-2">
+                    <Alert
+                        type="error"
+                        message={serverError}
+                        onClose={onServerErrorClose}
+                    />
+                </div>
+            )}
 
             <div className="flex justify-end gap-4 mt-4">
                 <Button

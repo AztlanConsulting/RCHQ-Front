@@ -9,11 +9,9 @@ const Pagination = ({
   loading,
   hasItems,
   hasEmployees,
-  entityLabel = "empleados",
-  itemLabel,
+  itemLabel = "empleados",
 }) => {
   const shouldShowPagination = hasItems ?? hasEmployees;
-  const resolvedItemLabel = itemLabel ?? entityLabel;
 
   if (!shouldShowPagination) {
     return null;
@@ -33,10 +31,9 @@ const Pagination = ({
         className="disabled:opacity-50 disabled:cursor-not-allowed"
       />
 
-      <div className="flex items-center justify-center px-2 text-center">
-        <span className="text-sm text-gray-600">
-          Página {page} de {totalPages} | Total: {total}
-          {resolvedItemLabel ? ` ${resolvedItemLabel}` : ""}
+      <div className="flex items-center justify-center gap-4">
+        <span className="text-center text-sm text-gray-600">
+          Página {page} de {totalPages} | Total: {total} {itemLabel}
         </span>
       </div>
 
