@@ -17,7 +17,7 @@ const LogsTable = ({ logs, loading }) => {
     return (
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <div className="p-8 text-center text-gray-500">
-          No hay logs disponibles para esta casa.
+          No hay registro de actividades disponibles para esta casa.
         </div>
       </div>
     );

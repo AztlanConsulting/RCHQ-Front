@@ -45,7 +45,7 @@ const Logs = () => {
     <div className="min-h-screen bg-white p-8">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-[#121212]">Logs de trabajadores</h1>
+          <h1 className="text-4xl font-bold text-[#121212]">Historial de actividades en Tochan</h1>
           <p className="mt-2 text-sm text-slate-600">
             Consulta el historial de acciones registradas en tu casa hogar.
           </p>

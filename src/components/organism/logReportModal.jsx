@@ -32,7 +32,7 @@ const LogReportModal = ({
     <Modal
       open={open}
       onClose={onClose}
-      title="Generar reporte de logs"
+      title="Generar reporte de actividades"
       className="max-w-lg"
     >
       <div className="space-y-6">
