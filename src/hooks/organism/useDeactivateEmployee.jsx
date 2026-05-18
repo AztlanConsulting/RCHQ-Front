@@ -25,9 +25,13 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
 
   const handleReasonChange = (value) => {
     if (value.length > 250) return;
-    if (/[<>]/.test(value)) return;
     setReason(value);
-    if (fieldError) setFieldError(null);
+    const parsed = deactivateEmployeeSchema.pick({ reason: true }).safeParse({ reason: value });
+    if (!parsed.success) {
+      setFieldError(parsed.error.issues[0].message);
+    } else {
+      setFieldError(null);
+    }
   };
 
   const handleSubmit = async () => {

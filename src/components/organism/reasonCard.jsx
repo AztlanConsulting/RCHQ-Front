@@ -1,3 +1,5 @@
+import { REASON_REGEX } from "../../utils/schema/employee/deactivate.schema";
+
 const MAX_CHARS = 250;
 
 const ReasonCard = ({
@@ -36,7 +38,11 @@ const ReasonCard = ({
               id="deactivate-reason"
               rows={5}
               value={reason}
-              onChange={(e) => onReasonChange(e.target.value)}
+            onChange={(e) => {
+              if (REASON_REGEX.test(e.target.value)) {
+                onReasonChange(e.target.value);
+              }
+            }}
               disabled={isSubmitting}
               maxLength={MAX_CHARS}
               placeholder="Escribe la razón de la baja..."
