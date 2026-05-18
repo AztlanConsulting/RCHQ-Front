@@ -28,7 +28,7 @@ const ReasonCard = ({
 
           <div
             className={`flex w-full cursor-text rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040] ${
-              fieldError ? "ring-1 ring-red-400" : ""
+              fieldError ? "ring-1 ring-[#9b1c1c]/50" : ""
             }`}
             onClick={() => document.getElementById("deactivate-reason")?.focus()}
           >
@@ -45,10 +45,10 @@ const ReasonCard = ({
           </div>
 
           <div className="flex items-center justify-between">
-            <span className={`text-xs ${fieldError ? "text-red-500 font-medium" : "text-transparent"}`}>
+            <span className={`text-xs ${fieldError ? "text-[#9b1c1c] font-medium" : "text-transparent"}`}>
               {fieldError ?? "placeholder"}
             </span>
-            <span className={`text-xs tabular-nums ${reason.length >= MAX_CHARS ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+            <span className={`text-xs tabular-nums ${reason.length >= MAX_CHARS ? "text-[#9b1c1c] font-semibold" : "text-gray-400"}`}>
               {reason.length}/{MAX_CHARS}
             </span>
           </div>
@@ -91,7 +91,7 @@ const ReasonCard = ({
             type="button"
             onClick={onSubmit}
             disabled={isSubmitting}
-            className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex-1 rounded-lg bg-[#9b1c1c] py-2.5 text-sm font-semibold text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Procesando..." : "Dar de baja"}
           </button>
