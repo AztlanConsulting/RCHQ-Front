@@ -81,7 +81,6 @@ describe("Prueba Unitaria: ReasonCard", () => {
     expect(btnSubmit).toBeDisabled();
     expect(btnCancel).toBeDisabled();
     
-    // Intentar cliquear la lista negra no debería disparar onBlacklistChange
     fireEvent.click(checkbox);
     expect(defaultProps.onBlacklistChange).not.toHaveBeenCalled();
   });

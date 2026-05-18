@@ -4,12 +4,10 @@ import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmploye
 import ReasonCard from "../../components/organism/reasonCard";
 import { deactivateEmployeeService } from "../../services/deactivateEmployeeService";
 
-// Secuestramos el servicio
 vi.mock("../../services/deactivateEmployeeService", () => ({
   deactivateEmployeeService: vi.fn(),
 }));
 
-// Componente contenedor para probar la integración del Hook + UI
 const TestIntegrationComponent = ({ employeeId, employeeName, setAlertMock }) => {
   const {
     isModalOpen,
@@ -61,10 +59,8 @@ describe("Integración: Dar de baja a un empleado", () => {
       />
     );
     
-    // Abrimos el modal
     fireEvent.click(screen.getByText("Abrir Modal"));
     
-    // Asegurarnos que se abrió
     expect(await screen.findByText(/Estás a punto de dar de baja a "María Gómez"/i)).toBeInTheDocument();
   };
 
@@ -72,12 +68,10 @@ describe("Integración: Dar de baja a un empleado", () => {
     deactivateEmployeeService.mockResolvedValueOnce({ success: true });
     await renderAndOpenModal();
     
-    // Clic en enviar sin escribir razón
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
     });
 
-    // Al quitar la restricción min(1), el servicio se debe llamar correctamente
     expect(deactivateEmployeeService).toHaveBeenCalledWith(employeeId, "", false);
   });
 
@@ -85,20 +79,16 @@ describe("Integración: Dar de baja a un empleado", () => {
     deactivateEmployeeService.mockResolvedValueOnce({ success: true });
     await renderAndOpenModal();
 
-    // Llenamos la razón
     fireEvent.change(screen.getByPlaceholderText("Escribe la razón de la baja..."), {
       target: { value: "Término de contrato" },
     });
 
-    // Enviamos
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
     });
 
-    // Verificamos que llamó al servicio correctamente
     expect(deactivateEmployeeService).toHaveBeenCalledWith(employeeId, "Término de contrato", false);
     
-    // Verificamos que lanzó la alerta de éxito
     expect(setAlertMock).toHaveBeenCalledWith({
       type: "success",
       message: '"María Gómez" ha sido dado de baja.',
@@ -113,7 +103,6 @@ describe("Integración: Dar de baja a un empleado", () => {
       target: { value: "Faltas graves" },
     });
 
-    // Clickeamos el checkbox de lista negra
     fireEvent.click(screen.getByRole("checkbox"));
 
     await act(async () => {

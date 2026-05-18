@@ -25,7 +25,7 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
 
   const handleReasonChange = (value) => {
     if (value.length > 250) return;
-    if (/[<>]/.test(value)) return; // Bloquear caracteres potencialmente peligrosos (XSS) en tiempo real
+    if (/[<>]/.test(value)) return;
     setReason(value);
     if (fieldError) setFieldError(null);
   };
@@ -42,13 +42,13 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
 
     try {
       await deactivateEmployeeService(employeeId, reason, addToBlacklist);
-      setIsModalOpen(false); // primero cierra
+      setIsModalOpen(false);
       setAlert({
         type: "success",
         message: `"${employeeName}" ha sido dado de baja${addToBlacklist ? " y agregado a la lista negra." : "."}`,
       });
     } catch (err) {
-      setIsModalOpen(false); // primero cierra
+      setIsModalOpen(false);
       setAlert({
         type: "error",
         message: err?.message ?? `Hubo un error al dar de baja a "${employeeName}".`,
