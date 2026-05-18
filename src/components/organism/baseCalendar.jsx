@@ -248,9 +248,13 @@ const BaseCalendar = ({
             views={{
                 timeGridDay: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotMinTime: "08:00:00",
+                    slotMaxTime: "18:00:00",
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotMinTime: "08:00:00",
+                    slotMaxTime: "18:00:00",
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
