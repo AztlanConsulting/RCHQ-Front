@@ -2,10 +2,9 @@ import { useState } from "react";
 import { deactivateEmployeeSchema } from "@/utils/schema/employee/deactivate.schema";
 import {
   deactivateEmployeeService,
-  insertIntoBlacklistService,
 } from "@/services/deactivateEmployeeService";
 
-export const useDeactivateEmployee = (employeeId, employeeName, curp, setAlert) => {
+export const useDeactivateEmployee = (employeeId, employeeName, setAlert) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [addToBlacklist, setAddToBlacklist] = useState(false);
@@ -41,41 +40,19 @@ export const useDeactivateEmployee = (employeeId, employeeName, curp, setAlert) 
     setFieldError(null);
 
     try {
-      await deactivateEmployeeService(employeeId, reason);
+      await deactivateEmployeeService(employeeId, reason, addToBlacklist);
+      setIsModalOpen(false); // primero cierra
+      setAlert({
+        type: "success",
+        message: `"${employeeName}" ha sido dado de baja${addToBlacklist ? " y agregado a la lista negra." : "."}`,
+      });
     } catch (err) {
+      setIsModalOpen(false); // primero cierra
       setAlert({
         type: "error",
         message: err?.message ?? `Hubo un error al dar de baja a "${employeeName}".`,
       });
-      setIsModalOpen(false);
-      setIsSubmitting(false);
-      return;
     }
-
-    if (!addToBlacklist) {
-      setAlert({
-        type: "success",
-        message: `"${employeeName}" ha sido dado de baja.`,
-      });
-      setIsModalOpen(false);
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      await insertIntoBlacklistService(curp);
-      setAlert({
-        type: "success",
-        message: `"${employeeName}" ha sido dado de baja y agregado a la lista negra.`,
-      });
-    } catch (err) {
-      setAlert({
-        type: "error",
-        message: err?.message ?? `"${employeeName}" ha sido dado de baja, pero hubo un error al agregarlo a la lista negra.`,
-      });
-    }
-
-    setIsModalOpen(false);
     setIsSubmitting(false);
   };
 

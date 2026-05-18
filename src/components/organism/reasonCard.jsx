@@ -1,23 +1,3 @@
-/**
- * reasonCard.jsx
- * Organism — Modal para dar de baja a un empleado.
- *
- * Recibe todo su estado desde useDeactivateEmployee (sin lógica propia).
- * Se monta dentro de detalleEmpleado.jsx.
- *
- * Props:
- *  - isOpen        {boolean}
- *  - employeeName  {string}
- *  - reason        {string}
- *  - onReasonChange {(value: string) => void}
- *  - addToBlacklist {boolean}
- *  - onBlacklistChange {(checked: boolean) => void}
- *  - fieldError    {string|null}
- *  - isSubmitting  {boolean}
- *  - onSubmit      {() => void}
- *  - onCancel      {() => void}
- */
-
 const MAX_CHARS = 250;
 
 const ReasonCard = ({
@@ -35,12 +15,7 @@ const ReasonCard = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-8 flex flex-col gap-6">
         <p className="text-center text-xl font-semibold text-gray-900 leading-snug">
           Estás a punto de dar de baja a &quot;{employeeName}&quot;
@@ -50,20 +25,25 @@ const ReasonCard = ({
           <label htmlFor="deactivate-reason" className="text-sm font-medium text-gray-700">
             Razón
           </label>
-          <textarea
-            id="deactivate-reason"
-            rows={5}
-            value={reason}
-            onChange={(e) => onReasonChange(e.target.value)}
-            disabled={isSubmitting}
-            maxLength={MAX_CHARS}
-            placeholder="Escribe la razón de la baja..."
-            className={`w-full resize-none rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:opacity-60 ${
-              fieldError
-                ? "border-red-400 focus:ring-red-300"
-                : "border-gray-300 focus:ring-blue-300"
+
+          <div
+            className={`flex w-full cursor-text rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040] ${
+              fieldError ? "ring-1 ring-red-400" : ""
             }`}
-          />
+            onClick={() => document.getElementById("deactivate-reason")?.focus()}
+          >
+            <textarea
+              id="deactivate-reason"
+              rows={5}
+              value={reason}
+              onChange={(e) => onReasonChange(e.target.value)}
+              disabled={isSubmitting}
+              maxLength={MAX_CHARS}
+              placeholder="Escribe la razón de la baja..."
+              className="w-full resize-none bg-transparent border-0 outline-none text-sm font-medium text-[#222] placeholder-[#aaaaaa]"
+            />
+          </div>
+
           <div className="flex items-center justify-between">
             <span className={`text-xs ${fieldError ? "text-red-500 font-medium" : "text-transparent"}`}>
               {fieldError ?? "placeholder"}
@@ -74,16 +54,37 @@ const ReasonCard = ({
           </div>
         </div>
 
-        <label className="flex items-center gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={addToBlacklist}
-            onChange={(e) => onBlacklistChange(e.target.checked)}
-            disabled={isSubmitting}
-            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"
-          />
-          <span className="text-sm text-gray-700">Agregar a la lista negra.</span>
-        </label>
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={() => !isSubmitting && onBlacklistChange(!addToBlacklist)}
+          role="checkbox"
+          aria-checked={addToBlacklist}
+          tabIndex={0}
+          onKeyDown={(e) => e.key === " " && !isSubmitting && onBlacklistChange(!addToBlacklist)}
+        >
+          <div
+            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
+              addToBlacklist
+                ? "bg-[#1e3a5f] border-[#1e3a5f]"
+                : "bg-neutral-50 border-gray-300 shadow-[inset_0px_2px_3px_#00000030]"
+            } ${isSubmitting ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+          >
+            {addToBlacklist && (
+              <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                <path
+                  d="M2 6l3 3 5-5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            )}
+          </div>
+          <span className={`text-sm text-gray-700 ${isSubmitting ? "opacity-60" : ""}`}>
+            Agregar a la lista negra.
+          </span>
+        </div>
 
         <div className="flex gap-3">
           <button

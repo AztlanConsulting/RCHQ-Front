@@ -1,11 +1,11 @@
 import { secureFetch } from "@/utils/secureFetchWrapper";
 import { buildApiError } from "@/utils/apiErrors";
 
-export const deactivateEmployeeService = async (employeeId, reason) => {
+export const deactivateEmployeeService = async (employeeId, reason, addToBlacklist) => {
   const response = await secureFetch(`/employee/${employeeId}/deactivate`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reason }),
+    body: JSON.stringify({ reason, addToBlacklist }),
   });
 
   const data = await response.json();
