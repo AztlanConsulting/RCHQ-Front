@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import AbsenceDetail from "../../components/molecules/calendarCards/absenceDetail";
 
+vi.mock("/document.svg", () => ({ default: "document.svg" }));
+
 const absence = {
   eventType: "Médica",
   employeeName: "Laura Mendoza",

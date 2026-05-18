@@ -124,7 +124,7 @@ describe("SideBar", () => {
   });
 
   it("no muestra Registros para roles distintos de Coordinador", () => {
-    setupSideBar({ user: { role: { name: "Admin" } } });
+    setupSideBar({ user: { role: { name: "Administrador" } } });
     renderSideBar();
 
     expect(screen.queryByRole("link", { name: "Acciones registradas" })).toBeNull();
@@ -207,7 +207,7 @@ describe("SideBar - rutas por rol", () => {
   it("manda Vacaciones a /app/vacaciones cuando el usuario no es Coordinador", () => {
     setupSideBar({
       expanded: true,
-      user: { role: { name: "Admin" } },
+      user: { role: { name: "Administrador" } },
     });
 
     renderSideBar();

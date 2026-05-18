@@ -20,6 +20,7 @@ import Documents from "./pages/documents";
 import DetalleEmpleado from "./pages/detalleEmpleado";
 import LogsHouse from "./pages/logsHouse";
 import VacationRequests from "./pages/vacationRequests";
+import Logs from "./pages/logs";
 import RoleRoute from "./components/roleRoute";
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
             <Route element={<RoleRoute allowedRoles={["Coordinador"]} />}>
               <Route path="acciones/casa" element={<LogsHouse />} />
               <Route path="vacaciones/solicitudes" element={<VacationRequests />} />
+              <Route path="logs" element={<Logs />} />
             </Route>
           </Route>
         </Route>

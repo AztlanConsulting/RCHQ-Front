@@ -1,31 +1,34 @@
+import Alert from "../components/atoms/alerts";
 import Button from "../components/atoms/button";
 import Pagination from "../components/molecules/pagination";
-import HouseLogsFilters from "../components/molecules/houseLogsFilters";
-import HouseLogsTable from "../components/molecules/houseLogsTable";
+import LogsFilters from "../components/molecules/logsFilters";
+import LogsTable from "../components/molecules/logsTable";
 import LogReportModal from "../components/organism/logReportModal";
 import { useHouseLogs } from "../hooks/pages/useHouseLogs";
 
-const LogsHouse = () => {
+const Logs = () => {
   const {
     logs,
-    totalLogs,
-    totalPages,
+    pagination,
     page,
     loading,
     error,
-    responsibleQuery,
-    setResponsibleQuery,
-    affectedQuery,
-    setAffectedQuery,
+    clearError,
+    handleNextPage,
+    handlePrevPage,
+    searchInput,
+    setSearchInput,
     filteredActionOptions,
     selectedActionIds,
     actionSearch,
     setActionSearch,
+    startDate,
+    endDate,
+    handleStartDateChange,
+    handleEndDateChange,
     selectedActionLabel,
     toggleActionValue,
     clearActionSelection,
-    dateFilter,
-    setDateFilter,
     isReportModalOpen,
     openReportModal,
     closeReportModal,
@@ -36,17 +39,16 @@ const LogsHouse = () => {
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
-    handleNextPage,
-    handlePrevPage,
   } = useHouseLogs();
 
   return (
-    <div className="p-8 md:flex md:h-full md:flex-col">
+    <div className="min-h-screen bg-white p-8">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-[#121212]">
-            Historial de actividades en Tochan
-          </h1>
+          <h1 className="text-4xl font-bold text-[#121212]">Historial de actividades en Tochan</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Consulta el historial de acciones registradas en tu casa hogar.
+          </p>
         </div>
 
         <Button
@@ -61,37 +63,39 @@ const LogsHouse = () => {
         />
       </div>
 
-      <div className="mb-6">
-        <HouseLogsFilters
-          responsibleQuery={responsibleQuery}
-          setResponsibleQuery={setResponsibleQuery}
-          affectedQuery={affectedQuery}
-          setAffectedQuery={setAffectedQuery}
-          filteredActionOptions={filteredActionOptions}
-          selectedActionIds={selectedActionIds}
-          actionSearch={actionSearch}
-          setActionSearch={setActionSearch}
-          selectedActionLabel={selectedActionLabel}
-          toggleActionValue={toggleActionValue}
-          clearActionSelection={clearActionSelection}
-          dateFilter={dateFilter}
-          setDateFilter={setDateFilter}
-        />
-      </div>
+      <LogsFilters
+        searchQuery={searchInput}
+        setSearchQuery={setSearchInput}
+        actionOptions={filteredActionOptions}
+        selectedActionIds={selectedActionIds}
+        actionSearch={actionSearch}
+        setActionSearch={setActionSearch}
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={handleStartDateChange}
+        onEndDateChange={handleEndDateChange}
+        selectedActionLabel={selectedActionLabel}
+        toggleActionValue={toggleActionValue}
+        clearActionSelection={clearActionSelection}
+      />
 
-      <div className="md:min-h-0 md:flex-1 md:overflow-y-auto">
-        <HouseLogsTable logs={logs} loading={loading} error={error} />
-      </div>
+      {error ? (
+        <div className="mb-5">
+          <Alert type="error" message={error} onClose={clearError} />
+        </div>
+      ) : null}
+
+      <LogsTable logs={logs} loading={loading} />
 
       <Pagination
         page={page}
-        totalPages={totalPages}
-        total={totalLogs}
+        totalPages={pagination.totalPages}
+        total={pagination.total}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
         loading={loading}
-        hasEmployees={totalLogs > 0}
-        entityLabel="registros"
+        hasItems={pagination.total > 0}
+        itemLabel="logs"
       />
 
       <LogReportModal
@@ -109,4 +113,4 @@ const LogsHouse = () => {
   );
 };
 
-export default LogsHouse;
+export default Logs;
