@@ -7,7 +7,7 @@ describe("getRoleName", () => {
     });
 
     it("obtiene el rol desde roleName", () => {
-        expect(getRoleName({ roleName: "Admin" })).toBe("admin");
+        expect(getRoleName({ roleName: "Administrador" })).toBe("Administrador");
     });
 
     it("obtiene el rol desde role como string", () => {
@@ -23,6 +23,6 @@ describe("getRoleName", () => {
 describe("hasRole", () => {
     it("compara roles sin importar mayúsculas/minúsculas", () => {
         expect(hasRole({ role: { name: "Coordinador" } }, "coordinador")).toBe(true);
-        expect(hasRole({ role: { name: "Admin" } }, "Coordinador")).toBe(false);
+        expect(hasRole({ role: { name: "Administrador" } }, "Coordinador")).toBe(false);
     });
 });

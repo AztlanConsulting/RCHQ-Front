@@ -35,14 +35,14 @@ import {
 } from "../../services/documentService";
 
 // ─── Helpers ──────────────────────────────────────────────
-const makeToken = (role = "Admin") => {
+const makeToken = (role = "Administrador") => {
   const payload = btoa(JSON.stringify({ id: "emp-123", role }));
   return `header.${payload}.signature`;
 };
 
 const TEST_EMPLOYEE_ID = "emp-123";
 
-const renderPage = (role = "Admin") => {
+const renderPage = (role = "Administrador") => {
   localStorage.setItem("token", makeToken(role));
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
@@ -123,7 +123,7 @@ describe("Documents — carga inicial", () => {
 describe("Documents — permisos por rol", () => {
   it("muestra el botón 'Subir documento' cuando el rol es Administrador", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
-    renderPage("Admin");
+    renderPage("Administrador");
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /subir documento/i }),

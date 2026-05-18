@@ -58,7 +58,7 @@ export const useDocuments = (employeeId) => {
     const userInfo = getUserInfoFromToken();
     if (!userInfo) return;
     const userRole = userInfo.role?.toLowerCase();
-    setCanModify(userRole === "admin" || userRole === "coordinador");
+    setCanModify(userRole === "Administrador" || userRole === "coordinador");
   }, [employeeId]);
 
   useEffect(() => {
