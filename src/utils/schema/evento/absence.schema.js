@@ -4,13 +4,13 @@ const REQUIRED_FIELD_MESSAGE = "Campo obligatorio";
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-const DESCRIPTION_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s¿?¡!,.\-+#"_]+$/;
-const DESCRIPTION_INVALID_REGEX = /[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s¿?¡!,.\-+#"_]/;
+const DESCRIPTION_REGEX = /^[\p{L}\p{N}\s¿?¡!]+$/u;
+const DESCRIPTION_TEST_REGEX = /[^\p{L}\p{N}\s¿?¡!]/u;
 
 export const sanitizeAbsenceDescription = (value, fallback = "") => {
     const nextValue = String(value ?? "");
 
-    return DESCRIPTION_INVALID_REGEX.test(nextValue) ? fallback : nextValue;
+    return DESCRIPTION_TEST_REGEX.test(nextValue) ? fallback : nextValue;
 };
 
 export const buildAbsenceFormSchema = ({
