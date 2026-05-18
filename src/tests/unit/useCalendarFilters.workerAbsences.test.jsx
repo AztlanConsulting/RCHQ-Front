@@ -108,7 +108,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
     await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
     expect(getHouseEmployees).not.toHaveBeenCalled();
 
-    rerender({ viewerRole: "Admin" });
+    rerender({ viewerRole: "Administrador" });
 
     await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
     expect(getAbsenceTypes).toHaveBeenCalledTimes(1);

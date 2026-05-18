@@ -19,7 +19,7 @@ const sanitizeAbsenceDescription = (value = "") =>
     .slice(0, 200);
 
 const canManageAbsenceEvidence = (role) =>
-  role === "Admin" || role === "Coordinador";
+  role === "Administrador" || role === "Coordinador";
 
 const getAbsenceEvidenceLabel = (selectedEvent, viewerRole) => {
   if (!selectedEvent) return "Sin evidencia";
@@ -92,6 +92,14 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
+
+  const showCalendarAlert = useCallback((nextAlert) => {
+    setAlert(nextAlert);
+  }, []);
+
+  const clearCalendarAlert = useCallback(() => {
+    setAlert(null);
+  }, []);
 
   const handleEventClick = useCallback((info) => {
     const detail = eventApiToDetail(info?.event);
@@ -318,7 +326,7 @@ export const useCalendarPage = ({
     } finally {
       setIsLoadingWhileDeleting(false);
     }
-  }, [closeDetail, reloadCurrentRange, selectedEvent?.absenceId]);
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
 
   return {
     selectedEvent,
@@ -345,6 +353,7 @@ export const useCalendarPage = ({
     setAbsenceField,
     handleAbsenceEvidenceChange,
     submitAbsenceEdit,
-    clearCalendarAlert: () => setAlert(null),
+    showCalendarAlert,
+    clearCalendarAlert,
   };
 };

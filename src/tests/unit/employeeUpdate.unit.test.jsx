@@ -668,7 +668,7 @@ describe("EmployeeAdminCard", () => {
 
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Admin")).toBeInTheDocument();
+      expect(screen.getByText("Administrador")).toBeInTheDocument();
     });
 
     it("muestra los checkboxes de días de trabajo", () => {

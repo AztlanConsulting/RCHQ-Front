@@ -70,7 +70,7 @@ describe("useCalendarPage", () => {
     });
   });
 
-  it.each(["Admin", "Coordinador"])(
+  it.each(["Administrador", "Coordinador"])(
     "muestra subir evidencia para %s cuando la ausencia no tiene evidencia",
     (viewerRole) => {
       const { result } = renderHook(() =>

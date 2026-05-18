@@ -65,7 +65,7 @@ describe("RoleRoute", () => {
     it("redirige a calendario si el usuario no tiene rol permitido", () => {
         useAuth.mockReturnValue({
             isAuthenticated: true,
-            user: { role: { name: "Admin" } },
+            user: { role: { name: "Administrador" } },
         });
 
         renderRoleRoute();

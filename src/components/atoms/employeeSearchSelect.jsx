@@ -1,8 +1,9 @@
 import { createPortal } from "react-dom";
 import EmployeeAvatar from "./employeeAvatar";
 import { useEmployeeSearchSelect } from "../../hooks/atoms/useEmployeeSearchSelect";
-import search from "/search.svg";
-import close from "/close.svg";
+
+const searchIcon = "/search.svg";
+const closeIcon = "/close.svg";
 
 const EmployeeSearchSelect = ({
     employees = [],
@@ -37,7 +38,7 @@ const EmployeeSearchSelect = ({
             <div ref={containerRef} className="relative">
                 <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
                     <img
-                        src={search}
+                        src={searchIcon}
                         alt=""
                         aria-hidden="true"
                         className="ml-3 w-4 h-4 flex-shrink-0 opacity-50"
@@ -143,7 +144,7 @@ const EmployeeSearchSelect = ({
                                 className="w-5 h-5 rounded-full bg-[#d1d5db] hover:bg-[#9ca3af] flex-shrink-0 transition-colors ml-auto flex items-center justify-center p-0"
                             >
                                 <img
-                                    src={close}
+                                    src={closeIcon}
                                     alt=""
                                     aria-hidden="true"
                                     className="w-3 h-3"
