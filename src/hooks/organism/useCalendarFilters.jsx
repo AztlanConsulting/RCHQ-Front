@@ -18,7 +18,7 @@ import {
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator"
 
-const daysBetweenDays = (startDate, endDate) => {
+const calculateTotalDays = (startDate, endDate) => {
     const start = toDateOnly(startDate);
     const end = toDateOnly(endDate);
 
@@ -67,7 +67,7 @@ const expandEventsForList = (events = [], isList) => {
             return;
         }
 
-        const totalDays = daysBetweenDays(start, end);
+        const totalDays = calculateTotalDays(start, end);
 
         for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
             const currentDay = new Date(start);
@@ -208,9 +208,9 @@ const getFilteredEvents = (
                     endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || eventStart,
                     isDeleted: Boolean(rawEvent.isDeleted),
                     currentDayIndex: rawEvent.currentDayIndex,
-                    totalDays: rawEvent.totalDays || rawEvent.startDate ? daysBetweenDays(rawEvent.startDate, rawEvent.endDate) : "",
-                    manyDaysStartReadableDate: rawEvent.startDate,
-                    manyDaysEndReadableDate: rawEvent.endDate,
+                    totalDays: rawEvent.totalDays || rawEvent.startDate ? calculateTotalDays(rawEvent.startDate, rawEvent.endDate) : "",
+                    startReadableDate: rawEvent.startDate,
+                    endReadableDate: rawEvent.endDate,
                 },
             };
         });

@@ -41,10 +41,8 @@ export const addDaysToDateOnly = (value, days) => {
 export const eventApiToDetail = (ev) => {
   if (!ev) return null;
   const x = ev.extendedProps ?? {};
-  console.log(x);
   const start = ev.start;
   const end = ev.end;
-  console.log(ev);
   return {
     id: ev.id,
     absenceId: x.absenceId,
@@ -54,10 +52,8 @@ export const eventApiToDetail = (ev) => {
     employeeName: x.employeeName,
     start,
     end,
-
-    readableStart: x.manyDaysStartReadableDate,
-    readableEnd: x.manyDaysEndReadableDate,
-
+    readableStart: x.startReadableDate,
+    readableEnd: x.endReadableDate,
     startStr: start != null ? start.toISOString?.() ?? String(start) : "",
     endStr: end != null ? end.toISOString?.() ?? String(end) : "",
     allDay: ev.allDay,
