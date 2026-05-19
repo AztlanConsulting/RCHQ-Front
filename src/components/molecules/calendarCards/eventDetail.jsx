@@ -1,6 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDateTime } from "../../../utils/calendarEventDetail";
+import Dates from "@/utils/dates"
 
 const EventDetail = ({ event }) => {
   if (!event) return null;
@@ -42,20 +42,20 @@ const EventDetail = ({ event }) => {
           Día (calendario):
         </Type>
         <p className="text-sm">
-          {event.date ? formatEventDateTime(event.date) : "—"}
+          {event.date ? Dates.formatEventDateTime(event.date) : "—"}
         </p>
       </div>
       <div className="w-full flex items-center justify-between gap-4 mb-2">
         <Type variant="metric-label" className="font-bold">
           Inicio:
         </Type>
-        <p className="text-sm">{formatEventDateTime(event.start ?? event.startStr)}</p>
+        <p className="text-sm">{Dates.formatEventDateTime(event.start ?? event.startStr)}</p>
       </div>
       <div className="w-full flex items-center justify-between gap-4 mb-4">
         <Type variant="metric-label" className="font-bold">
           Fin:
         </Type>
-        <p className="text-sm">{formatEventDateTime(event.end ?? event.endStr)}</p>
+        <p className="text-sm">{Dates.formatEventDateTime(event.end ?? event.endStr)}</p>
       </div>
 
       {event.description ? (

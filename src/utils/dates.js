@@ -37,4 +37,14 @@ export class Dates {
         const m = shifted.getMinutes();
         return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
     }
+
+    static formatEventDateTime = (value) => {
+        if (value == null || value === "") return "—";
+        const d = value instanceof Date ? value : new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("es-MX", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+      };
 }
