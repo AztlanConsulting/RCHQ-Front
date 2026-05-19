@@ -7,6 +7,7 @@ import {
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
+import { eventApiToDetail } from "../../utils/calendarEventDetail";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -54,7 +55,7 @@ export const useBaseCalendar = () => {
             return allEvents.filter(
                 (event) =>
                     (event.focus === "ausencias" &&
-                        String(event.employeeId) ===
+                        String(event.employeeId) ==
                             String(effectiveEmployeeId)) ||
                     (event.focus === "vacaciones" &&
                         String(event.employeeId) ===
@@ -63,17 +64,17 @@ export const useBaseCalendar = () => {
                         (event.scope === "house" ||
                             event.scope === "global")) ||
                     (event.scope === "personal" &&
-                        String(event.employeeId) ===
-                            String(effectiveEmployeeId)),
+                        event.peopleInsideEvent &&
+                        event.peopleInsideEvent.some(
+                            (person) =>
+                                String(person.id) ===
+                                String(effectiveEmployeeId),
+                        )),
             );
         }
 
         return allEvents;
-    }, [
-        allEvents,
-        calendarMode,
-        effectiveEmployeeId,
-    ]);
+    }, [allEvents, calendarMode, effectiveEmployeeId]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;

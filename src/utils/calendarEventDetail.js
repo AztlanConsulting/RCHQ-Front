@@ -76,6 +76,7 @@ export const eventApiToDetail = (ev) => {
     startDate: normalizeDateOnly(x.startDate ?? start),
     endDate: normalizeDateOnly(x.endDate ?? end),
     isDeleted: x.isDeleted,
+    peopleInsideEvent: x.peopleInsideEvent ?? null,
   };
 };
 

@@ -84,7 +84,7 @@ const Calendario = () => {
         filtersModalOpen,
         setFiltersModalOpen,
         visibleEvents,
-    } = useCalendarFilters(allEvents, { isList, viewerRole });
+    } = useCalendarFilters(allEvents, { isList, viewerRole, calendarMode });
 
     const {
         selectedEvent,
