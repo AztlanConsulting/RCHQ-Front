@@ -303,7 +303,11 @@ const AbsenceDetail = ({
         </div>
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-2.5">
+      <div
+        className={`mt-7 flex flex-wrap gap-2.5 ${
+          hasEvidence ? "items-center" : "items-baseline"
+        }`}
+      >
         <Type
           variant="metric-label"
           className="text-[0.9rem] font-bold text-[#121212]"
