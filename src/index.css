@@ -425,6 +425,11 @@ svg {
     margin-top: 0;
 }
 
+.fc tbody tr {
+    height: 10px !important; 
+    /* TODO: Modificar a una altura real chida */
+}
+
 /* Thin (100) */
 @font-face {
     font-family: "Public Sans";
