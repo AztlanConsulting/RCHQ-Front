@@ -118,7 +118,6 @@ const Calendario = () => {
         reloadCurrentRange,
         viewerRole,
     });
-    const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
 
     useEffect(() => {
         setOwnCalendar();
