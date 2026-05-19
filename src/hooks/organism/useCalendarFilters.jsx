@@ -100,6 +100,7 @@ const getFilteredEvents = (
     employeeFilters,
     absenceStatusFilters,
     absenceEvidenceFilters,
+    calendarMode,
 ) => {
     const selectedAbsenceTypeNames = new Set(
         absenceTypeOptions
@@ -127,10 +128,17 @@ const getFilteredEvents = (
             selectedAbsenceTypeNames.has(String(e.type).toLowerCase())
         ))
         .filter((e) => (
+            calendarMode == "personal" ||
             (e.focus !== "ausencias" &&
-            e.focus !== "vacaciones" &&
-            e.scope !== "personal") ||
+            e.focus !== "vacaciones") ||
             employeeFilters.includes(String(e.employeeId))
+        ))
+        .filter((e) => (
+            calendarMode == "personal" ||
+            (e.focus !== "eventos" || e.scope !== "personal") ||!e.peopleInsideEvent ||
+            employeeFilters.some((employeeId) => 
+                e.peopleInsideEvent.some((person) => String(person.id) === String(employeeId))
+            )
         ))
         .filter((e) => (
             e.focus !== "ausencias" ||
@@ -211,6 +219,7 @@ const getFilteredEvents = (
                     totalDays: rawEvent.totalDays || rawEvent.startDate ? calculateTotalDays(rawEvent.startDate, rawEvent.endDate) : "",
                     startReadableDate: rawEvent.startDate,
                     endReadableDate: rawEvent.endDate,
+                    peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
                 },
             };
         });
@@ -218,7 +227,7 @@ const getFilteredEvents = (
 
 export const useCalendarFilters = (
     allEvents = [],
-    { isList = false, viewerRole = "" } = {},
+    { isList = false, viewerRole = "", calendarMode = "personal" } = {},
 ) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
@@ -448,6 +457,7 @@ export const useCalendarFilters = (
             effectiveEmployeeFilters,
             absenceStatusFilters,
             absenceEvidenceFilters,
+            calendarMode,
         ),
         [
             allEvents,
@@ -461,6 +471,7 @@ export const useCalendarFilters = (
             effectiveEmployeeFilters,
             absenceStatusFilters,
             absenceEvidenceFilters,
+            calendarMode,
         ],
     );
 
