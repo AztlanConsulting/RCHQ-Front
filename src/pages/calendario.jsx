@@ -14,7 +14,8 @@ import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 
-const isManagementRole = (role) => role === "Administrador" || role === "Coordinador";
+const isManagementRole = (role) =>
+  role === "Administrador" || role === "Coordinador";
 
 const Calendario = () => {
   const calendarRef = useRef(null);
@@ -221,30 +222,18 @@ const Calendario = () => {
         open={selectedEvent != null}
         onClose={closeDetail}
         title={(() => {
-          switch (selectedEvent?.focus) {
-            case "ausencias":
-              return null;
+          if (["ausencias", "vacaciones"].includes(selectedEvent?.focus))
+            return null;
 
-            case "vacaciones":
-              return null;
-
-            default:
-              return "Detalle del evento";
-          }
+          return "Detalle del evento";
         })()}
         grayBackground={true}
         placement="center"
         className={() => {
-          switch (selectedEvent?.focus) {
-            case "ausencias":
-              return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
-            
-            case "vacaciones":
-              return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
+          if (["ausencias", "vacaciones"].includes(selectedEvent?.focus))
+            return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
 
-            default:
-              return "max-w-[25vw] max-h-[80vh]";
-          }
+          return "max-w-[25vw] max-h-[80vh]";
         }}
       >
         {(() => {
@@ -286,22 +275,22 @@ const Calendario = () => {
 
             case "vacaciones":
               return isManagementRole(viewerRole) ? (
-                <VacationDetail 
-                event={selectedEvent} 
-                onClose={closeDetail}
-                onEdit={() => {}}
-                onDelete={() => {}}
-                onApprove={() => {}}
-                onReject={() => {}}
+                <VacationDetail
+                  event={selectedEvent}
+                  onClose={closeDetail}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                  onApprove={() => {}}
+                  onReject={() => {}}
                 />
               ) : (
                 <VacationDetail
-                event={selectedEvent} 
-                onClose={closeDetail}
-                onEdit={() => {}}
-                onDelete={() => {}}
-                onApprove={() => {}}
-                onReject={() => {}}
+                  event={selectedEvent}
+                  onClose={closeDetail}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                  onApprove={() => {}}
+                  onReject={() => {}}
                 />
               );
 

@@ -116,7 +116,7 @@ const WorkerAbsenceDetail = ({
         <Button
           type="button"
           text="Cerrar"
-          width="w-full max-w-[8.5rem]"
+          width="w-full sm:w-[7.2rem]"
           height="h-10"
           textSize="text-base"
           bgColor="bg-[#1F3664]"
