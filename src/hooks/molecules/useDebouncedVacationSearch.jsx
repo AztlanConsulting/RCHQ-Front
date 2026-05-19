@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 
-const MIN_SEARCH_LENGTH = 2;
-const DEBOUNCE_MS = 350;
+const DEFAULT_MIN_SEARCH_LENGTH = 2;
+const DEFAULT_DEBOUNCE_MS = 350;
 
 const normalizeSearch = (value) => value.trim().replace(/\s+/g, " ");
 
-export const useDebouncedVacationSearch = (initialValue = "") => {
+export const useDebouncedVacationSearch = (
+    initialValue = "",
+    {
+        minSearchLength = DEFAULT_MIN_SEARCH_LENGTH,
+        debounceMs = DEFAULT_DEBOUNCE_MS,
+    } = {},
+) => {
     const [inputValue, setInputValue] = useState(initialValue);
     const [debouncedSearch, setDebouncedSearch] = useState(initialValue);
 
@@ -18,16 +24,16 @@ export const useDebouncedVacationSearch = (initialValue = "") => {
                 return;
             }
 
-            if (normalizedValue.length < MIN_SEARCH_LENGTH) {
+            if (normalizedValue.length < minSearchLength) {
                 setDebouncedSearch("");
                 return;
             }
 
             setDebouncedSearch(normalizedValue);
-        }, DEBOUNCE_MS);
+        }, debounceMs);
 
         return () => clearTimeout(timer);
-    }, [inputValue]);
+    }, [inputValue, debounceMs, minSearchLength]);
 
     const clearSearch = () => {
         setInputValue("");

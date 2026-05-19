@@ -65,7 +65,7 @@ const mockEmployee = {
   surname:     "Ramírez",
   email:       "carlos@mail.com",
   phoneNumber: "4421234567",
-  role:        "Admin",
+  role:        "Administrador",
   roleId:      "r1",
   houseId:     "h1",
   type:        "tiempo_completo",
@@ -122,13 +122,13 @@ const setupEmployeeDetail = (overrides = {}) => {
   return { mockSetAlert };
 };
 
-const makeToken = (role = "Admin") => {
+const makeToken = (role = "Administrador") => {
   const payload = btoa(JSON.stringify({ id: TEST_EMPLOYEE_ID, role }));
   return `header.${payload}.signature`;
 };
 
 const renderPage = () => {
-  localStorage.setItem("token", makeToken("Admin"));
+  localStorage.setItem("token", makeToken("Administrador"));
   
   return render(
     <MemoryRouter initialEntries={[`/app/personal/${TEST_EMPLOYEE_ID}`]}>
@@ -149,7 +149,7 @@ beforeEach(() => {
   setupEmployeeDetail();
 
   getUpdateFormService.mockResolvedValue({
-    roles:    [{ roleId: "r1", name: "Admin" }, { roleId: "r2", name: "Coordinador" }],
+    roles:    [{ roleId: "r1", name: "Administrador" }, { roleId: "r2", name: "Coordinador" }],
     houses:   [{ houseId: "h1", name: "Desarrollo" }],
     workdays: [
       { workdayId: "wd1", name: "Lunes" },
@@ -405,7 +405,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     await waitFor(() => {
-      const adminOption = screen.getAllByRole("option", { name: "Admin", hidden: true });
+      const adminOption = screen.getAllByRole("option", { name: "Administrador", hidden: true });
       expect(adminOption.length).toBeGreaterThan(0);
 
       const coordinadorOption = screen.getByRole("option", { name: "Coordinador", hidden: true });

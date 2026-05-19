@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Field = ({ label, value }) => (
@@ -15,6 +17,7 @@ const Field = ({ label, value }) => (
 
 const ProfileCard = ({ user }) => {
   const imageUrl = user?.foto ? `${API_URL}/${user.foto}` : null;
+  const navigate = useNavigate();
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -72,7 +75,10 @@ const ProfileCard = ({ user }) => {
         <button className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors">
           Modificar Perfil
         </button>
-        <button className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors">
+        <button 
+          onClick={() => navigate("/app/opciones")}
+          className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors"
+        >
           Otras Opciones
         </button>
       </div>

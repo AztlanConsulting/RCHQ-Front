@@ -10,11 +10,15 @@ import VacationRequests from "../../pages/vacationRequests";
 import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
+    approveVacationRequest,
+    rejectVacationRequest,
 } from "../../services/vacationRequestService";
 
 vi.mock("../../services/vacationRequestService", () => ({
     getPendingVacationRequests: vi.fn(),
     getReviewedVacationRequests: vi.fn(),
+    approveVacationRequest: vi.fn(),
+    rejectVacationRequest: vi.fn(),
 }));
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
@@ -118,6 +122,20 @@ describe("Integración: VacationRequests", () => {
 
         getPendingVacationRequests.mockResolvedValue(pendingResponse);
         getReviewedVacationRequests.mockResolvedValue(reviewedResponse);
+        approveVacationRequest.mockResolvedValue({
+            message: "Solicitud aprobada correctamente",
+            vacationRequest: {
+                vacationRequestId: "vac-001",
+                status: 1,
+            },
+        });
+        rejectVacationRequest.mockResolvedValue({
+            message: "Solicitud rechazada correctamente",
+            vacationRequest: {
+                vacationRequestId: "vac-001",
+                status: 2,
+            },
+        });
     });
 
     it("carga y muestra solicitudes pendientes al entrar", async () => {
@@ -356,5 +374,301 @@ describe("Integración: VacationRequests", () => {
         expect(input).toHaveValue("");
         expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("");
         expect(screen.getByLabelText("Fecha de término")).toHaveValue("");
+    });
+
+    it("abre modal de confirmación al presionar aprobar", async () => {
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeInTheDocument();
+        expect(screen.getAllByText("Ana Pendiente").length).toBeGreaterThan(0);
+        expect(
+            screen.getByText(/Esta acción moverá la solicitud a revisadas/),
+        ).toBeInTheDocument();
+
+        expect(approveVacationRequest).not.toHaveBeenCalled();
+    });
+
+    it("cierra modal de aprobación al presionar cancelar", async () => {
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+
+        expect(
+            screen.queryByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeNull();
+    });
+
+    it("aprueba una solicitud desde el modal y refresca la tabla", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
+
+        await waitFor(() => {
+            expect(approveVacationRequest).toHaveBeenCalledWith("vac-001");
+        });
+
+        await waitFor(() => {
+            expect(
+                screen.queryByRole("dialog", { name: "Aprobar solicitud" }),
+            ).toBeNull();
+        });
+
+        expect(getPendingVacationRequests).toHaveBeenCalledTimes(2);
+        expect(await screen.findByText("Luis Vacaciones")).toBeInTheDocument();
+        expect(screen.queryByText("Ana Pendiente")).toBeNull();
+    });
+
+    it("muestra error dentro del modal si falla la aprobación", async () => {
+        approveVacationRequest.mockRejectedValueOnce(
+            new Error("La solicitud ya fue revisada"),
+        );
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
+
+        expect(
+            await screen.findByText("La solicitud ya fue revisada"),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeInTheDocument();
+    });
+
+    it("no muestra alert global cuando el error de aprobación se muestra en el modal", async () => {
+        approveVacationRequest.mockRejectedValueOnce(
+            new Error("No se pudo aprobar la solicitud"),
+        );
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
+
+        expect(
+            await screen.findByText("No se pudo aprobar la solicitud"),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByRole("dialog", { name: "Aprobar solicitud" }),
+        ).toBeInTheDocument();
+
+        expect(screen.queryByRole("alert")).toBeNull();
+    });
+
+    it("muestra mensaje de éxito al aprobar una solicitud", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Aprobar solicitud")[0]);
+        fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
+
+        expect(
+            await screen.findByText("Solicitud de vacaciones aprobada con éxito"),
+        ).toBeInTheDocument();
+
+        expect(approveVacationRequest).toHaveBeenCalledWith("vac-001");
+    });
+
+    it("abre modal de confirmación al presionar rechazar", async () => {
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeInTheDocument();
+        expect(screen.getAllByText("Ana Pendiente").length).toBeGreaterThan(0);
+        expect(
+            screen.getByText(/Esta acción moverá la solicitud a revisadas/),
+        ).toBeInTheDocument();
+
+        expect(rejectVacationRequest).not.toHaveBeenCalled();
+    });
+
+    it("cierra modal de rechazo al presionar cancelar", async () => {
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+
+        expect(
+            screen.queryByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeNull();
+    });
+
+    it("rechaza una solicitud desde el modal y refresca la tabla", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        expect(
+            screen.getByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+        });
+
+        await waitFor(() => {
+            expect(
+                screen.queryByRole("dialog", { name: "Rechazar solicitud" }),
+            ).toBeNull();
+        });
+
+        expect(getPendingVacationRequests).toHaveBeenCalledTimes(2);
+        expect(await screen.findByText("Luis Vacaciones")).toBeInTheDocument();
+        expect(screen.queryByText("Ana Pendiente")).toBeNull();
+    });
+
+    it("muestra error dentro del modal si falla el rechazo", async () => {
+        rejectVacationRequest.mockRejectedValueOnce(
+            new Error("La solicitud ya fue revisada"),
+        );
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(
+            await screen.findByText("La solicitud ya fue revisada"),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeInTheDocument();
+    });
+
+    it("no muestra alert global cuando el error de rechazo se muestra en el modal", async () => {
+        rejectVacationRequest.mockRejectedValueOnce(
+            new Error("No se pudo rechazar la solicitud"),
+        );
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(
+            await screen.findByText("No se pudo rechazar la solicitud"),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByRole("dialog", { name: "Rechazar solicitud" }),
+        ).toBeInTheDocument();
+
+        expect(screen.queryByRole("alert")).toBeNull();
+    });
+
+    it("muestra mensaje de éxito al rechazar una solicitud", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(
+            await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
+        ).toBeInTheDocument();
+
+        expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
     });
 });

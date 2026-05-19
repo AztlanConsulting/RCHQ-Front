@@ -8,10 +8,12 @@ import EmployeeBasicCard from "../components/organism/employeeBasicCard";
 import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
 import DocumentsSection from "../components/organism/documentsSection";
+import ReasonCard from "../components/organism/reasonCard";
 import { useDrawer } from "@/hooks/atoms/useDrawer";
 import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
+import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
 
 const tabs = [
   { id: "overview",   label: "Overview" },
@@ -32,7 +34,7 @@ const DetalleEmpleado = () => {
   const {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
-    roles, houses,
+    roles,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
@@ -56,6 +58,29 @@ const DetalleEmpleado = () => {
   const infoDrawer     = useDrawer();
   const workdaysDrawer = useDrawer();
 
+  const employeeFullName = employee
+    ? `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim()
+    : "";
+
+  const {
+    isModalOpen,
+    openModal,
+    closeModal,
+    reason,
+    handleReasonChange,
+    addToBlacklist,
+    setAddToBlacklist,
+    fieldError,
+    isSubmitting,
+    handleSubmit,
+  } = useDeactivateEmployee(
+    employeeId,
+    employeeFullName,
+    setAlert,
+    employee?.isActive !== false,
+    getEmployeeDetail
+  );
+
   if (isLoading) return <Loader />;
 
   return (
@@ -67,7 +92,19 @@ const DetalleEmpleado = () => {
         </div>
       )}
 
-      {/* Título y tabs */}
+      <ReasonCard
+        isOpen={isModalOpen}
+        employeeName={employeeFullName}
+        reason={reason}
+        onReasonChange={handleReasonChange}
+        addToBlacklist={addToBlacklist}
+        onBlacklistChange={setAddToBlacklist}
+        fieldError={fieldError}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
+        onCancel={closeModal}
+      />
+
       <div className="flex flex-nowrap items-center gap-2 min-w-0">
         <button
           type="button"
@@ -95,19 +132,23 @@ const DetalleEmpleado = () => {
           onSelectionChange={(key) => setCurrentTab(key)}
           className="w-max max-md:hidden shrink-0 ml-0 md:ml-6"
         >
-          <Tabs.List type="underline" >
+          <Tabs.List type="underline">
             {tabs.map((tab) => (
-              <Tabs.Item
-                  key={tab.id}
-                  id={tab.id}
-                  label={tab.label}
-              />
+              <Tabs.Item key={tab.id} id={tab.id} label={tab.label} />
             ))}
           </Tabs.List>
         </Tabs>
+
+        <button
+          type="button"
+          onClick={openModal}
+          className="ml-auto shrink-0 rounded-lg bg-[#9b1c1c] px-4 py-2 text-sm font-semibold
+            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+        >
+          Dar de baja
+        </button>
       </div>
 
-      {/* Tarjeta superior */}
       <EmployeeBasicCard
         employee={employee}
         employeeHouse={employeeHouse}
@@ -122,7 +163,6 @@ const DetalleEmpleado = () => {
         onCancel={closeEdit}
       />
 
-      {/* Contenido por tab */}
       {currentTab === "overview" && (
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-4">
           <EmployeeContactCard
@@ -144,17 +184,16 @@ const DetalleEmpleado = () => {
             employeeVacationRequests={employeeVacationRequests}
             employeeFaults={employeeFaults}
             workdaysDrawer={workdaysDrawer}
-            isEditing={editSection === "admin"}
+            isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
             roles={roles}
-            houses={houses}
             frecuentPaymentTypes={frecuentPaymentTypes}
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
             saving={saving}
-            saveError={editSection === "admin" ? saveError : null}
+            saveError={editSection === "Administrador" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}

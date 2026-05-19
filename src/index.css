@@ -69,24 +69,174 @@ svg {
     color: #fafafa;
 }
 
+.fc .fc-header-toolbar {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 0.375rem;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 0.125rem;
+    min-width: 0;
+}
+
+/*
+ * <768px: title on row 1; chunks 1 & 3 flex-wrap on row 2.
+ * 493–767px: space-between (nav left, actions right) while they share a row.
+ * ≤492px: flex-start so when chunk 3 wraps, the new row is flush left.
+ */
+@media (max-width: 767px) {
+    .fc .fc-header-toolbar {
+        display: flex !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        row-gap: 0.5rem;
+        column-gap: 0.375rem;
+        min-width: 0;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        order: -1;
+        flex: 1 0 100%;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        text-align: left;
+        justify-content: flex-start;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: flex-start;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 492px) {
+    .fc .fc-header-toolbar {
+        justify-content: flex-start;
+        column-gap: 0.5rem;
+    }
+
+    .fc .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        justify-content: flex-start;
+    }
+}
+
+.fc .fc-toolbar-chunk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.fc .fc-toolbar-title {
+    font-weight: 700;
+    font-size: clamp(0.875rem, 1.5vw + 0.65rem, 1.125rem);
+    line-height: 1.2;
+    padding-inline: 0.25rem;
+}
+
 .fc .fc-button {
-    height: 48px;
-    font-weight: bold;
-    font-size: 20px;
-    box-shadow: 0 0 8px 1px #002f8e5a;
-    padding: 0 20px;
+    height: auto;
+    min-height: 2rem;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 0.35vw + 0.7rem, 0.8125rem);
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgb(0 47 142 / 0.2);
+    padding: 0.35rem 0.65rem;
     border: none;
+}
+
+.fc .fc-icon {
+    font-size: 1em;
 }
 
 .fc .fc-icon::before {
     position: relative;
-    top: -1px;
+    top: -0.05em;
 }
 
 .fc .fc-prev-button,
 .fc .fc-next-button {
-    width: 48px;
-    padding: 0;
+    width: auto;
+    min-width: 2rem;
+    padding-inline: 0.35rem;
+}
+
+/* Calendar “filtros” toolbar button (custom icon, left chunk after “Hoy”) */
+.fc .fc-icon-calendar-filter {
+    font-family: inherit;
+    font-size: 1em;
+    line-height: 1;
+    opacity: 1;
+}
+
+.fc .fc-icon-calendar-filter::before {
+    content: "";
+    display: block;
+    width: 1em;
+    height: 1em;
+    top: 0;
+    background: url("/filter.svg") center / contain no-repeat;
+    filter: brightness(0) invert(1);
+}
+
+.fc .fc-calendarFiltersButton-button {
+    min-width: 2rem;
+    padding-inline: 0.45rem;
+}
+
+/* Lista — icon-only; match size/padding to calendar filter button */
+.fc .fc-toggleListButton-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding-inline: 0.45rem;
+}
+
+.fc .fc-toggleListButton-button .fc-button-text {
+    display: none;
+}
+
+.fc .fc-icon-list {
+    font-family: inherit;
+    font-size: 1em;
+    line-height: 1;
+    opacity: 1;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
+
+.fc .fc-icon-list::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: relative;
+    background-color: #fafafa;
+    mask: url("/list.svg") no-repeat center / contain;
+    -webkit-mask: url("/list.svg") no-repeat center / contain;
+}
+
+@media (min-width: 1024px) {
+    .fc .fc-calendarFiltersButton-button {
+        display: none !important;
+    }
 }
 
 .fc .fc-createEventButton-button {
@@ -127,10 +277,6 @@ svg {
 .fc .fc-toolbar-chunk .fc-button-primary:focus,
 .fc .fc-toolbar-chunk .fc-button-primary:focus:active {
     box-shadow: none;
-}
-
-.fc-toolbar-title {
-    font-weight: bold;
 }
 
 .fc-col-header {
@@ -277,6 +423,10 @@ svg {
 
 .fc-dayGridMonth-view .fc-daygrid-day-events {
     margin-top: 0;
+}
+
+.fc tbody tr {
+    height: 10px !important; 
 }
 
 /* Thin (100) */

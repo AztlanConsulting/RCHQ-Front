@@ -65,7 +65,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.start) || "—"}
+                        {formatEventDate(event.readableStart) || "—"}
                     </Type>
                 </div>
                 <div>
@@ -79,7 +79,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.end) || "—"}
+                        {formatEventDate(event.readableEnd) || "—"}
                     </Type>
                 </div>
                 <div>
@@ -93,7 +93,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        5 días
+                        {event.totalDays}
                     </Type>
                 </div>
                 <div>
@@ -135,7 +135,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.feedback || "N/A"}
+                        {event.feedback || "Sin retroalimentación por el momento"}
                     </Type>
                 </div>
             </div>
@@ -159,11 +159,11 @@ const VacationDetail = ({
             ) : null}
 
             {!isPast ? (
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                <div className="mt-6 flex flex-row items-center gap-3 sm:justify-center sm:gap-8">
                     <Button
                         type="button"
                         text="Eliminar"
-                        width="w-full sm:w-[7.2rem]"
+                        width="w-1/2 sm:w-[7.2rem]"
                         height="h-8"
                         textSize="text-[0.95rem]"
                         bgColor="bg-[#A20000]"
@@ -176,7 +176,7 @@ const VacationDetail = ({
                     <Button
                         type="button"
                         text="Editar"
-                        width="w-full sm:w-[7.2rem]"
+                        width="w-1/2 sm:w-[7.2rem]"
                         height="h-8"
                         textSize="text-[0.95rem]"
                         bgColor="bg-[#1F3664]"
@@ -193,11 +193,11 @@ const VacationDetail = ({
                 <div>
                     <div className="mt-4 border border-b border-[#EAEAEA]"></div>
 
-                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                    <div className="mt-4 flex flex-row items-center gap-3 sm:justify-center sm:gap-8">
                         <Button
                             type="button"
                             text="Aprobar"
-                            width="w-full sm:w-[7.2rem]"
+                            width="w-1/2 sm:w-[7.2rem]"
                             height="h-8"
                             textSize="text-[0.95rem]"
                             bgColor="bg-[#1F3664]"
@@ -210,7 +210,7 @@ const VacationDetail = ({
                         <Button
                             type="button"
                             text="Rechazar"
-                            width="w-full sm:w-[7.2rem]"
+                            width="w-1/2 sm:w-[7.2rem]"
                             height="h-8"
                             textSize="text-[0.95rem]"
                             bgColor="bg-[#1F3664]"

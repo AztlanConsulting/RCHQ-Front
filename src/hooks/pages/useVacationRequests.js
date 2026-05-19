@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
+    approveVacationRequest,
+    rejectVacationRequest,
 } from "../../services/vacationRequestService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
@@ -38,6 +40,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [approvingRequestId, setApprovingRequestId] = useState(null);
+    const [rejectingRequestId, setRejectingRequestId] = useState(null);
 
     const clearError = () => {
         setError("");
@@ -127,6 +131,54 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         setPage(1);
     };
 
+    const handleApproveRequest = async (vacationRequestId) => {
+        if (!vacationRequestId || approvingRequestId) return;
+
+        setApprovingRequestId(vacationRequestId);
+        setError("");
+
+        try {
+            await approveVacationRequest(vacationRequestId);
+            const currentPage = Math.max(page, 1);
+
+            const nextPage =
+                requests.length === 1 && currentPage > 1
+                    ? currentPage - 1
+                    : currentPage;
+
+            await fetchRequests(nextPage);
+        } catch (err) {
+            setError(err.message || "No se pudo aprobar la solicitud");
+            throw err;
+        } finally {
+            setApprovingRequestId(null);
+        }
+    };
+
+    const handleRejectRequest = async (vacationRequestId) => {
+        if (!vacationRequestId || approvingRequestId || rejectingRequestId) return;
+
+        setRejectingRequestId(vacationRequestId);
+        setError("");
+
+        try {
+            await rejectVacationRequest(vacationRequestId);
+            const currentPage = Math.max(page, 1);
+
+            const nextPage =
+                requests.length === 1 && currentPage > 1
+                    ? currentPage - 1
+                    : currentPage;
+
+            await fetchRequests(nextPage);
+        } catch (err) {
+            setError(err.message || "No se pudo rechazar la solicitud");
+            throw err;
+        } finally {
+            setRejectingRequestId(null);
+        }
+    };
+
     return {
         view,
         setView: handleChangeView,
@@ -147,6 +199,10 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         loading,
         error,
         clearError,
+        approvingRequestId,
+        rejectingRequestId,
+        handleApproveRequest,
+        handleRejectRequest,
         handleNextPage,
         handlePrevPage,
         clearFilters,

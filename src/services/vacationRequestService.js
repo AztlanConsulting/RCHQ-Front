@@ -53,6 +53,29 @@ const parseVacationRequestsResponse = async (res) => {
     };
 };
 
+const parseVacationRequestActionResponse = async (res) => {
+    const data = await res.json();
+
+    if (!res.ok) {
+        const validationMessage = data.errors?.[0]?.message;
+
+        throw new Error(
+            validationMessage ||
+            data.message ||
+            "Error al actualizar la solicitud de vacaciones",
+        );
+    }
+
+    if (!data.success) {
+        throw new Error(data.message || "Error en la respuesta del servidor");
+    }
+
+    return {
+        message: data.message || "Solicitud actualizada correctamente",
+        vacationRequest: data.data?.vacationRequest || null,
+    };
+};
+
 export const getPendingVacationRequests = async ({
     page = 1,
     limit = 6,
@@ -97,4 +120,34 @@ export const getReviewedVacationRequests = async ({
     });
 
     return parseVacationRequestsResponse(res);
+};
+
+export const approveVacationRequest = async (vacationRequestId) => {
+    const res = await secureFetch(
+        `${API_URL}/vacation/request/${vacationRequestId}/approve`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        },
+    );
+
+    return parseVacationRequestActionResponse(res);
+};
+
+export const rejectVacationRequest = async (vacationRequestId) => {
+    const res = await secureFetch(
+        `${API_URL}/vacation/request/${vacationRequestId}/reject`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        },
+    );
+
+    return parseVacationRequestActionResponse(res);
 };

@@ -18,7 +18,7 @@ const buildAbsence = (overrides = {}) => ({
   absenceId: "absence-1",
   absenceTypeId: "type-medica",
   employeeId: "employee-worker",
-  name: "Ausencia",
+  name: "John Smith",
   type: "Médica",
   description: "Reposo indicado",
   start: "2026-05-05T00:00:00.000Z",
@@ -81,7 +81,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
 
     expect(getHouseEmployees).not.toHaveBeenCalled();
     expect(absenceEvent).toMatchObject({
-      title: "Ausencia Médica",
+      title: "Ausencia Médica de John Smith",
       backgroundColor: "#EF4444",
       borderColor: "#DC2626",
       allDay: true,
@@ -108,7 +108,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
     await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
     expect(getHouseEmployees).not.toHaveBeenCalled();
 
-    rerender({ viewerRole: "Admin" });
+    rerender({ viewerRole: "Administrador" });
 
     await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
     expect(getAbsenceTypes).toHaveBeenCalledTimes(1);
@@ -152,5 +152,51 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
     expect(result.current.visibleEvents).toHaveLength(1);
     expect(result.current.visibleEvents[0].extendedProps.absenceId)
       .toBe("with-evidence");
+  });
+
+  it("mantiene seleccionados por defecto los nuevos tipos de ausencia mientras el usuario no cambie el filtro", async () => {
+    getAbsenceTypes.mockResolvedValue([]);
+
+    const initialEvents = [
+      buildAbsence({
+        absenceId: "medica",
+        absenceTypeId: "type-medica",
+        type: "Médica",
+      }),
+    ];
+
+    const nextEvents = [
+      ...initialEvents,
+      buildAbsence({
+        absenceId: "personal",
+        absenceTypeId: "type-personal",
+        type: "Personal",
+        startDate: "2026-05-12",
+        endDate: "2026-05-12",
+      }),
+    ];
+
+    const { result, rerender } = renderHook(
+      ({ events }) =>
+        useCalendarFilters(events, {
+          isList: false,
+          viewerRole: "Psicóloga",
+        }),
+      { initialProps: { events: initialEvents } },
+    );
+
+    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+    expect(result.current.absenceTypeFilters).toEqual(["médica"]);
+
+    rerender({ events: nextEvents });
+
+    await waitFor(() => {
+      expect(result.current.absenceTypeFilters).toEqual(["médica", "personal"]);
+    });
+    await waitFor(() => {
+      expect(
+        result.current.visibleEvents.map((event) => event.extendedProps.absenceId),
+      ).toEqual(expect.arrayContaining(["medica", "personal"]));
+    });
   });
 });

@@ -7,6 +7,7 @@ import {
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
+import { eventApiToDetail } from "../../utils/calendarEventDetail";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -29,7 +30,7 @@ export const useBaseCalendar = () => {
     );
 
     const canViewHouseEvents = (role) =>
-        role === "Admin" || role === "Coordinador";
+        role === "Administrador" || role === "Coordinador";
 
     const isCoordinator = useMemo(
         () => effectiveViewerRole === "Coordinador",
@@ -50,43 +51,30 @@ export const useBaseCalendar = () => {
     );
 
     const filteredCalendarEvents = useMemo(() => {
-        if (isCoordinator) {
-            if (calendarMode === "personal") {
-                return allEvents.filter(
-                    (event) =>
-                        (event.focus === "ausencias" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)) ||
-                        (event.focus === "vacaciones" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)) ||
-                        (event.focus === "eventos" &&
-                            (event.scope === "house" ||
-                                event.scope === "global")) ||
-                        (event.scope === "personal" &&
-                            String(event.employeeId) ===
-                                String(effectiveEmployeeId)),
-                );
-            }
-
-            return allEvents;
-        }
-
-        if (!canSwitchCalendarMode || calendarMode === "personal") {
+        if (calendarMode === "personal") {
             return allEvents.filter(
                 (event) =>
-                    !(event.focus === "ausencias" && event.scope === "house"),
+                    (event.focus === "ausencias" &&
+                        String(event.employeeId) ==
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "vacaciones" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "eventos" &&
+                        (event.scope === "house" ||
+                            event.scope === "global")) ||
+                    (event.scope === "personal" &&
+                        event.peopleInsideEvent &&
+                        event.peopleInsideEvent.some(
+                            (person) =>
+                                String(person.id) ===
+                                String(effectiveEmployeeId),
+                        )),
             );
         }
 
         return allEvents;
-    }, [
-        allEvents,
-        calendarMode,
-        canSwitchCalendarMode,
-        effectiveEmployeeId,
-        isCoordinator,
-    ]);
+    }, [allEvents, calendarMode, effectiveEmployeeId]);
 
     const getCorrespondingView = (isList, viewType) => {
         let newView;
@@ -394,11 +382,17 @@ export const useBaseCalendar = () => {
         return true;
     };
 
+    const currentCalendarView = useMemo(
+        () => getCorrespondingView(isList, viewType),
+        [isList, viewType],
+    );
+
     return {
         employeeHouseName,
         allEvents: filteredCalendarEvents,
         isList,
         viewType,
+        currentCalendarView,
         viewerRole,
         calendarMode,
         setCalendarMode,

@@ -18,8 +18,13 @@ import TwoFactorAuth from "./pages/auth/twoFactorAuth";
 import MoreOptions from "./pages/moreOptions";
 import Documents from "./pages/documents";
 import DetalleEmpleado from "./pages/detalleEmpleado";
+import LogsHouse from "./pages/logsHouse";
 import VacationRequests from "./pages/vacationRequests";
+import Logs from "./pages/logs";
 import RoleRoute from "./components/roleRoute";
+import Vacaciones from "./pages/vacaciones";
+import Donaciones from "./pages/donaciones";
+import Certificaciones from "./pages/certificaciones";
 
 function App() {
   return (
@@ -53,9 +58,14 @@ function App() {
             <Route path="personal/ver/:employeeId" element={<DetalleEmpleado />} />
             <Route path="casas" element={<Casas />} />
             <Route path="calendario" element={<Calendario />} />
+            <Route path="vacaciones" element={<Vacaciones />} />
+            <Route path="donaciones" element={<Donaciones />} />
+            <Route path="certificaciones" element={<Certificaciones />} />
             
             <Route element={<RoleRoute allowedRoles={["Coordinador"]} />}>
+              <Route path="acciones/casa" element={<LogsHouse />} />
               <Route path="vacaciones/solicitudes" element={<VacationRequests />} />
+              <Route path="logs" element={<Logs />} />
             </Route>
           </Route>
         </Route>
