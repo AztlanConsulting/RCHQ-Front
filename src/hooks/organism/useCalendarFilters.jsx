@@ -135,7 +135,7 @@ const getFilteredEvents = (
         ))
         .filter((e) => (
             calendarMode == "personal" ||
-            (e.focus !== "eventos" || e.scope !== "personal") || 
+            (e.focus !== "eventos" || e.scope !== "personal") ||!e.peopleInsideEvent ||
             employeeFilters.some((employeeId) => 
                 e.peopleInsideEvent.some((person) => String(person.id) === String(employeeId))
             )
