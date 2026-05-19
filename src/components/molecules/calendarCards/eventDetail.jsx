@@ -4,14 +4,15 @@ import Dates from "@/utils/dates";
 
 const EventDetail = ({ event }) => {
   if (!event) return null;
+  console.log("event: ", event)
 
   return (
     <div className="text-left">
-      <Type variant="page-title" className="mb-2" as="h2">
+      <Type variant="page-title"  as="h2">
         {event.title ?? "—"}
       </Type>
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2">
         <span
           className="inline-block size-3 rounded-full shrink-0"
           style={{
@@ -35,22 +36,28 @@ const EventDetail = ({ event }) => {
         <Type variant="body" className="mb-4 block">
           {event.subtitle}
         </Type>
-      ) : null}
+      ) : (
+        <Type variant="body" className="mb-4 block">
+          sin subtitulo
+        </Type>
+      )}
 
       <div className="w-full flex items-center justify-between gap-4 mb-2">
-        <Type variant="metric-label" className="font-bold">
+        <Type variant="metric-label" color="black" className="text-black font-bold">
           Día (calendario):
         </Type>
         <p className="text-sm">
-          {event.date ? Dates.formatEventDateTime(event.date) : "—"}
+          {event.startDate ? Dates.formatEventCalendarDate(event.startDate) : "—"}
         </p>
       </div>
+
       <div className="w-full flex items-center justify-between gap-4 mb-2">
         <Type variant="metric-label" className="font-bold">
           Inicio:
         </Type>
         <p className="text-sm">{Dates.formatEventDateTime(event.start ?? event.startStr)}</p>
       </div>
+
       <div className="w-full flex items-center justify-between gap-4 mb-4">
         <Type variant="metric-label" className="font-bold">
           Fin:
@@ -69,8 +76,20 @@ const EventDetail = ({ event }) => {
       )) : null}
 
       <div className="w-full flex justify-around items-center gap-4 pt-2">
-        <Button type="button">Eliminar</Button>
-        <Button type="button">Modificar</Button>
+        <Button 
+          type="button"
+          bgColor="bg-[#A20000]" 
+          className="text-white"
+        >
+          Eliminar
+        </Button>
+        <Button 
+          type="button"  
+          bgColor="bg-[#1F3664]"
+          className="text-white"
+          >
+            Modificar
+          </Button>
       </div>
     </div>
   );

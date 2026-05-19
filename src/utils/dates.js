@@ -26,6 +26,14 @@ const DISPLAY_OFFSET_MS = 6 * 60 * 60 * 1000;
 
 const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
 
+const MEXICO_TZ = "America/Mexico_City";
+
+function capitalizeEs(word) {
+    if (!word) return word;
+    const w = word.trim();
+    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+}
+
 class Dates {
     static getStartHour(timestamp) {
         if (timestamp == null) return "";
@@ -101,6 +109,23 @@ class Dates {
             dateStyle: "long",
         });
     }
+
+    /** Día en rejilla: “Jueves 30 de Abril 2026” (zona México sobre el instante). */
+    static formatEventCalendarDate(value) {
+        console.log("value: ", value)
+        if (!value) return "—";
+        const d = value instanceof Date ? value : new Date(String(value));
+        if (Number.isNaN(d.getTime())) return "—";
+        const weekday = capitalizeEs(
+        new Intl.DateTimeFormat("es-MX", { weekday: "long", timeZone: MEXICO_TZ }).format(d),
+        );
+        const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: MEXICO_TZ }).format(d);
+        const month = capitalizeEs(
+        new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: MEXICO_TZ }).format(d),
+        );
+        const year = new Intl.DateTimeFormat("es-MX", { year: "numeric", timeZone: MEXICO_TZ }).format(d);
+        return `${weekday} ${dayNum} de ${month} ${year}`;
+    };
 
     static formatEventDateTime(value) {
         if (value == null || value === "") return "—";
