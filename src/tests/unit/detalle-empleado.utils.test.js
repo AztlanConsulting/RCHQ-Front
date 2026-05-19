@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
+import Dates from "../../utils/dates";
 import {
   totalWorkDaysFromApprovedVacationRequests,
-  parseUTCDateToHours,
   countWorkdayDays,
   countWorkdaysHours,
 } from "../../utils/detalle-empleado.utils";
@@ -55,21 +55,25 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
   });
 });
 
-// ─── parseUTCDateToHours ──────────────────────────────────────────────────────
-describe("parseUTCDateToHours", () => {
+// ─── Dates.parseUTCDateToHours ────────────────────────────────────────────────
+describe("Dates.parseUTCDateToHours", () => {
   it("retorna N/A para valores falsy", () => {
-    expect(parseUTCDateToHours(null)).toBe("N/A");
-    expect(parseUTCDateToHours(undefined)).toBe("N/A");
-    expect(parseUTCDateToHours("")).toBe("N/A");
+    expect(Dates.parseUTCDateToHours(null)).toBe("N/A");
+    expect(Dates.parseUTCDateToHours(undefined)).toBe("N/A");
+    expect(Dates.parseUTCDateToHours("")).toBe("N/A");
   });
 
   it("parsea horas UTC con padding", () => {
-    expect(parseUTCDateToHours("1970-01-01T08:00:00.000Z")).toBe("08:00");
-    expect(parseUTCDateToHours("1970-01-01T17:30:00.000Z")).toBe("17:30");
+    expect(Dates.parseUTCDateToHours("1970-01-01T08:00:00.000Z")).toBe("08:00");
+    expect(Dates.parseUTCDateToHours("1970-01-01T17:30:00.000Z")).toBe(
+      "17:30",
+    );
   });
 
   it("aplica padding a horas menores de 10", () => {
-    expect(parseUTCDateToHours("1970-01-01T09:05:00.000Z")).toBe("09:05");
+    expect(Dates.parseUTCDateToHours("1970-01-01T09:05:00.000Z")).toBe(
+      "09:05",
+    );
   });
 });
 

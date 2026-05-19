@@ -3,7 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import Dates from "@/utils/dates";
 import documentIcon from "/document.svg";
 
 const PlusIcon = () => (
@@ -155,7 +155,7 @@ const AbsenceDetail = ({
             }
             minDate={
               absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T12:00:00`)
+                ? Dates.dateOnlyToLocalDate(absenceForm.startDate)
                 : undefined
             }
             labelColor="text-[#121212]"
@@ -288,7 +288,7 @@ const AbsenceDetail = ({
             Fecha de inicio:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableStart)}
+            {Dates.formatEventDate(event.readableStart)}
           </Type>
         </div>
         <div>
@@ -296,7 +296,7 @@ const AbsenceDetail = ({
             Fecha de fin:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableEnd)}
+            {Dates.formatEventDate(event.readableEnd)}
           </Type>
         </div>
         <div className="sm:col-span-2">

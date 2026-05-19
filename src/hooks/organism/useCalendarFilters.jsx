@@ -4,11 +4,7 @@ import {
     getEventsTypes,
     getHouseEmployees,
 } from "../../services/calendarService";
-import {
-    addDaysToDateOnly,
-    dateOnlyToLocalDate,
-    normalizeDateOnly,
-} from "../../utils/calendarEventDetail";
+import Dates from "@/utils/dates";
 import { 
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
@@ -17,15 +13,6 @@ import {
     getFocusOption, getScopeOption,
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator"
-
-const calculateTotalDays = (startDate, endDate) => {
-    const start = toDateOnly(startDate);
-    const end = toDateOnly(endDate);
-
-    const totalDays = Math.round((end - start) / 86400000) + 1;
-
-    return totalDays;
-}
 
 const getVacationStatusValue = (status) => {
     if (status === 1) return "aprobadas";
@@ -41,10 +28,6 @@ const getAbsenceEvidenceValue = (event) => (
     event.link ? "con_evidencia" : "sin_evidencia"
 );
 
-const toDateOnly = (value) => {
-    return dateOnlyToLocalDate(value);
-};
-
 const expandEventsForList = (events = [], isList) => {
     if (!isList) return events;
 
@@ -59,21 +42,21 @@ const expandEventsForList = (events = [], isList) => {
             return;
         }
 
-        const start = toDateOnly(event.startDate);
-        const end = toDateOnly(event.endDate);
+        const start = Dates.dateOnlyToLocalDate(event.startDate);
+        const end = Dates.dateOnlyToLocalDate(event.endDate);
 
         if (!start || !end || end < start) {
             expanded.push(event);
             return;
         }
 
-        const totalDays = calculateTotalDays(start, end);
+        const totalDays = Dates.inclusiveDaySpan(event.startDate, event.endDate);
 
         for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
             const currentDay = new Date(start);
             currentDay.setDate(start.getDate() + dayIndex);
-            const currentDayValue = normalizeDateOnly(currentDay);
-            const nextDayValue = addDaysToDateOnly(currentDayValue, 1);
+            const currentDayValue = Dates.normalizeDateOnly(currentDay);
+            const nextDayValue = Dates.addDaysToDateOnly(currentDayValue, 1);
 
             expanded.push({
                 ...event,
@@ -156,12 +139,12 @@ const getFilteredEvents = (
                 && rawEvent.currentDayIndex
                 && rawEvent.totalDays,
             );
-            const normalizedStartDate = normalizeDateOnly(
+            const normalizedStartDate = Dates.normalizeDateOnly(
                 isExpandedListAbsence
                     ? rawEvent.start
                     : rawEvent.startDate ?? rawEvent.start,
             );
-            const normalizedEndDate = normalizeDateOnly(
+            const normalizedEndDate = Dates.normalizeDateOnly(
                 isExpandedListAbsence
                     ? rawEvent.end
                     : rawEvent.endDate ?? rawEvent.end,
@@ -173,7 +156,7 @@ const getFilteredEvents = (
                 ? (
                     isExpandedListAbsence
                         ? normalizedEndDate
-                        : addDaysToDateOnly(normalizedEndDate, 1)
+                        : Dates.addDaysToDateOnly(normalizedEndDate, 1)
                 )
                 : rawEvent.end;
 
@@ -216,7 +199,7 @@ const getFilteredEvents = (
                     endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || eventStart,
                     isDeleted: Boolean(rawEvent.isDeleted),
                     currentDayIndex: rawEvent.currentDayIndex,
-                    totalDays: rawEvent.totalDays || rawEvent.startDate ? calculateTotalDays(rawEvent.startDate, rawEvent.endDate) : "",
+                    totalDays: rawEvent.totalDays || rawEvent.startDate ? Dates.inclusiveDaySpan(rawEvent.startDate, rawEvent.endDate) : "",
                     startReadableDate: rawEvent.startDate,
                     endReadableDate: rawEvent.endDate,
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,

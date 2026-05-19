@@ -3,6 +3,7 @@ import {
   calendarItemToDetail,
   eventApiToDetail,
 } from "../../utils/calendarEventDetail";
+import Dates from "@/utils/dates";
 import {
   deleteAbsenceService,
   buildAbsenceEvidenceUrl,
@@ -131,8 +132,8 @@ export const useCalendarPage = ({
 
     setAbsenceForm({
       absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
-      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      startDate: Dates.isoDatePrefix(currentSelectedEvent.startDate),
+      endDate: Dates.isoDatePrefix(currentSelectedEvent.endDate),
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? ""),
     });
     setIsDeleteAbsenceOpen(false);
@@ -180,8 +181,8 @@ export const useCalendarPage = ({
 
     const original = {
       absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
-      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      startDate: Dates.isoDatePrefix(currentSelectedEvent.startDate),
+      endDate: Dates.isoDatePrefix(currentSelectedEvent.endDate),
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 

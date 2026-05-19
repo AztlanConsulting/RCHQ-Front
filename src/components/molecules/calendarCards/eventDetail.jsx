@@ -1,6 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import Dates from "@/utils/dates"
+import Dates from "@/utils/dates";
 
 const EventDetail = ({ event }) => {
   if (!event) return null;

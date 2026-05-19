@@ -1,42 +1,4 @@
-const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
-
-export const normalizeDateOnly = (value) => {
-  if (value == null || value === "") return "";
-
-  if (typeof value === "string") {
-    const trimmedValue = value.trim();
-    const matchedDate = trimmedValue.match(DATE_ONLY_PATTERN);
-
-    if (matchedDate) {
-      return matchedDate[1];
-    }
-  }
-
-  const parsedDate = value instanceof Date ? new Date(value.getTime()) : new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) return "";
-
-  const year = parsedDate.getFullYear();
-  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-  const day = String(parsedDate.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
-
-export const dateOnlyToLocalDate = (value) => {
-  const normalizedValue = normalizeDateOnly(value);
-  if (!normalizedValue) return null;
-
-  const [year, month, day] = normalizedValue.split("-").map(Number);
-  return new Date(year, month - 1, day, 12, 0, 0, 0);
-};
-
-export const addDaysToDateOnly = (value, days) => {
-  const baseDate = dateOnlyToLocalDate(value);
-  if (!baseDate) return "";
-
-  baseDate.setDate(baseDate.getDate() + days);
-  return normalizeDateOnly(baseDate);
-};
+import Dates from "./dates";
 
 export const eventApiToDetail = (ev) => {
   if (!ev) return null;
@@ -73,8 +35,8 @@ export const eventApiToDetail = (ev) => {
     usedDays: x.usedDays,
     totalDays: x.totalDays,
     link: x.link,
-    startDate: normalizeDateOnly(x.startDate ?? start),
-    endDate: normalizeDateOnly(x.endDate ?? end),
+    startDate: Dates.normalizeDateOnly(x.startDate ?? start),
+    endDate: Dates.normalizeDateOnly(x.endDate ?? end),
     isDeleted: x.isDeleted,
     peopleInsideEvent: x.peopleInsideEvent ?? null,
   };
@@ -110,26 +72,8 @@ export const calendarItemToDetail = (item) => {
     curp: item.curp ?? "",
     usedDays: item.usedDays,
     link: item.link ?? "",
-    startDate: normalizeDateOnly(item.startDate ?? item.start),
-    endDate: normalizeDateOnly(item.endDate ?? item.end),
+    startDate: Dates.normalizeDateOnly(item.startDate ?? item.start),
+    endDate: Dates.normalizeDateOnly(item.endDate ?? item.end),
     isDeleted: item.isDeleted,
   };
-};
-
-export const formatEventDate = (value) => {
-  if (value == null || value === "") return "—";
-  const dateOnly = dateOnlyToLocalDate(value);
-
-  if (dateOnly) {
-    return dateOnly.toLocaleDateString("es-MX", {
-      dateStyle: "long",
-    });
-  }
-
-  const parsedDate = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) return String(value);
-
-  return parsedDate.toLocaleDateString("es-MX", {
-    dateStyle: "long",
-  });
 };

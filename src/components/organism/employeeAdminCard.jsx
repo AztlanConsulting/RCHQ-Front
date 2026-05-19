@@ -6,9 +6,9 @@ import TextField from "../atoms/textField";
 import {
   countWorkdayDays,
   countWorkdaysHours,
-  parseUTCDateToHours,
   totalWorkDaysFromApprovedVacationRequests,
 } from "@/utils/detalle-empleado.utils";
+import Dates from "@/utils/dates";
 
 const TIPOS = [
   { value: "Nomina", label: "Nómina" },
@@ -157,7 +157,7 @@ const EmployeeAdminCard = ({
                 <div key={w.workdayId} className="w-full flex justify-between">
                   <Type variant="metric-label">{w.name}</Type>
                   <Type variant="metric-label">
-                    {`${parseUTCDateToHours(w.start)} - ${parseUTCDateToHours(w.end)}`}
+                    {`${Dates.parseUTCDateToHours(w.start)} - ${Dates.parseUTCDateToHours(w.end)}`}
                   </Type>
                 </div>
               ))}
