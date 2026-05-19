@@ -9,7 +9,12 @@ export async function secureFetch(input, init = {}) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const res = await fetch(input, { ...init, headers });
+  const base = import.meta.env.VITE_API_URL ?? "";
+  const url = typeof input === "string" && input.startsWith("/")
+    ? `${base}${input}`
+    : input;
+
+  const res = await fetch(url, { ...init, headers });
 
   if (res.status === 401 && !init.skipAuthRedirect) {
     clearAuthStorage();

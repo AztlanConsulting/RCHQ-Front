@@ -1,7 +1,9 @@
+import { useState } from "react";
 import Button from "../components/atoms/button";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
+import ConfirmApproveVacationModal from "../components/molecules/confirmApproveVacationModal";
 import { useVacationRequests } from "../hooks/pages/useVacationRequests";
 import Alert from "../components/atoms/alerts";
 
@@ -24,15 +26,59 @@ const VacationRequests = () => {
         loading,
         error,
         clearError,
+        approvingRequestId,
+        handleApproveRequest,
         handleNextPage,
         handlePrevPage,
         clearFilters,
     } = useVacationRequests();
 
+    const [requestToApprove, setRequestToApprove] = useState(null);
+    const [approveModalError, setApproveModalError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+
     const isPendingView = view === "pending";
 
+    const handleOpenApproveModal = (request) => {
+        clearError();
+        setApproveModalError("");
+        setSuccessMessage("");
+        setRequestToApprove(request);
+    };
+
+    const handleCloseApproveModal = () => {
+        if (approvingRequestId) return;
+
+        setApproveModalError("");
+        setRequestToApprove(null);
+    };
+
+    const handleConfirmApprove = async () => {
+        if (!requestToApprove?.vacationRequestId) return;
+
+        setApproveModalError("");
+        setSuccessMessage("");
+
+        try {
+            await handleApproveRequest(requestToApprove.vacationRequestId);
+            setRequestToApprove(null);
+            setSuccessMessage("Solicitud de vacaciones aprobada con éxito");
+        } catch (err) {
+            setApproveModalError(err.message || "No se pudo aprobar la solicitud");
+        }
+    };
+
     return (
-        <div className="p-8 bg-white min-h-screen">
+        <div className="p-8 md:flex md:flex-col md:h-full">
+            {successMessage && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+                    <Alert
+                        type="success"
+                        message={successMessage}
+                        onClose={() => setSuccessMessage("")}
+                    />
+                </div>
+            )}
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
                     {isPendingView
@@ -69,7 +115,7 @@ const VacationRequests = () => {
                 clearFilters={clearFilters}
             />
 
-            {error && (
+            {error && !requestToApprove && (
                 <div className="mb-5">
                     <Alert
                         type="error"
@@ -83,9 +129,11 @@ const VacationRequests = () => {
                 requests={requests}
                 view={view}
                 loading={loading}
+                approvingRequestId={approvingRequestId}
                 onViewDetail={(request) => {
                     setSelectedRequest(request);
                 }}
+                onOpenApproveModal={handleOpenApproveModal}
             />
 
             <Pagination
@@ -97,6 +145,14 @@ const VacationRequests = () => {
                 loading={loading}
                 hasEmployees={requests.length > 0}
                 itemLabel="solicitudes"
+            />
+
+            <ConfirmApproveVacationModal
+                request={requestToApprove}
+                loading={Boolean(approvingRequestId)}
+                error={approveModalError}
+                onCancel={handleCloseApproveModal}
+                onConfirm={handleConfirmApprove}
             />
         </div>
     );

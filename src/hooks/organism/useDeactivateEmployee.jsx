@@ -1,0 +1,93 @@
+import { useState } from "react";
+import { deactivateEmployeeSchema } from "@/utils/schema/employee/deactivate.schema";
+import {
+  deactivateEmployeeService,
+} from "@/services/deactivateEmployeeService";
+
+export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [addToBlacklist, setAddToBlacklist] = useState(false);
+  const [fieldError, setFieldError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const openModal = () => {
+    if (!isActive) {
+      setAlert({
+        type: "error",
+        message: "El empleado ya ha sido dado de baja previamente.",
+      });
+      return;
+    }
+    setReason("");
+    setAddToBlacklist(false);
+    setFieldError(null);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    if (isSubmitting) return;
+    setIsModalOpen(false);
+  };
+
+  const handleReasonChange = (value) => {
+    if (value.length > 250) return;
+    setReason(value);
+    const parsed = deactivateEmployeeSchema.pick({ reason: true }).safeParse({ reason: value });
+    if (!parsed.success) {
+      setFieldError(parsed.error.issues[0].message);
+    } else if (isActive && !value.trim()) {
+      setFieldError('El campo "Razón" es obligatorio.');
+    } else {
+      setFieldError(null);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const parsed = deactivateEmployeeSchema.safeParse({ reason, addToBlacklist });
+    if (!parsed.success) {
+      setFieldError(parsed.error.issues[0].message);
+      return;
+    }
+
+    if (isActive && !reason.trim()) {
+      setFieldError('El campo "Razón" es obligatorio.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFieldError(null);
+
+    try {
+      await deactivateEmployeeService(employeeId, reason, addToBlacklist);
+      setIsModalOpen(false);
+      setAlert({
+        type: "success",
+        message: `"${employeeName}" ha sido dado de baja${addToBlacklist ? " y agregado a la lista negra." : "."}`,
+      });
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (err) {
+      setIsModalOpen(false);
+      setAlert({
+        type: "error",
+        message: err?.message ?? `Hubo un error al dar de baja a "${employeeName}".`,
+      });
+    }
+    setIsSubmitting(false);
+  };
+
+  return {
+    isModalOpen,
+    openModal,
+    closeModal,
+    reason,
+    handleReasonChange,
+    addToBlacklist,
+    setAddToBlacklist,
+    fieldError,
+    isSubmitting,
+    handleSubmit,
+  };
+};

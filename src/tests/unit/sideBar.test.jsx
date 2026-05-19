@@ -71,7 +71,6 @@ describe("SideBar", () => {
       "Personal",
       "Casas Hogares",
       "Vacaciones",
-      "Ausencias",
       "Donaciones",
     ];
 
@@ -182,67 +181,5 @@ describe("SideBar mobile abierta", () => {
     const btn = screen.getByRole("button", { name: "Cerrar menú" });
 
     expect(btn).toHaveAttribute("aria-expanded", "true");
-  });
-});
-
-describe("SideBar - rutas por rol", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("manda Vacaciones a solicitudes cuando el usuario es Coordinador", () => {
-    setupSideBar({
-      expanded: true,
-      user: { role: { name: "Coordinador" } },
-    });
-
-    renderSideBar();
-
-    expect(screen.getByRole("link", { name: "Vacaciones" })).toHaveAttribute(
-      "href",
-      "/app/vacaciones/solicitudes",
-    );
-  });
-
-  it("manda Vacaciones a /app/vacaciones cuando el usuario no es Coordinador", () => {
-    setupSideBar({
-      expanded: true,
-      user: { role: { name: "Administrador" } },
-    });
-
-    renderSideBar();
-
-    expect(screen.getByRole("link", { name: "Vacaciones" })).toHaveAttribute(
-      "href",
-      "/app/vacaciones",
-    );
-  });
-
-  it("también reconoce roleName plano como Coordinador", () => {
-    setupSideBar({
-      expanded: true,
-      user: { roleName: "Coordinador" },
-    });
-
-    renderSideBar();
-
-    expect(screen.getByRole("link", { name: "Vacaciones" })).toHaveAttribute(
-      "href",
-      "/app/vacaciones/solicitudes",
-    );
-  });
-
-  it("también reconoce role como string Coordinador", () => {
-    setupSideBar({
-      expanded: true,
-      user: { role: "Coordinador" },
-    });
-
-    renderSideBar();
-
-    expect(screen.getByRole("link", { name: "Vacaciones" })).toHaveAttribute(
-      "href",
-      "/app/vacaciones/solicitudes",
-    );
   });
 });
