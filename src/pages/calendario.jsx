@@ -6,6 +6,7 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
+import VacationWorkerDetail from "../components/molecules/calendarCards/vacationWorkerDetail";
 import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
@@ -265,13 +266,11 @@ const Calendario = () => {
                 onReject={() => {}}
                 />
               ) : (
-                <VacationDetail
+                <VacationWorkerDetail
                 event={selectedEvent} 
                 onClose={closeDetail}
                 onEdit={() => {}}
                 onDelete={() => {}}
-                onApprove={() => {}}
-                onReject={() => {}}
                 />
               );
 
