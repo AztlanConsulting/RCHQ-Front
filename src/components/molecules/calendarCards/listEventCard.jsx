@@ -1,17 +1,14 @@
-const getAbsenceDayMeta = (event) => {
+const getEventDayMeta = (event) => {
   const currentDay = event.extendedProps?.currentDayIndex;
   const totalDays = event.extendedProps?.totalDays;
 
-  if (!currentDay || !totalDays || totalDays <= 1) return "";
+  if (!currentDay || !totalDays) return "";
   return `(Día ${currentDay}/${totalDays})`;
 };
 
 const ListEventCard = ({ arg }) => {
   const event = arg.event;
-  const isAbsence = event.extendedProps?.focus === "ausencias";
-  const title = isAbsence
-    ? `${event.extendedProps?.employeeName ?? event.title} ${getAbsenceDayMeta(event)}`.trim()
-    : event.title;
+  const title = `${event.title} ${getEventDayMeta(event)}`.trim();
 
   return (
     <div className="fc-list-event-card flex items-center gap-3 min-w-0">

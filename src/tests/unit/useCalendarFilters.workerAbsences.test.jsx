@@ -18,7 +18,7 @@ const buildAbsence = (overrides = {}) => ({
   absenceId: "absence-1",
   absenceTypeId: "type-medica",
   employeeId: "employee-worker",
-  name: "Ausencia",
+  name: "John Smith",
   type: "Médica",
   description: "Reposo indicado",
   start: "2026-05-05T00:00:00.000Z",
@@ -81,7 +81,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
 
     expect(getHouseEmployees).not.toHaveBeenCalled();
     expect(absenceEvent).toMatchObject({
-      title: "Ausencia Médica",
+      title: "Ausencia Médica de John Smith",
       backgroundColor: "#EF4444",
       borderColor: "#DC2626",
       allDay: true,

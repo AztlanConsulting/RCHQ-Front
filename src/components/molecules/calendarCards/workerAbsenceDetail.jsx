@@ -71,12 +71,12 @@ const WorkerAbsenceDetail = ({
 
         <div>
           <DetailLabel>Fecha de inicio:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.startDate)}</DetailValue>
+          <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
         <div>
           <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.endDate)}</DetailValue>
+          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
         </div>
 
         <div className="sm:col-span-2">
@@ -116,7 +116,7 @@ const WorkerAbsenceDetail = ({
         <Button
           type="button"
           text="Cerrar"
-          width="w-full max-w-[8.5rem]"
+          width="w-full sm:w-[7.2rem]"
           height="h-10"
           textSize="text-base"
           bgColor="bg-[#1F3664]"

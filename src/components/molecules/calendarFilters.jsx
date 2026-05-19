@@ -15,7 +15,16 @@ const focusTrailing = (opt) =>
 const scopeTrailing = (opt) =>
   opt.color ? (
     <span
-      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200"
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200/30"
+      style={{ backgroundColor: opt.color }}
+      aria-hidden
+    />
+  ) : null;
+
+const vacationTrailing = (opt) =>
+  opt.color ? (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200/30"
       style={{ backgroundColor: opt.color }}
       aria-hidden
     />
@@ -38,13 +47,13 @@ const CalendarFilters = ({
   absenceTypeFilters,
   setAbsenceTypeFilters,
   absenceTypeOptions,
-  absenceEmployeeFilters,
-  filteredAbsenceEmployeeOptions,
-  absenceEmployeeSearch,
-  selectedAbsenceEmployeeLabel,
-  setAbsenceEmployeeSearch,
-  toggleAbsenceEmployeeValue,
-  clearAbsenceEmployeeSelection,
+  employeeFilters,
+  filteredEmployeeOptions,
+  employeeSearch,
+  selectedEmployeeLabel,
+  setEmployeeSearch,
+  toggleEmployeeValue,
+  clearEmployeeSelection,
   absenceStatusFilters,
   setAbsenceStatusFilters,
   absenceStatusOptions,
@@ -61,10 +70,10 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
-  stackMaxHeightClass = "max-h-[65vh]",
+  stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
 }) => {
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${className}`}>
+    <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario
@@ -97,7 +106,7 @@ const CalendarFilters = ({
           })}
         </div>
       ) : null}
-      <div className={`flex flex-col gap-4 mt-4 ${stackMaxHeightClass}`}>
+      <div className={`flex flex-col gap-4 mt-4`}>
         <FilterGroup
           label="ENFOQUE"
           name="focus"
@@ -107,79 +116,82 @@ const CalendarFilters = ({
           renderTrailing={focusTrailing}
         />
         <div className="border border-b  border-[#1F3664]"></div>
+        {viewerRole === "Coordinador" && calendarMode === "house" ? (
+          <>
+            <SearchableCheckboxDropdown
+              label="TRABAJADOR"
+              name="employee"
+              filteredOptions={filteredEmployeeOptions}
+              values={employeeFilters}
+              search={employeeSearch}
+              selectedLabel={selectedEmployeeLabel}
+              onSearchChange={setEmployeeSearch}
+              onToggleValue={toggleEmployeeValue}
+              onClearSelection={clearEmployeeSelection}
+            />
+            <div className="border border-b border-[#EAEAEA]"></div>
+          </>
+        ) : null}
         <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
-        <FilterGroup
-          label="VISIBILIDAD"
-          name="scope"
-          options={scopeOptions}
-          values={scopeFilters}
-          setValues={setScopeFilters}
-          renderTrailing={scopeTrailing}
-        />
-        <div className="border border-b border-[#EAEAEA]"></div>
-        {showEventFilters && (
-          <>
-            <FilterGroup
-              label="CATEGORIA"
-              name="tipo-evento"
-              options={eventTypeOptions}
-              values={eventTypeFilters}
-              setValues={setEventTypeFilters}
-            />
-            <div className="border border-b border-[#EAEAEA]"></div>
-          </>
-        )}
-        {showVacationFilters && (
-          <>
-            <FilterGroup
-              label="ESTATUS DE VACACIONES"
-              name="vacaciones"
-              options={vacationStatusOptions}
-              values={vacationStatusFilters}
-              setValues={setVacationStatusFilters}
-            />
-            <div className="border border-b border-[#EAEAEA]"></div>
-          </>
-          
-        )}
-        {showAbscenceFilters && (
-          <>
-            <FilterGroup
-              label="TIPO DE AUSENCIA"
-              name="absence-type"
-              options={absenceTypeOptions}
-              values={absenceTypeFilters}
-              setValues={setAbsenceTypeFilters}
-            />
-            {viewerRole === "Coordinador" && calendarMode === "house" ? (
-              <SearchableCheckboxDropdown
-                label="TRABAJADOR"
-                name="absence-employee"
-                filteredOptions={filteredAbsenceEmployeeOptions}
-                values={absenceEmployeeFilters}
-                search={absenceEmployeeSearch}
-                selectedLabel={selectedAbsenceEmployeeLabel}
-                onSearchChange={setAbsenceEmployeeSearch}
-                onToggleValue={toggleAbsenceEmployeeValue}
-                onClearSelection={clearAbsenceEmployeeSelection}
+          <FilterGroup
+            label="VISIBILIDAD"
+            name="scope"
+            options={scopeOptions}
+            values={scopeFilters}
+            setValues={setScopeFilters}
+            renderTrailing={scopeTrailing}
+          />
+          <div className="border border-b border-[#EAEAEA]"></div>
+          {showEventFilters && (
+            <>
+              <FilterGroup
+                label="CATEGORIA"
+                name="tipo-evento"
+                options={eventTypeOptions}
+                values={eventTypeFilters}
+                setValues={setEventTypeFilters}
               />
-            ) : null}
-            <FilterGroup
-              label="ESTATUS"
-              name="absence-status"
-              options={absenceStatusOptions}
-              values={absenceStatusFilters}
-              setValues={setAbsenceStatusFilters}
-            />
-            <FilterGroup
-              label="EVIDENCIA"
-              name="absence-evidence"
-              options={absenceEvidenceOptions}
-              values={absenceEvidenceFilters}
-              setValues={setAbsenceEvidenceFilters}
-            />
-          </>
-        )}
+              <div className="border border-b border-[#EAEAEA]"></div>
+            </>
+          )}
+          {showVacationFilters && (
+            <>
+              <FilterGroup
+                label="ESTATUS DE VACACIONES"
+                name="vacaciones"
+                options={vacationStatusOptions}
+                values={vacationStatusFilters}
+                setValues={setVacationStatusFilters}
+                renderTrailing={vacationTrailing}
+              />
+              <div className="border border-b border-[#EAEAEA]"></div>
+            </>
+          )}
+          {showAbscenceFilters && (
+            <>
+              <FilterGroup
+                label="TIPO DE AUSENCIA"
+                name="absence-type"
+                options={absenceTypeOptions}
+                values={absenceTypeFilters}
+                setValues={setAbsenceTypeFilters}
+              />
+              <FilterGroup
+                label="ESTATUS"
+                name="absence-status"
+                options={absenceStatusOptions}
+                values={absenceStatusFilters}
+                setValues={setAbsenceStatusFilters}
+              />
+              <FilterGroup
+                label="EVIDENCIA"
+                name="absence-evidence"
+                options={absenceEvidenceOptions}
+                values={absenceEvidenceFilters}
+                setValues={setAbsenceEvidenceFilters}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

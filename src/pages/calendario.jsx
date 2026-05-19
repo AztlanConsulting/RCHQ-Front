@@ -7,6 +7,7 @@ import Alert from "../components/atoms/alerts";
 import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
+import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
 import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
@@ -64,13 +65,13 @@ const Calendario = () => {
         absenceTypeFilters,
         setAbsenceTypeFilters,
         absenceTypeOptions,
-        absenceEmployeeFilters,
-        filteredAbsenceEmployeeOptions,
-        absenceEmployeeSearch,
-        selectedAbsenceEmployeeLabel,
-        setAbsenceEmployeeSearch,
-        toggleAbsenceEmployeeValue,
-        clearAbsenceEmployeeSelection,
+        employeeFilters,
+        filteredEmployeeOptions,
+        employeeSearch,
+        selectedEmployeeLabel,
+        setEmployeeSearch,
+        toggleEmployeeValue,
+        clearEmployeeSelection,
         absenceStatusFilters,
         setAbsenceStatusFilters,
         absenceStatusOptions,
@@ -117,7 +118,6 @@ const Calendario = () => {
         reloadCurrentRange,
         viewerRole,
     });
-    const isAbsenceDetailOpen = selectedEvent?.focus === "ausencias";
 
     useEffect(() => {
         setOwnCalendar();
@@ -140,13 +140,13 @@ const Calendario = () => {
         absenceTypeFilters,
         setAbsenceTypeFilters,
         absenceTypeOptions,
-        absenceEmployeeFilters,
-        filteredAbsenceEmployeeOptions,
-        absenceEmployeeSearch,
-        selectedAbsenceEmployeeLabel,
-        setAbsenceEmployeeSearch,
-        toggleAbsenceEmployeeValue,
-        clearAbsenceEmployeeSelection,
+        employeeFilters,
+        filteredEmployeeOptions,
+        employeeSearch,
+        selectedEmployeeLabel,
+        setEmployeeSearch,
+        toggleEmployeeValue,
+        clearEmployeeSelection,
         absenceStatusFilters,
         setAbsenceStatusFilters,
         absenceStatusOptions,
@@ -222,58 +222,99 @@ const Calendario = () => {
             <Modal
                 open={selectedEvent != null}
                 onClose={closeDetail}
-                title={
-                    selectedEvent?.focus === "ausencias"
-                        ? null
-                        : "Detalle del evento"
-                }
-                grayBackground={isAbsenceDetailOpen}
-                placement={isAbsenceDetailOpen ? "center" : "right"}
-                className={
-                    selectedEvent?.focus === "ausencias"
-                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
-                        : "w-[92vw] max-w-[400px] max-h-[80vh]"
-                }
-            >
-                {selectedEvent?.focus === "ausencias" ? (
-                    isManagementRole(viewerRole) ? (
-                        <AbsenceDetail
-                            event={selectedEvent}
-                            isEditing={isAbsenceEditing}
-                            evidenceLabel={absenceEvidenceLabel}
-                            absenceTypeOptions={absenceTypeOptions}
-                            absenceForm={absenceForm}
-                            absenceEditError={absenceEditError}
-                            absenceDeleteError={absenceDeleteError}
-                            absenceEvidenceFileName={absenceEvidenceFileName}
-                            absenceEvidenceError={absenceEvidenceError}
-                            isSaving={isSavingAbsence}
-                            isDeleteOpen={isDeleteAbsenceOpen}
-                            isLoadingWhileDeleting={isLoadingWhileDeleting}
-                            canManageAbsence={isManagementRole(viewerRole)}
-                            onOpenEvidence={openAbsenceEvidence}
-                            onStartEdit={startAbsenceEdit}
-                            onCancelEdit={cancelAbsenceEdit}
-                            onSubmitEdit={submitAbsenceEdit}
-                            onOpenDelete={openDeleteAbsence}
-                            onCancelDelete={cancelDeleteAbsence}
-                            onConfirmDelete={confirmDeleteAbsence}
-                            onAbsenceFieldChange={setAbsenceField}
-                            onAbsenceEvidenceChange={
-                                handleAbsenceEvidenceChange
-                            }
-                        />
-                    ) : (
-                        <WorkerAbsenceDetail
-                            event={selectedEvent}
-                            evidenceLabel={absenceEvidenceLabel}
-                            onOpenEvidence={openAbsenceEvidence}
-                            onClose={closeDetail}
-                        />
+                title={(() => {
+                    if (
+                        ["ausencias", "vacaciones"].includes(
+                            selectedEvent?.focus,
+                        )
                     )
-                ) : (
-                    <EventDetail event={selectedEvent} />
-                )}
+                        return null;
+
+                    return "Detalle del evento";
+                })()}
+                grayBackground={true}
+                placement="center"
+                className={() => {
+                    if (
+                        ["ausencias", "vacaciones"].includes(
+                            selectedEvent?.focus,
+                        )
+                    )
+                        return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
+
+                    return "max-w-[25vw] max-h-[80vh]";
+                }}
+            >
+                {(() => {
+                    switch (selectedEvent?.focus) {
+                        case "ausencias":
+                            return isManagementRole(viewerRole) ? (
+                                <AbsenceDetail
+                                    event={selectedEvent}
+                                    isEditing={isAbsenceEditing}
+                                    evidenceLabel={absenceEvidenceLabel}
+                                    absenceTypeOptions={absenceTypeOptions}
+                                    absenceForm={absenceForm}
+                                    absenceEditError={absenceEditError}
+                                    absenceDeleteError={absenceDeleteError}
+                                    absenceEvidenceFileName={
+                                        absenceEvidenceFileName
+                                    }
+                                    absenceEvidenceError={absenceEvidenceError}
+                                    isSaving={isSavingAbsence}
+                                    isDeleteOpen={isDeleteAbsenceOpen}
+                                    isLoadingWhileDeleting={
+                                        isLoadingWhileDeleting
+                                    }
+                                    canManageAbsence={isManagementRole(
+                                        viewerRole,
+                                    )}
+                                    onOpenEvidence={openAbsenceEvidence}
+                                    onStartEdit={startAbsenceEdit}
+                                    onCancelEdit={cancelAbsenceEdit}
+                                    onSubmitEdit={submitAbsenceEdit}
+                                    onOpenDelete={openDeleteAbsence}
+                                    onCancelDelete={cancelDeleteAbsence}
+                                    onConfirmDelete={confirmDeleteAbsence}
+                                    onAbsenceFieldChange={setAbsenceField}
+                                    onAbsenceEvidenceChange={
+                                        handleAbsenceEvidenceChange
+                                    }
+                                />
+                            ) : (
+                                <WorkerAbsenceDetail
+                                    event={selectedEvent}
+                                    evidenceLabel={absenceEvidenceLabel}
+                                    onOpenEvidence={openAbsenceEvidence}
+                                    onClose={closeDetail}
+                                />
+                            );
+
+                        case "vacaciones":
+                            return isManagementRole(viewerRole) ? (
+                                <VacationDetail
+                                    event={selectedEvent}
+                                    onClose={closeDetail}
+                                    onEdit={() => {}}
+                                    onDelete={() => {}}
+                                    onApprove={() => {}}
+                                    onReject={() => {}}
+                                />
+                            ) : (
+                                <VacationDetail
+                                    event={selectedEvent}
+                                    onClose={closeDetail}
+                                    onEdit={() => {}}
+                                    onDelete={() => {}}
+                                    onApprove={() => {}}
+                                    onReject={() => {}}
+                                />
+                            );
+
+                        default:
+                            return <EventDetail event={selectedEvent} />;
+                    }
+                })()}
             </Modal>
 
             <RegisterHouseEventModal
