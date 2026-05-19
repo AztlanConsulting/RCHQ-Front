@@ -7,13 +7,16 @@ vi.mock("../../components/molecules/vacationRequestRow", () => ({
         request,
         view,
         approvingRequestId,
+        rejectingRequestId,
         onViewDetail,
         onOpenApproveModal,
+        onOpenRejectModal,
     }) => (
         <tr>
             <td>{request.employee.fullName}</td>
             <td>{view}</td>
             <td>{approvingRequestId || "sin-aprobacion"}</td>
+            <td>{rejectingRequestId || "sin-rechazo"}</td>
             <td>
                 <button
                     type="button"
@@ -26,6 +29,12 @@ vi.mock("../../components/molecules/vacationRequestRow", () => ({
                     onClick={() => onOpenApproveModal(request)}
                 >
                     Aprobar mock
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onOpenRejectModal(request)}
+                >
+                    Rechazar mock
                 </button>
             </td>
         </tr>
@@ -51,6 +60,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -66,6 +77,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -82,6 +95,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -99,6 +114,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -121,6 +138,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -136,6 +155,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId="vac-001"
                 onViewDetail={vi.fn()}
                 onOpenApproveModal={vi.fn()}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -155,6 +176,8 @@ describe("VacationRequestTable", () => {
                 approvingRequestId={null}
                 onViewDetail={onViewDetail}
                 onOpenApproveModal={onOpenApproveModal}
+                rejectingRequestId={null}
+                onOpenRejectModal={vi.fn()}
             />,
         );
 
@@ -163,5 +186,44 @@ describe("VacationRequestTable", () => {
 
         expect(onViewDetail).toHaveBeenCalledWith(requests[0]);
         expect(onOpenApproveModal).toHaveBeenCalledWith(requests[0]);
+    });
+    
+    it("pasa rejectingRequestId al row", () => {
+        render(
+            <VacationRequestTable
+                requests={requests}
+                view="pending"
+                loading={false}
+                approvingRequestId={null}
+                rejectingRequestId="vac-001"
+                onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
+                onOpenRejectModal={vi.fn()}
+            />,
+        );
+
+        expect(screen.getByText("vac-001")).toBeInTheDocument();
+    });
+
+    it("pasa onOpenRejectModal al row", () => {
+        const onOpenRejectModal = vi.fn();
+
+        render(
+            <VacationRequestTable
+                requests={requests}
+                view="pending"
+                loading={false}
+                approvingRequestId={null}
+                rejectingRequestId={null}
+                onViewDetail={vi.fn()}
+                onOpenApproveModal={vi.fn()}
+                onOpenRejectModal={onOpenRejectModal}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar mock" }));
+
+        expect(onOpenRejectModal).toHaveBeenCalledTimes(1);
+        expect(onOpenRejectModal).toHaveBeenCalledWith(requests[0]);
     });
 });

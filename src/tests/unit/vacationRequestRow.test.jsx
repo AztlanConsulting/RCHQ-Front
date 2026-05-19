@@ -29,6 +29,8 @@ const renderRow = (props = {}) => {
         approvingRequestId: null,
         onViewDetail: vi.fn(),
         onOpenApproveModal: vi.fn(),
+        rejectingRequestId: null,
+        onOpenRejectModal: vi.fn(),
     };
 
     return render(
@@ -132,5 +134,34 @@ describe("VacationRequestRow", () => {
         });
 
         expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    });
+
+    it("llama onOpenRejectModal con la solicitud al hacer click en Rechazar", () => {
+        const onOpenRejectModal = vi.fn();
+
+        renderRow({ onOpenRejectModal });
+
+        fireEvent.click(screen.getByTitle("Rechazar solicitud"));
+
+        expect(onOpenRejectModal).toHaveBeenCalledTimes(1);
+        expect(onOpenRejectModal).toHaveBeenCalledWith(mockRequest);
+    });
+
+    it("deshabilita el botón de rechazar cuando esa solicitud se está rechazando", () => {
+        const onOpenRejectModal = vi.fn();
+
+        renderRow({
+            rejectingRequestId: "vac-001",
+            onOpenRejectModal,
+        });
+
+        const rejectButton = screen.getByTitle("Rechazando solicitud");
+
+        expect(rejectButton).toBeDisabled();
+        expect(screen.getByAltText("Rechazando solicitud")).toBeInTheDocument();
+
+        fireEvent.click(rejectButton);
+
+        expect(onOpenRejectModal).not.toHaveBeenCalled();
     });
 });

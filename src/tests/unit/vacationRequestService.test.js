@@ -3,6 +3,7 @@ import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
     approveVacationRequest,
+    rejectVacationRequest,
 } from "../../services/vacationRequestService";
 import { secureFetch } from "../../utils/secureFetchWrapper";
 
@@ -205,6 +206,83 @@ describe("vacationRequestService", () => {
 
         await expect(approveVacationRequest("vac-001")).rejects.toThrow(
             "No se pudo aprobar",
+        );
+    });
+
+    it("rejectVacationRequest llama al endpoint correcto con PATCH", async () => {
+        secureFetch.mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                success: true,
+                message: "Solicitud rechazada correctamente",
+                data: {
+                    vacationRequest: {
+                        vacationRequestId: "vac-001",
+                        status: 2,
+                    },
+                },
+            }),
+        });
+
+        const result = await rejectVacationRequest("vac-001");
+
+        expect(secureFetch).toHaveBeenCalledWith(
+            expect.stringContaining("/vacation/request/vac-001/reject"),
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({}),
+            },
+        );
+
+        expect(result).toEqual({
+            message: "Solicitud rechazada correctamente",
+            vacationRequest: {
+                vacationRequestId: "vac-001",
+                status: 2,
+            },
+        });
+    });
+
+    it("rejectVacationRequest lanza error con mensaje del backend", async () => {
+        secureFetch.mockResolvedValue({
+            ok: false,
+            json: vi.fn().mockResolvedValue({
+                message: "La solicitud ya fue revisada",
+            }),
+        });
+
+        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+            "La solicitud ya fue revisada",
+        );
+    });
+
+    it("rejectVacationRequest lanza error con mensaje de validación", async () => {
+        secureFetch.mockResolvedValue({
+            ok: false,
+            json: vi.fn().mockResolvedValue({
+                errors: [{ message: "El id de solicitud es inválido" }],
+            }),
+        });
+
+        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+            "El id de solicitud es inválido",
+        );
+    });
+
+    it("rejectVacationRequest lanza error si success=false", async () => {
+        secureFetch.mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                success: false,
+                message: "No se pudo rechazar",
+            }),
+        });
+
+        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+            "No se pudo rechazar",
         );
     });
 });
