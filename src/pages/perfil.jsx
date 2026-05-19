@@ -1,0 +1,109 @@
+import { useState, useEffect, useCallback } from "react";
+import { getUserData, getReadableErrors } from "../services/profileService";
+import { getToken } from "../utils/authStorage";
+import ProfileCard from "../components/organism/profileCard";
+
+const STATUS_MAP = {
+  401: { title: "Sin permisos", message: "No tienes permisos para ver esta información." },
+  404: { title: "Ruta no encontrada", message: "No se encontró la ruta para obtener el perfil." },
+  501: { title: "Error del servidor", message: "Ocurrió un problema al obtener la información. Intenta más tarde." },
+  default: { title: "Error inesperado", message: "Ocurrió un error inesperado al cargar tu perfil." },
+};
+
+const ProfileSkeleton = () => (
+  <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm animate-pulse">
+    <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex-1 flex flex-col gap-3">
+        <div className="h-5 w-40 bg-slate-200 rounded" />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-0.5">
+            <div className="h-3 w-24 bg-slate-200 rounded" />
+            <div className="h-[38px] bg-slate-100 rounded-lg" />
+          </div>
+        ))}
+      </div>
+      <div className="flex-1 flex flex-col gap-3">
+        <div className="h-[120px] bg-slate-100 rounded-xl" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-0.5">
+            <div className="h-3 w-24 bg-slate-200 rounded" />
+            <div className="h-[38px] bg-slate-100 rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const ProfileError = ({ status, messages, onRetry }) => {
+  const info = STATUS_MAP[status] ?? STATUS_MAP.default;
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-red-100 bg-red-50 p-12 text-center">
+      <h3 className="text-lg font-bold text-red-700">{info.title}</h3>
+      <p className="text-sm text-red-600 max-w-sm">
+        {messages.length > 0 ? messages.join(" ") : info.message}
+      </p>
+      {status !== 401 && (
+        <button
+          onClick={onRetry}
+          className="mt-2 h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold
+                     hover:bg-[#16304f] active:bg-[#0f2540] transition-colors"
+        >
+          Reintentar
+        </button>
+      )}
+    </div>
+  );
+};
+
+const Perfil = () => {
+  const [user, setUser]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = getToken();
+      const data  = await getUserData(token);
+      const raw   = data?.data ?? data;
+      setUser({
+        foto:           raw?.picture     ?? "",
+        casaHogar:      raw?.houseName   ?? "",
+        puesto:         raw?.roleName    ?? "",
+        nombre:         raw?.name        ?? "",
+        apellidos:      raw?.surname     ?? "",
+        correo:         raw?.email       ?? "",
+        rfc:            raw?.rfc         ?? "",
+        curp:           raw?.curp        ?? "",
+        nss:            raw?.nss         ?? "",
+        cuentaBancaria: raw?.bankAccount ?? "",
+        cumpleanos: raw?.birthDate
+          ? new Date(raw.birthDate).toLocaleDateString("es-MX", {
+              day: "2-digit", month: "2-digit", year: "numeric",
+            })
+          : "",
+      });
+    } catch (err) {
+      setError({ status: err?.status ?? "default", messages: getReadableErrors(err) });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-bold text-slate-800">Mi Perfil</h1>
+      {loading && <ProfileSkeleton />}
+      {!loading && error && (
+        <ProfileError status={error.status} messages={error.messages} onRetry={fetchProfile} />
+      )}
+      {!loading && !error && user && <ProfileCard user={user} />}
+    </div>
+  );
+};
+
+export default Perfil;
