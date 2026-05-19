@@ -190,7 +190,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
     return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
-export const getHouseAbsencesInRange = async (startDate, endDate) => {
+export const getHouseEventsInRange = async (startDate, endDate) => {
     const token = getToken();
 
     if (!token) {

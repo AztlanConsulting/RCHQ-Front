@@ -15,3 +15,8 @@ export const normalToUTCWithOffset = (
 
     return newDate;
 };
+
+export const isPastDate = (date) => {
+    const now = new Date();
+    return now > date;
+} 

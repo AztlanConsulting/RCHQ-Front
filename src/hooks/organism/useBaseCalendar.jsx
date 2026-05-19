@@ -3,7 +3,7 @@ import {
     getCalendarViewerRole,
     getEmployeeHouseName,
     getEventsInRange,
-    getHouseAbsencesInRange,
+    getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
@@ -28,7 +28,7 @@ export const useBaseCalendar = () => {
         [viewerRole],
     );
 
-    const canViewHouseAbsences = (role) =>
+    const canViewHouseEvents = (role) =>
         role === "Administrador" || role === "Coordinador";
 
     const isCoordinator = useMemo(
@@ -37,7 +37,7 @@ export const useBaseCalendar = () => {
     );
 
     const canSwitchCalendarMode = useMemo(
-        () => canViewHouseAbsences(effectiveViewerRole),
+        () => canViewHouseEvents(effectiveViewerRole),
         [effectiveViewerRole],
     );
 
@@ -50,43 +50,29 @@ export const useBaseCalendar = () => {
     );
 
     const filteredCalendarEvents = useMemo(() => {
-        if (isCoordinator) {
-            if (calendarMode === "personal") {
-                return allEvents.filter(
-                    (event) =>
-                        event.focus === "ausencias" &&
-                        String(event.employeeId) ===
-                            String(effectiveEmployeeId),
-                );
-            }
-
-            return allEvents;
-        }
-
-        if (!canSwitchCalendarMode || calendarMode === "personal") {
+        if (calendarMode === "personal") {
             return allEvents.filter(
                 (event) =>
-                    !(event.focus === "ausencias" && event.scope === "house"),
+                    (event.focus === "ausencias" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "vacaciones" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)) ||
+                    (event.focus === "eventos" &&
+                        (event.scope === "house" ||
+                            event.scope === "global")) ||
+                    (event.scope === "personal" &&
+                        String(event.employeeId) ===
+                            String(effectiveEmployeeId)),
             );
         }
 
-        return allEvents.filter((event) => {
-            if (event.focus === "ausencias") {
-                return event.scope === "house";
-            }
-
-            if (event.focus === "eventos") {
-                return event.scope === "house" || event.scope === "global";
-            }
-
-            return false;
-        });
+        return allEvents;
     }, [
         allEvents,
         calendarMode,
-        canSwitchCalendarMode,
         effectiveEmployeeId,
-        isCoordinator,
     ]);
 
     const getCorrespondingView = (isList, viewType) => {
@@ -293,21 +279,20 @@ export const useBaseCalendar = () => {
 
     const loadCalendarEvents = useCallback(
         async (startDate, endDate, employeeId, role) => {
-            const personalEventsPromise =
-                role !== "Coordinador" && employeeId
-                    ? getEventsInRange(employeeId, startDate, endDate)
-                    : Promise.resolve([]);
-
-            const houseAbsencesPromise = canViewHouseAbsences(role)
-                ? getHouseAbsencesInRange(startDate, endDate)
+            const personalEventsPromise = employeeId
+                ? getEventsInRange(employeeId, startDate, endDate)
                 : Promise.resolve([]);
 
-            const [personalEvents, houseAbsences] = await Promise.all([
+            const sameHouseEventsPromise = canViewHouseEvents(role)
+                ? getHouseEventsInRange(startDate, endDate)
+                : Promise.resolve([]);
+
+            const [personalEvents, houseEvents] = await Promise.all([
                 personalEventsPromise,
-                houseAbsencesPromise,
+                sameHouseEventsPromise,
             ]);
 
-            return [...(personalEvents ?? []), ...(houseAbsences ?? [])];
+            return [...(personalEvents ?? []), ...(houseEvents ?? [])];
         },
         [],
     );
@@ -316,7 +301,7 @@ export const useBaseCalendar = () => {
         if (!lastFetchedRange.current) return [];
         if (
             effectiveEmployeeId == "" &&
-            !canViewHouseAbsences(effectiveViewerRole)
+            !canViewHouseEvents(effectiveViewerRole)
         )
             return [];
 
@@ -343,7 +328,7 @@ export const useBaseCalendar = () => {
 
         if (
             effectiveEmployeeId == "" &&
-            !canViewHouseAbsences(effectiveViewerRole)
+            !canViewHouseEvents(effectiveViewerRole)
         )
             return;
 

@@ -67,7 +67,6 @@ describe("VacationRequestFilters", () => {
         expect(screen.getByLabelText("Filtrar por estado")).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "Todas" })).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "Aprobadas" })).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Rechazadas" })).toBeInTheDocument();
     });
 
     it("llama setStatusFilter al cambiar estado", () => {

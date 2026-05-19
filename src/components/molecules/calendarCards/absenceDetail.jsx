@@ -288,7 +288,7 @@ const AbsenceDetail = ({
             Fecha de inicio:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.startDate)}
+            {formatEventDate(event.readableStart)}
           </Type>
         </div>
         <div>
@@ -296,7 +296,7 @@ const AbsenceDetail = ({
             Fecha de fin:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.endDate)}
+            {formatEventDate(event.readableEnd)}
           </Type>
         </div>
         <div className="sm:col-span-2">
