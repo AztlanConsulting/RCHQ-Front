@@ -84,7 +84,7 @@ const MoreOptions = () => {
               />
             }
             label="Documentos"
-            onClick={() => navigate(`/app/${user?.id}/documentos`)}
+            onClick={() => navigate(`/app/${user?.employeeId}/documentos`)}
           />
           <OptionCard
             icon={
@@ -115,7 +115,7 @@ const MoreOptions = () => {
               <img
                 src="/lock.svg"
                 alt="Cambiar contraseña"
-                className="w-9 h-9"
+                className="w-9 h-9 invert opacity-90"
               />
             }
             label="Cambiar contraseña"
