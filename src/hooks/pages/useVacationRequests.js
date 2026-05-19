@@ -139,11 +139,12 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
 
         try {
             await approveVacationRequest(vacationRequestId);
+            const currentPage = Math.max(page, 1);
 
             const nextPage =
-                requests.length === 1 && page > 1
-                    ? page - 1
-                    : page;
+                requests.length === 1 && currentPage > 1
+                    ? currentPage - 1
+                    : currentPage;
 
             await fetchRequests(nextPage);
         } catch (err) {
@@ -162,11 +163,12 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
 
         try {
             await rejectVacationRequest(vacationRequestId);
+            const currentPage = Math.max(page, 1);
 
             const nextPage =
-                requests.length === 1 && page > 1
-                    ? page - 1
-                    : page;
+                requests.length === 1 && currentPage > 1
+                    ? currentPage - 1
+                    : currentPage;
 
             await fetchRequests(nextPage);
         } catch (err) {
