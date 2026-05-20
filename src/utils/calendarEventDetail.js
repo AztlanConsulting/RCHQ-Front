@@ -46,6 +46,9 @@ export const eventApiToDetail = (ev) => {
     const end = ev.end;
     return {
         id: ev.id,
+        houseEventId: x.houseEventId,
+        eventId: x.eventId,
+        eventTypeId: x.eventTypeId,
         absenceId: x.absenceId,
         absenceTypeId: x.absenceTypeId,
         employeeId: x.employeeId,
@@ -67,6 +70,7 @@ export const eventApiToDetail = (ev) => {
         scope: x.scope,
         scopeLabel: x.scopeLabel,
         eventType: x.eventType,
+        isFreeDay: x.isFreeDay,
         date: x.date,
         icon: x.icon,
         status: x.status,
@@ -86,6 +90,9 @@ export const calendarItemToDetail = (item) => {
 
     return {
         id: item.id ?? item.absenceId ?? item.employeeId ?? item.name,
+        houseEventId: item.houseEventId,
+        eventId: item.eventId,
+        eventTypeId: item.eventTypeId,
         absenceId: item.absenceId,
         absenceTypeId: item.absenceTypeId,
         employeeId: item.employeeId,
@@ -108,6 +115,7 @@ export const calendarItemToDetail = (item) => {
         scope: item.scope,
         scopeLabel: item.scopeLabel ?? item.scope,
         eventType: item.type,
+        isFreeDay: item.isFreeDay,
         date: item.date ?? "",
         icon: item.icon ?? "",
         status: item.status,
