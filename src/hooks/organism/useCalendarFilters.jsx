@@ -211,6 +211,9 @@ const getFilteredEvents = (
                         : rawEvent.color || rawEvent.backgroundColor || "#000",
                 allDay: isAllDay,
                 extendedProps: {
+                    houseEventId: rawEvent.houseEventId,
+                    eventId: rawEvent.eventId ?? rawEvent.id,
+                    eventTypeId: rawEvent.eventTypeId,
                     absenceId: rawEvent.absenceId,
                     absenceTypeId: rawEvent.absenceTypeId,
                     vacationId: rawEvent.vacationId,
@@ -227,6 +230,7 @@ const getFilteredEvents = (
                     scopeLabel:
                         getScopeOption(rawEvent)?.label ?? rawEvent.scope,
                     eventType: rawEvent.type,
+                    isFreeDay: Boolean(rawEvent.isFreeDay),
                     date: rawEvent.date ?? "",
                     icon: getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,
