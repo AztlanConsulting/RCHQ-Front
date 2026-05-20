@@ -1,9 +1,15 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import {
+<<<<<<< HEAD
     formatEventDateRange,
     formatEventTime,
 } from "../../../utils/calendarEventDetail";
+=======
+  formatEventCalendarDate,
+  formatEventDateTime,
+} from "../../../utils/dates";
+>>>>>>> styles/vistasCalendario2
 
 const EventDetail = ({ event }) => {
     if (!event) return null;
@@ -82,6 +88,7 @@ const EventDetail = ({ event }) => {
                 </Type>
             ) : null}
 
+<<<<<<< HEAD
             {event.peopleInsideEvent
                 ? event.peopleInsideEvent.map((person, idx) => (
                       <p key={idx}>
@@ -96,6 +103,26 @@ const EventDetail = ({ event }) => {
             </div>
         </div>
     );
+=======
+      <div className="w-full flex justify-around items-center gap-4 pt-2">
+        <Button 
+          type="button"
+          bgColor="bg-[#A20000]" 
+          className="text-white"
+        >
+          Eliminar
+        </Button>
+        <Button 
+          type="button"  
+          bgColor="bg-[#1F3664]"
+          className="text-white"
+          >
+            Modificar
+          </Button>
+      </div>
+    </div>
+  );
+>>>>>>> styles/vistasCalendario2
 };
 
 export default EventDetail;

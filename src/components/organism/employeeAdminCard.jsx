@@ -8,7 +8,7 @@ import {
   countWorkdaysHours,
   parseUTCDateToHours,
   totalWorkDaysFromApprovedVacationRequests,
-} from "@/utils/detalle-empleado.utils";
+} from "@/utils/dates";
 
 const TIPOS = [
   { value: "Nomina", label: "Nómina" },

@@ -8,8 +8,8 @@ import {
     addDaysToDateOnly,
     dateOnlyToLocalDate,
     normalizeDateOnly,
-} from "../../utils/calendarEventDetail";
-import {
+} from "../../utils/dates";
+import { 
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
     FOCUS_OPTIONS,
