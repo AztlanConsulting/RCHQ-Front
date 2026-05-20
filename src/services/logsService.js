@@ -1,4 +1,4 @@
-import { getToken } from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
@@ -65,7 +65,7 @@ export const getHouseLogsService = async ({
   startDate = "",
   endDate = "",
 } = {}) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   if (!token) {
     throw new Error("No se encontró token de sesión");
@@ -120,7 +120,7 @@ export const getHouseLogsService = async ({
 };
 
 export const getLogsActionsService = async () => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   if (!token) {
     throw new Error("No se encontró token de sesión");
@@ -144,7 +144,7 @@ export const getLogsActionsService = async () => {
 };
 
 export const downloadHouseLogsReportService = async ({ month, year }) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   if (!token) {
     throw new Error("No se encontró token de sesión");

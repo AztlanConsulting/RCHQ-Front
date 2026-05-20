@@ -91,10 +91,12 @@ export const getUpdateFormService = async () => {
 ```
 
 ### localStorage (`auth.utils.js` / `AuthUtils`)
-El acceso al `localStorage` debe estar centralizado para evitar vulnerabilidades XSS directas o errores de typos:
-- `getToken()` / `setToken(token)` → Manejo del JWT Principal.
-- `getFirstLoginToken()` → Token para el flujo de cambio obligatorio de contraseña.
-- `getPreTwoFactorAuthToken()` → Token temporal si el usuario tiene 2FA activado.
+El acceso al `localStorage` debe estar centralizado para evitar vulnerabilidades XSS directas o errores de typos. **Importar siempre la clase** `import AuthUtils from "@/utils/auth.utils"` y usar métodos estáticos (`AuthUtils.getToken()`, `AuthUtils.setToken(token)`, `AuthUtils.clearAuthStorage()`, etc.). `authService` sigue re-exportando algunos helpers con nombre para pruebas y código legado que depende de `getToken` desde el servicio.
+
+Los métodos principales incluyen:
+- `AuthUtils.getToken()` / `setToken` → JWT de sesión.
+- `AuthUtils.getFirstLoginToken()` → flujo de cambio obligatorio de contraseña.
+- `AuthUtils.getPreTwoFactorAuthToken()` → token temporal con 2FA activado.
 
 ---
 

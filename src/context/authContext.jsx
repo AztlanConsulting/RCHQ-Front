@@ -1,35 +1,29 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import {
-  clearAuthStorage,
-  getStoredUser,
-  getToken,
-  setStoredUser,
-  setToken,
-} from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setTokenState] = useState(() => getToken());
-  const [user, setUserState] = useState(() => getStoredUser());
+  const [token, setTokenState] = useState(() => AuthUtils.getToken());
+  const [user, setUserState] = useState(() => AuthUtils.getStoredUser());
 
   useEffect(() => {
-    setTokenState(getToken());
-    setUserState(getStoredUser());
+    setTokenState(AuthUtils.getToken());
+    setUserState(AuthUtils.getStoredUser());
   }, []);
 
   const login = ({ token: newToken, user: newUser = null }) => {
-    setToken(newToken);
+    AuthUtils.setToken(newToken);
     setTokenState(newToken);
 
     if (newUser) {
-      setStoredUser(newUser);
+      AuthUtils.setStoredUser(newUser);
       setUserState(newUser);
     }
   };
 
   const logout = () => {
-    clearAuthStorage();
+    AuthUtils.clearAuthStorage();
     setTokenState(null);
     setUserState(null);
   };

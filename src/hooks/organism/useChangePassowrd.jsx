@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getFirstLoginToken,
-  setPreTwoFactorAuthToken,
-} from "../../utils/auth.utils";
+import AuthUtils from "../../utils/auth.utils";
 import { changePasswordFirstLoginService } from "../../services/passwordService";
 import useAuth from "../useAuth";
 import {
@@ -26,7 +23,7 @@ export const useChangePassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const token = getFirstLoginToken();
+    const token = AuthUtils.getFirstLoginToken();
     if (!token) {
       navigate("/iniciar-sesion", { replace: true });
     }
@@ -68,7 +65,7 @@ export const useChangePassword = () => {
           return;
         }
 
-        setPreTwoFactorAuthToken(preTwoFactorAuthToken);
+        AuthUtils.setPreTwoFactorAuthToken(preTwoFactorAuthToken);
         navigate("/2FA", { replace: true });
         return;
       }

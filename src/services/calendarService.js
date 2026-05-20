@@ -1,4 +1,4 @@
-import { getToken } from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 import CalendarUtils from "../utils/calendar.utils";
@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 class CalendarService  {
     static getEventsTypes = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -38,7 +38,7 @@ class CalendarService  {
     };
 
     static getEventsTypes = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -69,7 +69,7 @@ class CalendarService  {
     };
 
     getAbsenceTypes = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -98,7 +98,7 @@ class CalendarService  {
     };
 
     static getAbsenceAddData = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -128,7 +128,7 @@ class CalendarService  {
     };
 
     static getHouseEmployees = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -162,7 +162,7 @@ class CalendarService  {
             return [];
         }
     
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -194,7 +194,7 @@ class CalendarService  {
     };
 
     static getHouseEventsInRange = async (startDate, endDate) => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -225,7 +225,7 @@ class CalendarService  {
     };
 
     static createAbsenceService = async (employeeId, payload) => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -288,7 +288,7 @@ class CalendarService  {
     };
 
     static updateAbsenceService = async (absenceId, payload) => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -343,7 +343,7 @@ class CalendarService  {
     };
 
     deleteAbsenceService = async (absenceId) => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");
@@ -374,7 +374,7 @@ class CalendarService  {
     };
 
     getEmployeeHouseName = async () => {
-        const token = getToken();
+        const token = AuthUtils.getToken();
     
         if (!token) {
             throw new Error("No se encontró token de sesión");

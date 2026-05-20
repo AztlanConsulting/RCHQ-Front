@@ -5,12 +5,11 @@ import {
     getHouseEmployees,
 } from "../../services/calendarService";
 import Dates from "@/utils/dates";
-import { 
+import CalendarUtils, {
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
     FOCUS_OPTIONS, SCOPE_OPTIONS,
     STATUS_OPTIONS,
-    getFocusOption, getScopeOption,
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator"
 
@@ -185,12 +184,12 @@ const getFilteredEvents = (
                     subtitle: rawEvent.subtitle ?? "",
                     description: rawEvent.description ?? "",
                     focus: rawEvent.focus,
-                    focusLabel: getFocusOption(rawEvent)?.label ?? rawEvent.focus,
+                    focusLabel: CalendarUtils.getFocusOption(rawEvent)?.label ?? rawEvent.focus,
                     scope: rawEvent.scope,
-                    scopeLabel: getScopeOption(rawEvent)?.label ?? rawEvent.scope,
+                    scopeLabel: CalendarUtils.getScopeOption(rawEvent)?.label ?? rawEvent.scope,
                     eventType: rawEvent.type,
                     date: rawEvent.date ?? "",
-                    icon: getFocusOption(rawEvent)?.icon ?? "",
+                    icon: CalendarUtils.getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,
                     curp: rawEvent.curp ?? "",
                     usedDays: rawEvent.usedDays,

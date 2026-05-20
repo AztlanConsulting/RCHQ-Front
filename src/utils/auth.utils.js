@@ -99,25 +99,4 @@ class AuthUtils {
   }
 }
 
-export const parseJwtPayload = (token) => AuthUtils.parseJwtPayload(token);
-export const getToken = () => AuthUtils.getToken();
-export const setToken = (token) => AuthUtils.setToken(token);
-export const removeToken = () => AuthUtils.removeToken();
-export const getFirstLoginToken = () => AuthUtils.getFirstLoginToken();
-export const setFirstLoginToken = (token) => AuthUtils.setFirstLoginToken(token);
-export const removeFirstLoginToken = () => AuthUtils.removeFirstLoginToken();
-export const getPreTwoFactorAuthToken = () =>
-  AuthUtils.getPreTwoFactorAuthToken();
-export const setPreTwoFactorAuthToken = (token) =>
-  AuthUtils.setPreTwoFactorAuthToken(token);
-export const removePreTwoFactorAuthToken = () =>
-  AuthUtils.removePreTwoFactorAuthToken();
-export const getStoredUser = () => AuthUtils.getStoredUser();
-export const setStoredUser = (user) => AuthUtils.setStoredUser(user);
-export const removeStoredUser = () => AuthUtils.removeStoredUser();
-export const clearAuthStorage = () => AuthUtils.clearAuthStorage();
-export const hasToken = () => AuthUtils.hasToken();
-export const getOwnEmployeeId = () => AuthUtils.getOwnEmployeeId();
-export const getCalendarViewerRole = () => AuthUtils.getCalendarViewerRole();
-
 export default AuthUtils;

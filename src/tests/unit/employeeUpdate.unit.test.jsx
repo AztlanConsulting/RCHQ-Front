@@ -6,7 +6,9 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 // ── Mocks globales ─────────────────────────────────────────────────────────────
 
 vi.mock("../../utils/auth.utils", () => ({
-  getToken: vi.fn(() => "mock-token"),
+  default: {
+    getToken: vi.fn(() => "mock-token"),
+  },
 }));
 
 vi.mock("@/utils/secureFetchWrapper", () => ({
@@ -19,7 +21,7 @@ vi.mock("../utils/apiErrors", () => ({
 
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
-import { getToken } from "../../utils/auth.utils";
+import AuthUtils from "../../utils/auth.utils";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 import {
   getUpdateFormService,
@@ -50,14 +52,14 @@ describe("employeeUpdateService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    getToken.mockReturnValue("mock-token");
+    AuthUtils.getToken.mockReturnValue("mock-token");
   });
 
   // ── getUpdateFormService ───────────────────────────────────────────────────
 
   describe("getUpdateFormService", () => {
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
+      AuthUtils.getToken.mockReturnValue(null);
       await expect(getUpdateFormService()).rejects.toThrow("No se encontró token de sesión");
       expect(secureFetch).not.toHaveBeenCalled();
     });
@@ -93,7 +95,7 @@ describe("employeeUpdateService", () => {
     const body   = { name: "Juan", surname: "Pérez" };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
+      AuthUtils.getToken.mockReturnValue(null);
       await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 
@@ -146,7 +148,7 @@ describe("employeeUpdateService", () => {
     const body   = { email: "juan@mail.com", phoneNumber: "4421234567" };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
+      AuthUtils.getToken.mockReturnValue(null);
       await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 
@@ -179,7 +181,7 @@ describe("employeeUpdateService", () => {
     const body   = { type: "tiempo_completo", salary: 15000 };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
+      AuthUtils.getToken.mockReturnValue(null);
       await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 

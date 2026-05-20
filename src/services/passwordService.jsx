@@ -1,10 +1,4 @@
-import {
-  getToken,
-  getFirstLoginToken,
-  setToken,
-  setStoredUser,
-  removeFirstLoginToken,
-} from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 
 import { buildApiError } from "../utils/apiErrors";
 
@@ -14,7 +8,7 @@ const changePasswordFirstLoginService = async (
   newPassword,
   confirmPassword,
 ) => {
-  const token = getFirstLoginToken();
+  const token = AuthUtils.getFirstLoginToken();
 
   if (!token) {
     throw new Error("No se encontró token de primer inicio de sesión");
@@ -39,16 +33,16 @@ const changePasswordFirstLoginService = async (
     );
   }
 
-  removeFirstLoginToken();
+  AuthUtils.removeFirstLoginToken();
 
   const sessionToken = data?.data?.token;
   const user = data?.data?.user;
 
   if (sessionToken) {
-    setToken(sessionToken);
+    AuthUtils.setToken(sessionToken);
   }
   if (user) {
-    setStoredUser(user);
+    AuthUtils.setStoredUser(user);
   }
 
   return data;
@@ -59,7 +53,7 @@ const changePasswordService = async (
   newPassword,
   confirmPassword,
 ) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   if (!token) {
     throw new Error("No se encontró token de sesión");

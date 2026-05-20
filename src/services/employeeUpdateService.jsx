@@ -1,11 +1,11 @@
-import { getToken } from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const getUpdateFormService = async () => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/update-form`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -16,7 +16,7 @@ export const getUpdateFormService = async () => {
 };
 
 export const updateBasicInfoService = async (employeeId, body) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/basic-info`, {
     method: "PUT",
@@ -32,7 +32,7 @@ export const updateBasicInfoService = async (employeeId, body) => {
 };
 
 export const updateContactInfoService = async (employeeId, body) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/contact-info`, {
     method: "PUT",
@@ -48,7 +48,7 @@ export const updateContactInfoService = async (employeeId, body) => {
 };
 
 export const updateAdminInfoService = async (employeeId, body) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/admin-info`, {
     method: "PUT",

@@ -7,7 +7,9 @@ vi.mock("../../../src/services/profileService", () => ({
 }));
 
 vi.mock("../../../src/utils/auth.utils", () => ({
-  getToken: vi.fn().mockReturnValue("mock-token"),
+  default: {
+    getToken: vi.fn().mockReturnValue("mock-token"),
+  },
 }));
 
 import Perfil from "../../../src/pages/perfil";

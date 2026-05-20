@@ -5,11 +5,11 @@
 // Componente generado con ChatGPT, revisado por Iván Flores
 
 import { Navigate, Outlet } from "react-router-dom";
-import { getFirstLoginToken, getToken } from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 
 const FirstLoginRoute = () => {
-  const firstLoginToken = getFirstLoginToken();
-  const sessionToken = getToken();
+  const firstLoginToken = AuthUtils.getFirstLoginToken();
+  const sessionToken = AuthUtils.getToken();
 
   if (sessionToken) {
     return <Navigate to="/app/calendario" replace />;

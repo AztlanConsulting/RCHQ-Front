@@ -1,10 +1,10 @@
-import { getToken, clearAuthStorage } from "./auth.utils";
+import AuthUtils from "./auth.utils";
 
 const LOGIN_PATH = "/iniciar-sesion";
 
 export async function secureFetch(input, init = {}) {
   const headers = new Headers(init.headers || {});
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }
@@ -17,7 +17,7 @@ export async function secureFetch(input, init = {}) {
   const res = await fetch(url, { ...init, headers });
 
   if (res.status === 401 && !init.skipAuthRedirect) {
-    clearAuthStorage();
+    AuthUtils.clearAuthStorage();
     if (window.location.pathname !== LOGIN_PATH) {
       window.location.replace(LOGIN_PATH);
     }

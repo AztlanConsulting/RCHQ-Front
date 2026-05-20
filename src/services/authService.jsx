@@ -1,39 +1,29 @@
-import {
-  clearAuthStorage,
-  getToken,
-  getPreTwoFactorAuthToken,
-  getFirstLoginToken,
-  setToken,
-  setStoredUser,
-  setPreTwoFactorAuthToken,
-  setFirstLoginToken,
-  removePreTwoFactorAuthToken,
-} from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 import { buildApiError, getReadableErrors } from "../utils/apiErrors";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const saveLoginSession = (responseData) => {
-  clearAuthStorage();
+  AuthUtils.clearAuthStorage();
   const token = responseData?.data?.token;
   const user = responseData?.data?.user;
-  if (token) setToken(token);
-  if (user) setStoredUser(user);
+  if (token) AuthUtils.setToken(token);
+  if (user) AuthUtils.setStoredUser(user);
 };
 
 export const savePreTwoFactorSession = (responseData) => {
-  clearAuthStorage();
+  AuthUtils.clearAuthStorage();
   const preTwoFactorAuthToken = responseData?.preTwoFactorAuthToken;
   if (preTwoFactorAuthToken) {
-    setPreTwoFactorAuthToken(preTwoFactorAuthToken);
+    AuthUtils.setPreTwoFactorAuthToken(preTwoFactorAuthToken);
   }
 };
 
 const saveFirstLoginSession = (responseData) => {
-  clearAuthStorage();
+  AuthUtils.clearAuthStorage();
   const firstLoginToken = responseData?.data?.firstLoginToken;
   if (firstLoginToken) {
-    setFirstLoginToken(firstLoginToken);
+    AuthUtils.setFirstLoginToken(firstLoginToken);
   }
 };
 
@@ -65,11 +55,11 @@ export const loginService = async (email, password) => {
 };
 
 export const logoutService = () => {
-  clearAuthStorage();
+  AuthUtils.clearAuthStorage();
 };
 
 export const activateTwoFactorAuthService = async () => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/setup`, {
@@ -93,7 +83,7 @@ export const activateTwoFactorAuthService = async () => {
 };
 
 export const verifyTwoFactorAuthService = async (code) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/verify`, {
@@ -119,7 +109,7 @@ export const verifyTwoFactorAuthService = async (code) => {
 };
 
 export const validateLoginTwoFactorAuthService = async (code) => {
-  const token = getPreTwoFactorAuthToken();
+  const token = AuthUtils.getPreTwoFactorAuthToken();
   if (!token) throw new Error("No se encontró token de pre-autenticación");
 
   const response = await fetch(`${API_URL}/auth/2fa/validate`, {
@@ -145,7 +135,7 @@ export const validateLoginTwoFactorAuthService = async (code) => {
 };
 
 export const getTwoFactorAuthStatus = async () => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/status`, {
@@ -170,7 +160,7 @@ export const getTwoFactorAuthStatus = async () => {
 };
 
 export const deactivateTwoFactorAuthService = async (password) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
   const response = await fetch(`${API_URL}/auth/2fa/disable`, {
@@ -196,9 +186,9 @@ export const deactivateTwoFactorAuthService = async (password) => {
 };
 
 export { getReadableErrors } from "../utils/apiErrors";
-export {
-  getToken,
-  getPreTwoFactorAuthToken,
-  getFirstLoginToken,
-  removePreTwoFactorAuthToken,
-} from "../utils/auth.utils";
+export const getToken = () => AuthUtils.getToken();
+export const getPreTwoFactorAuthToken = () =>
+  AuthUtils.getPreTwoFactorAuthToken();
+export const getFirstLoginToken = () => AuthUtils.getFirstLoginToken();
+export const removePreTwoFactorAuthToken = () =>
+  AuthUtils.removePreTwoFactorAuthToken();

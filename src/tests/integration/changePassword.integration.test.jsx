@@ -19,10 +19,12 @@ vi.mock("../../../src/hooks/useAuth", () => ({
 }));
 
 vi.mock("../../../src/utils/auth.utils", () => ({
-  getFirstLoginToken: vi.fn(),
-  setPreTwoFactorAuthToken: vi.fn((token) => {
-    localStorage.setItem("preTwoFactorAuth", token);
-  }),
+  default: {
+    getFirstLoginToken: vi.fn(),
+    setPreTwoFactorAuthToken: vi.fn((token) => {
+      localStorage.setItem("preTwoFactorAuth", token);
+    }),
+  },
 }));
 
 vi.mock("../../../src/services/passwordService", () => ({
@@ -35,10 +37,7 @@ vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
   ]),
 }));
 
-import {
-  getFirstLoginToken,
-  setPreTwoFactorAuthToken,
-} from "../../utils/auth.utils";
+import AuthUtils from "../../utils/auth.utils";
 import { changePasswordFirstLoginService } from "../../services/passwordService";
 
 const renderPage = () =>
@@ -58,12 +57,12 @@ const fillAndSubmit = async (newPassword, confirmPassword) => {
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getFirstLoginToken.mockReturnValue("first-login-token");
+  AuthUtils.getFirstLoginToken.mockReturnValue("first-login-token");
 });
 
 describe("ChangePassword — integración", () => {
   it("redirige a iniciar sesión si no hay first login token", () => {
-    getFirstLoginToken.mockReturnValue(null);
+    AuthUtils.getFirstLoginToken.mockReturnValue(null);
 
     renderPage();
 
@@ -126,7 +125,7 @@ describe("ChangePassword — integración", () => {
     await fillAndSubmit("NuevaPass123", "NuevaPass123");
 
     await waitFor(() => {
-      expect(setPreTwoFactorAuthToken).toHaveBeenCalledWith("pre-2fa-token");
+      expect(AuthUtils.setPreTwoFactorAuthToken).toHaveBeenCalledWith("pre-2fa-token");
       expect(localStorage.getItem("preTwoFactorAuth")).toBe("pre-2fa-token");
       expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
     });

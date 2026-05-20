@@ -1,13 +1,11 @@
-import {
-  getToken,
-} from "../utils/auth.utils";
+import AuthUtils from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const getEmployeeDetailService = async (employeeId) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   if (!token) throw new Error("No se encontró token de sesión");
 
