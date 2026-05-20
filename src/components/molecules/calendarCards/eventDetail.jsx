@@ -72,8 +72,20 @@ const EventDetail = ({ event }) => {
       )) : null}
 
       <div className="w-full flex justify-around items-center gap-4 pt-2">
-        <Button type="button">Eliminar</Button>
-        <Button type="button">Modificar</Button>
+        <Button 
+          type="button"
+          bgColor="bg-[#A20000]" 
+          className="text-white"
+        >
+          Eliminar
+        </Button>
+        <Button 
+          type="button"  
+          bgColor="bg-[#1F3664]"
+          className="text-white"
+          >
+            Modificar
+          </Button>
       </div>
     </div>
   );
