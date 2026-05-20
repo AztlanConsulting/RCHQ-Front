@@ -9,14 +9,16 @@ import {
     dateOnlyToLocalDate,
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
-import { 
+import {
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
-    FOCUS_OPTIONS, SCOPE_OPTIONS,
+    FOCUS_OPTIONS,
+    SCOPE_OPTIONS,
     STATUS_OPTIONS,
-    getFocusOption, getScopeOption,
+    getFocusOption,
+    getScopeOption,
 } from "../../utils/calendar.utils";
-import { getPersonalEventTitle } from "../../utils/titleGenerator"
+import { getPersonalEventTitle } from "../../utils/titleGenerator";
 
 const calculateTotalDays = (startDate, endDate) => {
     const start = toDateOnly(startDate);
@@ -25,7 +27,7 @@ const calculateTotalDays = (startDate, endDate) => {
     const totalDays = Math.round((end - start) / 86400000) + 1;
 
     return totalDays;
-}
+};
 
 const getVacationStatusValue = (status) => {
     if (status === 1) return "aprobadas";
@@ -33,13 +35,11 @@ const getVacationStatusValue = (status) => {
     return "rechazadas";
 };
 
-const getAbsenceStatusValue = (event) => (
-    event.isDeleted ? "eliminadas" : "no_eliminadas"
-);
+const getAbsenceStatusValue = (event) =>
+    event.isDeleted ? "eliminadas" : "no_eliminadas";
 
-const getAbsenceEvidenceValue = (event) => (
-    event.link ? "con_evidencia" : "sin_evidencia"
-);
+const getAbsenceEvidenceValue = (event) =>
+    event.link ? "con_evidencia" : "sin_evidencia";
 
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
@@ -51,10 +51,7 @@ const expandEventsForList = (events = [], isList) => {
     const expanded = [];
 
     events.forEach((event) => {
-        if (
-            !event.startDate ||
-            !event.endDate
-        ) {
+        if (!event.startDate || !event.endDate) {
             expanded.push(event);
             return;
         }
@@ -105,92 +102,114 @@ const getFilteredEvents = (
     const selectedAbsenceTypeNames = new Set(
         absenceTypeOptions
             .filter((option) => absenceTypeFilters.includes(option.value))
-            .map((option) => option.normalizedName ?? String(option.label).toLowerCase()),
+            .map(
+                (option) =>
+                    option.normalizedName ?? String(option.label).toLowerCase(),
+            ),
     );
 
     return expandEventsForList(allEvents, isList)
         .filter((e) => focusFilters.includes(e.focus))
-        .filter((e) => (
-            e.focus !== "eventos" ||
-            scopeFilters.includes(e.scope)
-        ))
-        .filter((e) => (
-            e.focus !== "eventos" ||
-            eventTypeFilters.includes(String(e.type).toLowerCase())
-        ))
-        .filter((e) => (
-            e.focus !== "vacaciones" ||
-            vacationStatusFilters.includes(getVacationStatusValue(e.status))
-        ))
-        .filter((e) => (
-            e.focus !== "ausencias" ||
-            absenceTypeFilters.includes(String(e.absenceTypeId ?? "")) ||
-            selectedAbsenceTypeNames.has(String(e.type).toLowerCase())
-        ))
-        .filter((e) => (
-            calendarMode == "personal" ||
-            (e.focus !== "ausencias" &&
-            e.focus !== "vacaciones") ||
-            employeeFilters.includes(String(e.employeeId))
-        ))
-        .filter((e) => (
-            calendarMode == "personal" ||
-            (e.focus !== "eventos" || e.scope !== "personal") ||!e.peopleInsideEvent ||
-            employeeFilters.some((employeeId) => 
-                e.peopleInsideEvent.some((person) => String(person.id) === String(employeeId))
-            )
-        ))
-        .filter((e) => (
-            e.focus !== "ausencias" ||
-            absenceStatusFilters.includes(getAbsenceStatusValue(e))
-        ))
-        .filter((e) => (
-            e.focus !== "ausencias" ||
-            absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e))
-        ))
+        .filter((e) => e.focus !== "eventos" || scopeFilters.includes(e.scope))
+        .filter(
+            (e) =>
+                e.focus !== "eventos" ||
+                eventTypeFilters.includes(String(e.type).toLowerCase()),
+        )
+        .filter(
+            (e) =>
+                e.focus !== "vacaciones" ||
+                vacationStatusFilters.includes(
+                    getVacationStatusValue(e.status),
+                ),
+        )
+        .filter(
+            (e) =>
+                e.focus !== "ausencias" ||
+                absenceTypeFilters.includes(String(e.absenceTypeId ?? "")) ||
+                selectedAbsenceTypeNames.has(String(e.type).toLowerCase()),
+        )
+        .filter(
+            (e) =>
+                calendarMode == "personal" ||
+                (e.focus !== "ausencias" && e.focus !== "vacaciones") ||
+                employeeFilters.includes(String(e.employeeId)),
+        )
+        .filter(
+            (e) =>
+                calendarMode == "personal" ||
+                e.focus !== "eventos" ||
+                e.scope !== "personal" ||
+                !e.peopleInsideEvent ||
+                employeeFilters.some((employeeId) =>
+                    e.peopleInsideEvent.some(
+                        (person) => String(person.id) === String(employeeId),
+                    ),
+                ),
+        )
+        .filter(
+            (e) =>
+                e.focus !== "ausencias" ||
+                absenceStatusFilters.includes(getAbsenceStatusValue(e)),
+        )
+        .filter(
+            (e) =>
+                e.focus !== "ausencias" ||
+                absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e)),
+        )
         .map((rawEvent, idx) => {
-            const isAllDay = rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones";
+            const isRangeRecord =
+                rawEvent.focus === "ausencias" ||
+                rawEvent.focus === "vacaciones";
+            const isAllDay = isRangeRecord || rawEvent.allDay === true;
             const isExpandedListAbsence = Boolean(
-                isList
-                &&( rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones")
-                && rawEvent.currentDayIndex
-                && rawEvent.totalDays,
+                isList &&
+                (rawEvent.focus === "ausencias" ||
+                    rawEvent.focus === "vacaciones") &&
+                rawEvent.currentDayIndex &&
+                rawEvent.totalDays,
             );
             const normalizedStartDate = normalizeDateOnly(
                 isExpandedListAbsence
                     ? rawEvent.start
-                    : rawEvent.startDate ?? rawEvent.start,
+                    : (rawEvent.startDate ?? rawEvent.start),
             );
             const normalizedEndDate = normalizeDateOnly(
                 isExpandedListAbsence
                     ? rawEvent.end
-                    : rawEvent.endDate ?? rawEvent.end,
+                    : (rawEvent.endDate ?? rawEvent.end),
             );
-            const eventStart = isAllDay && normalizedStartDate
-                ? normalizedStartDate
-                : rawEvent.start;
-            const eventEnd = isAllDay && normalizedEndDate
-                ? (
-                    isExpandedListAbsence
+            const eventStart =
+                isAllDay && normalizedStartDate
+                    ? normalizedStartDate
+                    : rawEvent.start;
+            const eventEnd =
+                isAllDay && normalizedEndDate
+                    ? isExpandedListAbsence
                         ? normalizedEndDate
-                        : addDaysToDateOnly(normalizedEndDate, 1)
-                )
-                : rawEvent.end;
+                        : isRangeRecord
+                          ? addDaysToDateOnly(normalizedEndDate, 1)
+                          : normalizedEndDate === normalizedStartDate
+                            ? addDaysToDateOnly(normalizedEndDate, 1)
+                            : normalizedEndDate
+                    : rawEvent.end;
 
             return {
                 id: String(idx),
-                title: (rawEvent.focus === "ausencias" || rawEvent.focus === "vacaciones")
-                    ? getPersonalEventTitle(rawEvent)
-                    : rawEvent.name,
+                title:
+                    rawEvent.focus === "ausencias" ||
+                    rawEvent.focus === "vacaciones"
+                        ? getPersonalEventTitle(rawEvent)
+                        : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,
-                backgroundColor: rawEvent.focus === "ausencias"
-                    ? "#EF4444"
-                    : rawEvent.color,
-                borderColor: rawEvent.focus === "ausencias"
-                    ? "#DC2626"
-                    : rawEvent.color || rawEvent.backgroundColor || "#000",
-                allDay: isAllDay || Boolean(rawEvent.lastsAllDay),
+                backgroundColor:
+                    rawEvent.focus === "ausencias" ? "#EF4444" : rawEvent.color,
+                borderColor:
+                    rawEvent.focus === "ausencias"
+                        ? "#DC2626"
+                        : rawEvent.color || rawEvent.backgroundColor || "#000",
+                allDay: isAllDay,
                 extendedProps: {
                     absenceId: rawEvent.absenceId,
                     absenceTypeId: rawEvent.absenceTypeId,
@@ -202,28 +221,47 @@ const getFilteredEvents = (
                     subtitle: rawEvent.subtitle ?? "",
                     description: rawEvent.description ?? "",
                     focus: rawEvent.focus,
-                    focusLabel: getFocusOption(rawEvent)?.label ?? rawEvent.focus,
+                    focusLabel:
+                        getFocusOption(rawEvent)?.label ?? rawEvent.focus,
                     scope: rawEvent.scope,
-                    scopeLabel: getScopeOption(rawEvent)?.label ?? rawEvent.scope,
+                    scopeLabel:
+                        getScopeOption(rawEvent)?.label ?? rawEvent.scope,
                     eventType: rawEvent.type,
                     date: rawEvent.date ?? "",
                     icon: getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,
                     curp: rawEvent.curp ?? "",
                     usedDays: rawEvent.usedDays,
-                    link: rawEvent.focus === "ausencias" ? rawEvent.link ?? "" : "",
-                    startDate: normalizedStartDate || rawEvent.startDate || rawEvent.start || eventStart,
-                    endDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || eventStart,
+                    link:
+                        rawEvent.focus === "ausencias"
+                            ? (rawEvent.link ?? "")
+                            : "",
+                    startDate:
+                        normalizedStartDate ||
+                        rawEvent.startDate ||
+                        rawEvent.start ||
+                        eventStart,
+                    endDate:
+                        normalizedEndDate ||
+                        rawEvent.endDate ||
+                        rawEvent.end ||
+                        eventStart,
                     isDeleted: Boolean(rawEvent.isDeleted),
                     currentDayIndex: rawEvent.currentDayIndex,
-                    totalDays: rawEvent.totalDays || rawEvent.startDate ? calculateTotalDays(rawEvent.startDate, rawEvent.endDate) : "",
+                    totalDays:
+                        rawEvent.totalDays || rawEvent.startDate
+                            ? calculateTotalDays(
+                                  rawEvent.startDate,
+                                  rawEvent.endDate,
+                              )
+                            : "",
                     startReadableDate: rawEvent.startDate,
                     endReadableDate: rawEvent.endDate,
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
                 },
             };
         });
-}
+};
 
 export const useCalendarFilters = (
     allEvents = [],
@@ -238,18 +276,23 @@ export const useCalendarFilters = (
 
     const [eventTypeOptions, setEventTypeOptions] = useState([]);
     const [eventTypeFilters, setEventTypeFilters] = useState([]);
-    const [catalogAbsenceTypeOptions, setCatalogAbsenceTypeOptions] = useState([]);
+    const [catalogAbsenceTypeOptions, setCatalogAbsenceTypeOptions] = useState(
+        [],
+    );
     const [catalogEmployeeOptions, setCatalogEmployeeOptions] = useState([]);
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
         STATUS_OPTIONS.map((o) => o.value),
     );
     const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState(null);
-    const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
+    const [
+        hasCustomizedAbsenceTypeFilters,
+        setHasCustomizedAbsenceTypeFilters,
+    ] = useState(false);
     const [employeeFilters, setEmployeeFilters] = useState([]);
     const [employeeSearch, setEmployeeSearch] = useState("");
-    const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() =>
-        ["no_eliminadas"],
-    );
+    const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() => [
+        "no_eliminadas",
+    ]);
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
@@ -279,7 +322,9 @@ export const useCalendarFilters = (
                 setCatalogAbsenceTypeOptions(
                     absenceTypes.map((absenceType) => ({
                         value: String(
-                            absenceType.absenceTypeId ?? absenceType.name?.toLowerCase?.() ?? "",
+                            absenceType.absenceTypeId ??
+                                absenceType.name?.toLowerCase?.() ??
+                                "",
                         ),
                         label: absenceType.name,
                         normalizedName: String(absenceType.name).toLowerCase(),
@@ -334,7 +379,12 @@ export const useCalendarFilters = (
         const employees = new Map();
 
         allEvents
-            .filter((event) => event.focus === "ausencias" || event.focus === "vacaciones" || event.scope === "personal")
+            .filter(
+                (event) =>
+                    event.focus === "ausencias" ||
+                    event.focus === "vacaciones" ||
+                    event.scope === "personal",
+            )
             .forEach((event) => {
                 if (!event.employeeId) return;
                 employees.set(String(event.employeeId), {
@@ -348,30 +398,37 @@ export const useCalendarFilters = (
         );
     }, [allEvents]);
 
-    const absenceTypeOptions = useMemo(() => (
-        catalogAbsenceTypeOptions.length > 0
-            ? catalogAbsenceTypeOptions
-            : fallbackAbsenceTypeOptions
-    ), [catalogAbsenceTypeOptions, fallbackAbsenceTypeOptions]);
+    const absenceTypeOptions = useMemo(
+        () =>
+            catalogAbsenceTypeOptions.length > 0
+                ? catalogAbsenceTypeOptions
+                : fallbackAbsenceTypeOptions,
+        [catalogAbsenceTypeOptions, fallbackAbsenceTypeOptions],
+    );
 
-    const employeeOptions = useMemo(() => (
-        catalogEmployeeOptions.length > 0
-            ? catalogEmployeeOptions
-            : fallbackEmployeeOptions
-    ), [catalogEmployeeOptions, fallbackEmployeeOptions]);
+    const employeeOptions = useMemo(
+        () =>
+            catalogEmployeeOptions.length > 0
+                ? catalogEmployeeOptions
+                : fallbackEmployeeOptions,
+        [catalogEmployeeOptions, fallbackEmployeeOptions],
+    );
 
-    const setAbsenceTypeFilters = useCallback((nextValue) => {
-        setHasCustomizedAbsenceTypeFilters(true);
-        setAbsenceTypeFiltersState((previousValue) => {
-            const resolvedPreviousValue = previousValue ?? absenceTypeOptions.map(
-                (option) => option.value,
-            );
+    const setAbsenceTypeFilters = useCallback(
+        (nextValue) => {
+            setHasCustomizedAbsenceTypeFilters(true);
+            setAbsenceTypeFiltersState((previousValue) => {
+                const resolvedPreviousValue =
+                    previousValue ??
+                    absenceTypeOptions.map((option) => option.value);
 
-            return typeof nextValue === "function"
-                ? nextValue(resolvedPreviousValue)
-                : nextValue;
-        });
-    }, [absenceTypeOptions]);
+                return typeof nextValue === "function"
+                    ? nextValue(resolvedPreviousValue)
+                    : nextValue;
+            });
+        },
+        [absenceTypeOptions],
+    );
 
     const effectiveAbsenceTypeFilters = useMemo(() => {
         const nextValues = absenceTypeOptions.map((opt) => opt.value);
@@ -382,7 +439,11 @@ export const useCalendarFilters = (
         if (absenceTypeFilters.length === 0) return [];
 
         return absenceTypeFilters.filter((value) => nextValues.includes(value));
-    }, [absenceTypeFilters, absenceTypeOptions, hasCustomizedAbsenceTypeFilters]);
+    }, [
+        absenceTypeFilters,
+        absenceTypeOptions,
+        hasCustomizedAbsenceTypeFilters,
+    ]);
 
     const effectiveEmployeeFilters = useMemo(() => {
         const nextValues = employeeOptions.map((opt) => opt.value);
@@ -412,9 +473,11 @@ export const useCalendarFilters = (
         }
         if (effectiveEmployeeFilters.length === 0) return "Ninguno";
         if (effectiveEmployeeFilters.length === 1) {
-            return employeeOptions.find(
-                (option) => option.value === effectiveEmployeeFilters[0],
-            )?.label ?? "1 seleccionado";
+            return (
+                employeeOptions.find(
+                    (option) => option.value === effectiveEmployeeFilters[0],
+                )?.label ?? "1 seleccionado"
+            );
         }
 
         return `${effectiveEmployeeFilters.length} seleccionados`;
@@ -423,10 +486,7 @@ export const useCalendarFilters = (
     const toggleEmployeeValue = (optionValue, checked) => {
         if (checked) {
             if (!effectiveEmployeeFilters.includes(optionValue)) {
-                setEmployeeFilters([
-                    ...effectiveEmployeeFilters,
-                    optionValue,
-                ]);
+                setEmployeeFilters([...effectiveEmployeeFilters, optionValue]);
             }
             return;
         }
@@ -441,24 +501,25 @@ export const useCalendarFilters = (
     };
 
     const showEventFilters = focusFilters.includes("eventos");
-    const showVacationFilters  = focusFilters.includes("vacaciones");
-    const showAbscenceFilters  = focusFilters.includes("ausencias");
+    const showVacationFilters = focusFilters.includes("vacaciones");
+    const showAbscenceFilters = focusFilters.includes("ausencias");
 
     const visibleEvents = useMemo(
-        () => getFilteredEvents(
-            allEvents,
-            isList,
-            focusFilters,
-            scopeFilters,
-            eventTypeFilters,
-            vacationStatusFilters,
-            absenceTypeOptions,
-            effectiveAbsenceTypeFilters,
-            effectiveEmployeeFilters,
-            absenceStatusFilters,
-            absenceEvidenceFilters,
-            calendarMode,
-        ),
+        () =>
+            getFilteredEvents(
+                allEvents,
+                isList,
+                focusFilters,
+                scopeFilters,
+                eventTypeFilters,
+                vacationStatusFilters,
+                absenceTypeOptions,
+                effectiveAbsenceTypeFilters,
+                effectiveEmployeeFilters,
+                absenceStatusFilters,
+                absenceEvidenceFilters,
+                calendarMode,
+            ),
         [
             allEvents,
             isList,
@@ -476,11 +537,21 @@ export const useCalendarFilters = (
     );
 
     return {
-        focusFilters, setFocusFilters, focusOptions: FOCUS_OPTIONS,
-        scopeFilters,   setScopeFilters,   scopeOptions: SCOPE_OPTIONS,
-        eventTypeFilters, setEventTypeFilters, eventTypeOptions,
-        vacationStatusFilters, setVacationStatusFilters, vacationStatusOptions: STATUS_OPTIONS,
-        absenceTypeFilters: effectiveAbsenceTypeFilters, setAbsenceTypeFilters, absenceTypeOptions,
+        focusFilters,
+        setFocusFilters,
+        focusOptions: FOCUS_OPTIONS,
+        scopeFilters,
+        setScopeFilters,
+        scopeOptions: SCOPE_OPTIONS,
+        eventTypeFilters,
+        setEventTypeFilters,
+        eventTypeOptions,
+        vacationStatusFilters,
+        setVacationStatusFilters,
+        vacationStatusOptions: STATUS_OPTIONS,
+        absenceTypeFilters: effectiveAbsenceTypeFilters,
+        setAbsenceTypeFilters,
+        absenceTypeOptions,
         employeeFilters: effectiveEmployeeFilters,
         filteredEmployeeOptions,
         employeeSearch,
@@ -490,10 +561,17 @@ export const useCalendarFilters = (
         toggleEmployeeValue,
         clearEmployeeSelection,
         employeeOptions,
-        absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
-        absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
-        showEventFilters, showVacationFilters, showAbscenceFilters,
-        filtersModalOpen, setFiltersModalOpen,
-        visibleEvents, 
+        absenceStatusFilters,
+        setAbsenceStatusFilters,
+        absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
+        absenceEvidenceFilters,
+        setAbsenceEvidenceFilters,
+        absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
+        showEventFilters,
+        showVacationFilters,
+        showAbscenceFilters,
+        filtersModalOpen,
+        setFiltersModalOpen,
+        visibleEvents,
     };
 };
