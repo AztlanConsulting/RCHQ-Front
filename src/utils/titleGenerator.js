@@ -4,11 +4,20 @@ export const getPersonalEventTitle = (event) => {
 
     if (event.employeeId) {
         if (event.focus === "ausencias") {
-            return `Ausencia ${rawType} de ${rawName}`
+            return `Ausencia ${rawType} de ${rawName}`;
         }
 
-        if (event.focus === "vacaciones") { 
-            return `Vacación de ${rawName}`
+        if (event.focus === "vacaciones") {
+            const status = Number(event.status);
+
+            if (status === 0) {
+                return `Solicitud de Vacaciones de ${rawName}`;
+            }
+            if (status === 2) {
+                return `Vacaciones Rechazadas de ${rawName}`;
+            }
+
+            return `Vacación de ${rawName}`;
         }
 
         return rawName;
