@@ -23,7 +23,7 @@ const parseJson = async (res) => {
 };
 
 export const getVacationEmployees = async () => {
-    const res = await secureFetch(`${API_URL}/house/employees`, {
+    const res = await secureFetch(`${API_URL}/vacation/employees/eligible`, {
         method: "GET",
     });
 

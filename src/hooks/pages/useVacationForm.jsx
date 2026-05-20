@@ -24,9 +24,11 @@ const normalizeEmployeeOption = (employee) => {
         employee.id ??
         "";
 
-    const name = employee.fullName
-        ?? [employee.name, employee.surname].filter(Boolean).join(" ")
-        ?? "Empleado sin nombre";
+    const name =
+        employee.fullName ??
+        employee.name ??
+        [employee.name, employee.surname].filter(Boolean).join(" ") ??
+        "Empleado sin nombre";
 
     return {
         value: id,
