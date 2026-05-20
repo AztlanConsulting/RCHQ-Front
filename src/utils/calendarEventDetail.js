@@ -1,6 +1,7 @@
 import Dates from "./dates";
 
 export const eventApiToDetail = (ev) => {
+  console.log("event pre api convert: ", ev);
   if (!ev) return null;
   const x = ev.extendedProps ?? {};
   const start = ev.start;

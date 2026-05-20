@@ -25,14 +25,57 @@ export const ABSENCE_EVIDENCE_OPTIONS = [
     { value: "sin_evidencia", label: "Sin evidencia" },
 ];
 
-export const getFocusOption = (event) => {
-    return FOCUS_OPTIONS.find(
-        (f) => f.value === event.focus
-    );
-}
+class CalendarUtils  {
+    static getScopeOption = (event) => {
+        return SCOPE_OPTIONS.find(
+            (s) => s.value === event.scope
+        );
+    };
 
-export const getScopeOption = (event) => {
-    return SCOPE_OPTIONS.find(
-        (s) => s.value === event.scope
-    );
-}
+    static getFocusOption = (event) => {
+        return FOCUS_OPTIONS.find(
+            (f) => f.value === event.focus
+        );
+    };
+
+    static normalizeCalendarEvent = (event) => {
+        const isAbsence = event?.focus === "ausencias" || event?.absenceId;
+        const evidencePath = isAbsence ? event?.link || event?.url || "" : "";
+    
+        return {
+            ...event,
+            link: evidencePath
+                ? `${API_URL}/${String(evidencePath).replace(/^\/+/, "")}`
+                : "",
+        };
+    };
+
+    static buildAbsenceEvidenceUrl = (link) => {
+        if (!link) return "";
+    
+        if (/^https?:\/\//i.test(link)) {
+            return link;
+        }
+    
+        const baseUrl = String(API_URL ?? "").replace(/\/+$/, "");
+        const normalizedLink = String(link).replace(/^\/+/, "");
+    
+        return `${baseUrl}/${normalizedLink}`;
+    };
+
+    static getOwnEmployeeId = () => {
+        const userData = getStoredUser();
+        const tokenPayload = parseJwtPayload(getToken());
+        const employeeId = userData?.employeeId ?? tokenPayload?.id ?? "";
+        return employeeId;
+    };
+
+    static getCalendarViewerRole = () => {
+        const userData = getStoredUser();
+        const tokenPayload = parseJwtPayload(getToken());
+    
+        return userData?.role ?? userData?.roleName ?? tokenPayload?.role ?? "";
+    };
+};
+
+export default CalendarUtils;

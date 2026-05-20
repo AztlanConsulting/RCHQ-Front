@@ -4,7 +4,10 @@ import Dates from "@/utils/dates";
 
 const EventDetail = ({ event }) => {
   if (!event) return null;
-  console.log("event: ", event)
+  console.log("event passed to card: ", event)
+
+  const eventIsMultiDay = event.startDate != event.endDate;
+  console.log("eventismulti ", eventIsMultiDay)
 
   return (
     <div className="text-left">
@@ -42,28 +45,48 @@ const EventDetail = ({ event }) => {
         </Type>
       )}
 
-      <div className="w-full flex items-center justify-between gap-4 mb-2">
-        <Type variant="metric-label" color="black" className="text-black font-bold">
-          Día (calendario):
-        </Type>
-        <p className="text-sm">
-          {event.startDate ? Dates.formatEventCalendarDate(event.startDate) : "—"}
-        </p>
-      </div>
+      {eventIsMultiDay ? (
+        <>
+          <div className="w-full flex items-center justify-between gap-4 mb-2">
+            <Type variant="metric-label" className="font-bold">
+              Inicio:
+            </Type>
+            <p className="text-sm">{Dates.formatEventDateTime(event.start ?? event.startStr)}</p>
+          </div>
 
-      <div className="w-full flex items-center justify-between gap-4 mb-2">
-        <Type variant="metric-label" className="font-bold">
-          Inicio:
-        </Type>
-        <p className="text-sm">{Dates.formatEventDateTime(event.start ?? event.startStr)}</p>
-      </div>
+          <div className="w-full flex items-center justify-between gap-4 mb-4">
+            <Type variant="metric-label" className="font-bold">
+              Fin:
+            </Type>
+            <p className="text-sm">{Dates.formatEventDateTime(event.end ?? event.endStr)}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="w-full flex items-center justify-between gap-4 mb-2">
+            <Type variant="metric-label" color="black" className="text-black font-bold">
+              Día (calendario):
+            </Type>
+            <p className="text-sm">
+              {event.startDate ? Dates.formatEventCalendarDate(event.startDate) : "—"}
+            </p>
+          </div>
 
-      <div className="w-full flex items-center justify-between gap-4 mb-4">
-        <Type variant="metric-label" className="font-bold">
-          Fin:
-        </Type>
-        <p className="text-sm">{Dates.formatEventDateTime(event.end ?? event.endStr)}</p>
-      </div>
+          <div className="w-full flex items-center justify-between gap-4 mb-2">
+            <Type variant="metric-label" className="font-bold">
+              Inicio:
+            </Type>
+            <p className="text-sm">{Dates.formatEventDateTime(event.start ?? event.startStr)}</p>
+          </div>
+
+          <div className="w-full flex items-center justify-between gap-4 mb-4">
+            <Type variant="metric-label" className="font-bold">
+              Fin:
+            </Type>
+            <p className="text-sm">{Dates.formatEventDateTime(event.end ?? event.endStr)}</p>
+          </div>
+        </>
+      )}
 
       {event.description ? (
         <Type variant="body" className="mb-4 block whitespace-pre-wrap">
