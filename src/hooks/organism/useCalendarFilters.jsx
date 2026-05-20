@@ -5,12 +5,8 @@ import {
     getHouseEmployees,
 } from "../../services/calendarService";
 import Dates from "@/utils/dates";
-import CalendarUtils, {
-    ABSENCE_EVIDENCE_OPTIONS,
-    ABSENCE_STATUS_OPTIONS,
-    FOCUS_OPTIONS, SCOPE_OPTIONS,
-    STATUS_OPTIONS,
-} from "../../utils/calendar.utils";
+import CalendarConfigs from "../../configs/calendar.configs";
+import CalendarUtils from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator"
 
 const getVacationStatusValue = (status) => {
@@ -212,10 +208,10 @@ export const useCalendarFilters = (
     { isList = false, viewerRole = "", calendarMode = "personal" } = {},
 ) => {
     const [focusFilters, setFocusFilters] = useState(() =>
-        FOCUS_OPTIONS.map((o) => o.value),
+        CalendarConfigs.FOCUS_OPTIONS.map((o) => o.value),
     );
     const [scopeFilters, setScopeFilters] = useState(() =>
-        SCOPE_OPTIONS.map((o) => o.value),
+        CalendarConfigs.SCOPE_OPTIONS.map((o) => o.value),
     );
 
     const [eventTypeOptions, setEventTypeOptions] = useState([]);
@@ -223,7 +219,7 @@ export const useCalendarFilters = (
     const [catalogAbsenceTypeOptions, setCatalogAbsenceTypeOptions] = useState([]);
     const [catalogEmployeeOptions, setCatalogEmployeeOptions] = useState([]);
     const [vacationStatusFilters, setVacationStatusFilters] = useState(() =>
-        STATUS_OPTIONS.map((o) => o.value),
+        CalendarConfigs.STATUS_OPTIONS.map((o) => o.value),
     );
     const [absenceTypeFilters, setAbsenceTypeFiltersState] = useState(null);
     const [hasCustomizedAbsenceTypeFilters, setHasCustomizedAbsenceTypeFilters] = useState(false);
@@ -233,7 +229,7 @@ export const useCalendarFilters = (
         ["no_eliminadas"],
     );
     const [absenceEvidenceFilters, setAbsenceEvidenceFilters] = useState(() =>
-        ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
+        CalendarConfigs.ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
     const [filtersModalOpen, setFiltersModalOpen] = useState(false);
     const canUseEmployeeCatalog =
@@ -458,10 +454,10 @@ export const useCalendarFilters = (
     );
 
     return {
-        focusFilters, setFocusFilters, focusOptions: FOCUS_OPTIONS,
-        scopeFilters,   setScopeFilters,   scopeOptions: SCOPE_OPTIONS,
+        focusFilters, setFocusFilters, focusOptions: CalendarConfigs.FOCUS_OPTIONS,
+        scopeFilters,   setScopeFilters,   scopeOptions: CalendarConfigs.SCOPE_OPTIONS,
         eventTypeFilters, setEventTypeFilters, eventTypeOptions,
-        vacationStatusFilters, setVacationStatusFilters, vacationStatusOptions: STATUS_OPTIONS,
+        vacationStatusFilters, setVacationStatusFilters, vacationStatusOptions: CalendarConfigs.STATUS_OPTIONS,
         absenceTypeFilters: effectiveAbsenceTypeFilters, setAbsenceTypeFilters, absenceTypeOptions,
         employeeFilters: effectiveEmployeeFilters,
         filteredEmployeeOptions,
@@ -472,8 +468,8 @@ export const useCalendarFilters = (
         toggleEmployeeValue,
         clearEmployeeSelection,
         employeeOptions,
-        absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: ABSENCE_STATUS_OPTIONS,
-        absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: ABSENCE_EVIDENCE_OPTIONS,
+        absenceStatusFilters, setAbsenceStatusFilters, absenceStatusOptions: CalendarConfigs.ABSENCE_STATUS_OPTIONS,
+        absenceEvidenceFilters, setAbsenceEvidenceFilters, absenceEvidenceOptions: CalendarConfigs.ABSENCE_EVIDENCE_OPTIONS,
         showEventFilters, showVacationFilters, showAbscenceFilters,
         filtersModalOpen, setFiltersModalOpen,
         visibleEvents, 
