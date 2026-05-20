@@ -64,6 +64,10 @@ const EventDetail = ({ event }) => {
         </Type>
       ) : null}
 
+      {event.peopleInsideEvent ? event.peopleInsideEvent.map((person, idx) => (
+        <p key={idx}>{person?.name} - {person?.id}</p>
+      )) : null}
+
       <div className="w-full flex justify-around items-center gap-4 pt-2">
         <Button type="button">Eliminar</Button>
         <Button type="button">Modificar</Button>
