@@ -73,7 +73,7 @@ const CalendarFilters = ({
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
 }) => {
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
+    <div className={`pl-2 pr-2 flex flex-col gap-1 mb-auto ${className}`}>
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario

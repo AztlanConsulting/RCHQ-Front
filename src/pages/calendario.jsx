@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import Type from "../components/atoms/type";
+import { useCallback, useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import CalendarFiltersModal from "../components/molecules/calendarFiltersModal";
@@ -19,6 +19,7 @@ const isManagementRole = (role) =>
 
 const Calendario = () => {
     const calendarRef = useRef(null);
+    const prevFullCalendarViewTypeRef = useRef(null);
 
     const {
         employeeHouseName,
@@ -119,6 +120,24 @@ const Calendario = () => {
         viewerRole,
     });
 
+    const handleDatesSetAndCloseDetailOnViewChange = useCallback(
+        async (dateInfo) => {
+            const nextViewType = dateInfo?.view?.type;
+            if (
+                prevFullCalendarViewTypeRef.current != null &&
+                nextViewType != null &&
+                prevFullCalendarViewTypeRef.current !== nextViewType
+            ) {
+                closeDetail();
+            }
+            if (nextViewType != null) {
+                prevFullCalendarViewTypeRef.current = nextViewType;
+            }
+            await handleDatesSet(dateInfo);
+        },
+        [closeDetail, handleDatesSet],
+    );
+
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
@@ -211,7 +230,9 @@ const Calendario = () => {
                     getWeekDayName={getWeekDayName}
                     resizeHandler={resizeHandler}
                     visibleEvents={visibleEvents}
-                    handleDatesSet={handleDatesSet}
+                    handleDatesSet={
+                        handleDatesSetAndCloseDetailOnViewChange
+                    }
                     onEventClick={handleEventClick}
                     onDateDrag={handleDateDrags}
                     onDateDragging={handleDateDragging}
@@ -233,17 +254,20 @@ const Calendario = () => {
                     return "Detalle del evento";
                 })()}
                 grayBackground={true}
-                placement="center"
-                className={() => {
-                    if (
-                        ["ausencias", "vacaciones"].includes(
-                            selectedEvent?.focus,
-                        )
+                placement={
+                    ["ausencias", "vacaciones"].includes(
+                        selectedEvent?.focus,
                     )
-                        return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
-
-                    return "max-w-[25vw] max-h-[80vh]";
-                }}
+                        ? "center"
+                        : "right"
+                }
+                className={
+                    ["ausencias", "vacaciones"].includes(
+                        selectedEvent?.focus,
+                    )
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        : "w-[92vw] max-w-[400px] max-h-[80vh]"
+                }
             >
                 {(() => {
                     switch (selectedEvent?.focus) {

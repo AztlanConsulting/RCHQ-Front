@@ -3,8 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
-import { isPastDate } from "../../../utils/dates";
+import { formatEventDate, isPastDate } from "../../../utils/dates";
 
 const VacationDetail = ({
     event,
