@@ -149,7 +149,7 @@ const AbsenceDetail = ({
             }
             minDate={
               absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T12:00:00`)
+                ? new Date(`${absenceForm.startDate}T00:00:00`)
                 : undefined
             }
             labelColor="text-[#121212]"
