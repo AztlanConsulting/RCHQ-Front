@@ -7,7 +7,6 @@ import {
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
-import { eventApiToDetail } from "../../utils/calendarEventDetail";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);

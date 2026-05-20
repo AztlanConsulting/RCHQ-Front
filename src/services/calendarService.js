@@ -68,7 +68,7 @@ class CalendarService  {
         return eventTypes;
     };
 
-    getAbsenceTypes = async () => {
+    static getAbsenceTypes = async () => {
         const token = AuthUtils.getToken();
     
         if (!token) {
@@ -342,7 +342,7 @@ class CalendarService  {
         return response?.data?.absence;
     };
 
-    deleteAbsenceService = async (absenceId) => {
+    static deleteAbsenceService = async (absenceId) => {
         const token = AuthUtils.getToken();
     
         if (!token) {
@@ -373,7 +373,7 @@ class CalendarService  {
         return response?.data?.absence;
     };
 
-    getEmployeeHouseName = async () => {
+    static getEmployeeHouseName = async () => {
         const token = AuthUtils.getToken();
     
         if (!token) {
