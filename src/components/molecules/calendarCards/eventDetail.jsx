@@ -5,7 +5,7 @@ import {
     formatEventTime,
 } from "../../../utils/calendarEventDetail";
 
-const EventDetail = ({ event }) => {
+const EventDetail = ({ event, onEdit }) => {
     if (!event) return null;
 
     const dayText = formatEventDateRange(
@@ -92,7 +92,7 @@ const EventDetail = ({ event }) => {
 
             <div className="w-full flex justify-around items-center gap-4 pt-2">
                 <Button type="button">Eliminar</Button>
-                <Button type="button">Modificar</Button>
+                <Button type="button" onClick={onEdit}>Modificar</Button>
             </div>
         </div>
     );
