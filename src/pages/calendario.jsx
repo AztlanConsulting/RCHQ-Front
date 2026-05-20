@@ -302,13 +302,11 @@ const Calendario = () => {
                                     onReject={() => {}}
                                 />
                             ) : (
-                                <VacationDetail
+                                <VacationWorkerDetail
                                     event={selectedEvent}
                                     onClose={closeDetail}
                                     onEdit={() => {}}
                                     onDelete={() => {}}
-                                    onApprove={() => {}}
-                                    onReject={() => {}}
                                 />
                             );
 
