@@ -1,20 +1,16 @@
 import { describe, it, expect } from "vitest";
 import Dates from "../../utils/dates";
-import {
-  totalWorkDaysFromApprovedVacationRequests,
-  countWorkdayDays,
-  countWorkdaysHours,
-} from "../../utils/detalle-empleado.utils";
+import EmployeeUtils from "../../utils/employee.utils";
 
 // ─── totalWorkDaysFromApprovedVacationRequests ────────────────────────────────
 describe("totalWorkDaysFromApprovedVacationRequests", () => {
   it("retorna 0 para entradas no array", () => {
-    expect(totalWorkDaysFromApprovedVacationRequests(null)).toBe(0);
-    expect(totalWorkDaysFromApprovedVacationRequests(undefined)).toBe(0);
+    expect(EmployeeUtils.totalWorkDaysFromApprovedVacationRequests(null)).toBe(0);
+    expect(EmployeeUtils.totalWorkDaysFromApprovedVacationRequests(undefined)).toBe(0);
   });
 
   it("ignora solicitudes con status distinto de 1", () => {
-    const sum = totalWorkDaysFromApprovedVacationRequests([
+    const sum = EmployeeUtils.totalWorkDaysFromApprovedVacationRequests([
       { status: 0, start: "2024-01-01T00:00:00.000Z", end: "2024-01-05T00:00:00.000Z" },
     ]);
     expect(sum).toBe(0);
@@ -22,7 +18,7 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
 
   it("suma días laborables (fallback Lun–Vie) sin employeeWorkdays", () => {
     // 2024-01-01 (lun) – 2024-01-02 (mar) = 2; 2024-01-08 (lun) = 1 → 3
-    const sum = totalWorkDaysFromApprovedVacationRequests([
+    const sum = EmployeeUtils.totalWorkDaysFromApprovedVacationRequests([
       { status: 1, start: "2024-01-01T00:00:00.000Z", end: "2024-01-02T00:00:00.000Z" },
       { status: 1, start: "2024-01-08T00:00:00.000Z", end: "2024-01-08T00:00:00.000Z" },
     ]);
@@ -38,7 +34,7 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
       { name: "Jueves" },
       { name: "Viernes" },
     ];
-    const sum = totalWorkDaysFromApprovedVacationRequests(
+    const sum = EmployeeUtils.totalWorkDaysFromApprovedVacationRequests(
       [{ status: 1, start: "2024-01-01T00:00:00.000Z", end: "2024-01-05T00:00:00.000Z" }],
       workdays,
     );
@@ -47,7 +43,7 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
 
   it("ignora nombres de días desconocidos sin romper", () => {
     const workdays = [{ name: "Lunes" }, { name: "DiasDesconocido" }];
-    const sum = totalWorkDaysFromApprovedVacationRequests(
+    const sum = EmployeeUtils.totalWorkDaysFromApprovedVacationRequests(
       [{ status: 1, start: "2024-01-01T00:00:00.000Z", end: "2024-01-01T00:00:00.000Z" }],
       workdays,
     );
@@ -80,28 +76,28 @@ describe("Dates.parseUTCDateToHours", () => {
 // ─── countWorkdayDays ─────────────────────────────────────────────────────────
 describe("countWorkdayDays", () => {
   it("retorna 0 para entradas no array", () => {
-    expect(countWorkdayDays(null)).toBe(0);
-    expect(countWorkdayDays(undefined)).toBe(0);
+    expect(EmployeeUtils.countWorkdayDays(null)).toBe(0);
+    expect(EmployeeUtils.countWorkdayDays(undefined)).toBe(0);
   });
 
   it("retorna la cantidad de días en el array", () => {
-    expect(countWorkdayDays([])).toBe(0);
-    expect(countWorkdayDays([{ name: "Lunes" }, { name: "Martes" }])).toBe(2);
+    expect(EmployeeUtils.countWorkdayDays([])).toBe(0);
+    expect(EmployeeUtils.countWorkdayDays([{ name: "Lunes" }, { name: "Martes" }])).toBe(2);
   });
 });
 
 // ─── countWorkdaysHours ───────────────────────────────────────────────────────
 describe("countWorkdaysHours", () => {
   it("retorna 0 para entradas no array", () => {
-    expect(countWorkdaysHours(null)).toBe(0);
-    expect(countWorkdaysHours(undefined)).toBe(0);
+    expect(EmployeeUtils.countWorkdaysHours(null)).toBe(0);
+    expect(EmployeeUtils.countWorkdaysHours(undefined)).toBe(0);
   });
 
   it("retorna 0 para workdays sin start o end", () => {
-    expect(countWorkdaysHours([{ name: "Lunes" }])).toBe(0);
+    expect(EmployeeUtils.countWorkdaysHours([{ name: "Lunes" }])).toBe(0);
   });
 
   it("retorna 0 para un array vacío", () => {
-    expect(countWorkdaysHours([])).toBe(0);
+    expect(EmployeeUtils.countWorkdaysHours([])).toBe(0);
   });
 });
