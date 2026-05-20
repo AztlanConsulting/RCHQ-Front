@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    getAbsenceTypes,
-    getEventsTypes,
-    getHouseEmployees,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendarService";
 import Dates from "@/utils/dates";
 import CalendarConfigs from "../../configs/calendar.configs";
 import CalendarUtils from "../../utils/calendar.utils";
@@ -236,7 +232,7 @@ export const useCalendarFilters = (
         viewerRole === "Administrador" || viewerRole === "Coordinador";
 
     useEffect(() => {
-        getEventsTypes()
+        CalendarService.getEventsTypes()
             .then((types) => {
                 if (!Array.isArray(types)) return;
                 const opts = types.map((t) => ({
@@ -250,7 +246,7 @@ export const useCalendarFilters = (
     }, []);
 
     useEffect(() => {
-        getAbsenceTypes()
+        CalendarService.getAbsenceTypes()
             .then((absenceTypes) => {
                 if (!Array.isArray(absenceTypes)) return;
 
@@ -275,7 +271,7 @@ export const useCalendarFilters = (
             return;
         }
 
-        getHouseEmployees()
+        CalendarService.getHouseEmployees()
             .then((employees) => {
                 if (!Array.isArray(employees)) return;
 

@@ -37,37 +37,6 @@ class CalendarService  {
         return eventTypes;
     };
 
-    static getEventsTypes = async () => {
-        const token = AuthUtils.getToken();
-    
-        if (!token) {
-            throw new Error("No se encontró token de sesión");
-        }
-    
-        const rawResponse = await secureFetch(
-            `${API_URL}/event/getAllTypes`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            },
-        );
-    
-        const response = await rawResponse.json();
-        if (!rawResponse.ok) {
-            throw buildApiError(
-                rawResponse,
-                response,
-                "No se pudieron obtener los tipos de evento",
-            );
-        }
-        const eventTypes = response?.data?.eventTypes;
-    
-        return eventTypes;
-    };
-
     static getAbsenceTypes = async () => {
         const token = AuthUtils.getToken();
     

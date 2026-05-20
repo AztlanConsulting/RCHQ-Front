@@ -1,16 +1,15 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCalendarFilters } from "../../hooks/organism/useCalendarFilters";
-import {
-  getAbsenceTypes,
-  getEventsTypes,
-  getHouseEmployees,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
-  getAbsenceTypes: vi.fn(),
-  getEventsTypes: vi.fn(),
-  getHouseEmployees: vi.fn(),
+  __esModule: true,
+  default: {
+    getAbsenceTypes: vi.fn(),
+    getEventsTypes: vi.fn(),
+    getHouseEmployees: vi.fn(),
+  },
 }));
 
 const buildAbsence = (overrides = {}) => ({
@@ -35,11 +34,11 @@ const buildAbsence = (overrides = {}) => ({
 describe("useCalendarFilters - trabajador consulta ausencias", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getEventsTypes.mockResolvedValue([{ name: "General" }]);
-    getAbsenceTypes.mockResolvedValue([
+    CalendarService.getEventsTypes.mockResolvedValue([{ name: "General" }]);
+    CalendarService.getAbsenceTypes.mockResolvedValue([
       { absenceTypeId: "type-medica", name: "Médica" },
     ]);
-    getHouseEmployees.mockResolvedValue([
+    CalendarService.getHouseEmployees.mockResolvedValue([
       { employeeId: "other-employee", name: "Otra persona" },
     ]);
   });
@@ -66,7 +65,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       }),
     );
 
-    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(CalendarService.getAbsenceTypes).toHaveBeenCalledTimes(1));
     await waitFor(() =>
       expect(result.current.visibleEvents.map((event) => event.title))
         .toContain("Evento global"),
@@ -79,7 +78,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       (event) => event.title === "Evento global",
     );
 
-    expect(getHouseEmployees).not.toHaveBeenCalled();
+    expect(CalendarService.getHouseEmployees).not.toHaveBeenCalled();
     expect(absenceEvent).toMatchObject({
       title: "Ausencia Médica de John Smith",
       backgroundColor: "#EF4444",
@@ -105,13 +104,13 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       { initialProps: { viewerRole: "" } },
     );
 
-    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
-    expect(getHouseEmployees).not.toHaveBeenCalled();
+    await waitFor(() => expect(CalendarService.getAbsenceTypes).toHaveBeenCalledTimes(1));
+    expect(CalendarService.getHouseEmployees).not.toHaveBeenCalled();
 
     rerender({ viewerRole: "Administrador" });
 
-    await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
-    expect(getAbsenceTypes).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(CalendarService.getHouseEmployees).toHaveBeenCalledTimes(1));
+    expect(CalendarService.getAbsenceTypes).toHaveBeenCalledTimes(1);
   });
 
   it("filtra ausencias del trabajador por evidencia", async () => {
@@ -135,7 +134,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       }),
     );
 
-    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(CalendarService.getAbsenceTypes).toHaveBeenCalledTimes(1));
 
     act(() => {
       result.current.setAbsenceEvidenceFilters(["sin_evidencia"]);
@@ -155,7 +154,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
   });
 
   it("mantiene seleccionados por defecto los nuevos tipos de ausencia mientras el usuario no cambie el filtro", async () => {
-    getAbsenceTypes.mockResolvedValue([]);
+    CalendarService.getAbsenceTypes.mockResolvedValue([]);
 
     const initialEvents = [
       buildAbsence({
@@ -185,7 +184,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
       { initialProps: { events: initialEvents } },
     );
 
-    await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(CalendarService.getAbsenceTypes).toHaveBeenCalledTimes(1));
     expect(result.current.absenceTypeFilters).toEqual(["médica"]);
 
     rerender({ events: nextEvents });

@@ -6,7 +6,7 @@ import {
     getEmployeesForSelector,
 } from "../../services/eventService";
 
-import { getCalendarViewerRole } from "../../services/calendarService";
+import AuthUtils from "../../utils/auth.utils";
 
 import {
     personalEventSchema,
@@ -48,7 +48,7 @@ export const usePersonalForm = ({
     });
 
     useEffect(() => {
-        const role = getCalendarViewerRole();
+        const role = AuthUtils.getCalendarViewerRole();
         setIsCoordinator(role === "Coordinador");
     }, []);
 

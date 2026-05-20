@@ -1,11 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import {
-    getCalendarViewerRole,
-    getEmployeeHouseName,
-    getEventsInRange,
-    getHouseEventsInRange,
-    getOwnEmployeeId,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendarService";
+import AuthUtils from "../../utils/auth.utils";
 import { normalToUTCWithOffset } from "../../utils/dates";
 
 export const useBaseCalendar = () => {
@@ -20,11 +15,11 @@ export const useBaseCalendar = () => {
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
-        () => viewEmployeeId || getOwnEmployeeId(),
+        () => viewEmployeeId || AuthUtils.getOwnEmployeeId(),
         [viewEmployeeId],
     );
     const effectiveViewerRole = useMemo(
-        () => viewerRole || getCalendarViewerRole(),
+        () => viewerRole || AuthUtils.getCalendarViewerRole(),
         [viewerRole],
     );
 
@@ -280,11 +275,11 @@ export const useBaseCalendar = () => {
     const loadCalendarEvents = useCallback(
         async (startDate, endDate, employeeId, role) => {
             const personalEventsPromise = employeeId
-                ? getEventsInRange(employeeId, startDate, endDate)
+                ? CalendarService.getEventsInRange(employeeId, startDate, endDate)
                 : Promise.resolve([]);
 
             const sameHouseEventsPromise = canViewHouseEvents(role)
-                ? getHouseEventsInRange(startDate, endDate)
+                ? CalendarService.getHouseEventsInRange(startDate, endDate)
                 : Promise.resolve([]);
 
             const [personalEvents, houseEvents] = await Promise.all([
@@ -346,12 +341,12 @@ export const useBaseCalendar = () => {
     };
 
     const setOwnCalendar = useCallback(async () => {
-        const ownId = getOwnEmployeeId();
-        const role = getCalendarViewerRole();
+        const ownId = AuthUtils.getOwnEmployeeId();
+        const role = AuthUtils.getCalendarViewerRole();
         setViewEmployeeId(ownId);
         setViewerRole(role);
         setCalendarMode("personal");
-        const employeeHouseName = await getEmployeeHouseName();
+        const employeeHouseName = await CalendarService.getEmployeeHouseName();
         setEmployeeHouseName(employeeHouseName);
     }, []);
 
