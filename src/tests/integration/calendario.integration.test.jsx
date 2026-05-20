@@ -65,6 +65,11 @@ vi.mock("../../components/molecules/calendarCards/workerAbsenceDetail", () => ({
     </div>
   ),
 }));
+/*
+vi.mock("../../components/organism/evento/registerEventModal", () => ({
+  default: ({ isOpen }) =>
+    isOpen ? <div data-testid="register-event-modal" /> : null,
+}));*/
 
 describe("Integración: Calendario page", () => {
   const setOwnCalendar = vi.fn();

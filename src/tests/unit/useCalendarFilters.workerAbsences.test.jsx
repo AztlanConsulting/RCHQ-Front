@@ -81,7 +81,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
 
     expect(getHouseEmployees).not.toHaveBeenCalled();
     expect(absenceEvent).toMatchObject({
-      title: "Ausencia Médica de John Smith",
+      title: "Ausencia Médica",
       backgroundColor: "#EF4444",
       borderColor: "#DC2626",
       allDay: true,

@@ -35,7 +35,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.start) || "—"}
+                        {formatEventDate(event.readableStart) || "—"}
                     </Type>
                 </div>
                 <div>
@@ -49,7 +49,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.end) || "—"}
+                        {formatEventDate(event.readableEnd) || "—"}
                     </Type>
                 </div>
                 <div>
