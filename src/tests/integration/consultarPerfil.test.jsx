@@ -13,7 +13,7 @@ vi.mock("../../services/profileService", () => ({
   }),
 }));
 
-vi.mock("../../utils/authStorage", () => ({
+vi.mock("../../utils/auth.utils", () => ({
   getToken: vi.fn(() => "fake-token"),
 }));
 

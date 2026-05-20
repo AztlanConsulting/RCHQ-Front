@@ -8,7 +8,7 @@ import {
   setPreTwoFactorAuthToken,
   setFirstLoginToken,
   removePreTwoFactorAuthToken,
-} from "../utils/authStorage";
+} from "../utils/auth.utils";
 import { buildApiError, getReadableErrors } from "../utils/apiErrors";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -195,10 +195,10 @@ export const deactivateTwoFactorAuthService = async (password) => {
   return data;
 };
 
+export { getReadableErrors } from "../utils/apiErrors";
 export {
-  getReadableErrors,
   getToken,
   getPreTwoFactorAuthToken,
   getFirstLoginToken,
   removePreTwoFactorAuthToken,
-};
+} from "../utils/auth.utils";

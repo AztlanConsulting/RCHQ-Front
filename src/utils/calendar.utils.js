@@ -25,6 +25,8 @@ export const ABSENCE_EVIDENCE_OPTIONS = [
     { value: "sin_evidencia", label: "Sin evidencia" },
 ];
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 class CalendarUtils  {
     static getScopeOption = (event) => {
         return SCOPE_OPTIONS.find(
@@ -61,20 +63,6 @@ class CalendarUtils  {
         const normalizedLink = String(link).replace(/^\/+/, "");
     
         return `${baseUrl}/${normalizedLink}`;
-    };
-
-    static getOwnEmployeeId = () => {
-        const userData = getStoredUser();
-        const tokenPayload = parseJwtPayload(getToken());
-        const employeeId = userData?.employeeId ?? tokenPayload?.id ?? "";
-        return employeeId;
-    };
-
-    static getCalendarViewerRole = () => {
-        const userData = getStoredUser();
-        const tokenPayload = parseJwtPayload(getToken());
-    
-        return userData?.role ?? userData?.roleName ?? tokenPayload?.role ?? "";
     };
 };
 

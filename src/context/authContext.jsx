@@ -5,7 +5,7 @@ import {
   getToken,
   setStoredUser,
   setToken,
-} from "../utils/authStorage";
+} from "../utils/auth.utils";
 
 const AuthContext = createContext(null);
 

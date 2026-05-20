@@ -32,7 +32,7 @@ src/
 ├── context/                    
 │   └── authContext.jsx         → Estado global de sesión (exporta useAuthContext)
 ├── utils/
-│   ├── authStorage.js          → Funciones para interactuar con localStorage
+│   ├── auth.utils.js           → AuthUtils + localStorage de sesión
 │   ├── apiErrors.js            → Transformación y estandarización de errores (buildApiError)
 │   ├── secureFetchWrapper.js   → Wrapper de Fetch que inyecta tokens automáticamente
 │   └── schema/                 → Esquemas de validación Zod
@@ -90,7 +90,7 @@ export const getUpdateFormService = async () => {
 };
 ```
 
-### localStorage (authStorage.js)
+### localStorage (`auth.utils.js` / `AuthUtils`)
 El acceso al `localStorage` debe estar centralizado para evitar vulnerabilidades XSS directas o errores de typos:
 - `getToken()` / `setToken(token)` → Manejo del JWT Principal.
 - `getFirstLoginToken()` → Token para el flujo de cambio obligatorio de contraseña.

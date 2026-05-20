@@ -6,7 +6,7 @@ vi.mock("../../../src/services/profileService", () => ({
   getReadableErrors: vi.fn((err) => [err?.message ?? "Error inesperado"]),
 }));
 
-vi.mock("../../../src/utils/authStorage", () => ({
+vi.mock("../../../src/utils/auth.utils", () => ({
   getToken: vi.fn().mockReturnValue("mock-token"),
 }));
 

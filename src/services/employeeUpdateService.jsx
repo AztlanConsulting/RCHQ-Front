@@ -1,4 +1,4 @@
-import { getToken } from "../utils/authStorage";
+import { getToken } from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 

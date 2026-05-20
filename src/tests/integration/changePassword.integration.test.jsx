@@ -18,7 +18,7 @@ vi.mock("../../../src/hooks/useAuth", () => ({
   default: () => ({ login: mockLogin }),
 }));
 
-vi.mock("../../../src/utils/authStorage", () => ({
+vi.mock("../../../src/utils/auth.utils", () => ({
   getFirstLoginToken: vi.fn(),
   setPreTwoFactorAuthToken: vi.fn((token) => {
     localStorage.setItem("preTwoFactorAuth", token);
@@ -38,7 +38,7 @@ vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
 import {
   getFirstLoginToken,
   setPreTwoFactorAuthToken,
-} from "../../utils/authStorage";
+} from "../../utils/auth.utils";
 import { changePasswordFirstLoginService } from "../../services/passwordService";
 
 const renderPage = () =>

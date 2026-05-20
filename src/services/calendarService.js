@@ -1,29 +1,9 @@
-import { getToken, getStoredUser } from "../utils/authStorage";
+import { getToken } from "../utils/auth.utils";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 import CalendarUtils from "../utils/calendar.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-
-const parseJwtPayload = (token) => {
-    if (!token) return null;
-
-    try {
-        const [, payload] = token.split(".");
-        if (!payload) return null;
-
-        const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = normalized.padEnd(
-            normalized.length + ((4 - (normalized.length % 4)) % 4),
-            "=",
-        );
-        const decoded = atob(padded);
-        return JSON.parse(decoded);
-    } catch {
-        return null;
-    }
-};
 
 class CalendarService  {
     static getEventsTypes = async () => {

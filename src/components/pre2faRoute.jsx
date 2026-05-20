@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { getPreTwoFactorAuthToken } from "../utils/authStorage";
+import { getPreTwoFactorAuthToken } from "../utils/auth.utils";
 
 const PreTwoFactorAuthRoute = () => {
   const token = getPreTwoFactorAuthToken();

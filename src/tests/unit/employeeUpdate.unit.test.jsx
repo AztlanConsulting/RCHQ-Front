@@ -5,7 +5,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // ── Mocks globales ─────────────────────────────────────────────────────────────
 
-vi.mock("../../utils/authStorage", () => ({
+vi.mock("../../utils/auth.utils", () => ({
   getToken: vi.fn(() => "mock-token"),
 }));
 
@@ -19,7 +19,7 @@ vi.mock("../utils/apiErrors", () => ({
 
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
-import { getToken } from "../../utils/authStorage";
+import { getToken } from "../../utils/auth.utils";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 import {
   getUpdateFormService,

@@ -1,4 +1,4 @@
-import { getToken, clearAuthStorage } from "./authStorage";
+import { getToken, clearAuthStorage } from "./auth.utils";
 
 const LOGIN_PATH = "/iniciar-sesion";
 

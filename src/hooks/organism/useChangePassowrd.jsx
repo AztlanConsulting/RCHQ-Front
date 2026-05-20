@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getFirstLoginToken,
   setPreTwoFactorAuthToken,
-} from "../../utils/authStorage";
+} from "../../utils/auth.utils";
 import { changePasswordFirstLoginService } from "../../services/passwordService";
 import useAuth from "../useAuth";
 import {

@@ -4,7 +4,7 @@ import {
   setToken,
   setStoredUser,
   removeFirstLoginToken,
-} from "../utils/authStorage";
+} from "../utils/auth.utils";
 
 import { buildApiError } from "../utils/apiErrors";
 

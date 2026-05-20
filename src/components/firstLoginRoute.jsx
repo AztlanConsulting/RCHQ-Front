@@ -5,7 +5,7 @@
 // Componente generado con ChatGPT, revisado por Iván Flores
 
 import { Navigate, Outlet } from "react-router-dom";
-import { getFirstLoginToken, getToken } from "../utils/authStorage";
+import { getFirstLoginToken, getToken } from "../utils/auth.utils";
 
 const FirstLoginRoute = () => {
   const firstLoginToken = getFirstLoginToken();

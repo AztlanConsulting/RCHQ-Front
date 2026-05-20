@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getUserData, getReadableErrors } from "../services/profileService";
-import { getToken } from "../utils/authStorage";
+import { getToken } from "../utils/auth.utils";
 import ProfileCard from "../components/organism/profileCard";
 
 const STATUS_MAP = {
