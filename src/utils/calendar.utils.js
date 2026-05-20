@@ -3,15 +3,32 @@ import Dates from "./dates";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * UI/helpers for calendar events: config lookups, API URL normalization,
+ * and mapping FullCalendar/API shapes → detail cards.
+ */
 class CalendarUtils {
+  /**
+   * @param {{ scope?: string }} event — raw event with `scope` token (global | house | personal).
+   * @returns {{ value, label, color } | undefined} — matching row from `CalendarConfigs.SCOPE_OPTIONS`, or undefined.
+   */
   static getScopeOption = (event) => {
     return CalendarConfigs.SCOPE_OPTIONS.find((s) => s.value === event.scope);
   };
 
+  /**
+   * @param {{ focus?: string }} event — raw event with `focus` token (eventos | vacaciones | ausencias).
+   * @returns {{ value, label, icon } | undefined} — matching row from `CalendarConfigs.FOCUS_OPTIONS`, or undefined.
+   */
   static getFocusOption = (event) => {
     return CalendarConfigs.FOCUS_OPTIONS.find((f) => f.value === event.focus);
   };
 
+  /**
+   * For absence rows, turns relative evidence paths into full API URLs; clears `link` for non-absences.
+   * @param {object} event — calendar event object (may include focus, absenceId, link, url).
+   * @returns {object} — shallow clone of `event` with `link` set to absolute URL or "".
+   */
   static normalizeCalendarEvent = (event) => {
     const isAbsence = event?.focus === "ausencias" || event?.absenceId;
     const evidencePath = isAbsence ? event?.link || event?.url || "" : "";
@@ -24,6 +41,11 @@ class CalendarUtils {
     };
   };
 
+  /**
+   * Builds a browser-openable URL for absence evidence (relative path → `API_URL`, http(s) left as-is).
+   * @param {string} [link] — path or full URL; falsy → "".
+   * @returns {string} — full URL or "".
+   */
   static buildAbsenceEvidenceUrl = (link) => {
     if (!link) return "";
 
@@ -37,6 +59,11 @@ class CalendarUtils {
     return `${baseUrl}/${normalizedLink}`;
   };
 
+  /**
+   * Maps a FullCalendar event instance → flat “detail” object for cards/modals.
+   * @param {object | null | undefined} ev — FullCalendar event (title, start, end, extendedProps, …).
+   * @returns {object | null} — normalized detail shape, or null if `ev` is falsy.
+   */
   static eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
@@ -79,6 +106,11 @@ class CalendarUtils {
     };
   };
 
+  /**
+   * Maps an API/list “calendar item” shape → same detail shape as `eventApiToDetail` (different field names).
+   * @param {object | null | undefined} item — e.g. absence row from range endpoint (`name`, `start`, `lastsAllDay`, …).
+   * @returns {object | null} — detail object for UI, or null if `item` is falsy.
+   */
   static calendarItemToDetail = (item) => {
     if (!item) return null;
 

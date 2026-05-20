@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import CalendarService from "../../services/calendarService";
 import AuthUtils from "../../utils/auth.utils";
-import { normalToUTCWithOffset } from "../../utils/dates";
+import Dates from "../../utils/dates";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -362,8 +362,8 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const startDate = normalToUTCWithOffset(info.start);
-        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+        const startDate = Dates.normalToUTCWithOffset(info.start);
+        const endDate = Dates.normalToUTCWithOffset(info.end, { seconds: -1 });
 
         setSelectedDates({ startDate, endDate });
 
