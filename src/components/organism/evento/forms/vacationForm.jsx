@@ -121,10 +121,9 @@ const VacationForm = (props) => {
                 </div>
             </div>
 
-            <div className="rounded-lg bg-blue-50 px-4 py-3 text-sm font-medium text-[#1E3A5F]">
-                Las vacaciones registradas por coordinación quedarán aprobadas
-                automáticamente.
-            </div>
+            <p className="mb-5 text-xs text-slate-400">
+                Las vacaciones registradas por coordinación quedarán aprobadas automáticamente.
+            </p>
 
             {serverError && (
                 <Alert
