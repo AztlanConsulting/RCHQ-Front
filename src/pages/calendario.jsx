@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Type from "../components/atoms/type";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
@@ -8,7 +8,8 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
-import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
+import RegisterEventModal from "../components/organism/evento/registerEventModal";
+import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
@@ -19,6 +20,7 @@ const isManagementRole = (role) =>
 
 const Calendario = () => {
     const calendarRef = useRef(null);
+    const [editingHouseEvent, setEditingHouseEvent] = useState(null);
 
     const {
         employeeHouseName,
@@ -122,6 +124,22 @@ const Calendario = () => {
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
+
+    const openHouseEventEdit = () => {
+        if (
+            selectedEvent?.focus !== "eventos" ||
+            selectedEvent?.scope !== "house"
+        ) {
+            setAlert({
+                type: "error",
+                message: "Solo se pueden modificar eventos de casa.",
+            });
+            return;
+        }
+
+        setEditingHouseEvent(selectedEvent);
+        closeDetail();
+    };
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -312,12 +330,31 @@ const Calendario = () => {
                             );
 
                         default:
-                            return <EventDetail event={selectedEvent} />;
+                            return (
+                                <EventDetail
+                                    event={selectedEvent}
+                                    onEdit={openHouseEventEdit}
+                                />
+                            );
                     }
                 })()}
             </Modal>
 
-            <RegisterHouseEventModal
+            <UpdateHouseEventModal
+                event={editingHouseEvent}
+                isOpen={editingHouseEvent != null}
+                onClose={() => setEditingHouseEvent(null)}
+                onSuccess={async () => {
+                    setEditingHouseEvent(null);
+                    await reloadCurrentRange();
+                    setAlert({
+                        type: "success",
+                        message: "Evento modificado exitosamente",
+                    });
+                }}
+            />
+
+            <RegisterEventModal
                 isOpen={selectedDates != null}
                 onClose={() => closeCreationModal(calendarRef)}
                 onSuccess={() => {
