@@ -21,11 +21,8 @@ const isManagementRole = (role) =>
 
 const Calendario = () => {
     const calendarRef = useRef(null);
-<<<<<<< HEAD
     const [editingHouseEvent, setEditingHouseEvent] = useState(null);
-=======
     const prevFullCalendarViewTypeRef = useRef(null);
->>>>>>> styles/vistasCalendario3
 
     const {
         employeeHouseName,
