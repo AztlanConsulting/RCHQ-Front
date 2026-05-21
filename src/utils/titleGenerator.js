@@ -24,7 +24,7 @@ export const getPersonalEventTitle = (event, viewerRole = "") => {
                 return `Vacaciones Rechazadas${linkUserText}`;
             }
 
-            return `Vacación${linkUserText}`;
+            return `Vacaciones${linkUserText}`;
         }
 
         return rawName;
