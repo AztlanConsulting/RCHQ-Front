@@ -14,6 +14,7 @@ import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbs
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
+import { calendarItemToDetail } from "../utils/calendarEventDetail";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -102,6 +103,7 @@ const Calendario = () => {
         absenceEvidenceFileName,
         absenceEvidenceError,
         closeDetail,
+        showEventDetail,
         handleEventClick,
         absenceEvidenceLabel,
         openAbsenceEvidence,
@@ -125,20 +127,33 @@ const Calendario = () => {
         setOwnCalendar();
     }, [setOwnCalendar]);
 
-    const openHouseEventEdit = () => {
-        if (
-            selectedEvent?.focus !== "eventos" ||
-            selectedEvent?.scope !== "house"
-        ) {
-            setAlert({
-                type: "error",
-                message: "Solo se pueden modificar eventos de casa.",
-            });
+    const openEventEdit = () => {
+        if (!selectedEvent) return;
+        const { focus, scope } = selectedEvent;
+
+        if (focus === "eventos" && scope === "house") {
+            setEditingHouseEvent(selectedEvent);
+            closeDetail();
             return;
         }
 
-        setEditingHouseEvent(selectedEvent);
-        closeDetail();
+        // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
+        setAlert({
+            type: "error",
+            message: "No se puede modificar este tipo de evento.",
+        });
+    };
+
+    const openEventDelete = () => {
+        if (!selectedEvent) return;
+        const { focus, scope } = selectedEvent;
+
+        if (focus === "eventos" && scope === "house") {
+            // TODO: abrir modal de eliminación de evento de casa
+            return;
+        }
+
+        // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
     };
 
     const calendarFiltersProps = {
@@ -333,7 +348,8 @@ const Calendario = () => {
                             return (
                                 <EventDetail
                                     event={selectedEvent}
-                                    onEdit={openHouseEventEdit}
+                                    onEdit={openEventEdit}
+                                    onDelete={openEventDelete}
                                 />
                             );
                     }
@@ -345,8 +361,22 @@ const Calendario = () => {
                 isOpen={editingHouseEvent != null}
                 onClose={() => setEditingHouseEvent(null)}
                 onSuccess={async () => {
+                    const houseEventId = editingHouseEvent?.houseEventId;
                     setEditingHouseEvent(null);
-                    await reloadCurrentRange();
+
+                    const rawEvents = await reloadCurrentRange();
+
+                    const refreshedEvent = rawEvents?.find(
+                        (ev) =>
+                            ev.focus === "eventos" &&
+                            ev.scope === "house" &&
+                            String(ev.houseEventId) === String(houseEventId),
+                    );
+
+                    if (refreshedEvent) {
+                        showEventDetail(calendarItemToDetail(refreshedEvent));
+                    }
+
                     setAlert({
                         type: "success",
                         message: "Evento modificado exitosamente",
