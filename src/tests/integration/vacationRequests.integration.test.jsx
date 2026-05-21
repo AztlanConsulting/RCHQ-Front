@@ -7,9 +7,9 @@ import {
     act,
 } from "@testing-library/react";
 import VacationRequests from "../../pages/vacationRequests";
-import VacationRequestService from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacation.service";
 
-vi.mock("../../services/vacationRequestService", () => ({
+vi.mock("../../services/vacation.service", () => ({
     default: {
         getPending: vi.fn(),
         getReviewed: vi.fn(),

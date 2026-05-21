@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 
 // ─── Factories ────────────────────────────────────────────────────────────────
 

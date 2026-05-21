@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import LogsService from "../../services/logsService";
+import LogsService from "../../services/logs.service";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const MOBILE_BREAKPOINT = 640;

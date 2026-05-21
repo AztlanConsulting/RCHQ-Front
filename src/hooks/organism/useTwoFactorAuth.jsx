@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useField } from "../atoms/useField";
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 
 const useGeneration = () => {
   const [qr, setQr] = useState("");

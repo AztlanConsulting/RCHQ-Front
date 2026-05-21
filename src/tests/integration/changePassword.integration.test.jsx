@@ -27,7 +27,7 @@ vi.mock("../../../src/utils/auth.utils", () => ({
   },
 }));
 
-vi.mock("../../../src/services/passwordService", () => ({
+vi.mock("../../../src/services/password.service", () => ({
   default: {
     changePasswordFirstLogin: vi.fn(),
   },
@@ -40,7 +40,7 @@ vi.mock("../../../src/utils/mappers/auth/passwordErrorMapper", () => ({
 }));
 
 import AuthUtils from "../../utils/auth.utils";
-import PasswordService from "../../services/passwordService";
+import PasswordService from "../../services/password.service";
 
 const renderPage = () =>
   render(

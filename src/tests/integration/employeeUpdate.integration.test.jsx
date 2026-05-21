@@ -24,7 +24,7 @@ vi.mock("../../services/employeeUpdateService", () => ({
   },
 }));
 
-vi.mock("../../services/documentService", () => ({
+vi.mock("../../services/document.service", () => ({
   default: {
     getDocuments:     vi.fn().mockResolvedValue({ success: true, body: null }),
     getTypes:         vi.fn().mockResolvedValue([]),

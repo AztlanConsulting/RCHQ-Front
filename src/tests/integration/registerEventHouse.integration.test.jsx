@@ -8,9 +8,9 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import EventService from "../../services/eventService";
+import EventService from "../../services/event.service";
 
-vi.mock("../../services/eventService", () => ({
+vi.mock("../../services/event.service", () => ({
     default: {
         createHouseEvent: vi.fn(),
         getEventTypes: vi.fn(),

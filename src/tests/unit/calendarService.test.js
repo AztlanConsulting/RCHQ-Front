@@ -6,7 +6,7 @@ vi.mock("../../utils/secureFetchWrapper", () => ({
 
 import { secureFetch } from "../../utils/helpers/secureFetchWrapper";
 
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import CalendarUtils from "../../utils/calendar.utils";
 
 describe("calendarService", () => {

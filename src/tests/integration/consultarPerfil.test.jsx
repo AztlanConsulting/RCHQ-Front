@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Perfil from "../../pages/perfil";
 
-vi.mock("../../services/profileService", () => ({
+vi.mock("../../services/profile.service", () => ({
   default: {
     ProfileService.getUserData:      vi.fn(),
     getReadableErrors: vi.fn((err) => {
@@ -21,7 +21,7 @@ vi.mock("../../utils/auth.utils", () => ({
   },
 }));
 
-import ProfileService from "../../services/profileService";
+import ProfileService from "../../services/profile.service";
 
 const mockUserRaw = {
   picture:     null,

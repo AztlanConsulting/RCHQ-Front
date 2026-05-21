@@ -16,7 +16,7 @@ vi.mock("../../../src/hooks/useAuth", () => ({
   default: () => ({ login: mockLogin }),
 }));
 
-vi.mock("../../../src/services/authService", () => ({
+vi.mock("../../../src/services/auth.service", () => ({
   default: {
     login: vi.fn(),
     getReadableErrors: vi.fn((err) => [
@@ -25,7 +25,7 @@ vi.mock("../../../src/services/authService", () => ({
   },
 }));
 
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 
 const renderLogin = () =>
   render(

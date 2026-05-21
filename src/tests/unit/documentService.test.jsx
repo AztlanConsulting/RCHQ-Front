@@ -1,6 +1,6 @@
 // tests/unit/documentService.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import DocumentService from "../../services/documentService";
+import DocumentService from "../../services/document.service";
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({

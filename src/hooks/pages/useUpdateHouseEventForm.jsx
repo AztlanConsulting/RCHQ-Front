@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import UpdateEventService from "../../services/updateEventService";
-import EventService from "../../services/eventService";
+import EventService from "../../services/event.service";
 // import {
 //     Dates.addDaysToDateOnly,
 //     normalizeDateOnly,

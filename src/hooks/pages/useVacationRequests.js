@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import VacationRequestService from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacation.service";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const LIMIT = 6;

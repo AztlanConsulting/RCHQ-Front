@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import VacationRequestService from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacation.service";
 import { secureFetch } from "../../utils/helpers/secureFetchWrapper";
 
 vi.mock("../../utils/secureFetchWrapper", () => ({

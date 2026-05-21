@@ -4,7 +4,7 @@ import { renderHook, act } from "@testing-library/react";
 import { useDocuments } from "../../hooks/organism/useDocuments";
 
 // ── Mocks de servicios ──────────────────────────────────────────
-vi.mock("../../services/documentService", () => ({
+vi.mock("../../services/document.service", () => ({
   getDocumentsService: vi.fn().mockResolvedValue({ data: { documents: {} } }),
   getDocumentTypesService: vi.fn().mockResolvedValue([
     { value: "cv", label: "CV" },
@@ -85,7 +85,7 @@ describe("useDocuments — modal: validaciones al submit", () => {
 
   it("llama al servicio con FormData válido en modo creación", async () => {
     const { uploadDocumentService } =
-      await import("../../services/documentService");
+      await import("../../services/document.service");
     const { result } = renderHook(() => useDocuments(EMPLOYEE_ID));
     await openUploadModal(result);
     act(() => {
@@ -105,7 +105,7 @@ describe("useDocuments — modal: validaciones al submit", () => {
 
   it("en modo edición permite submit sin archivo", async () => {
     const { updateDocumentService } =
-      await import("../../services/documentService");
+      await import("../../services/document.service");
     const { result } = renderHook(() => useDocuments(EMPLOYEE_ID));
     await openEditModal(result, { documentId: "cv" });
     await act(async () => {

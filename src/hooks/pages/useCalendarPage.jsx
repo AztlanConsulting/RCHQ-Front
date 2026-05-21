@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import CalendarUtils from "../../utils/calendar.utils";
 import Dates from "@/utils/helpers/dates";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;

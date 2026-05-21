@@ -8,14 +8,14 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import AuthUtils from "../../utils/auth.utils";
 
 vi.mock("../../hooks/organism/useBaseCalendar", () => ({
     useBaseCalendar: vi.fn(),
 }));
 
-vi.mock("../../services/calendarService", () => ({
+vi.mock("../../services/calendar.service", () => ({
     __esModule: true,
     default: {
         getAbsenceTypes: vi.fn(),

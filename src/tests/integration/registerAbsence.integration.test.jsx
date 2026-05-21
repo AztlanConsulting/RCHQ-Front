@@ -8,11 +8,11 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import AuthUtils from "../../utils/auth.utils";
-import EventService from "../../services/eventService";
+import EventService from "../../services/event.service";
 
-vi.mock("../../services/calendarService", () => ({
+vi.mock("../../services/calendar.service", () => ({
     __esModule: true,
     default: {
         createAbsenceService: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock("../../utils/auth.utils", () => ({
     },
 }));
 
-vi.mock("../../services/eventService", () => ({
+vi.mock("../../services/event.service", () => ({
     default: {
         createHouseEvent: vi.fn(),
         getEventTypes: vi.fn(),

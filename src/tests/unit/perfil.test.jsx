@@ -1,7 +1,7 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../../../src/services/profileService", () => ({
+vi.mock("../../../src/services/profile.service", () => ({
   default: {
     ProfileService.getUserData:       vi.fn(),
     getReadableErrors: vi.fn((err) => [err?.message ?? "Error inesperado"]),
@@ -15,7 +15,7 @@ vi.mock("../../../src/utils/auth.utils", () => ({
 }));
 
 import Perfil from "../../../src/pages/perfil";
-import ProfileService from "../../../src/services/profileService";
+import ProfileService from "../../../src/services/profile.service";
 
 const PROFILE_DATA = {
   data: {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import EventService from "../../services/eventService";
+import EventService from "../../services/event.service";
 
 import {
     houseEventSchema,

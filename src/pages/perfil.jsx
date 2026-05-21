@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import ProfileService from "../services/profileService";
+import ProfileService from "../services/profile.service";
 import AuthUtils from "../utils/auth.utils";
 import ProfileCard from "../components/organism/profileCard";
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";
-import AuthService from "../../services/authService";
-import PasswordService from "../../services/passwordService";
+import AuthService from "../../services/auth.service";
+import PasswordService from "../../services/password.service";
 import {
   selfServiceChangePasswordSchema,
   getFirstSchemaError,

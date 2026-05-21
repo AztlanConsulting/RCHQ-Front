@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 import { useAuthContext } from "../../context/authContext";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";

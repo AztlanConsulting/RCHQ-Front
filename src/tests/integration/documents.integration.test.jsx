@@ -11,7 +11,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Documents from "../../pages/documents";
 
 // ─── Mocks ────────────────────────────────────────────────
-vi.mock("../../services/documentService", () => ({
+vi.mock("../../services/document.service", () => ({
   default: {
     getDocuments:     vi.fn(),
     upload:           vi.fn(),
@@ -28,7 +28,7 @@ vi.mock("../../services/documentService", () => ({
   },
 }));
 
-import DocumentService from "../../services/documentService";
+import DocumentService from "../../services/document.service";
 
 // ─── Helpers ──────────────────────────────────────────────
 const makeToken = (role = "Administrador") => {

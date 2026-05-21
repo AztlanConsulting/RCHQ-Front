@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useCalendarPage } from "../../hooks/pages/useCalendarPage";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 
-vi.mock("../../services/calendarService", () => ({
+vi.mock("../../services/calendar.service", () => ({
     __esModule: true,
     default: {
         deleteAbsenceService: vi.fn(),

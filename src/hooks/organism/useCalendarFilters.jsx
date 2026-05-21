@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import Dates from "@/utils/helpers/dates";
 import CalendarConfigs from "../../utils/configs/calendar.configs";
 import CalendarUtils from "../../utils/calendar.utils";

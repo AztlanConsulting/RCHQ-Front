@@ -2,9 +2,9 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAbsenceForm } from "../../hooks/pages/useAbsenceForm";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 
-vi.mock("../../services/calendarService", () => ({
+vi.mock("../../services/calendar.service", () => ({
     __esModule: true,
     default: {
         createAbsenceService: vi.fn(),

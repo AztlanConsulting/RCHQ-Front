@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { deactivateEmployeeSchema } from "@/utils/schemas/deactivate.schema";
-import DeactivateEmployeeService from "@/services/deactivateEmployeeService";
+import DeactivateEmployeeService from "@/services/deactivate.service";
 
 export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

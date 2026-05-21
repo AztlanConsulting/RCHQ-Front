@@ -2,9 +2,9 @@ import { render, screen, fireEvent, act, waitFor } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmployee";
 import ReasonCard from "../../components/organism/reasonCard";
-import DeactivateEmployeeService from "../../services/deactivateEmployeeService";
+import DeactivateEmployeeService from "../../services/deactivate.service";
 
-vi.mock("../../services/deactivateEmployeeService", () => ({
+vi.mock("../../services/deactivate.service", () => ({
   default: {
     deactivate: vi.fn(),
   },

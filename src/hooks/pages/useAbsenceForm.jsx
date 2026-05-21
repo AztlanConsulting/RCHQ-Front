@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import {
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,

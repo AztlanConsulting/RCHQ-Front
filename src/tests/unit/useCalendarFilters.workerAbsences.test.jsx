@@ -1,9 +1,9 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCalendarFilters } from "../../hooks/organism/useCalendarFilters";
-import CalendarService from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 
-vi.mock("../../services/calendarService", () => ({
+vi.mock("../../services/calendar.service", () => ({
     __esModule: true,
     default: {
         getAbsenceTypes: vi.fn(),

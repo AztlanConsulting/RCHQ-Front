@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useField } from "../atoms/useField";
 import { useDocumentFile } from "../atoms/useDocumentFile";
-import DocumentService from "../../services/documentService";
+import DocumentService from "../../services/document.service";
 
 const getUserInfoFromToken = () => {
   try {

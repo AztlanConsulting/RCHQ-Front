@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import UpdateHouseEventModal from "../../components/organism/evento/updateHouseEventModal";
 import UpdateEventService from "../../services/updateEventService";
-import EventService from "../../services/eventService";
+import EventService from "../../services/event.service";
 
 vi.mock("../../services/updateEventService", () => ({
     default: {
@@ -17,7 +17,7 @@ vi.mock("../../services/updateEventService", () => ({
     },
 }));
 
-vi.mock("../../services/eventService", () => ({
+vi.mock("../../services/event.service", () => ({
     default: {
         getEventTypes: vi.fn(),
     },

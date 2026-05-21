@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthUtils from "../../utils/auth.utils";
-import PasswordService from "../../services/passwordService";
+import PasswordService from "../../services/password.service";
 import useAuth from "../useAuth";
 import {
   firstLoginChangePasswordSchema,
