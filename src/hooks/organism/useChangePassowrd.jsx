@@ -7,7 +7,7 @@ import {
   firstLoginChangePasswordSchema,
   getFirstSchemaError,
 } from "../../utils/schema/auth/password.schemas";
-import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
+import { mapPasswordApiError } from "@/utils/mappers/auth/passwordErrorMapper";
 
 export const useChangePassword = () => {
   const navigate = useNavigate();

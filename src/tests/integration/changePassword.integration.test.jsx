@@ -31,7 +31,7 @@ vi.mock("../../../src/services/passwordService", () => ({
   changePasswordFirstLoginService: vi.fn(),
 }));
 
-vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
+vi.mock("../../../src/utils/mappers/auth/passwordErrorMapper", () => ({
   mapPasswordApiError: vi.fn(() => [
     "La nueva contraseña debe ser diferente a la temporal",
   ]),
