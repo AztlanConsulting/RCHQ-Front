@@ -1,10 +1,10 @@
-const SEARCH_DISALLOWED_CHARS_REGEX = /[^\p{L}\p{M}\p{N}\s]/gu;
-
 class Strings {
+  static SEARCH_DISALLOWED_CHARS_REGEX = /[^\p{L}\p{M}\p{N}\s]/gu;
+
   static sanitize(value = "") {
     return String(value)
       .normalize("NFC")
-      .replace(SEARCH_DISALLOWED_CHARS_REGEX, "");
+      .replace(Strings.SEARCH_DISALLOWED_CHARS_REGEX, "");
   }
 
   static getSafeText(value, fallback = "-") {

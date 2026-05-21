@@ -11,7 +11,7 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 import CalendarUtils from "@/utils/calendar.utils";
-import { FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY } from "../../utils/helpers/dates";
+import Dates from "../../utils/helpers/dates";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
@@ -156,8 +156,8 @@ const BaseCalendar = ({
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) =>
                     formatTimeGridSlotLabel(arg.date),
-                slotMinTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
-                slotMaxTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
+                slotMinTime: Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
+                slotMaxTime: Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
                 slotDuration: "00:30:00",
                 slotLabelInterval: "01:00:00",
             },
@@ -165,8 +165,8 @@ const BaseCalendar = ({
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) =>
                     formatTimeGridSlotLabel(arg.date),
-                slotMinTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
-                slotMaxTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
+                slotMinTime: Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
+                slotMaxTime: Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
                 slotDuration: "00:30:00",
                 slotLabelInterval: "01:00:00",
             },
@@ -218,7 +218,7 @@ const BaseCalendar = ({
             timeZone="UTC"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
-            scrollTime={FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.scrollTime}
+            scrollTime={Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.scrollTime}
             scrollTimeReset={false}
             headerToolbar={headerToolbar}
             titleFormat={titleFormatFn}
