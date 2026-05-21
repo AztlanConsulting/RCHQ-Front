@@ -11,6 +11,7 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 import { widenTimeGridColumnEventHarness } from "@/utils/weekTimeGridHarnessWidth";
+import { FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY } from "../../utils/dates";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
@@ -155,8 +156,8 @@ const BaseCalendar = ({
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) =>
                     formatTimeGridSlotLabel(arg.date),
-                slotMinTime: "08:00:00",
-                slotMaxTime: "18:00:00",
+                slotMinTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
+                slotMaxTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
                 slotDuration: "00:30:00",
                 slotLabelInterval: "01:00:00",
             },
@@ -164,8 +165,8 @@ const BaseCalendar = ({
                 dayHeaderContent: (arg) => getWeekDayName(arg),
                 slotLabelContent: (arg) =>
                     formatTimeGridSlotLabel(arg.date),
-                slotMinTime: "08:00:00",
-                slotMaxTime: "18:00:00",
+                slotMinTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMinTime,
+                slotMaxTime: FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.slotMaxTime,
                 slotDuration: "00:30:00",
                 slotLabelInterval: "01:00:00",
             },
@@ -217,7 +218,7 @@ const BaseCalendar = ({
             timeZone="UTC"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
-            scrollTime="08:00:00"
+            scrollTime={FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.scrollTime}
             scrollTimeReset={false}
             headerToolbar={headerToolbar}
             titleFormat={titleFormatFn}
