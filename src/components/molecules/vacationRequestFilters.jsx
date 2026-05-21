@@ -2,7 +2,7 @@ import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import Button from "../atoms/button";
-import { sanitizeSearchInput } from "../../utils/searchInput";
+import Search from "../../utils/helpers/search";
 
 const VacationRequestFilters = ({
     view,
@@ -17,7 +17,7 @@ const VacationRequestFilters = ({
     clearFilters,
 }) => {
     const handleSearchChange = (value) => {
-        setSearchQuery(sanitizeSearchInput(value));
+        setSearchQuery(Search.sanitize(value));
     };
 
     const handleStartDateChange = (event) => {

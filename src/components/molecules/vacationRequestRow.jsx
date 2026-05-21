@@ -1,10 +1,6 @@
 import EmployeeAvatar from "../atoms/employeeAvatar";
 import Button from "../atoms/button";
-import {
-    formatDate,
-    getSafeText,
-    getStatusClassName,
-} from "../../utils/vacationRequests";
+import VacationUtils from "../../utils/vacation.utils";
 
 const VacationRequestRow = ({
     request,
@@ -16,7 +12,7 @@ const VacationRequestRow = ({
     onOpenRejectModal,
 }) => {
     const employee = request.employee || {};
-    const fullName = getSafeText(employee.fullName);
+    const fullName = VacationUtils.getSafeText(employee.fullName);
     const isApproving = approvingRequestId === request.vacationRequestId;
     const isRejecting = rejectingRequestId === request.vacationRequestId;
 
@@ -35,15 +31,15 @@ const VacationRequestRow = ({
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {getSafeText(employee.curp)}
+                {VacationUtils.getSafeText(employee.curp)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {formatDate(request.startDate)}
+                {VacationUtils.formatDate(request.startDate)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {formatDate(request.endDate)}
+                {VacationUtils.formatDate(request.endDate)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
@@ -53,7 +49,7 @@ const VacationRequestRow = ({
             {view === "reviewed" && (
                 <td className="px-4 py-3 text-center">
                     <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${getStatusClassName(
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${VacationUtils.getStatusClassName(
                             request.status,
                         )}`}
                     >
