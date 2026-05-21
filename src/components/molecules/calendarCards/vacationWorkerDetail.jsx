@@ -63,7 +63,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        5 días
+                        {event.totalDays}
                     </Type>
                 </div>
                 <div>
