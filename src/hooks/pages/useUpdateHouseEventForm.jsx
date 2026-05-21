@@ -107,16 +107,14 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        queueMicrotask(() => {
-            setForm(getInitialForm(event));
-            setErrors({});
-            setServerError(null);
-            setOverlapState({
-                show: false,
-                collisions: [],
-                pendingPayload: null,
-                isForcing: false,
-            });
+        setForm(getInitialForm(event));
+        setErrors({});
+        setServerError(null);
+        setOverlapState({
+            show: false,
+            collisions: [],
+            pendingPayload: null,
+            isForcing: false,
         });
     }, [event, isOpen]);
 
