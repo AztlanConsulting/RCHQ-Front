@@ -1,11 +1,11 @@
 import { buildApiError } from "../utils/apiErrors";
-import { getToken } from "../utils/authStorage";
+import AuthUtils from "../utils/auth.utils";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const updateHouseEvent = async (houseEventId, payload) => {
-    const token = getToken();
+    const token = AuthUtils.getToken();
 
     if (!token) {
         throw new Error("No se encontró token de sesión");

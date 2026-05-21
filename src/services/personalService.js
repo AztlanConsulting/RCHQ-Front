@@ -1,10 +1,10 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
+import AuthUtils from "../utils/auth.utils";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
-const getToken = () => localStorage.getItem("token");
-
 export const getEmployeeFormData = async () => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   const res = await fetch(`${API_URL}/employee/add`, {
     method: "GET",
@@ -26,7 +26,7 @@ export const getEmployeeFormData = async () => {
 };
 
 export const createEmployee = async (data) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   const formData = new FormData();
 
@@ -75,7 +75,7 @@ export const getEmployees = async (
   search = "",
   active = "true",
 ) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   const params = new URLSearchParams({
     page,
@@ -108,7 +108,7 @@ export const getEmployees = async (
 };
 
 export const getEmployeeById = async (employeeId) => {
-  const token = getToken();
+  const token = AuthUtils.getToken();
 
   const res = await fetch(`${API_URL}/employee/${employeeId}`, {
     method: "GET",

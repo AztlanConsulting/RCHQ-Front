@@ -1,6 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import Dates from "@/utils/dates";
 
 const DetailLabel = ({ children, className = "" }) => (
   <Type
@@ -71,12 +71,12 @@ const WorkerAbsenceDetail = ({
 
         <div>
           <DetailLabel>Fecha de inicio:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
+          <DetailValue>{Dates.formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
         <div>
           <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+          <DetailValue>{Dates.formatEventDate(event?.readableEnd)}</DetailValue>
         </div>
 
         <div className="sm:col-span-2">

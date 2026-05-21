@@ -6,8 +6,10 @@ vi.mock("../../../src/services/profileService", () => ({
   getReadableErrors: vi.fn((err) => [err?.message ?? "Error inesperado"]),
 }));
 
-vi.mock("../../../src/utils/authStorage", () => ({
-  getToken: vi.fn().mockReturnValue("mock-token"),
+vi.mock("../../../src/utils/auth.utils", () => ({
+  default: {
+    getToken: vi.fn().mockReturnValue("mock-token"),
+  },
 }));
 
 import Perfil from "../../../src/pages/perfil";

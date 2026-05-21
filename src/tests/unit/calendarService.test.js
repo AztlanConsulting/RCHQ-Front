@@ -6,24 +6,17 @@ vi.mock("../../utils/secureFetchWrapper", () => ({
 
 import { secureFetch } from "../../utils/secureFetchWrapper";
 
-describe("calendarService", () => {
-  let buildAbsenceEvidenceUrl;
-  let updateAbsenceService;
+import CalendarService from "../../services/calendarService";
+import CalendarUtils from "../../utils/calendar.utils";
 
+describe("calendarService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
     vi.stubEnv("VITE_API_URL", "http://api.test");
   });
 
-  const loadService = async () => {
-    ({ buildAbsenceEvidenceUrl, updateAbsenceService } = await import(
-      "../../services/calendarService"
-    ));
-  };
-
   it("envía JSON cuando solo se actualizan campos de la ausencia", async () => {
-    await loadService();
     localStorage.setItem("token", "token-test");
     secureFetch.mockResolvedValue({
       ok: true,
@@ -32,7 +25,7 @@ describe("calendarService", () => {
       }),
     });
 
-    await updateAbsenceService("absence-1", {
+    await CalendarService.updateAbsenceService("absence-1", {
       description: "Nueva descripción",
     });
 
@@ -50,7 +43,6 @@ describe("calendarService", () => {
   });
 
   it("envía FormData cuando se actualiza la evidencia", async () => {
-    await loadService();
     localStorage.setItem("token", "token-test");
     secureFetch.mockResolvedValue({
       ok: true,
@@ -63,7 +55,7 @@ describe("calendarService", () => {
       type: "application/pdf",
     });
 
-    await updateAbsenceService("absence-1", {
+    await CalendarService.updateAbsenceService("absence-1", {
       description: "Nueva descripción",
       file,
     });
@@ -85,7 +77,6 @@ describe("calendarService", () => {
   });
 
   it("conserva strings vacíos en FormData para permitir limpiar campos", async () => {
-    await loadService();
     localStorage.setItem("token", "token-test");
     secureFetch.mockResolvedValue({
       ok: true,
@@ -98,7 +89,7 @@ describe("calendarService", () => {
       type: "application/pdf",
     });
 
-    await updateAbsenceService("absence-1", {
+    await CalendarService.updateAbsenceService("absence-1", {
       description: "",
       file,
     });
@@ -108,17 +99,15 @@ describe("calendarService", () => {
     expect(requestBody.get("file")).toBe(file);
   });
 
-  it("anida la URL relativa de evidencia con el API_URL", async () => {
-    await loadService();
-    expect(buildAbsenceEvidenceUrl("uploads/documents/test.pdf")).toBe(
-      "http://api.test/uploads/documents/test.pdf",
-    );
+  it("anida la URL relativa de evidencia con el API_URL", () => {
+    expect(
+      CalendarUtils.buildAbsenceEvidenceUrl("uploads/documents/test.pdf"),
+    ).toBe("http://api.test/uploads/documents/test.pdf");
   });
 
-  it("no modifica una URL absoluta de evidencia", async () => {
-    await loadService();
-    expect(buildAbsenceEvidenceUrl("https://cdn.test/evidencia.pdf")).toBe(
-      "https://cdn.test/evidencia.pdf",
-    );
+  it("no modifica una URL absoluta de evidencia", () => {
+    expect(
+      CalendarUtils.buildAbsenceEvidenceUrl("https://cdn.test/evidencia.pdf"),
+    ).toBe("https://cdn.test/evidencia.pdf");
   });
 });
