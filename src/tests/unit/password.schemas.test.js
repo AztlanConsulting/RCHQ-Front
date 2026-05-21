@@ -3,7 +3,7 @@ import {
   selfServiceChangePasswordSchema,
   firstLoginChangePasswordSchema,
   PASSWORD_POLICY_MESSAGE,
-} from "../../utils/schema/auth/password.schemas";
+} from "../../utils/schemas/password.schemas";
 
 describe("password.schemas — selfServiceChangePasswordSchema", () => {
   it("falla cuando la contraseña actual está vacía", () => {
