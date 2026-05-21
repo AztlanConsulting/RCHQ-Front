@@ -1,5 +1,6 @@
 import { secureFetch } from "../utils/helpers/secureFetchWrapper";
 import AuthUtils from "../utils/auth.utils";
+import { buildApiError } from "../utils/helpers/apiErrors";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -103,6 +104,37 @@ class EventService {
     }
 
     return json;
+  }
+  static async updateHouseEvent(houseEventId, payload) {
+    const token = AuthUtils.getToken();
+
+    if (!token) {
+      throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(
+      `${BASE_URL}/event/house/${houseEventId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok && rawResponse.status !== 409) {
+      throw buildApiError(
+        rawResponse,
+        response,
+        "No se pudo modificar el evento de casa",
+      );
+    }
+
+    return response;
   }
 }
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import UpdateEventService from "../../services/updateEventService";
 import EventService from "../../services/event.service";
 // import {
 //     Dates.addDaysToDateOnly,
@@ -211,7 +210,7 @@ export const useUpdateHouseEventForm = ({
         setServerError(null);
 
         try {
-            const response = await UpdateEventService.updateHouseEvent(houseEventId, payload);
+            const response = await EventService.updateHouseEvent(houseEventId, payload);
 
             if (!response.success && response.data?.collisions?.length) {
                 setOverlapState({
@@ -247,7 +246,7 @@ export const useUpdateHouseEventForm = ({
         setOverlapState((prev) => ({ ...prev, isForcing: true }));
 
         try {
-            const response = await UpdateEventService.updateHouseEvent(houseEventId, {
+            const response = await EventService.updateHouseEvent(houseEventId, {
                 ...overlapState.pendingPayload,
                 forceOverlap: true,
             });

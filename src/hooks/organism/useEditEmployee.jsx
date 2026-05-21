@@ -5,7 +5,7 @@ import {
   employeeAdminUpdateSchema,
   normalizeEmployeeContractType,
 } from "../../utils/schemas/update.schema";
-import EmployeeUpdateService from "../../services/employeeUpdateService";
+import EmployeeService from "../../services/employee.service";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
   const [editSection, setEditSection] = useState(null);
@@ -66,7 +66,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setEditSection("Administrador");
     setLoadingCatalogues(true);
     try {
-      const formData = await EmployeeUpdateService.getUpdateForm();
+      const formData = await EmployeeService.getUpdateForm();
       setRoles(formData?.roles ?? []);
       setAllWorkdays(formData?.workdays ?? []);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
@@ -193,7 +193,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
       }
 
-      await EmployeeUpdateService.updateBasicInfo(employeeId, validation.data);
+      await EmployeeService.updateBasicInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
     } catch (err) {
@@ -213,7 +213,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Es necesario completar todos los campos de contacto.");
       }
 
-      await EmployeeUpdateService.updateContactInfo(employeeId, validation.data);
+      await EmployeeService.updateContactInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información de contacto actualizada con éxito");
     } catch (err) {
@@ -285,7 +285,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Revisa los campos administrativos.");
       }
 
-      await EmployeeUpdateService.updateAdminInfo(employeeId, validation.data);
+      await EmployeeService.updateAdminInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {

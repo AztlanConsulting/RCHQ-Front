@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PersonalService from "../../services/personalService";
+import EmployeeService from "../../services/employee.service";
 import { employeeCreateSchema } from "../../utils/schemas/employeeAdd.schema";
 
 const INITIAL_FORM = {
@@ -29,7 +29,7 @@ const useEmployeeCreateForm = (onSuccess) => {
     useEffect(() => {
         const load = async () => {
             try {
-                const data = await PersonalService.getFormData();
+                const data = await EmployeeService.getFormData();
                 setRoles(data.roles ?? []);
             } catch (err) {
                 setServerError("Error cargando datos iniciales");
@@ -109,7 +109,7 @@ const useEmployeeCreateForm = (onSuccess) => {
                 picture: photo,
             };
 
-            const response = await PersonalService.createEmployee(payload);
+            const response = await EmployeeService.createEmployee(payload);
 
             setForm(INITIAL_FORM);
             setPhoto(null);
