@@ -189,7 +189,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         />
                     )}
 
-                    <div className="flex justify-end gap-3 pt-1">
+                    <div className="flex justify-center gap-3 pt-1">
                         <Button
                             text={isSubmitting ? "Modificando..." : "Modificar"}
                             onClick={handleSubmit}
