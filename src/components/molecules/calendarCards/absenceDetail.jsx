@@ -6,13 +6,6 @@ import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import documentIcon from "/document.svg";
 
-const PlusIcon = () => (
-  <span aria-hidden="true" 
-  className="mr-1.5 inline-flex text-[1rem] leading-none text-white">
-    +
-  </span>
-);
-
 const DocumentWhiteIcon = () => (
   <img
     src={documentIcon}
@@ -23,14 +16,14 @@ const DocumentWhiteIcon = () => (
 );
 
 const ReadOnlyField = ({ label, value, fullWidth = false }) => (
-    <div className={fullWidth ? "col-span-2" : ""}>
-        <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
-            {label}
-        </Type>
-        <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-            {value || "-"}
-        </div>
+  <div className={fullWidth ? "col-span-2" : ""}>
+    <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
+      {label}
+    </Type>
+    <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+      {value || "-"}
     </div>
+  </div>
 );
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
@@ -108,6 +101,7 @@ const AbsenceDetail = ({
   if (!event) return null;
 
   const canModifyAbsence = canManageAbsence && !event.isDeleted;
+  const hasEvidence = Boolean(event.link);
 
   if (isEditing) {
     return (
@@ -155,7 +149,7 @@ const AbsenceDetail = ({
             }
             minDate={
               absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T12:00:00`)
+                ? new Date(`${absenceForm.startDate}T00:00:00`)
                 : undefined
             }
             labelColor="text-[#121212]"
@@ -288,7 +282,9 @@ const AbsenceDetail = ({
             Fecha de inicio:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableStart)}
+            {formatEventDate(
+              event.readableStart ?? event.startDate ?? event.start,
+            )}
           </Type>
         </div>
         <div>
@@ -296,7 +292,7 @@ const AbsenceDetail = ({
             Fecha de fin:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableEnd)}
+            {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
           </Type>
         </div>
         <div className="sm:col-span-2">
@@ -307,25 +303,37 @@ const AbsenceDetail = ({
         </div>
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-2.5">
-        <Type variant="metric-label" className="text-[0.9rem] font-bold text-[#121212]">
+      <div
+        className={`mt-7 flex flex-wrap gap-2.5 ${
+          hasEvidence ? "items-center" : "items-baseline"
+        }`}
+      >
+        <Type
+          variant="metric-label"
+          className="text-[0.9rem] font-bold text-[#121212]"
+        >
           Evidencia:
         </Type>
-        <Button
-          type="button"
-          text={evidenceLabel}
-          width="w-auto"
-          height="h-8"
-          textSize="text-[0.72rem]"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          onClick={onOpenEvidence}
-          disabled={!event.link}
-          icon={event.link ? <DocumentWhiteIcon /> : <PlusIcon />}
-          className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
-        />
+        {hasEvidence ? (
+          <Button
+            type="button"
+            text={evidenceLabel}
+            width="w-auto"
+            height="h-8"
+            textSize="text-[0.72rem]"
+            bgColor="bg-[#1F3664]"
+            textColor="text-white"
+            hoverColor="hover:bg-[#15284A]"
+            activeColor="active:bg-[#0E1B33]"
+            onClick={onOpenEvidence}
+            icon={<DocumentWhiteIcon />}
+            className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+          />
+        ) : (
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            Sin evidencia
+          </Type>
+        )}
       </div>
 
       {canModifyAbsence ? (

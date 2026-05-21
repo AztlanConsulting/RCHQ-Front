@@ -89,7 +89,11 @@ const WorkerAbsenceDetail = ({
           </DetailValue>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+        <div
+          className={`flex flex-wrap gap-3 sm:col-span-2 ${
+            hasEvidence ? "items-center" : "items-baseline"
+          }`}
+        >
           <DetailLabel className="mb-0">Evidencia:</DetailLabel>
           {hasEvidence ? (
             <Button
