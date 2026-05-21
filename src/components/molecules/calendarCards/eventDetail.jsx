@@ -1,9 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import {
-    formatEventDateRange,
-    formatEventTime,
-} from "../../../utils/calendarEventDetail";
+import { formatEventDateRange, formatEventTime } from "../../../utils/dates";
 
 const EventDetail = ({ event, onEdit, onDelete }) => {
     if (!event) return null;
@@ -82,13 +79,17 @@ const EventDetail = ({ event, onEdit, onDelete }) => {
                 </Type>
             ) : null}
 
-            {event.peopleInsideEvent
-                ? event.peopleInsideEvent.map((person, idx) => (
-                      <p key={idx}>
-                          {person?.name} - {person?.id}
-                      </p>
-                  ))
-                : null}
+            {event.peopleInsideEvent &&
+            Array.isArray(event.peopleInsideEvent) &&
+            event.peopleInsideEvent.length > 0 ? (
+                <div className="mb-4">
+                    {event.peopleInsideEvent.map((person, idx) => (
+                        <p key={`${person?.id}-${idx}`} className="text-sm">
+                            {person?.name} - {person?.id}
+                        </p>
+                    ))}
+                </div>
+            ) : null}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
                 <Button

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   calendarItemToDetail,
   eventApiToDetail,
-} from "../../utils/calendarEventDetail";
+} from "../../utils/calendar.utils";
 import {
   deleteAbsenceService,
   buildAbsenceEvidenceUrl,
