@@ -33,6 +33,23 @@ export function shiftCalendarApiInstantForFullCalendar(value) {
   return new Date(d.getTime() + CALENDAR_DISPLAY_OFFSET_MS);
 }
 
+/**
+ * Hours added above; used only when FC uses `timeZone="UTC"` and timed events passed
+ * `shiftCalendarApiInstantForFullCalendar` — México wall-clock workday aligns on the UTC axis.
+ */
+export const FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY = Object.freeze(
+  (() => {
+    const h = CALENDAR_DISPLAY_OFFSET_MS / (60 * 60 * 1000);
+    const hh = (wall) =>
+      `${String(Math.trunc(wall + h)).padStart(2, "0")}:00:00`;
+    return {
+      slotMinTime: hh(8),
+      slotMaxTime: hh(18),
+      scrollTime: hh(8),
+    };
+  })(),
+);
+
 const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
 
 /** Hour:minute in the user's local TZ (use after shiftCalendarApiInstantForFullCalendar for API-derived datetimes). */
@@ -304,13 +321,14 @@ export function formatEventDateRange(
 
 /** Hora solo (UTC), p. ej. inicio/fin en eventos timed. */
 export function formatEventTime(value) {
+  console.log("input: ", value);
   if (value == null || value === "") return "—";
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return String(value);
   return d.toLocaleTimeString("es-MX", {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: "UTC",
+    timeZone: "America/Mexico_City",
   });
 }
 
