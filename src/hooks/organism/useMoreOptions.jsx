@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";
-import {
-  getTwoFactorAuthStatus,
-  deactivateTwoFactorAuthService,
-} from "../../services/authService";
-import { changePasswordService } from "../../services/passwordService";
+import AuthService from "../../services/authService";
+import PasswordService from "../../services/passwordService";
 import {
   selfServiceChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/schema/auth/password.schemas";
+} from "../../utils/schemas/password.schemas";
 import { mapPasswordApiError } from "../../utils/mappers/auth/passwordErrorMapper";
 
 export const useTwoFactorAuthOptions = () => {
@@ -42,7 +39,7 @@ export const useTwoFactorAuthOptions = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await getTwoFactorAuthStatus();
+        const response = await AuthService.getTwoFactorStatus();
         setIsTwoFactorAuthActive(response.StatusTwoFactorAuth ?? false);
       } catch (err) {
         console.error(
@@ -70,7 +67,7 @@ export const useTwoFactorAuthOptions = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await deactivateTwoFactorAuthService(password.value);
+      const response = await AuthService.deactivateTwoFactor(password.value);
       if (response.nextStep === "TWO_FACTOR_AUTH_DISABLED") {
         setIsTwoFactorAuthActive(false);
         showDisableModal.toggle();
@@ -129,7 +126,7 @@ export const useTwoFactorAuthOptions = () => {
     }
 
     try {
-      const response = await changePasswordService(
+      const response = await PasswordService.changePassword(
         currentPassword,
         newPassword,
         confirmPassword,

@@ -8,15 +8,14 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import {
-    createPersonalEvent,
-    getEventTypes,
-} from "../../services/eventService";
+import EventService from "../../services/eventService";
 
 vi.mock("../../services/eventService", () => ({
-    createPersonalEvent: vi.fn(),
-    getEventTypes: vi.fn(),
-    getEmployeesForSelector: vi.fn(),
+    default: {
+        createPersonalEvent: vi.fn(),
+        getEventTypes: vi.fn(),
+        getEmployeesForSelector: vi.fn(),
+    },
 }));
 
 vi.mock("../../components/atoms/alerts", () => ({
@@ -150,9 +149,9 @@ describe("Integración: agregar evento de personal", () => {
         localStorage.clear();
         localStorage.setItem("user", JSON.stringify({ role: "Empleado" }));
 
-        getEventTypes.mockResolvedValue(mockEventTypes);
+        EventService.getEventTypes.mockResolvedValue(mockEventTypes);
 
-        createPersonalEvent.mockResolvedValue({
+        EventService.createPersonalEvent.mockResolvedValue({
             success: true,
             data: {
                 personalEventId: "evt-1",
@@ -165,7 +164,7 @@ describe("Integración: agregar evento de personal", () => {
         renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         expect(
@@ -194,7 +193,7 @@ describe("Integración: agregar evento de personal", () => {
         const { onClose, onSuccess } = renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         fillBaseFields();
@@ -210,10 +209,10 @@ describe("Integración: agregar evento de personal", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(1);
         });
 
-        expect(createPersonalEvent).toHaveBeenCalledWith({
+        expect(EventService.createPersonalEvent).toHaveBeenCalledWith({
             eventTypeId: EVENT_TYPE_ID,
             name: "Reunión de equipo",
             date: "2026-05-05",
@@ -237,7 +236,7 @@ describe("Integración: agregar evento de personal", () => {
         renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         fireEvent.change(screen.getByRole("combobox"), {
@@ -249,14 +248,14 @@ describe("Integración: agregar evento de personal", () => {
         expect(
             screen.getByText("El titulo es obligatorio"),
         ).toBeInTheDocument();
-        expect(createPersonalEvent).not.toHaveBeenCalled();
+        expect(EventService.createPersonalEvent).not.toHaveBeenCalled();
     });
 
     it("crea un evento de todo el día", async () => {
         renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         fillBaseFields();
@@ -268,10 +267,10 @@ describe("Integración: agregar evento de personal", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(1);
         });
 
-        expect(createPersonalEvent).toHaveBeenCalledWith(
+        expect(EventService.createPersonalEvent).toHaveBeenCalledWith(
             expect.objectContaining({
                 allDay: true,
                 date: "2026-05-05",
@@ -280,7 +279,7 @@ describe("Integración: agregar evento de personal", () => {
     });
 
     it("muestra el modal de empalme cuando el backend regresa empleados con colisiones", async () => {
-        createPersonalEvent.mockResolvedValueOnce({
+        EventService.createPersonalEvent.mockResolvedValueOnce({
             success: false,
             data: { overlappedEmployees: mockOverlappedEmployees },
         });
@@ -288,7 +287,7 @@ describe("Integración: agregar evento de personal", () => {
         renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         fillBaseFields();
@@ -299,7 +298,7 @@ describe("Integración: agregar evento de personal", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(1);
         });
 
         expect(
@@ -313,7 +312,7 @@ describe("Integración: agregar evento de personal", () => {
     });
 
     it("permite forzar el registro cuando hay empalme (coordinador)", async () => {
-        createPersonalEvent
+        EventService.createPersonalEvent
             .mockResolvedValueOnce({
                 success: false,
                 data: { overlappedEmployees: mockOverlappedEmployees },
@@ -330,7 +329,7 @@ describe("Integración: agregar evento de personal", () => {
         const { onClose, onSuccess } = renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         await act(async () => {
@@ -357,7 +356,7 @@ describe("Integración: agregar evento de personal", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(1);
         });
 
         expect(
@@ -369,10 +368,10 @@ describe("Integración: agregar evento de personal", () => {
         await clickLastConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(2);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(2);
         });
 
-        expect(createPersonalEvent).toHaveBeenLastCalledWith(
+        expect(EventService.createPersonalEvent).toHaveBeenLastCalledWith(
             expect.objectContaining({ forceOverlap: true }),
         );
 
@@ -385,14 +384,14 @@ describe("Integración: agregar evento de personal", () => {
     });
 
     it("muestra error del servidor si falla createPersonalEvent", async () => {
-        createPersonalEvent.mockRejectedValueOnce(
+        EventService.createPersonalEvent.mockRejectedValueOnce(
             new Error("Error al registrar evento personal"),
         );
 
         renderModal();
 
         await waitFor(() => {
-            expect(getEventTypes).toHaveBeenCalledTimes(1);
+            expect(EventService.getEventTypes).toHaveBeenCalledTimes(1);
         });
 
         fillBaseFields();
@@ -403,7 +402,7 @@ describe("Integración: agregar evento de personal", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createPersonalEvent).toHaveBeenCalledTimes(1);
         });
 
         expect(screen.getByRole("alert")).toHaveTextContent(

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthUtils from "../../utils/auth.utils";
-import { changePasswordFirstLoginService } from "../../services/passwordService";
+import PasswordService from "../../services/passwordService";
 import useAuth from "../useAuth";
 import {
   firstLoginChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/schema/auth/password.schemas";
+} from "../../utils/schemas/password.schemas";
 import { mapPasswordApiError } from "@/utils/mappers/auth/passwordErrorMapper";
 
 export const useChangePassword = () => {
@@ -50,7 +50,7 @@ export const useChangePassword = () => {
     }
 
     try {
-      const response = await changePasswordFirstLoginService(
+      const response = await PasswordService.changePasswordFirstLogin(
         newPassword,
         confirmPassword,
       );

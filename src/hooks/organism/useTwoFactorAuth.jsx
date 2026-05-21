@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useField } from "../atoms/useField";
-import {
-  activateTwoFactorAuthService,
-  verifyTwoFactorAuthService,
-} from "../../services/authService";
+import AuthService from "../../services/authService";
 
 const useGeneration = () => {
   const [qr, setQr] = useState("");
@@ -16,7 +13,7 @@ const useGeneration = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await activateTwoFactorAuthService();
+      const response = await AuthService.activateTwoFactor();
       if (!response) {
         setError(
           "No se pudo iniciar la configuración de autenticación en dos pasos",
@@ -55,7 +52,7 @@ const useVerification = (onSuccess) => {
     setLoading(true);
     setError("");
     try {
-      const response = await verifyTwoFactorAuthService(code);
+      const response = await AuthService.verifyTwoFactor(code);
       if (!response) throw new Error("No se pudo validar el código");
       if (response.nextStep === "TWO_FACTOR_AUTH_SETUP_COMPLETE") {
         onSuccess();

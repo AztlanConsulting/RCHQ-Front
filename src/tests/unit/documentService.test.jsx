@@ -1,12 +1,6 @@
 // tests/unit/documentService.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  getDocumentTypesService,
-  getDocumentsService,
-  uploadDocumentService,
-  updateDocumentService,
-  deleteDocumentService,
-} from "../../services/documentService";
+import DocumentService from "../../services/documentService";
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({
@@ -22,7 +16,7 @@ beforeEach(() => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// getDocumentTypesService
+// getTypes
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("getDocumentTypesService", () => {
@@ -34,7 +28,7 @@ describe("getDocumentTypesService", () => {
         { document_id: "uuid-2", name: "NSS" },
       ],
     });
-    const result = await getDocumentTypesService();
+    const result = await DocumentService.getTypes();
     expect(result).toEqual([
       { value: "uuid-1", label: "Curriculum Vitae" },
       { value: "uuid-2", label: "NSS" },
@@ -44,7 +38,7 @@ describe("getDocumentTypesService", () => {
   it("hace GET al endpoint correcto con Authorization header", async () => {
     localStorage.setItem("token", "my-token");
     mockFetch({ data: [] });
-    await getDocumentTypesService();
+    await DocumentService.getTypes();
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/document-types"),
       expect.objectContaining({
@@ -56,7 +50,7 @@ describe("getDocumentTypesService", () => {
   it("lanza error cuando la respuesta no es ok", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "No autorizado" }, false, 401);
-    await expect(getDocumentTypesService()).rejects.toMatchObject({
+    await expect(DocumentService.getTypes()).rejects.toMatchObject({
       message: "No autorizado",
       status: 401,
     });
@@ -64,7 +58,7 @@ describe("getDocumentTypesService", () => {
 
   it("envía token null si no hay token en localStorage (sin validación previa)", async () => {
     mockFetch({ data: [] });
-    await getDocumentTypesService();
+    await DocumentService.getTypes();
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/document-types"),
       expect.objectContaining({
@@ -75,7 +69,7 @@ describe("getDocumentTypesService", () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// getDocumentsService
+// getDocuments
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("getDocumentsService", () => {
@@ -85,14 +79,14 @@ describe("getDocumentsService", () => {
       success: true,
       data: [{ document_id: "doc-1", url: "uploads/documents/cv.pdf" }],
     });
-    const result = await getDocumentsService("emp-123");
+    const result = await DocumentService.getDocuments("emp-123");
     expect(result.data[0].url).toContain("uploads/documents/cv.pdf");
   });
 
   it("hace GET al endpoint correcto con Authorization header", async () => {
     localStorage.setItem("token", "my-token");
     mockFetch({ data: [] });
-    await getDocumentsService("emp-456");
+    await DocumentService.getDocuments("emp-456");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-456/documents"),
       expect.objectContaining({
@@ -104,7 +98,7 @@ describe("getDocumentsService", () => {
   it("lanza error con status cuando la respuesta no es ok", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "No autorizado" }, false, 401);
-    await expect(getDocumentsService("emp-123")).rejects.toMatchObject({
+    await expect(DocumentService.getDocuments("emp-123")).rejects.toMatchObject({
       message: "No autorizado",
       status: 401,
     });
@@ -113,13 +107,13 @@ describe("getDocumentsService", () => {
   it("maneja data undefined en la respuesta sin romper", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true, data: undefined });
-    const result = await getDocumentsService("emp-123");
+    const result = await DocumentService.getDocuments("emp-123");
     expect(result.data).toBeUndefined();
   });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// uploadDocumentService
+// upload
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("uploadDocumentService", () => {
@@ -127,7 +121,7 @@ describe("uploadDocumentService", () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     const formData = new FormData();
-    await uploadDocumentService("emp-123", formData);
+    await DocumentService.upload("emp-123", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents"),
       expect.objectContaining({
@@ -142,7 +136,7 @@ describe("uploadDocumentService", () => {
     localStorage.setItem("token", "valid-token");
     const apiResponse = { success: true, message: "Documento subido" };
     mockFetch(apiResponse);
-    const result = await uploadDocumentService("emp-123", new FormData());
+    const result = await DocumentService.upload("emp-123", new FormData());
     expect(result).toEqual(apiResponse);
   });
 
@@ -150,21 +144,21 @@ describe("uploadDocumentService", () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "Faltan campos requeridos" }, false, 400);
     await expect(
-      uploadDocumentService("emp-123", new FormData()),
+      DocumentService.upload("emp-123", new FormData()),
     ).rejects.toMatchObject({ status: 400 });
   });
 
   it("lanza error con status 409 cuando el documento ya existe", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "Ya existe un documento para ese campo", field: "cv" }, false, 409);
-    const error = await uploadDocumentService("emp-123", new FormData()).catch((e) => e);
+    const error = await DocumentService.upload("emp-123", new FormData()).catch((e) => e);
     expect(error.status).toBe(409);
     expect(error.field).toBe("cv");
   });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// updateDocumentService
+// update
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("updateDocumentService", () => {
@@ -172,7 +166,7 @@ describe("updateDocumentService", () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     const formData = new FormData();
-    await updateDocumentService("emp-123", "cv", formData);
+    await DocumentService.update("emp-123", "cv", formData);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
       expect.objectContaining({
@@ -186,7 +180,7 @@ describe("updateDocumentService", () => {
   it("retorna la respuesta del servidor al actualizar", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true, message: "Actualizado" });
-    const result = await updateDocumentService("emp-123", "cv", new FormData());
+    const result = await DocumentService.update("emp-123", "cv", new FormData());
     expect(result.success).toBe(true);
   });
 
@@ -194,20 +188,20 @@ describe("updateDocumentService", () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "Documento no encontrado" }, false, 404);
     await expect(
-      updateDocumentService("emp-123", "cv", new FormData()),
+      DocumentService.update("emp-123", "cv", new FormData()),
     ).rejects.toMatchObject({ status: 404 });
   });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// deleteDocumentService
+// delete
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("deleteDocumentService", () => {
   it("hace DELETE al endpoint con el field correcto", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
-    await deleteDocumentService("emp-123", "cv");
+    await DocumentService.delete("emp-123", "cv");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
       expect.objectContaining({
@@ -220,14 +214,14 @@ describe("deleteDocumentService", () => {
   it("retorna la respuesta exitosa al eliminar", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ success: true, message: "Documento eliminado" });
-    const result = await deleteDocumentService("emp-123", "cv");
+    const result = await DocumentService.delete("emp-123", "cv");
     expect(result.success).toBe(true);
   });
 
   it("lanza error con status 404 cuando el documento no existe", async () => {
     localStorage.setItem("token", "valid-token");
     mockFetch({ message: "Documento no encontrado" }, false, 404);
-    await expect(deleteDocumentService("emp-123", "cv")).rejects.toMatchObject({
+    await expect(DocumentService.delete("emp-123", "cv")).rejects.toMatchObject({
       status: 404,
     });
   });

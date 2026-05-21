@@ -11,7 +11,7 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 import { widenTimeGridColumnEventHarness } from "@/utils/weekTimeGridHarnessWidth";
-import { FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY } from "../../utils/dates";
+import { FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY } from "../../utils/helpers/dates";
 
 const MONTH_DAY_EVENT_CAP = 3;
 

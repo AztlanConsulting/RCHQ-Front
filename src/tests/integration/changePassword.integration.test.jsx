@@ -28,7 +28,9 @@ vi.mock("../../../src/utils/auth.utils", () => ({
 }));
 
 vi.mock("../../../src/services/passwordService", () => ({
-  changePasswordFirstLoginService: vi.fn(),
+  default: {
+    changePasswordFirstLogin: vi.fn(),
+  },
 }));
 
 vi.mock("../../../src/utils/mappers/auth/passwordErrorMapper", () => ({
@@ -38,7 +40,7 @@ vi.mock("../../../src/utils/mappers/auth/passwordErrorMapper", () => ({
 }));
 
 import AuthUtils from "../../utils/auth.utils";
-import { changePasswordFirstLoginService } from "../../services/passwordService";
+import PasswordService from "../../services/passwordService";
 
 const renderPage = () =>
   render(
@@ -82,11 +84,11 @@ describe("ChangePassword — integración", () => {
       ).toBeInTheDocument();
     });
 
-    expect(changePasswordFirstLoginService).not.toHaveBeenCalled();
+    expect(PasswordService.changePasswordFirstLogin).not.toHaveBeenCalled();
   });
 
   it("hace login y navega al dashboard cuando el cambio es exitoso", async () => {
-    changePasswordFirstLoginService.mockResolvedValue({
+    PasswordService.changePasswordFirstLogin.mockResolvedValue({
       success: true,
       data: {
         token: "session-token",
@@ -98,7 +100,7 @@ describe("ChangePassword — integración", () => {
     await fillAndSubmit("NuevaPass123", "NuevaPass123");
 
     await waitFor(() => {
-      expect(changePasswordFirstLoginService).toHaveBeenCalledWith(
+      expect(PasswordService.changePasswordFirstLogin).toHaveBeenCalledWith(
         "NuevaPass123",
         "NuevaPass123",
       );
@@ -113,7 +115,7 @@ describe("ChangePassword — integración", () => {
   });
 
   it("navega a /2FA cuando el backend indica VERIFY_2FA", async () => {
-    changePasswordFirstLoginService.mockResolvedValue({
+    PasswordService.changePasswordFirstLogin.mockResolvedValue({
       success: true,
       nextStep: "VERIFY_TWO_FACTOR_AUTH",
       data: {
@@ -136,7 +138,7 @@ describe("ChangePassword — integración", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    changePasswordFirstLoginService.mockRejectedValue(
+    PasswordService.changePasswordFirstLogin.mockRejectedValue(
       new Error("backend error"),
     );
 

@@ -3,7 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import Dates from "@/utils/dates";
+import Dates from "@/utils/helpers/dates";
 import documentIcon from "/document.svg";
 
 const DocumentWhiteIcon = () => (

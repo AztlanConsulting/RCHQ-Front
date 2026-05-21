@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
 import CalendarService from "../../services/calendarService";
 import AuthUtils from "../../utils/auth.utils";
-import { getEventTypes } from "../../services/eventService";
+import EventService from "../../services/eventService";
 
 vi.mock("../../services/calendarService", () => ({
     __esModule: true,
@@ -28,8 +28,10 @@ vi.mock("../../utils/auth.utils", () => ({
 }));
 
 vi.mock("../../services/eventService", () => ({
-    createHouseEvent: vi.fn(),
-    getEventTypes: vi.fn(),
+    default: {
+        createHouseEvent: vi.fn(),
+        getEventTypes: vi.fn(),
+    },
 }));
 
 vi.mock("../../components/atoms/alerts", () => ({
@@ -177,7 +179,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         AuthUtils.getCalendarViewerRole.mockReturnValue("Coordinador");
-        getEventTypes.mockResolvedValue([]);
+        EventService.getEventTypes.mockResolvedValue([]);
         CalendarService.getAbsenceAddData.mockResolvedValue({
             employees,
             absenceTypes,

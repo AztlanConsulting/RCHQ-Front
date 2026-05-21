@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getEmployees } from "../../services/personalService";
+import PersonalService from "../../services/personalService";
 
 export const useEmployees = () => {
   const [employees, setEmployees] = useState([]);
@@ -25,7 +25,7 @@ export const useEmployees = () => {
     setError(null);
 
     try {
-      const result = await getEmployees(pageNum, limit, searchStr, activeStr);
+      const result = await PersonalService.getEmployees(pageNum, limit, searchStr, activeStr);
       setEmployees(result.data);
       setPagination(result.pagination);
     } catch (err) {

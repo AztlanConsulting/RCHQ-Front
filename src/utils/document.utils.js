@@ -1,8 +1,6 @@
-import { DOCUMENT_TYPES } from "../services/documentService";
-
 class DocumentUtils {
-  static getDocumentLabel(typeValue) {
-    const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
+  static getDocumentLabel(typeValue, documentTypes = []) {
+    const found = documentTypes.find((dt) => dt.value === typeValue);
     return found ? found.label : typeValue;
   }
 

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { createHouseEvent, getEventTypes } from "../../services/eventService";
+import EventService from "../../services/eventService";
 
 import {
     houseEventSchema,
     buildPayload,
-} from "../../utils/schema/evento/houseEvent.schema";
+} from "../../utils/schemas/houseEvent.schema";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -44,7 +44,7 @@ export const useHouseForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        EventService.getEventTypes()
             .then((types) =>
                 setEventTypes(
                     types.map((t) => ({
@@ -135,7 +135,7 @@ export const useHouseForm = ({
         setIsSubmitting(true);
 
         try {
-            const response = await createHouseEvent(payload);
+            const response = await EventService.createHouseEvent(payload);
 
             if (!response.success && response.data?.collisions?.length) {
                 setOverlapState({
@@ -183,7 +183,7 @@ export const useHouseForm = ({
         }));
 
         try {
-            const response = await createHouseEvent({
+            const response = await EventService.createHouseEvent({
                 ...overlapState.pendingPayload,
                 forceOverlap: true,
             });

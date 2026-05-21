@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import CalendarUtils from "../../utils/calendar.utils";
-import Dates from "@/utils/dates";
+import Dates from "@/utils/helpers/dates";
 import CalendarService from "../../services/calendarService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 

@@ -2,10 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import TwoFactorLogin from "../../pages/auth/twoFactorLogin";
-import {
-  validateLoginTwoFactorAuthService,
-  getToken,
-} from "../../services/authService";
+import AuthService from "../../services/authService";
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -20,8 +17,10 @@ vi.mock("../../context/authContext", () => ({
 }));
 
 vi.mock("../../services/authService", () => ({
-  validateLoginTwoFactorAuthService: vi.fn(),
-  getToken: vi.fn(),
+  default: {
+    validateLoginTwoFactor: vi.fn(),
+    getToken: vi.fn(),
+  },
 }));
 
 const renderPage = () =>
@@ -34,12 +33,12 @@ const renderPage = () =>
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getToken.mockReturnValue(null);
+  AuthService.getToken.mockReturnValue(null);
 });
 
 describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", () => {
   it("redirige al calendario cuando ya hay sessionToken en localStorage", () => {
-    getToken.mockReturnValue("existing-session-token");
+    AuthService.getToken.mockReturnValue("existing-session-token");
     renderPage();
     expect(mockNavigate).toHaveBeenCalledWith("/app/calendario", {
       replace: true,
@@ -47,7 +46,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
   });
 
   it("llama a login() con el token final y navega al calendario cuando el código es válido", async () => {
-    validateLoginTwoFactorAuthService.mockResolvedValue({
+    AuthService.validateLoginTwoFactor.mockResolvedValue({
       nextStep: "LOGIN_COMPLETE",
       token: "final-session-token",
       data: { id: 1, name: "Test User" },
@@ -73,7 +72,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
   it("muestra error y permanece en la página cuando el código es inválido", async () => {
     const error = new Error("Código de autenticación en dos pasos inválido");
     error.status = 401;
-    validateLoginTwoFactorAuthService.mockRejectedValue(error);
+    AuthService.validateLoginTwoFactor.mockRejectedValue(error);
     renderPage();
 
     fireEvent.change(screen.getByRole("textbox"), {
@@ -96,7 +95,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
       "La autenticación en dos pasos está bloqueada temporalmente. Intenta más tarde.",
     );
     error.status = 423;
-    validateLoginTwoFactorAuthService.mockRejectedValue(error);
+    AuthService.validateLoginTwoFactor.mockRejectedValue(error);
     renderPage();
 
     fireEvent.change(screen.getByRole("textbox"), {
@@ -119,7 +118,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
     fireEvent.click(screen.getByRole("button", { name: /verificar/i }));
 
     await waitFor(() =>
-      expect(validateLoginTwoFactorAuthService).not.toHaveBeenCalled(),
+      expect(AuthService.validateLoginTwoFactor).not.toHaveBeenCalled(),
     );
   });
 });

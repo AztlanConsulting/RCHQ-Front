@@ -8,41 +8,43 @@ const buildApiError = (response, data, fallbackMessage) => {
   return errorMessage;
 };
 
-const getReadableErrors = (err) => {
-  if (Array.isArray(err?.errors) && err.errors.length > 0) {
-    return err.errors.map((item) => item.message);
-  }
-  if (err?.message) {
-    return [err.message];
-  }
-  return ["Ocurrió un error inesperado"];
-};
+class ProfileService {
+  static async getUserData(token) {
+    const response = await fetch(`${API_URL}/user/profile`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-const getUserData = async (token) => {
-  const response = await fetch(`${API_URL}/user/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const data = await response.json();
 
-  const data = await response.json();
+    if (!response.ok) {
+      const fallbackMessages = {
+        401: "No tienes permisos para ver esta información.",
+        404: "Ruta no encontrada.",
+        501: "Ocurrió un problema al obtener la información.",
+      };
+      throw buildApiError(
+        response,
+        data,
+        fallbackMessages[response.status] ?? "Error desconocido."
+      );
+    }
 
-  if (!response.ok) {
-    const fallbackMessages = {
-      401: "No tienes permisos para ver esta información.",
-      404: "Ruta no encontrada.",
-      501: "Ocurrió un problema al obtener la información.",
-    };
-    throw buildApiError(
-      response,
-      data,
-      fallbackMessages[response.status] ?? "Error desconocido."
-    );
+    return data;
   }
 
-  return data;
-};
+  static getReadableErrors(err) {
+    if (Array.isArray(err?.errors) && err.errors.length > 0) {
+      return err.errors.map((item) => item.message);
+    }
+    if (err?.message) {
+      return [err.message];
+    }
+    return ["Ocurrió un error inesperado"];
+  }
+}
 
-export { getUserData, getReadableErrors };
+export default ProfileService;

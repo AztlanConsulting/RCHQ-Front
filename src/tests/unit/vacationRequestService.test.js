@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-    getPendingVacationRequests,
-    getReviewedVacationRequests,
-    approveVacationRequest,
-    rejectVacationRequest,
-} from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacationRequestService";
 import { secureFetch } from "../../utils/secureFetchWrapper";
 
 vi.mock("../../utils/secureFetchWrapper", () => ({
@@ -33,7 +28,7 @@ describe("vacationRequestService", () => {
     it("getPendingVacationRequests construye query params correctamente", async () => {
         secureFetch.mockResolvedValue(mockOkResponse);
 
-        await getPendingVacationRequests({
+        await VacationRequestService.getPending({
             page: 2,
             limit: 6,
             search: "  ana pendiente  ",
@@ -58,7 +53,7 @@ describe("vacationRequestService", () => {
     it("getReviewedVacationRequests incluye status", async () => {
         secureFetch.mockResolvedValue(mockOkResponse);
 
-        await getReviewedVacationRequests({
+        await VacationRequestService.getReviewed({
             page: 1,
             limit: 6,
             search: "ana",
@@ -74,7 +69,7 @@ describe("vacationRequestService", () => {
     it("regresa data y pagination cuando la respuesta es exitosa", async () => {
         secureFetch.mockResolvedValue(mockOkResponse);
 
-        const result = await getPendingVacationRequests({});
+        const result = await VacationRequestService.getPending({});
 
         expect(result.data).toEqual([{ vacationRequestId: "vac-001" }]);
         expect(result.pagination).toEqual({
@@ -95,7 +90,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        const result = await getPendingVacationRequests({});
+        const result = await VacationRequestService.getPending({});
 
         expect(result.data).toEqual([]);
         expect(result.pagination).toEqual({
@@ -114,7 +109,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(getPendingVacationRequests({ search: "x" })).rejects.toThrow(
+        await expect(VacationRequestService.getPending({ search: "x" })).rejects.toThrow(
             "La búsqueda no puede superar 100 caracteres",
         );
     });
@@ -127,7 +122,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(getPendingVacationRequests({})).rejects.toThrow(
+        await expect(VacationRequestService.getPending({})).rejects.toThrow(
             "Error en la respuesta del servidor",
         );
     });
@@ -147,7 +142,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        const result = await approveVacationRequest("vac-001");
+        const result = await VacationRequestService.approve("vac-001");
 
         expect(secureFetch).toHaveBeenCalledWith(
             expect.stringContaining("/vacation/request/vac-001/approve"),
@@ -177,7 +172,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(approveVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.approve("vac-001")).rejects.toThrow(
             "La solicitud ya fue revisada",
         );
     });
@@ -190,7 +185,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(approveVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.approve("vac-001")).rejects.toThrow(
             "El id de solicitud es inválido",
         );
     });
@@ -204,7 +199,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(approveVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.approve("vac-001")).rejects.toThrow(
             "No se pudo aprobar",
         );
     });
@@ -224,7 +219,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        const result = await rejectVacationRequest("vac-001");
+        const result = await VacationRequestService.reject("vac-001");
 
         expect(secureFetch).toHaveBeenCalledWith(
             expect.stringContaining("/vacation/request/vac-001/reject"),
@@ -254,7 +249,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.reject("vac-001")).rejects.toThrow(
             "La solicitud ya fue revisada",
         );
     });
@@ -267,7 +262,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.reject("vac-001")).rejects.toThrow(
             "El id de solicitud es inválido",
         );
     });
@@ -281,7 +276,7 @@ describe("vacationRequestService", () => {
             }),
         });
 
-        await expect(rejectVacationRequest("vac-001")).rejects.toThrow(
+        await expect(VacationRequestService.reject("vac-001")).rejects.toThrow(
             "No se pudo rechazar",
         );
     });

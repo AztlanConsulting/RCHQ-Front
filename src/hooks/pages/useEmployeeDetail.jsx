@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getEmployeeDetailService } from "../../services/employeeDetailService";
+import EmployeeDetailService from "../../services/employeeDetailService";
 
 export const useEmployeeDetail = (employeeId) => {
   const [employee, setEmployee]                       = useState({});
@@ -21,7 +21,7 @@ export const useEmployeeDetail = (employeeId) => {
   const getEmployeeDetail = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data      = await getEmployeeDetailService(employeeId);
+      const data      = await EmployeeDetailService.getDetail(employeeId);
       const basicInfo = data?.data?.employee?.basicInfo ?? null;
       const adminInfo = data?.data?.employee?.adminInfo ?? null;
       setEmployee(basicInfo.employee);

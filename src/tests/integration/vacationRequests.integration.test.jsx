@@ -7,18 +7,15 @@ import {
     act,
 } from "@testing-library/react";
 import VacationRequests from "../../pages/vacationRequests";
-import {
-    getPendingVacationRequests,
-    getReviewedVacationRequests,
-    approveVacationRequest,
-    rejectVacationRequest,
-} from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacationRequestService";
 
 vi.mock("../../services/vacationRequestService", () => ({
-    getPendingVacationRequests: vi.fn(),
-    getReviewedVacationRequests: vi.fn(),
-    approveVacationRequest: vi.fn(),
-    rejectVacationRequest: vi.fn(),
+    default: {
+        getPending: vi.fn(),
+        getReviewed: vi.fn(),
+        approve: vi.fn(),
+        reject: vi.fn(),
+    },
 }));
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
@@ -120,16 +117,16 @@ describe("Integración: VacationRequests", () => {
         vi.clearAllMocks();
         vi.useRealTimers();
 
-        getPendingVacationRequests.mockResolvedValue(pendingResponse);
-        getReviewedVacationRequests.mockResolvedValue(reviewedResponse);
-        approveVacationRequest.mockResolvedValue({
+        VacationRequestService.getPending.mockResolvedValue(pendingResponse);
+        VacationRequestService.getReviewed.mockResolvedValue(reviewedResponse);
+        VacationRequestService.approve.mockResolvedValue({
             message: "Solicitud aprobada correctamente",
             vacationRequest: {
                 vacationRequestId: "vac-001",
                 status: 1,
             },
         });
-        rejectVacationRequest.mockResolvedValue({
+        VacationRequestService.reject.mockResolvedValue({
             message: "Solicitud rechazada correctamente",
             vacationRequest: {
                 vacationRequestId: "vac-001",
@@ -151,7 +148,7 @@ describe("Integración: VacationRequests", () => {
             screen.getByText("Página 1 de 1 | Total: 2 solicitudes"),
         ).toBeInTheDocument();
 
-        expect(getPendingVacationRequests).toHaveBeenCalledWith(
+        expect(VacationRequestService.getPending).toHaveBeenCalledWith(
             expect.objectContaining({
                 page: 1,
                 limit: 6,
@@ -166,7 +163,7 @@ describe("Integración: VacationRequests", () => {
     it("mantiene la tabla visible mientras carga una nueva búsqueda", async () => {
         let resolveSecondRequest;
 
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockImplementationOnce(
                 () =>
@@ -187,7 +184,7 @@ describe("Integración: VacationRequests", () => {
             await wait(400);
         });
 
-        expect(getPendingVacationRequests).toHaveBeenCalledTimes(2);
+        expect(VacationRequestService.getPending).toHaveBeenCalledTimes(2);
 
         expect(screen.getByText("Ana Pendiente")).toBeInTheDocument();
         expect(screen.queryByText("Cargando solicitudes...")).toBeNull();
@@ -200,7 +197,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("hace búsqueda con debounce y manda el valor normalizado al servicio", async () => {
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce(singlePendingResponse);
 
@@ -217,7 +214,7 @@ describe("Integración: VacationRequests", () => {
         });
 
         await waitFor(() => {
-            expect(getPendingVacationRequests).toHaveBeenLastCalledWith(
+            expect(VacationRequestService.getPending).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     search: "ana pendiente",
                     page: 1,
@@ -250,7 +247,7 @@ describe("Integración: VacationRequests", () => {
         });
 
         await waitFor(() => {
-            expect(getPendingVacationRequests).toHaveBeenLastCalledWith(
+            expect(VacationRequestService.getPending).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     search: "us",
                 }),
@@ -274,7 +271,7 @@ describe("Integración: VacationRequests", () => {
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
         expect(screen.getByText("Aprobada")).toBeInTheDocument();
 
-        expect(getReviewedVacationRequests).toHaveBeenCalledWith(
+        expect(VacationRequestService.getReviewed).toHaveBeenCalledWith(
             expect.objectContaining({
                 page: 1,
                 limit: 6,
@@ -299,7 +296,7 @@ describe("Integración: VacationRequests", () => {
         });
 
         await waitFor(() => {
-            expect(getReviewedVacationRequests).toHaveBeenLastCalledWith(
+            expect(VacationRequestService.getReviewed).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     status: "approved",
                     page: 1,
@@ -329,7 +326,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("muestra error cuando el servicio falla", async () => {
-        getPendingVacationRequests.mockRejectedValueOnce(
+        VacationRequestService.getPending.mockRejectedValueOnce(
             new Error("No se pudieron cargar las solicitudes"),
         );
 
@@ -391,7 +388,7 @@ describe("Integración: VacationRequests", () => {
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
 
-        expect(approveVacationRequest).not.toHaveBeenCalled();
+        expect(VacationRequestService.approve).not.toHaveBeenCalled();
     });
 
     it("cierra modal de aprobación al presionar cancelar", async () => {
@@ -413,7 +410,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("aprueba una solicitud desde el modal y refresca la tabla", async () => {
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce({
                 data: [pendingRequests[1]],
@@ -438,7 +435,7 @@ describe("Integración: VacationRequests", () => {
         fireEvent.click(screen.getByRole("button", { name: "Aprobar" }));
 
         await waitFor(() => {
-            expect(approveVacationRequest).toHaveBeenCalledWith("vac-001");
+            expect(VacationRequestService.approve).toHaveBeenCalledWith("vac-001");
         });
 
         await waitFor(() => {
@@ -447,13 +444,13 @@ describe("Integración: VacationRequests", () => {
             ).toBeNull();
         });
 
-        expect(getPendingVacationRequests).toHaveBeenCalledTimes(2);
+        expect(VacationRequestService.getPending).toHaveBeenCalledTimes(2);
         expect(await screen.findByText("Luis Vacaciones")).toBeInTheDocument();
         expect(screen.queryByText("Ana Pendiente")).toBeNull();
     });
 
     it("muestra error dentro del modal si falla la aprobación", async () => {
-        approveVacationRequest.mockRejectedValueOnce(
+        VacationRequestService.approve.mockRejectedValueOnce(
             new Error("La solicitud ya fue revisada"),
         );
 
@@ -475,7 +472,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("no muestra alert global cuando el error de aprobación se muestra en el modal", async () => {
-        approveVacationRequest.mockRejectedValueOnce(
+        VacationRequestService.approve.mockRejectedValueOnce(
             new Error("No se pudo aprobar la solicitud"),
         );
 
@@ -498,7 +495,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("muestra mensaje de éxito al aprobar una solicitud", async () => {
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce({
                 data: [pendingRequests[1]],
@@ -521,7 +518,7 @@ describe("Integración: VacationRequests", () => {
             await screen.findByText("Solicitud de vacaciones aprobada con éxito"),
         ).toBeInTheDocument();
 
-        expect(approveVacationRequest).toHaveBeenCalledWith("vac-001");
+        expect(VacationRequestService.approve).toHaveBeenCalledWith("vac-001");
     });
 
     it("abre modal de confirmación al presionar rechazar", async () => {
@@ -539,7 +536,7 @@ describe("Integración: VacationRequests", () => {
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
 
-        expect(rejectVacationRequest).not.toHaveBeenCalled();
+        expect(VacationRequestService.reject).not.toHaveBeenCalled();
     });
 
     it("cierra modal de rechazo al presionar cancelar", async () => {
@@ -561,7 +558,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("rechaza una solicitud desde el modal y refresca la tabla", async () => {
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce({
                 data: [pendingRequests[1]],
@@ -586,7 +583,7 @@ describe("Integración: VacationRequests", () => {
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         await waitFor(() => {
-            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+            expect(VacationRequestService.reject).toHaveBeenCalledWith("vac-001");
         });
 
         await waitFor(() => {
@@ -595,13 +592,13 @@ describe("Integración: VacationRequests", () => {
             ).toBeNull();
         });
 
-        expect(getPendingVacationRequests).toHaveBeenCalledTimes(2);
+        expect(VacationRequestService.getPending).toHaveBeenCalledTimes(2);
         expect(await screen.findByText("Luis Vacaciones")).toBeInTheDocument();
         expect(screen.queryByText("Ana Pendiente")).toBeNull();
     });
 
     it("muestra error dentro del modal si falla el rechazo", async () => {
-        rejectVacationRequest.mockRejectedValueOnce(
+        VacationRequestService.reject.mockRejectedValueOnce(
             new Error("La solicitud ya fue revisada"),
         );
 
@@ -623,7 +620,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("no muestra alert global cuando el error de rechazo se muestra en el modal", async () => {
-        rejectVacationRequest.mockRejectedValueOnce(
+        VacationRequestService.reject.mockRejectedValueOnce(
             new Error("No se pudo rechazar la solicitud"),
         );
 
@@ -646,7 +643,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("muestra mensaje de éxito al rechazar una solicitud", async () => {
-        getPendingVacationRequests
+        VacationRequestService.getPending
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce({
                 data: [pendingRequests[1]],
@@ -669,6 +666,6 @@ describe("Integración: VacationRequests", () => {
             await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
         ).toBeInTheDocument();
 
-        expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+        expect(VacationRequestService.reject).toHaveBeenCalledWith("vac-001");
     });
 });

@@ -3,125 +3,124 @@ import AuthUtils from "../utils/auth.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const getEmployeeFormData = async () => {
-  const token = AuthUtils.getToken();
+class PersonalService {
+  static async getFormData() {
+    const token = AuthUtils.getToken();
 
-  const res = await fetch(`${API_URL}/employee/add`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const res = await fetch(`${API_URL}/employee/add`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) {
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    throw new Error("Error cargando datos del formulario");
-  }
-
-  return data;
-};
-
-export const createEmployee = async (data) => {
-  const token = AuthUtils.getToken();
-
-  const formData = new FormData();
-
-  Object.keys(data).forEach((key) => {
-    if (data[key] !== null && data[key] !== undefined) {
-      formData.append(key, data[key]);
-    }
-  });
-
-  const res = await fetch(`${API_URL}/employee/add`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
-
-  const response = await res.json();
-
-  if (!res.ok) {
-    let errorMessage = "Error desconocido. Intente más tarde";
-
-    if (response.errors) {
-      errorMessage = response.errors
-        .map((e) => `${e.campo}: ${e.mensaje}`)
-        .join("\n");
-    } else if (response.error) {
-      errorMessage = response.error;
+    if (!res.ok) {
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      throw new Error("Error cargando datos del formulario");
     }
 
-    const error = new Error(errorMessage);
+    return data;
+  }
 
-    if (response.redirect) {
-      error.redirect = response.redirect;
+  static async createEmployee(data) {
+    const token = AuthUtils.getToken();
+
+    const formData = new FormData();
+
+    Object.keys(data).forEach((key) => {
+      if (data[key] !== null && data[key] !== undefined) {
+        formData.append(key, data[key]);
+      }
+    });
+
+    const res = await fetch(`${API_URL}/employee/add`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const response = await res.json();
+
+    if (!res.ok) {
+      let errorMessage = "Error desconocido. Intente más tarde";
+
+      if (response.errors) {
+        errorMessage = response.errors
+          .map((e) => `${e.campo}: ${e.mensaje}`)
+          .join("\n");
+      } else if (response.error) {
+        errorMessage = response.error;
+      }
+
+      const error = new Error(errorMessage);
+
+      if (response.redirect) {
+        error.redirect = response.redirect;
+      }
+
+      throw error;
     }
 
-    throw error;
+    return response;
   }
 
-  return response;
-};
+  static async getEmployees(page = 1, limit = 7, search = "", active = "true") {
+    const token = AuthUtils.getToken();
 
-export const getEmployees = async (
-  page = 1,
-  limit = 7,
-  search = "",
-  active = "true",
-) => {
-  const token = AuthUtils.getToken();
+    const params = new URLSearchParams({
+      page,
+      limit,
+      search,
+      active,
+    });
 
-  const params = new URLSearchParams({
-    page,
-    limit,
-    search,
-    active,
-  });
+    const res = await secureFetch(`${API_URL}/employee/getAll?${params}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  const res = await secureFetch(`${API_URL}/employee/getAll?${params}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const data = await res.json();
 
-  const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Error al obtener empleados");
+    }
 
-  if (!res.ok) {
-    throw new Error(data.message || "Error al obtener empleados");
+    if (!data.success) {
+      throw new Error("Error en la respuesta del servidor");
+    }
+
+    return {
+      data: data.data,
+      pagination: data.pagination,
+    };
   }
 
-  if (!data.success) {
-    throw new Error("Error en la respuesta del servidor");
+  static async getById(employeeId) {
+    const token = AuthUtils.getToken();
+
+    const res = await fetch(`${API_URL}/employee/${employeeId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Error al obtener empleado");
+    }
+
+    return data;
   }
+}
 
-  return {
-    data: data.data,
-    pagination: data.pagination,
-  };
-};
-
-export const getEmployeeById = async (employeeId) => {
-  const token = AuthUtils.getToken();
-
-  const res = await fetch(`${API_URL}/employee/${employeeId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "Error al obtener empleado");
-  }
-
-  return data;
-};
+export default PersonalService;

@@ -21,14 +21,13 @@ vi.mock("react-router-dom", async (importOriginal) => {
 
 // Mock Services
 vi.mock("../../services/personalService", () => ({
-    getEmployeeFormData: vi.fn(),
-    createEmployee: vi.fn(),
+    default: {
+        getFormData: vi.fn(),
+        createEmployee: vi.fn(),
+    },
 }));
 
-import {
-    getEmployeeFormData,
-    createEmployee,
-} from "../../services/personalService";
+import PersonalService from "../../services/personalService";
 
 const renderPage = () =>
     render(
@@ -120,7 +119,7 @@ afterEach(() => {
 describe("AltaPersonal — integración de formulario y servicios", () => {
     it("carga los roles iniciales y quita el estado de carga", async () => {
         // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+        PersonalService.getFormData.mockResolvedValue({ roles: mockRoles });
 
         // Act
         renderPage();
@@ -133,12 +132,12 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
                 screen.queryByText(/cargando datos/i),
             ).not.toBeInTheDocument();
         });
-        expect(getEmployeeFormData).toHaveBeenCalledTimes(1);
+        expect(PersonalService.getFormData).toHaveBeenCalledTimes(1);
     });
 
     it("muestra un error de Zod si el formulario está vacío", async () => {
         // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+        PersonalService.getFormData.mockResolvedValue({ roles: mockRoles });
         renderPage();
         await waitFor(() =>
             expect(
@@ -156,7 +155,7 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
 
         // Assert
         await waitFor(() => {
-            expect(createEmployee).not.toHaveBeenCalled();
+            expect(PersonalService.createEmployee).not.toHaveBeenCalled();
             expect(
                 screen.getAllByText(/El nombre es obligatorio/i).length,
             ).toBeGreaterThan(0);
@@ -168,8 +167,8 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
 
     it("crea el empleado exitosamente", async () => {
         // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        createEmployee.mockResolvedValue({ success: true });
+        PersonalService.getFormData.mockResolvedValue({ roles: mockRoles });
+        PersonalService.createEmployee.mockResolvedValue({ success: true });
         renderPage();
         await waitFor(() =>
             expect(
@@ -182,15 +181,15 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
 
         // Assert
         await waitFor(() => {
-            expect(createEmployee).toHaveBeenCalledTimes(1);
+            expect(PersonalService.createEmployee).toHaveBeenCalledTimes(1);
         });
         expect(mockOnSuccess).toHaveBeenCalledTimes(1);
     });
 
     it("muestra error si el backend falla", async () => {
         // Arrange
-        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        createEmployee.mockRejectedValue(
+        PersonalService.getFormData.mockResolvedValue({ roles: mockRoles });
+        PersonalService.createEmployee.mockRejectedValue(
             new Error("El correo electrónico ya está registrado"),
         );
         renderPage();
@@ -205,7 +204,7 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
 
         // Assert
         await waitFor(() => {
-            expect(createEmployee).toHaveBeenCalledTimes(1);
+            expect(PersonalService.createEmployee).toHaveBeenCalledTimes(1);
         });
         expect(
             screen.getByText("El correo electrónico ya está registrado"),
