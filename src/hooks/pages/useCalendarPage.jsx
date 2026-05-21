@@ -8,6 +8,7 @@ import {
   buildAbsenceEvidenceUrl,
   updateAbsenceService,
 } from "../../services/calendarService";
+import { deleteHouseEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
@@ -75,6 +76,10 @@ export const useCalendarPage = ({
   const [absenceDeleteError, setAbsenceDeleteError] = useState("");
   const [isLoadingWhileDeleting, setIsLoadingWhileDeleting] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [editingHouseEvent, setEditingHouseEvent] = useState(null);
+  const [isDeleteHouseEventOpen, setIsDeleteHouseEventOpen] = useState(false);
+  const [isDeletingHouseEvent, setIsDeletingHouseEvent] = useState(false);
+  const [deleteHouseEventError, setDeleteHouseEventError] = useState("");
   const {
     file: absenceEvidenceFile,
     fileName: absenceEvidenceFileName,
@@ -90,6 +95,8 @@ export const useCalendarPage = ({
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setAbsenceDeleteError("");
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
@@ -100,6 +107,8 @@ export const useCalendarPage = ({
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setAbsenceDeleteError("");
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
   }, []);
 
   const showCalendarAlert = useCallback((nextAlert) => {
@@ -118,6 +127,8 @@ export const useCalendarPage = ({
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setAbsenceDeleteError("");
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
   }, []);
 
   const absenceEvidenceLabel = useMemo(
@@ -337,6 +348,99 @@ export const useCalendarPage = ({
     }
   }, [closeDetail, reloadCurrentRange, selectedEvent]);
 
+  const openEventEdit = useCallback(() => {
+    if (!selectedEvent) return;
+    const { focus, scope } = selectedEvent;
+
+    if (focus === "eventos" && scope === "house") {
+      setEditingHouseEvent(selectedEvent);
+      closeDetail();
+      return;
+    }
+
+    // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
+    setAlert({
+      type: "error",
+      message: "No se puede modificar este tipo de evento.",
+    });
+  }, [closeDetail, selectedEvent]);
+
+  const openEventDelete = useCallback(() => {
+    if (!selectedEvent) return;
+    const { focus, scope } = selectedEvent;
+
+    if (focus === "eventos" && scope === "house") {
+      setDeleteHouseEventError("");
+      setIsDeleteHouseEventOpen(true);
+      return;
+    }
+
+    // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
+  }, [selectedEvent]);
+
+  const cancelDeleteHouseEvent = useCallback(() => {
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
+  }, []);
+
+  const confirmDeleteHouseEvent = useCallback(async () => {
+    const houseEventId =
+      selectedEvent?.houseEventId ?? selectedEvent?.eventId;
+    if (!houseEventId) return;
+
+    setIsDeletingHouseEvent(true);
+    setDeleteHouseEventError("");
+
+    try {
+      await deleteHouseEvent(houseEventId);
+      setIsDeleteHouseEventOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar el evento.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Evento eliminado exitosamente",
+      });
+    } catch (err) {
+      setDeleteHouseEventError(
+        err?.message ?? "Error al eliminar el evento",
+      );
+    } finally {
+      setIsDeletingHouseEvent(false);
+    }
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
+
+  const onHouseEventEditSuccess = useCallback(async () => {
+    const houseEventId = editingHouseEvent?.houseEventId;
+    setEditingHouseEvent(null);
+
+    const rawEvents = await reloadCurrentRange?.();
+
+    const refreshedEvent = rawEvents?.find(
+      (ev) =>
+        ev.focus === "eventos" &&
+        ev.scope === "house" &&
+        String(ev.houseEventId) === String(houseEventId),
+    );
+
+    if (refreshedEvent) {
+      showEventDetail(calendarItemToDetail(refreshedEvent));
+    }
+
+    setAlert({
+      type: "success",
+      message: "Evento modificado exitosamente",
+    });
+  }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
+
   return {
     selectedEvent,
     isAbsenceEditing,
@@ -365,5 +469,15 @@ export const useCalendarPage = ({
     submitAbsenceEdit,
     showCalendarAlert,
     clearCalendarAlert,
+    editingHouseEvent,
+    setEditingHouseEvent,
+    isDeleteHouseEventOpen,
+    isDeletingHouseEvent,
+    deleteHouseEventError,
+    openEventEdit,
+    openEventDelete,
+    cancelDeleteHouseEvent,
+    confirmDeleteHouseEvent,
+    onHouseEventEditSuccess,
   };
 };
