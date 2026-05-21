@@ -2,8 +2,33 @@ import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import { formatEventDateRange, formatEventTime } from "../../../utils/dates";
 
-const EventDetail = ({ event, onEdit, onDelete }) => {
+const canDelete = (scope, role) => {
+    if (scope === "global") return role === "Administrador";
+    if (scope === "house" || scope === "personal") return role === "Coordinador";
+    return true;
+};
+
+const canEdit = (scope, role) => {
+    if (scope === "global") return role === "Administrador";
+    if (scope === "house" || scope === "personal") return role === "Coordinador";
+    return true;
+};
+
+const EventDetail = ({
+    event,
+    onEdit,
+    onDelete,
+    isDeleteOpen = false,
+    onCancelDelete,
+    onConfirmDelete,
+    isDeleting = false,
+    deleteError = "",
+    viewerRole = "",
+}) => {
     if (!event) return null;
+
+    const showDelete = canDelete(event.scope, viewerRole);
+    const showEdit = canEdit(event.scope, viewerRole);
 
     const dayText = formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
@@ -12,7 +37,7 @@ const EventDetail = ({ event, onEdit, onDelete }) => {
     );
 
     return (
-        <div className="text-left">
+        <div className="relative text-left">
             <Type variant="page-title" className="mb-2" as="h2">
                 {event.title ?? "—"}
             </Type>
@@ -91,34 +116,65 @@ const EventDetail = ({ event, onEdit, onDelete }) => {
                 </div>
             ) : null}
 
-            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                <Button
-                    type="button"
-                    text="Eliminar"
-                    width="w-full sm:w-[7.2rem]"
-                    height="h-8"
-                    textSize="text-[0.95rem]"
-                    bgColor="bg-[#A20000]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#870000]"
-                    activeColor="active:bg-[#6B0000]"
-                    className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
-                    onClick={onDelete}
+            {(showDelete || showEdit) ? (
+                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                    {showDelete ? (
+                        <Button
+                            type="button"
+                            text="Eliminar"
+                            width="w-full sm:w-[7.2rem]"
+                            height="h-8"
+                            textSize="text-[0.95rem]"
+                            bgColor="bg-[#A20000]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#870000]"
+                            activeColor="active:bg-[#6B0000]"
+                            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+                            onClick={onDelete}
+                        />
+                    ) : null}
+                    {showEdit ? (
+                        <Button
+                            type="button"
+                            text="Editar"
+                            width="w-full sm:w-[7.2rem]"
+                            height="h-8"
+                            textSize="text-[0.95rem]"
+                            bgColor="bg-[#1F3664]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#15284A]"
+                            activeColor="active:bg-[#0E1B33]"
+                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                            onClick={onEdit}
+                        />
+                    ) : null}
+                </div>
+            ) : null}
+            {isDeleteOpen ? (
+                <ConfirmDeleteModal
+                    label={event?.title ?? "este evento"}
+                    mode="delete"
+                    inline
+                    loading={isDeleting}
+                    title="Eliminar evento"
+                    body={
+                        <>
+                            ¿Estás seguro que deseas eliminar el evento{" "}
+                            <span className="font-semibold text-slate-700">
+                                {event?.title ?? "este evento"}
+                            </span>
+                            ? Esta acción no se puede deshacer.
+                            {deleteError ? (
+                                <span className="mt-2 block rounded-md bg-red-50 px-3 py-2 text-red-600">
+                                    {deleteError}
+                                </span>
+                            ) : null}
+                        </>
+                    }
+                    onCancel={onCancelDelete}
+                    onConfirm={onConfirmDelete}
                 />
-                <Button
-                    type="button"
-                    text="Editar"
-                    width="w-full sm:w-[7.2rem]"
-                    height="h-8"
-                    textSize="text-[0.95rem]"
-                    bgColor="bg-[#1F3664]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#15284A]"
-                    activeColor="active:bg-[#0E1B33]"
-                    className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                    onClick={onEdit}
-                />
-            </div>
+            ) : null}
         </div>
     );
 };

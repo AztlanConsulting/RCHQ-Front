@@ -8,13 +8,14 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
+import VacationWorkerDetail from "../components/molecules/calendarCards/vacationWorkerDetail";
+import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import RegisterEventModal from "../components/organism/evento/registerEventModal";
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
-import { calendarItemToDetail } from "../utils/calendarEventDetail";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -104,7 +105,6 @@ const Calendario = () => {
         absenceEvidenceFileName,
         absenceEvidenceError,
         closeDetail,
-        showEventDetail,
         handleEventClick,
         absenceEvidenceLabel,
         openAbsenceEvidence,
@@ -118,6 +118,16 @@ const Calendario = () => {
         submitAbsenceEdit,
         showCalendarAlert,
         clearCalendarAlert,
+        editingHouseEvent,
+        setEditingHouseEvent,
+        isDeleteHouseEventOpen,
+        isDeletingHouseEvent,
+        deleteHouseEventError,
+        openEventEdit,
+        openEventDelete,
+        cancelDeleteHouseEvent,
+        confirmDeleteHouseEvent,
+        onHouseEventEditSuccess,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -145,35 +155,6 @@ const Calendario = () => {
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
-
-    const openEventEdit = () => {
-        if (!selectedEvent) return;
-        const { focus, scope } = selectedEvent;
-
-        if (focus === "eventos" && scope === "house") {
-            setEditingHouseEvent(selectedEvent);
-            closeDetail();
-            return;
-        }
-
-        // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
-        setAlert({
-            type: "error",
-            message: "No se puede modificar este tipo de evento.",
-        });
-    };
-
-    const openEventDelete = () => {
-        if (!selectedEvent) return;
-        const { focus, scope } = selectedEvent;
-
-        if (focus === "eventos" && scope === "house") {
-            // TODO: abrir modal de eliminación de evento de casa
-            return;
-        }
-
-        // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
-    };
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -358,13 +339,11 @@ const Calendario = () => {
                                     onReject={() => {}}
                                 />
                             ) : (
-                                <VacationDetail
+                                <VacationWorkerDetail
                                     event={selectedEvent}
                                     onClose={closeDetail}
                                     onEdit={() => {}}
                                     onDelete={() => {}}
-                                    onApprove={() => {}}
-                                    onReject={() => {}}
                                 />
                             );
 
@@ -374,6 +353,12 @@ const Calendario = () => {
                                     event={selectedEvent}
                                     onEdit={openEventEdit}
                                     onDelete={openEventDelete}
+                                    isDeleteOpen={isDeleteHouseEventOpen}
+                                    onCancelDelete={cancelDeleteHouseEvent}
+                                    onConfirmDelete={confirmDeleteHouseEvent}
+                                    isDeleting={isDeletingHouseEvent}
+                                    deleteError={deleteHouseEventError}
+                                    viewerRole={viewerRole}
                                 />
                             );
                     }
@@ -384,28 +369,7 @@ const Calendario = () => {
                 event={editingHouseEvent}
                 isOpen={editingHouseEvent != null}
                 onClose={() => setEditingHouseEvent(null)}
-                onSuccess={async () => {
-                    const houseEventId = editingHouseEvent?.houseEventId;
-                    setEditingHouseEvent(null);
-
-                    const rawEvents = await reloadCurrentRange();
-
-                    const refreshedEvent = rawEvents?.find(
-                        (ev) =>
-                            ev.focus === "eventos" &&
-                            ev.scope === "house" &&
-                            String(ev.houseEventId) === String(houseEventId),
-                    );
-
-                    if (refreshedEvent) {
-                        showEventDetail(calendarItemToDetail(refreshedEvent));
-                    }
-
-                    setAlert({
-                        type: "success",
-                        message: "Evento modificado exitosamente",
-                    });
-                }}
+                onSuccess={onHouseEventEditSuccess}
             />
 
             <RegisterEventModal
