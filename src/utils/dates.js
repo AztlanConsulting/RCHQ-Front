@@ -321,7 +321,6 @@ export function formatEventDateRange(
 
 /** Hora solo (UTC), p. ej. inicio/fin en eventos timed. */
 export function formatEventTime(value) {
-  console.log("input: ", value);
   if (value == null || value === "") return "—";
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return String(value);

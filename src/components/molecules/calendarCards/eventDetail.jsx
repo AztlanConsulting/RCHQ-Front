@@ -4,7 +4,6 @@ import { formatEventDateRange, formatEventTime } from "../../../utils/dates";
 
 const EventDetail = ({ event }) => {
     if (!event) return null;
-    console.log("event: ", event);
 
     const dayText = formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
