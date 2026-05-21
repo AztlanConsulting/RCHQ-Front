@@ -232,6 +232,59 @@ class CalendarUtils {
       harness.style.right = `${Math.max(0, R - delta / 2)}%`;
     }
   }
+
+  static buildVacationRequestQuery({
+    page = 1,
+    limit = 6,
+    search = "",
+    startDate = "",
+    endDate = "",
+    status = "",
+  }) {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+    const trimmedSearch = search.trim();
+    if (trimmedSearch) params.set("search", trimmedSearch);
+    if (startDate) params.set("startDate", startDate);
+    if (endDate) params.set("endDate", endDate);
+    if (status) params.set("status", status);
+    return params.toString();
+  }
+
+  static async parseVacationRequestsResponse(res) {
+    const data = await res.json();
+    if (!res.ok) {
+      const validationMessage = data.errors?.[0]?.message;
+      throw new Error(
+        validationMessage ||
+        data.message ||
+        "Error al obtener solicitudes de vacaciones",
+      );
+    }
+    if (!data.success) throw new Error("Error en la respuesta del servidor");
+    return {
+      data: Array.isArray(data.data) ? data.data : [],
+      pagination: data.pagination || { page: 1, limit: 6, total: 0, totalPages: 0 },
+    };
+  }
+
+  static async parseVacationRequestActionResponse(res) {
+    const data = await res.json();
+    if (!res.ok) {
+      const validationMessage = data.errors?.[0]?.message;
+      throw new Error(
+        validationMessage ||
+        data.message ||
+        "Error al actualizar la solicitud de vacaciones",
+      );
+    }
+    if (!data.success) throw new Error(data.message || "Error en la respuesta del servidor");
+    return {
+      message: data.message || "Solicitud actualizada correctamente",
+      vacationRequest: data.data?.vacationRequest || null,
+    };
+  }
 }
 
 export default CalendarUtils;

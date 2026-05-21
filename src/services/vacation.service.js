@@ -1,96 +1,23 @@
 import { secureFetch } from "../utils/helpers/secureFetchWrapper";
+import CalendarUtils from "../utils/calendar.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const buildQueryParams = ({
-  page = 1,
-  limit = 6,
-  search = "",
-  startDate = "",
-  endDate = "",
-  status = "",
-}) => {
-  const params = new URLSearchParams();
-
-  params.set("page", String(page));
-  params.set("limit", String(limit));
-
-  const trimmedSearch = search.trim();
-
-  if (trimmedSearch) params.set("search", trimmedSearch);
-  if (startDate) params.set("startDate", startDate);
-  if (endDate) params.set("endDate", endDate);
-  if (status) params.set("status", status);
-
-  return params.toString();
-};
-
-const parseVacationRequestsResponse = async (res) => {
-  const data = await res.json();
-
-  if (!res.ok) {
-    const validationMessage = data.errors?.[0]?.message;
-
-    throw new Error(
-      validationMessage ||
-      data.message ||
-      "Error al obtener solicitudes de vacaciones",
-    );
-  }
-
-  if (!data.success) {
-    throw new Error("Error en la respuesta del servidor");
-  }
-
-  return {
-    data: Array.isArray(data.data) ? data.data : [],
-    pagination: data.pagination || {
-      page: 1,
-      limit: 6,
-      total: 0,
-      totalPages: 0,
-    },
-  };
-};
-
-const parseVacationRequestActionResponse = async (res) => {
-  const data = await res.json();
-
-  if (!res.ok) {
-    const validationMessage = data.errors?.[0]?.message;
-
-    throw new Error(
-      validationMessage ||
-      data.message ||
-      "Error al actualizar la solicitud de vacaciones",
-    );
-  }
-
-  if (!data.success) {
-    throw new Error(data.message || "Error en la respuesta del servidor");
-  }
-
-  return {
-    message: data.message || "Solicitud actualizada correctamente",
-    vacationRequest: data.data?.vacationRequest || null,
-  };
-};
-
 class VacationRequestService {
   static async getPending({ page = 1, limit = 6, search = "", startDate = "", endDate = "" }) {
-    const query = buildQueryParams({ page, limit, search, startDate, endDate });
+    const query = CalendarUtils.buildVacationRequestQuery({ page, limit, search, startDate, endDate });
     const res = await secureFetch(`${API_URL}/vacation/requests/pending?${query}`, {
       method: "GET",
     });
-    return parseVacationRequestsResponse(res);
+    return CalendarUtils.parseVacationRequestsResponse(res);
   }
 
   static async getReviewed({ page = 1, limit = 6, search = "", startDate = "", endDate = "", status = "all" }) {
-    const query = buildQueryParams({ page, limit, search, startDate, endDate, status });
+    const query = CalendarUtils.buildVacationRequestQuery({ page, limit, search, startDate, endDate, status });
     const res = await secureFetch(`${API_URL}/vacation/requests/reviewed?${query}`, {
       method: "GET",
     });
-    return parseVacationRequestsResponse(res);
+    return CalendarUtils.parseVacationRequestsResponse(res);
   }
 
   static async approve(vacationRequestId) {
@@ -102,7 +29,7 @@ class VacationRequestService {
         body: JSON.stringify({}),
       },
     );
-    return parseVacationRequestActionResponse(res);
+    return CalendarUtils.parseVacationRequestActionResponse(res);
   }
 
   static async reject(vacationRequestId) {
@@ -114,7 +41,7 @@ class VacationRequestService {
         body: JSON.stringify({}),
       },
     );
-    return parseVacationRequestActionResponse(res);
+    return CalendarUtils.parseVacationRequestActionResponse(res);
   }
 }
 
