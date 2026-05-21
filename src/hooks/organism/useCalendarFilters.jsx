@@ -3,7 +3,6 @@ import CalendarService from "../../services/calendarService";
 import Dates from "@/utils/helpers/dates";
 import CalendarConfigs from "../../utils/configs/calendar.configs";
 import CalendarUtils from "../../utils/calendar.utils";
-import { getPersonalEventTitle } from "../../utils/titleGenerator";
 
 
 const getVacationStatusValue = (status) => {
@@ -172,7 +171,7 @@ const getFilteredEvents = (
                 title:
                     rawEvent.focus === "ausencias" ||
                     rawEvent.focus === "vacaciones"
-                        ? getPersonalEventTitle(rawEvent)
+                        ? CalendarUtils.getPersonalEventTitle(rawEvent)
                         : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,

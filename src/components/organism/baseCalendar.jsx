@@ -10,7 +10,7 @@ import DayGridOverflowCard from "../molecules/calendarCards/dayGridOverflowCard"
 import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
-import { widenTimeGridColumnEventHarness } from "@/utils/weekTimeGridHarnessWidth";
+import CalendarUtils from "@/utils/calendar.utils";
 import { FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY } from "../../utils/helpers/dates";
 
 const MONTH_DAY_EVENT_CAP = 3;
@@ -203,7 +203,7 @@ const BaseCalendar = ({
     const handleTimedEventDidMount = useCallback((info) => {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                widenTimeGridColumnEventHarness(info);
+                CalendarUtils.widenTimeGridColumnEventHarness(info);
             });
         });
     }, []);

@@ -3,7 +3,7 @@ import Button from "../atoms/button";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
-import DocumentUtils from "../../utils/document.utils";
+import Documents from "../../utils/helpers/documents";
 
 const DocumentsSection = ({
   documents,
@@ -66,9 +66,9 @@ const DocumentsSection = ({
               key={doc.documentId}
               doc={doc}
               label={doc.name}
-              date={DocumentUtils.formatDocumentDate(doc.uploadedAt)}
-              fileUrl={DocumentUtils.getDocumentFileUrl(doc)}
-              isPdf={DocumentUtils.isDocumentPdf(doc)}
+              date={Documents.formatDocumentDate(doc.uploadedAt)}
+              fileUrl={Documents.getDocumentFileUrl(doc)}
+              isPdf={Documents.isDocumentPdf(doc)}
               onEdit={handleOpenEdit}
               onDelete={setDocToDelete}
               isBeingDeleted={deletingId === doc.documentId}

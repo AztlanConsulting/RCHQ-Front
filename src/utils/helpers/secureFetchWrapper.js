@@ -1,4 +1,4 @@
-import AuthUtils from "./auth.utils";
+import AuthUtils from "../auth.utils";
 
 const LOGIN_PATH = "/iniciar-sesion";
 

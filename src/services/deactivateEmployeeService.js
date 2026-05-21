@@ -1,5 +1,5 @@
-import { secureFetch } from "@/utils/secureFetchWrapper";
-import { buildApiError } from "@/utils/apiErrors";
+import { secureFetch } from "@/utils/helpers/secureFetchWrapper";
+import { buildApiError } from "@/utils/helpers/apiErrors";
 
 class DeactivateEmployeeService {
   static async deactivate(employeeId, reason, addToBlacklist) {

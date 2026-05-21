@@ -1,4 +1,4 @@
-import { secureFetch } from "../utils/secureFetchWrapper";
+import { secureFetch } from "../utils/helpers/secureFetchWrapper";
 import AuthUtils from "../utils/auth.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;

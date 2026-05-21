@@ -1,4 +1,4 @@
-class DocumentUtils {
+class Documents {
   static getDocumentLabel(typeValue, documentTypes = []) {
     const found = documentTypes.find((dt) => dt.value === typeValue);
     return found ? found.label : typeValue;
@@ -24,4 +24,4 @@ class DocumentUtils {
   }
 }
 
-export default DocumentUtils;
+export default Documents;

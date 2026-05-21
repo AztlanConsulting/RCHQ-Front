@@ -1,6 +1,6 @@
-import { buildApiError } from "../utils/apiErrors";
+import { buildApiError } from "../utils/helpers/apiErrors";
 import AuthUtils from "../utils/auth.utils";
-import { secureFetch } from "../utils/secureFetchWrapper";
+import { secureFetch } from "../utils/helpers/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

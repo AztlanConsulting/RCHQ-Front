@@ -1,6 +1,6 @@
 import AuthUtils from "../utils/auth.utils";
-import { buildApiError } from "../utils/apiErrors";
-import { secureFetch } from "../utils/secureFetchWrapper";
+import { buildApiError } from "../utils/helpers/apiErrors";
+import { secureFetch } from "../utils/helpers/secureFetchWrapper";
 import CalendarUtils from "../utils/calendar.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;

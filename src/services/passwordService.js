@@ -1,5 +1,5 @@
 import AuthUtils from "../utils/auth.utils";
-import { buildApiError } from "../utils/apiErrors";
+import { buildApiError } from "../utils/helpers/apiErrors";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import Dates from "../../utils/dates";
+import Dates from "../../utils/helpers/dates";
 import EmployeeUtils from "../../utils/employee.utils";
 
 // ─── totalWorkDaysFromApprovedVacationRequests ────────────────────────────────
