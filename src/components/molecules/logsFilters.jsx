@@ -1,7 +1,7 @@
 import TextField from "../atoms/textField";
 import VacationDateField from "../atoms/vacationDateField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
-import Search from "../../utils/helpers/search";
+import Strings from "../../utils/helpers/strings";
 
 const LogsFilters = ({
   searchQuery,
@@ -19,7 +19,7 @@ const LogsFilters = ({
   clearActionSelection,
 }) => {
   const handleSearchChange = (value) => {
-    setSearchQuery(Search.sanitize(value));
+    setSearchQuery(Strings.sanitize(value));
   };
 
   return (

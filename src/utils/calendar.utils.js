@@ -171,6 +171,12 @@ class CalendarUtils {
     };
   };
 
+  static getVacationStatusClassName(status) {
+    if (status === 1) return "bg-green-100 text-green-800";
+    if (status === 2) return "bg-red-100 text-red-800";
+    return "bg-yellow-100 text-yellow-800";
+  }
+
   static getPersonalEventTitle(event) {
     const rawName = String(event.title ?? event.name ?? "").trim();
     const rawType = String(event.type ?? "").trim();

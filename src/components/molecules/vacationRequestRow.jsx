@@ -1,6 +1,8 @@
 import EmployeeAvatar from "../atoms/employeeAvatar";
 import Button from "../atoms/button";
-import VacationUtils from "../../utils/vacation.utils";
+import Dates from "@/utils/helpers/dates";
+import Strings from "@/utils/helpers/strings";
+import CalendarUtils from "@/utils/calendar.utils";
 
 const VacationRequestRow = ({
     request,
@@ -12,7 +14,7 @@ const VacationRequestRow = ({
     onOpenRejectModal,
 }) => {
     const employee = request.employee || {};
-    const fullName = VacationUtils.getSafeText(employee.fullName);
+    const fullName = Strings.getSafeText(employee.fullName);
     const isApproving = approvingRequestId === request.vacationRequestId;
     const isRejecting = rejectingRequestId === request.vacationRequestId;
 
@@ -31,15 +33,15 @@ const VacationRequestRow = ({
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {VacationUtils.getSafeText(employee.curp)}
+                {Strings.getSafeText(employee.curp)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {VacationUtils.formatDate(request.startDate)}
+                {Dates.formatDate(request.startDate)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                {VacationUtils.formatDate(request.endDate)}
+                {Dates.formatDate(request.endDate)}
             </td>
 
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
@@ -49,7 +51,7 @@ const VacationRequestRow = ({
             {view === "reviewed" && (
                 <td className="px-4 py-3 text-center">
                     <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${VacationUtils.getStatusClassName(
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${CalendarUtils.getVacationStatusClassName(
                             request.status,
                         )}`}
                     >

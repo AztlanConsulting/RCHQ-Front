@@ -303,6 +303,18 @@ class Dates {
     const w = word.trim();
     return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
   }
+
+  static formatDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return new Intl.DateTimeFormat("es-MX", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date);
+  }
 }
 
 export default Dates;

@@ -1,7 +1,7 @@
 import DateField from "../atoms/dateField";
 import TextField from "../atoms/textField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
-import Search from "../../utils/helpers/search";
+import Strings from "../../utils/helpers/strings";
 
 const HouseLogsFilters = ({
   responsibleQuery,
@@ -19,11 +19,11 @@ const HouseLogsFilters = ({
   setDateFilter,
 }) => {
   const handleResponsibleChange = (value) => {
-    setResponsibleQuery(Search.sanitize(value));
+    setResponsibleQuery(Strings.sanitize(value));
   };
 
   const handleAffectedChange = (value) => {
-    setAffectedQuery(Search.sanitize(value));
+    setAffectedQuery(Strings.sanitize(value));
   };
 
   return (
