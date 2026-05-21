@@ -70,7 +70,6 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
-  /** When false (ej. filtros dentro del modal ya con overflow), no max-height ni scrollbar en esta pieza */
   containScroll = true,
 }) => {
   const scrollShellClass = containScroll
