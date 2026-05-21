@@ -191,19 +191,6 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
 
                     <div className="flex justify-center gap-3 pt-1">
                         <Button
-                            text={isSubmitting ? "Modificando..." : "Modificar"}
-                            onClick={handleSubmit}
-                            disabled={isSubmitting}
-                            width="w-auto"
-                            height="h-[38px]"
-                            textSize="text-sm"
-                            fontWeight="font-bold"
-                            bgColor="bg-white"
-                            hoverColor="hover:bg-neutral-100"
-                            activeColor="active:bg-neutral-200"
-                            className="px-5 shadow-[0_0_5px_rgba(30,58,95,0.35)]"
-                        />
-                        <Button
                             text="Cancelar"
                             onClick={onClose}
                             disabled={isSubmitting}
@@ -211,11 +198,25 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             height="h-[38px]"
                             textSize="text-sm"
                             fontWeight="font-bold"
-                            bgColor="bg-[#1E3A5F]"
+                            bgColor="bg-white"
+                            textColor="text-[#121212]"
+                            hoverColor="hover:bg-slate-50"
+                            activeColor="active:bg-slate-100"
+                            className="px-5 border border-slate-200 shadow-md"
+                        />
+                        <Button
+                            text={isSubmitting ? "Modificando..." : "Modificar"}
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            width="w-auto"
+                            height="h-[38px]"
+                            textSize="text-sm"
+                            fontWeight="font-bold"
+                            bgColor="bg-[#1F3664]"
                             textColor="text-white"
-                            hoverColor="hover:bg-[#162d4a]"
-                            activeColor="active:bg-[#0f1f33]"
-                            className="px-5"
+                            hoverColor="hover:bg-[#15284A]"
+                            activeColor="active:bg-[#0E1B33]"
+                            className="px-5 shadow-md"
                         />
                     </div>
                 </div>
