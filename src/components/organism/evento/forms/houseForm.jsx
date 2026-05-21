@@ -7,11 +7,7 @@ import SelectField from "../../../atoms/selectField";
 import TimeField from "../../../atoms/timeField";
 import OverlapModal from "../../overlapModal";
 
-<<<<<<< Updated upstream:src/components/organism/evento/forms/houseForm.jsx
 import { useHouseForm } from "../../../../hooks/pages/useHouseForm";
-=======
-import { useHouseForm } from "../../../hooks/pages/useHouseForm";
->>>>>>> Stashed changes:src/pages/evento/forms/casaForm.jsx
 
 const CasaForm = (props) => {
     const {
