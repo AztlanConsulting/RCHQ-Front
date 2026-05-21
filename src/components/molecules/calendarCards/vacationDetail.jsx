@@ -1,8 +1,5 @@
 import Button from "../../atoms/button";
-import DateField from "../../atoms/dateField";
-import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 
