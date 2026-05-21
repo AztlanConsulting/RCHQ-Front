@@ -1,15 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import {
-<<<<<<< HEAD
-    formatEventDateRange,
-    formatEventTime,
-} from "../../../utils/calendarEventDetail";
-=======
-  formatEventCalendarDate,
-  formatEventDateTime,
-} from "../../../utils/dates";
->>>>>>> styles/vistasCalendario2
+import { formatEventDateRange, formatEventTime } from "../../../utils/dates";
 
 const EventDetail = ({ event }) => {
     if (!event) return null;
@@ -88,41 +79,28 @@ const EventDetail = ({ event }) => {
                 </Type>
             ) : null}
 
-<<<<<<< HEAD
-            {event.peopleInsideEvent
-                ? event.peopleInsideEvent.map((person, idx) => (
-                      <p key={idx}>
-                          {person?.name} - {person?.id}
-                      </p>
-                  ))
-                : null}
+            {event.peopleInsideEvent &&
+            Array.isArray(event.peopleInsideEvent) &&
+            event.peopleInsideEvent.length > 0 ? (
+                <div className="mb-4">
+                    {event.peopleInsideEvent.map((person, idx) => (
+                        <p key={`${person?.id}-${idx}`} className="text-sm">
+                            {person?.name} - {person?.id}
+                        </p>
+                    ))}
+                </div>
+            ) : null}
 
             <div className="w-full flex justify-around items-center gap-4 pt-2">
-                <Button type="button">Eliminar</Button>
-                <Button type="button">Modificar</Button>
+                <Button type="button" bgColor="bg-[#A20000]" className="text-white">
+                    Eliminar
+                </Button>
+                <Button type="button" bgColor="bg-[#1F3664]" className="text-white">
+                    Modificar
+                </Button>
             </div>
         </div>
     );
-=======
-      <div className="w-full flex justify-around items-center gap-4 pt-2">
-        <Button 
-          type="button"
-          bgColor="bg-[#A20000]" 
-          className="text-white"
-        >
-          Eliminar
-        </Button>
-        <Button 
-          type="button"  
-          bgColor="bg-[#1F3664]"
-          className="text-white"
-          >
-            Modificar
-          </Button>
-      </div>
-    </div>
-  );
->>>>>>> styles/vistasCalendario2
 };
 
 export default EventDetail;

@@ -252,6 +252,68 @@ export function countWorkdaysHours(workdays) {
   return workdays.reduce((prev, curr) => prev + countWorkdayHours(curr), 0);
 }
 
+function normalizeUTCDateOnly(value) {
+  if (value == null || value === "") return "";
+  if (typeof value === "string") {
+    const matchedDate = value.trim().match(DATE_ONLY_PATTERN);
+    if (matchedDate) return matchedDate[1];
+  }
+  const parsedDate = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+  const year = parsedDate.getUTCFullYear();
+  const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDaysToUTCDateOnly(value, days) {
+  const normalizedValue = normalizeUTCDateOnly(value);
+  if (!normalizedValue) return "";
+  const [year, month, day] = normalizedValue.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days, 0, 0, 0, 0));
+  return normalizeUTCDateOnly(date);
+}
+
+function formatEventUTCOnlyLong(value) {
+  const normalizedValue = normalizeUTCDateOnly(value);
+  if (!normalizedValue) return "—";
+  return new Date(`${normalizedValue}T00:00:00.000Z`).toLocaleDateString(
+    "es-MX",
+    { dateStyle: "long", timeZone: "UTC" },
+  );
+}
+
+/** Rango día en tarjeta (UTC date-only): legacy alinear con payloads Z/API. */
+export function formatEventDateRange(
+  start,
+  end,
+  { endExclusive = false } = {},
+) {
+  const startDate = normalizeUTCDateOnly(start);
+  const rawEndDate = normalizeUTCDateOnly(end);
+  const endDate =
+    endExclusive && rawEndDate ? addDaysToUTCDateOnly(rawEndDate, -1) : rawEndDate;
+
+  if (!startDate && !endDate) return "—";
+  if (!endDate || startDate === endDate) {
+    return formatEventUTCOnlyLong(startDate || endDate);
+  }
+
+  return `${formatEventUTCOnlyLong(startDate)} - ${formatEventUTCOnlyLong(endDate)}`;
+}
+
+/** Hora solo (UTC), p. ej. inicio/fin en eventos timed. */
+export function formatEventTime(value) {
+  if (value == null || value === "") return "—";
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleTimeString("es-MX", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
+}
+
 /** Ausencias: fechas solo-día con es-MX largo. */
 export const formatEventDate = (value) => {
   if (value == null || value === "") return "—";
