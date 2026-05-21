@@ -1,23 +1,30 @@
-export const getPersonalEventTitle = (event) => {
+export const getPersonalEventTitle = (event, viewerRole = "") => {
     const rawName = String(event.title ?? event.name ?? "").trim();
     const rawType = String(event.type ?? "").trim();
 
+    const seesManyPeople = ["administrador", "coordinador"].includes(
+        String(viewerRole).toLowerCase(),
+    );
+
+    const linkUserText = seesManyPeople && rawName ? ` de ${rawName}` : "";
+
     if (event.employeeId) {
         if (event.focus === "ausencias") {
-            return `Ausencia ${rawType} de ${rawName}`;
+            return `Ausencia ${rawType}${linkUserText}`;
         }
 
         if (event.focus === "vacaciones") {
             const status = Number(event.status);
 
             if (status === 0) {
-                return `Solicitud de Vacaciones de ${rawName}`;
-            }
-            if (status === 2) {
-                return `Vacaciones Rechazadas de ${rawName}`;
+                return `Solicitud de Vacaciones${linkUserText}`;
             }
 
-            return `Vacación de ${rawName}`;
+            if (status === 2) {
+                return `Vacaciones Rechazadas${linkUserText}`;
+            }
+
+            return `Vacación${linkUserText}`;
         }
 
         return rawName;

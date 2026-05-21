@@ -98,6 +98,7 @@ const getFilteredEvents = (
     absenceStatusFilters,
     absenceEvidenceFilters,
     calendarMode,
+    viewerRole,
 ) => {
     const selectedAbsenceTypeNames = new Set(
         absenceTypeOptions
@@ -199,7 +200,7 @@ const getFilteredEvents = (
                 title:
                     rawEvent.focus === "ausencias" ||
                     rawEvent.focus === "vacaciones"
-                        ? getPersonalEventTitle(rawEvent)
+                        ? getPersonalEventTitle(rawEvent, viewerRole)
                         : rawEvent.name,
                 start: eventStart,
                 end: eventEnd,
@@ -523,6 +524,7 @@ export const useCalendarFilters = (
                 absenceStatusFilters,
                 absenceEvidenceFilters,
                 calendarMode,
+                viewerRole,
             ),
         [
             allEvents,
@@ -537,6 +539,7 @@ export const useCalendarFilters = (
             absenceStatusFilters,
             absenceEvidenceFilters,
             calendarMode,
+            viewerRole,
         ],
     );
 

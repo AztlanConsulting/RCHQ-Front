@@ -8,6 +8,8 @@ import Modal from "../components/atoms/modal";
 import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
+import VacationWorkerDetail from "../components/molecules/calendarCards/vacationWorkerDetail";
+import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import RegisterEventModal from "../components/organism/evento/registerEventModal";
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
@@ -334,13 +336,11 @@ const Calendario = () => {
                                     onReject={() => {}}
                                 />
                             ) : (
-                                <VacationDetail
+                                <VacationWorkerDetail
                                     event={selectedEvent}
                                     onClose={closeDetail}
                                     onEdit={() => {}}
                                     onDelete={() => {}}
-                                    onApprove={() => {}}
-                                    onReject={() => {}}
                                 />
                             );
 
