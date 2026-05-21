@@ -97,6 +97,18 @@ class AuthUtils {
     const tokenPayload = AuthUtils.parseJwtPayload(AuthUtils.getToken());
     return userData?.role ?? userData?.roleName ?? tokenPayload?.role ?? "";
   }
+
+  /** Normalized lowercase role string from various user shapes (`role.name`, `roleName`, `role`). */
+  static getRoleName(user) {
+    const roleName =
+      user?.role?.name || user?.roleName || user?.role || "";
+
+    return String(roleName).toLowerCase();
+  }
+
+  static hasRole(user, role) {
+    return AuthUtils.getRoleName(user) === String(role).toLowerCase();
+  }
 }
 
 export default AuthUtils;

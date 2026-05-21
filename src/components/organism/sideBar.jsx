@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
-import { hasRole } from "../../utils/auth/getRoleName";
+import AuthUtils from "../../utils/auth.utils";
 
 // ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
@@ -15,7 +15,7 @@ const Icon = ({ name, className }) => (
 );
 
 const getNavItems = (user) => {
-  const isCoordinator = hasRole(user, "coordinador");
+  const isCoordinator = AuthUtils.hasRole(user, "coordinador");
   const navItems = [
     { to: "/app/calendario", label: "Calendario", icon: "calendar" },
     { to: "/app/personal", label: "Personal", icon: "employee" },
