@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { updateHouseEvent } from "../../services/updateEventService";
 import { getEventTypes } from "../../services/eventService";
-import {
-    addDaysToDateOnly,
-    normalizeDateOnly,
-} from "../../utils/calendarEventDetail";
+// import {
+//     Dates.addDaysToDateOnly,
+//     normalizeDateOnly,
+// } from "../../utils/calendarEventDetail";
+import Dates from "@/utils/dates";
 import {
     buildPayload,
     houseEventSchema,
@@ -47,13 +48,13 @@ const getTimeValue = (value) => {
 const getInitialForm = (event) => {
     if (!event) return DEFAULT_FORM;
 
-    const startDate = normalizeDateOnly(event.startDate ?? event.start);
-    const rawEndDate = normalizeDateOnly(
+    const startDate = Dates.normalizeDateOnly(event.startDate ?? event.start);
+    const rawEndDate = Dates.normalizeDateOnly(
         event.endDate ?? event.end ?? event.start,
     );
     const endDate =
         event.allDay && rawEndDate > startDate
-            ? addDaysToDateOnly(rawEndDate, -1)
+            ? Dates.addDaysToDateOnly(rawEndDate, -1)
             : rawEndDate;
 
     return {
