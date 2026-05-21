@@ -70,7 +70,13 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
+  /** When false (ej. filtros dentro del modal ya con overflow), no max-height ni scrollbar en esta pieza */
+  containScroll = true,
 }) => {
+  const scrollShellClass = containScroll
+    ? "max-h-[calc(100vh-8rem)] min-w-0 overflow-y-auto overflow-x-hidden scrollbar-hide"
+    : "min-w-0 overflow-visible";
+
   return (
     <div className={`pl-2 pr-2 flex flex-col gap-1 mb-auto ${className}`}>
       {showPageHeading ? (
@@ -83,7 +89,7 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
-      <div className="max-h-[calc(100vh-8rem)] min-w-0 overflow-y-auto overflow-x-hidden scrollbar-hide">
+      <div className={scrollShellClass}>
         {canSwitchCalendarMode ? (
           <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {calendarModeOptions.map((option) => {
@@ -132,7 +138,7 @@ const CalendarFilters = ({
               <div className="border border-b border-[#EAEAEA]"></div>
             </>
           ) : null}
-          <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
+          <div className="flex flex-col gap-4">
             <FilterGroup
               label="VISIBILIDAD"
               name="scope"
