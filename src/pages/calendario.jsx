@@ -14,7 +14,7 @@ import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbs
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
-import { calendarItemToDetail } from "../utils/calendarEventDetail";
+import CalendarUtils from "../utils/calendar.utils";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -398,7 +398,7 @@ const Calendario = () => {
                     );
 
                     if (refreshedEvent) {
-                        showEventDetail(calendarItemToDetail(refreshedEvent));
+                        showEventDetail(CalendarUtils.calendarItemToDetail(refreshedEvent));
                     }
 
                     setAlert({

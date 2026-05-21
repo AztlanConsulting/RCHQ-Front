@@ -13,8 +13,10 @@ vi.mock("../../services/profileService", () => ({
   }),
 }));
 
-vi.mock("../../utils/authStorage", () => ({
-  getToken: vi.fn(() => "fake-token"),
+vi.mock("../../utils/auth.utils", () => ({
+  default: {
+    getToken: vi.fn(() => "fake-token"),
+  },
 }));
 
 import { getUserData } from "../../services/profileService";

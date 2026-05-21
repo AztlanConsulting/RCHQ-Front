@@ -1,11 +1,11 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDateRange, formatEventTime } from "../../../utils/dates";
+import Dates from "@/utils/dates";
 
 const EventDetail = ({ event, onEdit, onDelete }) => {
     if (!event) return null;
 
-    const dayText = formatEventDateRange(
+    const dayText = Dates.formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
         event.date || event.endDate || event.end || event.endStr,
         { endExclusive: Boolean(event.allDay) && !event.date },
@@ -59,7 +59,7 @@ const EventDetail = ({ event, onEdit, onDelete }) => {
                             Inicio:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.start ?? event.startStr)}
+                            {Dates.formatEventTime(event.start ?? event.startStr)}
                         </p>
                     </div>
                     <div className="w-full flex items-center justify-between gap-4 mb-4">
@@ -67,7 +67,7 @@ const EventDetail = ({ event, onEdit, onDelete }) => {
                             Fin:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.end ?? event.endStr)}
+                            {Dates.formatEventTime(event.end ?? event.endStr)}
                         </p>
                     </div>
                 </>

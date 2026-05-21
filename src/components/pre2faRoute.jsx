@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { getPreTwoFactorAuthToken } from "../utils/authStorage";
+import AuthUtils from "../utils/auth.utils";
 
 const PreTwoFactorAuthRoute = () => {
-  const token = getPreTwoFactorAuthToken();
+  const token = AuthUtils.getPreTwoFactorAuthToken();
   return token ? <Outlet /> : <Navigate to="/iniciar-sesion" replace />;
 };
 

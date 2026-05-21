@@ -3,7 +3,7 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate, isPastDate } from "../../../utils/dates";
+import Dates from "@/utils/dates";
 
 const VacationDetail = ({
     event,
@@ -13,7 +13,7 @@ const VacationDetail = ({
     onApprove,
     onReject,
 }) => {
-    const isPast = isPastDate(event.start);
+    const isPast = Dates.isPastDate(event.start);
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -64,7 +64,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableStart) || "—"}
+                        {Dates.formatEventDate(event.readableStart) || "—"}
                     </Type>
                 </div>
                 <div>
@@ -78,7 +78,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableEnd) || "—"}
+                        {Dates.formatEventDate(event.readableEnd) || "—"}
                     </Type>
                 </div>
                 <div>

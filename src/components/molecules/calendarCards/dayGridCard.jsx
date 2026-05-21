@@ -1,8 +1,8 @@
-import { getStartHour } from "@/utils/dates";
+import Dates from "@/utils/dates";
 
 const DayGridCard = ({ arg }) => {
     const start = arg.event.start;
-    const timeLabel = start != null ? getStartHour(start) : "";
+    const timeLabel = start != null ? Dates.getStartHour(start) : "";
     const showDayLabel = arg.event.allDay || timeLabel === "00:00";
 
     return (

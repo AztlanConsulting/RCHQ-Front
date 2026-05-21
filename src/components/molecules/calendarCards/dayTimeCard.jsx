@@ -1,4 +1,4 @@
-import { getStartHour } from "@/utils/dates";
+import Dates from "@/utils/dates";
 
 const DayTimeCard = ({ arg }) => {
   const ev = arg.event;
@@ -11,11 +11,11 @@ const DayTimeCard = ({ arg }) => {
 
   let timeLine = "";
   if (!ev.allDay && start != null && end != null) {
-    const a = getStartHour(start);
-    const b = getStartHour(end);
+    const a = Dates.getStartHour(start);
+    const b = Dates.getStartHour(end);
     if (a && b) timeLine = `${a} – ${b}`;
   }
-  const startHm = start != null ? getStartHour(start) : "";
+  const startHm = start != null ? Dates.getStartHour(start) : "";
   const showDayLabel = ev.allDay || startHm === "00:00";
 
   return (
