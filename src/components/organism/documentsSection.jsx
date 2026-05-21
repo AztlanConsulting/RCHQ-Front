@@ -3,7 +3,7 @@ import Button from "../atoms/button";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
-import DocumentUtils from "../../utils/documentCard.utils";
+import DocumentUtils from "../../utils/document.utils";
 
 const DocumentsSection = ({
   documents,
