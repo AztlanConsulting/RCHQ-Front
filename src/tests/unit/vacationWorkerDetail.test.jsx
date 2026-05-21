@@ -7,6 +7,7 @@ const baseVacation = {
     end: new Date(2026, 5, 10),
     readableStart: new Date(2026, 5, 5),
     readableEnd: new Date(2026, 5, 10),
+    totalDays: 5,
     usedDays: 4,
     status: 0,
     feedback: "",
@@ -43,7 +44,7 @@ describe("VacationWorkerDetail", () => {
         expect(screen.getByText("5 de junio de 2026")).toBeInTheDocument();
         expect(screen.getByText("Fecha de final:")).toBeInTheDocument();
         expect(screen.getByText("10 de junio de 2026")).toBeInTheDocument();
-        expect(screen.getByText("5 días")).toBeInTheDocument();
+        expect(screen.getByText("5")).toBeInTheDocument();
         expect(screen.getByText("4")).toBeInTheDocument();
         expect(screen.getByText("Pendiente")).toBeInTheDocument();
         expect(screen.getByText("N/A")).toBeInTheDocument();

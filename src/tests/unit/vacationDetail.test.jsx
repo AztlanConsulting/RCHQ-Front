@@ -51,10 +51,11 @@ describe("VacationDetail", () => {
         expect(screen.getByText("10 de junio de 2026")).toBeInTheDocument();
         expect(screen.getByText("6")).toBeInTheDocument();
         expect(screen.getByText("4")).toBeInTheDocument();
-        expect(screen.getByText("Pendiente")).toBeInTheDocument();
+        expect(screen.getByText("En espera")).toBeInTheDocument();
+        expect(screen.queryByText("Retroalimentación:")).not.toBeInTheDocument();
         expect(
-            screen.getByText("Sin retroalimentación por el momento"),
-        ).toBeInTheDocument();
+            screen.queryByText("Sin retroalimentación por el momento"),
+        ).not.toBeInTheDocument();
     });
 
     it("muestra eliminar, editar, aprobar y rechazar si la solicitud futura está pendiente", () => {
@@ -86,7 +87,7 @@ describe("VacationDetail", () => {
             },
         });
 
-        expect(screen.getByText("Aceptado")).toBeInTheDocument();
+        expect(screen.getByText("Aprobadas")).toBeInTheDocument();
         expect(
             screen.getByText("Disfruta tus vacaciones!!"),
         ).toBeInTheDocument();
