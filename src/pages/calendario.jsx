@@ -1,5 +1,5 @@
 import Type from "../components/atoms/type";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import BaseCalendar from "../components/organism/baseCalendar";
 import CalendarFilters from "../components/molecules/calendarFilters";
 import CalendarFiltersModal from "../components/molecules/calendarFiltersModal";
@@ -9,7 +9,6 @@ import EventDetail from "../components/molecules/calendarCards/eventDetail";
 import AbsenceDetail from "../components/molecules/calendarCards/absenceDetail";
 import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
 import VacationWorkerDetail from "../components/molecules/calendarCards/vacationWorkerDetail";
-import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import RegisterEventModal from "../components/organism/evento/registerEventModal";
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
@@ -23,7 +22,6 @@ const isManagementRole = (role) =>
 
 const Calendario = () => {
     const calendarRef = useRef(null);
-    const [editingHouseEvent, setEditingHouseEvent] = useState(null);
     const prevFullCalendarViewTypeRef = useRef(null);
 
     const {
@@ -197,6 +195,10 @@ const Calendario = () => {
         canSwitchCalendarMode,
     };
 
+    const isAbsenceOrVacation = ["ausencias", "vacaciones"].includes(
+        selectedEvent?.focus,
+    );
+
     return (
         <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
             {alert?.message ? (
@@ -258,28 +260,11 @@ const Calendario = () => {
             <Modal
                 open={selectedEvent != null}
                 onClose={closeDetail}
-                title={(() => {
-                    if (
-                        ["ausencias", "vacaciones"].includes(
-                            selectedEvent?.focus,
-                        )
-                    )
-                        return null;
-
-                    return "Detalle del evento";
-                })()}
+                title={isAbsenceOrVacation ? null : "Detalle del evento"}
                 grayBackground={true}
-                placement={
-                    ["ausencias", "vacaciones"].includes(
-                        selectedEvent?.focus,
-                    )
-                        ? "center"
-                        : "right"
-                }
+                placement={isAbsenceOrVacation ? "center" : "right"}
                 className={
-                    ["ausencias", "vacaciones"].includes(
-                        selectedEvent?.focus,
-                    )
+                    isAbsenceOrVacation
                         ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
                         : "w-[92vw] max-w-[400px] max-h-[80vh]"
                 }

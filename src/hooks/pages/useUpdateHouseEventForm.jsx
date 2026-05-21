@@ -2,10 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { updateHouseEvent } from "../../services/updateEventService";
 import { getEventTypes } from "../../services/eventService";
-// import {
-//     Dates.addDaysToDateOnly,
-//     normalizeDateOnly,
-// } from "../../utils/calendarEventDetail";
 import Dates from "@/utils/dates";
 import {
     buildPayload,

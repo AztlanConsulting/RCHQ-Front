@@ -1,5 +1,5 @@
 import { buildApiError } from "../utils/apiErrors";
-import { getToken } from "../utils/authStorage";
+import AuthUtils from "../utils/auth.utils";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;

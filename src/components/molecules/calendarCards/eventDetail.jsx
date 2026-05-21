@@ -1,10 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import {
-    formatEventDateRange,
-    formatEventTime,
-} from "../../../utils/calendarEventDetail";
 import Dates from "@/utils/dates";
 
 const canModify = (scope, role) => {
@@ -29,7 +25,7 @@ const EventDetail = ({
     const showDelete = canModify(event.scope, viewerRole);
     const showEdit = canModify(event.scope, viewerRole);
 
-    const dayText = formatEventDateRange(
+    const dayText = Dates.formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
         event.date || event.endDate || event.end || event.endStr,
         { endExclusive: Boolean(event.allDay) && !event.date },

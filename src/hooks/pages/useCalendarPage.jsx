@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { calendarItemToDetail } from "../../utils/calendarEventDetail";
 import { deleteHouseEvent } from "../../services/deleteEventService";
 import CalendarUtils from "../../utils/calendar.utils";
 import Dates from "@/utils/dates";
@@ -418,7 +417,7 @@ export const useCalendarPage = ({
     );
 
     if (refreshedEvent) {
-      showEventDetail(calendarItemToDetail(refreshedEvent));
+      showEventDetail(CalendarUtils.calendarItemToDetail(refreshedEvent));
     }
 
     setAlert({
