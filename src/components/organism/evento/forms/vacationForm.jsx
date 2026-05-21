@@ -126,11 +126,13 @@ const VacationForm = (props) => {
             </p>
 
             {serverError && (
-                <Alert
-                    type="error"
-                    message={serverError}
-                    onClose={() => setServerError("")}
-                />
+                <div className="mb-5">
+                    <Alert
+                        type="error"
+                        message={serverError}
+                        onClose={() => setServerError("")}
+                    />
+                </div>
             )}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
