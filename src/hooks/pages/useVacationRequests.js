@@ -6,6 +6,7 @@ import {
     rejectVacationRequest,
 } from "../../services/vacationRequestService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
+import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacationRequests.schema";
 
 const LIMIT = 6;
 
@@ -14,11 +15,6 @@ const DEFAULT_PAGINATION = {
     limit: LIMIT,
     total: 0,
     totalPages: 0,
-};
-
-const isInvalidDateRange = (startDate, endDate) => {
-    if (!startDate || !endDate) return false;
-    return startDate > endDate;
 };
 
 export const useVacationRequests = ({ initialView = "pending" } = {}) => {
@@ -59,11 +55,13 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
 
     const fetchRequests = useCallback(
         async (pageToFetch = 1) => {
-            if (isInvalidDateRange(filters.startDate, filters.endDate)) {
+            const validationError = getVacationRequestFiltersError(filters);
+
+            if (validationError) {
                 setRequests([]);
                 setPagination(DEFAULT_PAGINATION);
                 setPage(1);
-                setError("La fecha de inicio no puede ser posterior a la fecha de término");
+                setError(validationError);
                 return;
             }
 
