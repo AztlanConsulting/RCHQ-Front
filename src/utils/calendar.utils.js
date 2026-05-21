@@ -1,4 +1,4 @@
-import CalendarConfigs from "../configs/calendar.configs";
+import CalendarConfigs from "./configs/calendar.configs";
 import Dates from "./dates";
 
 const API_URL = import.meta.env.VITE_API_URL;

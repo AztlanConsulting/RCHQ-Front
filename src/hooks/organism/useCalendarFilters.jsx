@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CalendarService from "../../services/calendarService";
 import Dates from "@/utils/dates";
-import CalendarConfigs from "../../configs/calendar.configs";
+import CalendarConfigs from "../../utils/configs/calendar.configs";
 import CalendarUtils from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator";
 
