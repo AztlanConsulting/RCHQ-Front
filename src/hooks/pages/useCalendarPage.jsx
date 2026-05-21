@@ -93,6 +93,15 @@ export const useCalendarPage = ({
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
+  const showEventDetail = useCallback((detail) => {
+    selectedEventRef.current = detail;
+    setSelectedEvent(detail);
+    setIsAbsenceEditing(false);
+    setIsDeleteAbsenceOpen(false);
+    setAbsenceEditError("");
+    setAbsenceDeleteError("");
+  }, []);
+
   const showCalendarAlert = useCallback((nextAlert) => {
     setAlert(nextAlert);
   }, []);
@@ -342,6 +351,7 @@ export const useCalendarPage = ({
     absenceEvidenceFileName,
     absenceEvidenceError,
     closeDetail,
+    showEventDetail,
     handleEventClick,
     absenceEvidenceLabel,
     openAbsenceEvidence,
