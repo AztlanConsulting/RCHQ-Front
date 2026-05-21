@@ -1,4 +1,4 @@
-import { secureFetch } from "../utils/helpers/secureFetchWrapper";
+import { secureFetch } from "../utils/secureFetchWrapper";
 import CalendarUtils from "../utils/calendar.utils";
 
 const API_URL = import.meta.env.VITE_API_URL;

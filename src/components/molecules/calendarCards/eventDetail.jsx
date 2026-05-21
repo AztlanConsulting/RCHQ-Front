@@ -1,6 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const EventDetail = ({ event, onEdit, onDelete }) => {
     if (!event) return null;

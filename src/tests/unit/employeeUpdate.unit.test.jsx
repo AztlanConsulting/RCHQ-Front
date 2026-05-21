@@ -22,7 +22,7 @@ vi.mock("../utils/apiErrors", () => ({
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
 import AuthUtils from "../../utils/auth.utils";
-import { secureFetch } from "@/utils/helpers/secureFetchWrapper";
+import { secureFetch } from "@/utils/secureFetchWrapper";
 import EmployeeService from "../../services/employee.service";
 
 import EmployeeContactCard from "../../components/organism/employeeContactCard";

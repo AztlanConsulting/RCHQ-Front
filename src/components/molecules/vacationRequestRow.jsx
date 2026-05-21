@@ -1,7 +1,7 @@
 import EmployeeAvatar from "../atoms/employeeAvatar";
 import Button from "../atoms/button";
-import Dates from "@/utils/helpers/dates";
-import Strings from "@/utils/helpers/strings";
+import Dates from "@/utils/helpers/dates.helpers";
+import Strings from "@/utils/helpers/strings.helpers";
 import CalendarUtils from "@/utils/calendar.utils";
 
 const VacationRequestRow = ({

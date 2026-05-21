@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import Dates from "../../utils/helpers/dates";
+import Dates from "../../utils/helpers/dates.helpers";
 
 describe("Dates (calendar date-only helpers)", () => {
   it("normaliza strings ISO a fechas YYYY-MM-DD sin desfase por zona horaria", () => {

@@ -1,7 +1,7 @@
 import DateField from "../atoms/dateField";
 import TextField from "../atoms/textField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
-import Strings from "../../utils/helpers/strings";
+import Strings from "../../utils/helpers/strings.helpers";
 
 const HouseLogsFilters = ({
   responsibleQuery,

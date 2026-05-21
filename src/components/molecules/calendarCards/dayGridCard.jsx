@@ -1,4 +1,4 @@
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const DayGridCard = ({ arg }) => {
     const start = arg.event.start;

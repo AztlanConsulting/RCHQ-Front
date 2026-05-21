@@ -5,7 +5,7 @@ import EventService from "../../services/event.service";
 //     Dates.addDaysToDateOnly,
 //     normalizeDateOnly,
 // } from "../../utils/calendarEventDetail";
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 import {
     buildPayload,
     houseEventSchema,

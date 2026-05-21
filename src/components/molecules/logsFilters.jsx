@@ -1,7 +1,7 @@
 import TextField from "../atoms/textField";
 import VacationDateField from "../atoms/vacationDateField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
-import Strings from "../../utils/helpers/strings";
+import Strings from "../../utils/helpers/strings.helpers";
 
 const LogsFilters = ({
   searchQuery,

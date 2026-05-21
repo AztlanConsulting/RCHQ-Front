@@ -4,7 +4,7 @@ import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import EmployeeUtils from "@/utils/employee.utils";
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const TIPOS = [
   { value: "Nomina", label: "Nómina" },

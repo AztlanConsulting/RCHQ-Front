@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import CalendarService from "../../services/calendar.service";
 import AuthUtils from "../../utils/auth.utils";
-import Dates from "../../utils/helpers/dates";
+import Dates from "../../utils/helpers/dates.helpers";
 
 const getCorrespondingView = (isList, viewType) => {
     if (viewType == "Month") {

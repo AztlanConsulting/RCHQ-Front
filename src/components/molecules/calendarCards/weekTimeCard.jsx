@@ -1,4 +1,4 @@
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const WeekTimeCard = ({ arg }) => {
   const ev = arg.event;

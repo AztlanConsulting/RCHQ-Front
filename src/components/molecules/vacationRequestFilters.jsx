@@ -2,7 +2,7 @@ import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import Button from "../atoms/button";
-import Strings from "../../utils/helpers/strings";
+import Strings from "../../utils/helpers/strings.helpers";
 
 const VacationRequestFilters = ({
     view,

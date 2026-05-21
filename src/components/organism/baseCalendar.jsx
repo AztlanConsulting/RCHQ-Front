@@ -11,7 +11,7 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 import CalendarUtils from "@/utils/calendar.utils";
-import Dates from "../../utils/helpers/dates";
+import Dates from "../../utils/helpers/dates.helpers";
 
 const MONTH_DAY_EVENT_CAP = 3;
 

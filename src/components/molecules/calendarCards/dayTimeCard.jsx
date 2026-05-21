@@ -1,4 +1,4 @@
-import Dates from "@/utils/helpers/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const DayTimeCard = ({ arg }) => {
   const ev = arg.event;
