@@ -7,21 +7,15 @@ class Dates {
   static DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
 
   /**
-   * México wall-clock workday slots for FullCalendar when using timeZone="UTC"
-   * and timed events have been passed through shiftCalendarApiInstantForFullCalendar.
+   * México wall-clock workday slots for FullCalendar (timeZone="local").
+   * Values are plain wall-clock hours; FullCalendar interprets them in the
+   * browser's local timezone, which matches México time on the target machine.
    */
-  static FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY = Object.freeze(
-    (() => {
-      const h = 6; // CALENDAR_DISPLAY_OFFSET_MS / (60 * 60 * 1000)
-      const hh = (wall) =>
-        `${String(Math.trunc(wall + h)).padStart(2, "0")}:00:00`;
-      return {
-        slotMinTime: hh(8),
-        slotMaxTime: hh(18),
-        scrollTime: hh(8),
-      };
-    })(),
-  );
+  static FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY = Object.freeze({
+    slotMinTime: "00:00:00",
+    slotMaxTime: "24:00:00",
+    scrollTime: "08:00:00",
+  });
 
   static isDateOnlyString(value) {
     if (value == null || value === "" || value instanceof Date) return false;

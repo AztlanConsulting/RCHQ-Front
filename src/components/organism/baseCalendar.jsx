@@ -15,7 +15,7 @@ import Dates from "../../utils/helpers/dates.helpers";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
-/** Left axis for time grids: "12am", "1am", … "12pm", "1pm" (locale "es" omits meridiem by default). */
+/** Left axis for time grids: "12am", "1am", … "12pm", "1pm". */
 const formatTimeGridSlotLabel = (date) => {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
     const h24 = date.getHours();
@@ -215,7 +215,7 @@ const BaseCalendar = ({
             plugins={FULL_CALENDAR_PLUGINS}
             locales={CALENDAR_LOCALES}
             locale="es"
-            timeZone="UTC"
+            timeZone="local"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             scrollTime={Dates.FULLCALENDAR_UTC_SLOTS_MEXICO_WORKDAY.scrollTime}

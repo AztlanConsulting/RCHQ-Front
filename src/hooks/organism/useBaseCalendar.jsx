@@ -371,8 +371,21 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const startDate = Dates.normalToUTCWithOffset(info.start);
-        const endDate = Dates.normalToUTCWithOffset(info.end, { seconds: -1 });
+        let startDate, endDate;
+
+        if (info.allDay) {
+            // Month view: info.startStr / info.endStr are "YYYY-MM-DD" strings.
+            // info.endStr is the exclusive next day, so subtract one day.
+            startDate = new Date(info.startStr.slice(0, 10) + "T00:00:00Z");
+            const endDateStr = Dates.addDaysToUTCDateOnly(info.endStr.slice(0, 10), -1);
+            endDate = new Date(endDateStr + "T00:00:00Z");
+        } else {
+            // Time-grid views: FullCalendar (timeZone="local") gives local-time Dates.
+            // normalToUTCWithOffset reads local components and re-encodes them as UTC,
+            // which is correct here since the local time IS the Mexico wall-clock time.
+            startDate = Dates.normalToUTCWithOffset(info.start);
+            endDate = Dates.normalToUTCWithOffset(info.end, { seconds: -1 });
+        }
 
         setSelectedDates({ startDate, endDate });
 
