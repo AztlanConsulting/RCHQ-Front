@@ -156,6 +156,40 @@ describe("VacationDetail", () => {
         expect(onEdit).toHaveBeenCalledTimes(1);
     });
 
+    it("mantiene el título de solicitud y el estilo del detalle al editar una vacación pendiente", () => {
+        renderVacationDetail({
+            isEditing: true,
+            vacationForm: {
+                startDate: "2026-06-05",
+                endDate: "2026-06-10",
+            },
+        });
+
+        const title = screen.getByRole("heading", {
+            name: "Solicitud de Vacaciones",
+        });
+
+        expect(title).toHaveClass("mb-5", "text-[2rem]", "leading-none");
+    });
+
+    it("mantiene el título Vacaciones al editar una vacación aprobada", () => {
+        renderVacationDetail({
+            isEditing: true,
+            event: {
+                ...baseVacation,
+                status: 1,
+            },
+            vacationForm: {
+                startDate: "2026-06-05",
+                endDate: "2026-06-10",
+            },
+        });
+
+        expect(
+            screen.getByRole("heading", { name: "Vacaciones" }),
+        ).toBeInTheDocument();
+    });
+
     it("muestra fechas actualizadas desde readableStart y readableEnd", () => {
         renderVacationDetail({
             event: {
