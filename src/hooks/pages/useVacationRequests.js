@@ -19,12 +19,17 @@ const DEFAULT_PAGINATION = {
     totalPages: 0,
 };
 
-export const useVacationRequests = ({ initialView = "pending" } = {}) => {
+const useVacationRequestsBase = ({
+    initialView,
+    getFetcher,
+    includeSearch = false,
+    errorMessage,
+    onReset = () => {},
+} = {}) => {
     const [view, setView] = useState(initialView);
     const [requests, setRequests] = useState([]);
     const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
     const [page, setPage] = useState(1);
-
     const {
         inputValue: searchInput,
         setInputValue: setSearchInput,
@@ -35,11 +40,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [endDate, setEndDate] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
 
-    const [selectedRequest, setSelectedRequest] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [approvingRequestId, setApprovingRequestId] = useState(null);
-    const [rejectingRequestId, setRejectingRequestId] = useState(null);
 
     const clearError = () => {
         setError("");
@@ -47,12 +49,12 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
 
     const filters = useMemo(
         () => ({
-            search: searchQuery,
+            ...(includeSearch ? { search: searchQuery } : {}),
             startDate,
             endDate,
             status: statusFilter,
         }),
-        [searchQuery, startDate, endDate, statusFilter],
+        [includeSearch, searchQuery, startDate, endDate, statusFilter],
     );
 
     const fetchRequests = useCallback(
@@ -71,10 +73,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
             setError("");
 
             try {
-                const fetcher =
-                    view === "pending"
-                        ? getPendingVacationRequests
-                        : getReviewedVacationRequests;
+                const fetcher = getFetcher(view);
 
                 const result = await fetcher({
                     page: pageToFetch,
@@ -88,12 +87,12 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
             } catch (err) {
                 setRequests([]);
                 setPagination(DEFAULT_PAGINATION);
-                setError(err.message || "No se pudieron cargar las solicitudes");
+                setError(err.message || errorMessage);
             } finally {
                 setLoading(false);
             }
         },
-        [view, filters],
+        [view, filters, getFetcher, errorMessage],
     );
 
     useEffect(() => {
@@ -107,7 +106,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const handleChangeView = (nextView) => {
         setView(nextView);
         setPage(1);
-        setSelectedRequest(null);
+        onReset();
     };
 
     const handleNextPage = () => {
@@ -127,9 +126,69 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         setStartDate("");
         setEndDate("");
         setStatusFilter("all");
-        setSelectedRequest(null);
         setPage(1);
+        onReset();
     };
+
+    return {
+        view,
+        setView: handleChangeView,
+        requests,
+        pagination,
+        page,
+        searchInput,
+        setSearchInput,
+        searchQuery,
+        startDate,
+        setStartDate,
+        endDate,
+        setEndDate,
+        statusFilter,
+        setStatusFilter,
+        loading,
+        error,
+        setError,
+        clearError,
+        handleNextPage,
+        handlePrevPage,
+        clearFilters,
+        refetch: (pageToFetch = page) => fetchRequests(pageToFetch),
+    };
+};
+
+const getVacationRequestsFetcher = (view) => {
+    return view === "pending"
+        ? getPendingVacationRequests
+        : getReviewedVacationRequests;
+};
+
+const getVacationListFetcher = (view) => {
+    return view === "future"
+        ? getFutureVacationRequests
+        : getPastVacationRequests;
+};
+
+export const useVacationRequests = ({ initialView = "pending" } = {}) => {
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [approvingRequestId, setApprovingRequestId] = useState(null);
+    const [rejectingRequestId, setRejectingRequestId] = useState(null);
+
+    const vacationRequests = useVacationRequestsBase({
+        initialView,
+        getFetcher: getVacationRequestsFetcher,
+        includeSearch: true,
+        errorMessage: "No se pudieron cargar las solicitudes",
+        onReset: () => setSelectedRequest(null),
+    });
+
+    const {
+        requests,
+        page,
+        refetch,
+        setError,
+    } = vacationRequests;
+
+    const clearError = vacationRequests.clearError;
 
     const handleApproveRequest = async (vacationRequestId) => {
         if (!vacationRequestId || approvingRequestId) return;
@@ -146,7 +205,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
                     ? currentPage - 1
                     : currentPage;
 
-            await fetchRequests(nextPage);
+            await refetch(nextPage);
         } catch (err) {
             setError(err.message || "No se pudo aprobar la solicitud");
             throw err;
@@ -170,7 +229,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
                     ? currentPage - 1
                     : currentPage;
 
-            await fetchRequests(nextPage);
+            await refetch(nextPage);
         } catch (err) {
             setError(err.message || "No se pudo rechazar la solicitud");
             throw err;
@@ -180,152 +239,21 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     };
 
     return {
-        view,
-        setView: handleChangeView,
-        requests,
-        pagination,
-        page,
-        searchInput,
-        setSearchInput,
-        searchQuery,
-        startDate,
-        setStartDate,
-        endDate,
-        setEndDate,
-        statusFilter,
-        setStatusFilter,
+        ...vacationRequests,
         selectedRequest,
         setSelectedRequest,
-        loading,
-        error,
         clearError,
         approvingRequestId,
         rejectingRequestId,
         handleApproveRequest,
         handleRejectRequest,
-        handleNextPage,
-        handlePrevPage,
-        clearFilters,
-        refetch: () => fetchRequests(page),
     };
 };
 
 export const useVacationList = ({ initialView = "future" } = {}) => {
-    const [view, setView] = useState(initialView);
-    const [requests, setRequests] = useState([]);
-    const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-    const [page, setPage] = useState(1);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-
-    const clearError = () => {
-        setError("");
-    };
-
-    const filters = useMemo(
-        () => ({
-            startDate,
-            endDate,
-            status: statusFilter,
-        }),
-        [startDate, endDate, statusFilter],
-    );
-
-    const fetchRequests = useCallback(
-        async (pageToFetch = 1) => {
-            const validationError = getVacationRequestFiltersError(filters);
-
-            if (validationError) {
-                setRequests([]);
-                setPagination(DEFAULT_PAGINATION);
-                setPage(1);
-                setError(validationError);
-                return;
-            }
-
-            setLoading(true);
-            setError("");
-
-            try {
-                const fetcher =
-                    view === "future"
-                        ? getFutureVacationRequests
-                        : getPastVacationRequests;
-
-                const result = await fetcher({
-                    page: pageToFetch,
-                    limit: LIMIT,
-                    ...filters,
-                });
-
-                setRequests(result.data);
-                setPagination(result.pagination);
-                setPage(result.pagination.page || pageToFetch);
-            } catch (err) {
-                setRequests([]);
-                setPagination(DEFAULT_PAGINATION);
-                setError(err.message || "No se pudieron cargar las vacaciones");
-            } finally {
-                setLoading(false);
-            }
-        },
-        [view, filters],
-    );
-
-    useEffect(() => {
-        fetchRequests(1);
-    }, [fetchRequests]);
-
-    useEffect(() => {
-        setPage(1);
-    }, [startDate, endDate, statusFilter, view]);
-
-    const handleChangeView = (nextView) => {
-        setView(nextView);
-        setPage(1);
-    };
-
-    const handleNextPage = () => {
-        if (page < pagination.totalPages) {
-            fetchRequests(page + 1);
-        }
-    };
-
-    const handlePrevPage = () => {
-        if (page > 1) {
-            fetchRequests(page - 1);
-        }
-    };
-
-    const clearFilters = () => {
-        setStartDate("");
-        setEndDate("");
-        setStatusFilter("all");
-        setPage(1);
-    };
-
-    return {
-        view,
-        setView: handleChangeView,
-        requests,
-        pagination,
-        page,
-        startDate,
-        setStartDate,
-        endDate,
-        setEndDate,
-        statusFilter,
-        setStatusFilter,
-        loading,
-        error,
-        clearError,
-        handleNextPage,
-        handlePrevPage,
-        clearFilters,
-        refetch: () => fetchRequests(page),
-    };
+    return useVacationRequestsBase({
+        initialView,
+        getFetcher: getVacationListFetcher,
+        errorMessage: "No se pudieron cargar las vacaciones",
+    });
 };
