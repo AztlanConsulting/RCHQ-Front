@@ -107,12 +107,16 @@ const SearchableCheckboxDropdown = ({
                     htmlFor={inputId}
                     className="inline-flex w-full cursor-pointer items-center rounded-md p-2 hover:bg-slate-100"
                   >
-                    <Checkbox
+                    <input
                       id={inputId}
+                      type="checkbox"
+                      name={name}
+                      value={String(option.value)}
                       checked={values.includes(option.value)}
                       onChange={(event) =>
                         onToggleValue?.(option.value, event.target.checked)
                       }
+                      className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
                     />
                     <span className="ms-2 w-full text-sm font-medium text-slate-800">
                       {option.label}
