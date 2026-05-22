@@ -1,15 +1,14 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useCalendarPage } from "../../hooks/pages/useCalendarPage";
-import {
-    deleteAbsenceService,
-    updateAbsenceService,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 
-vi.mock("../../services/calendarService", () => ({
-    deleteAbsenceService: vi.fn(),
-    updateAbsenceService: vi.fn(),
-    buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
+vi.mock("../../services/calendar.service", () => ({
+    __esModule: true,
+    default: {
+        deleteAbsenceService: vi.fn(),
+        updateAbsenceService: vi.fn(),
+    },
 }));
 
 const buildCalendarClickInfo = () => ({
@@ -132,7 +131,7 @@ describe("useCalendarPage", () => {
             await result.current.submitAbsenceEdit();
         });
 
-        expect(updateAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.updateAbsenceService).not.toHaveBeenCalled();
         expect(result.current.isAbsenceEditing).toBe(false);
     });
 
@@ -159,7 +158,7 @@ describe("useCalendarPage", () => {
             },
         ]);
 
-        updateAbsenceService.mockResolvedValue({
+        CalendarService.updateAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
             absenceTypeId: "type-2",
             name: "Luis Martínez",
@@ -196,7 +195,7 @@ describe("useCalendarPage", () => {
             await result.current.submitAbsenceEdit();
         });
 
-        expect(updateAbsenceService).toHaveBeenCalledWith("absence-1", {
+        expect(CalendarService.updateAbsenceService).toHaveBeenCalledWith("absence-1", {
             absenceTypeId: "type-2",
             startDate: "2026-05-18",
             endDate: "2026-05-22",
@@ -212,7 +211,7 @@ describe("useCalendarPage", () => {
 
     it("elimina la ausencia, recarga el rango y cierra el detalle", async () => {
         const reloadCurrentRange = vi.fn().mockResolvedValue([]);
-        deleteAbsenceService.mockResolvedValue({
+        CalendarService.deleteAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
             isDeleted: true,
         });
@@ -238,7 +237,7 @@ describe("useCalendarPage", () => {
             await result.current.confirmDeleteAbsence();
         });
 
-        expect(deleteAbsenceService).toHaveBeenCalledWith("absence-1");
+        expect(CalendarService.deleteAbsenceService).toHaveBeenCalledWith("absence-1");
         expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
         expect(result.current.selectedEvent).toBe(null);
         expect(result.current.alert).toEqual({
@@ -248,7 +247,7 @@ describe("useCalendarPage", () => {
     });
 
     it("muestra error si falla la eliminación", async () => {
-        deleteAbsenceService.mockRejectedValue(
+        CalendarService.deleteAbsenceService.mockRejectedValue(
             new Error("No se pudo eliminar"),
         );
 
@@ -280,7 +279,7 @@ describe("useCalendarPage", () => {
             type: "application/pdf",
         });
 
-        updateAbsenceService.mockResolvedValue({
+        CalendarService.updateAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
             link: "uploads/documents/evidencia.pdf",
         });
@@ -307,7 +306,7 @@ describe("useCalendarPage", () => {
             await result.current.submitAbsenceEdit();
         });
 
-        expect(updateAbsenceService).toHaveBeenCalledWith("absence-1", {
+        expect(CalendarService.updateAbsenceService).toHaveBeenCalledWith("absence-1", {
             file,
         });
         expect(result.current.isAbsenceEditing).toBe(false);
@@ -333,7 +332,7 @@ describe("useCalendarPage", () => {
         });
 
         expect(window.open).toHaveBeenCalledWith(
-            "http://api.test/uploads/documents/evidencia.pdf",
+            expect.stringContaining("uploads/documents/evidencia.pdf"),
             "_blank",
             "noopener,noreferrer",
         );

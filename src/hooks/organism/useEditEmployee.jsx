@@ -4,13 +4,8 @@ import {
   employeeContactUpdateSchema, 
   employeeAdminUpdateSchema,
   normalizeEmployeeContractType,
-} from "../../utils/schema/employee/update.schema";
-import {
-  getUpdateFormService,
-  updateBasicInfoService,
-  updateContactInfoService,
-  updateAdminInfoService,
-} from "../../services/employeeUpdateService";
+} from "../../utils/schemas/employee/update.schema";
+import EmployeeService from "../../services/employee.service";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
   const [editSection, setEditSection] = useState(null);
@@ -71,7 +66,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setEditSection("Administrador");
     setLoadingCatalogues(true);
     try {
-      const formData = await getUpdateFormService();
+      const formData = await EmployeeService.getUpdateForm();
       setRoles(formData?.roles ?? []);
       setAllWorkdays(formData?.workdays ?? []);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
@@ -198,7 +193,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
       }
 
-      await updateBasicInfoService(employeeId, validation.data);
+      await EmployeeService.updateBasicInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
     } catch (err) {
@@ -218,7 +213,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Es necesario completar todos los campos de contacto.");
       }
 
-      await updateContactInfoService(employeeId, validation.data);
+      await EmployeeService.updateContactInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información de contacto actualizada con éxito");
     } catch (err) {
@@ -290,7 +285,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Revisa los campos administrativos.");
       }
 
-      await updateAdminInfoService(employeeId, validation.data);
+      await EmployeeService.updateAdminInfo(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {

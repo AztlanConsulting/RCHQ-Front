@@ -3,12 +3,8 @@ import Loader from "../atoms/loader";
 import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
-import {
-  countWorkdayDays,
-  countWorkdaysHours,
-  parseUTCDateToHours,
-  totalWorkDaysFromApprovedVacationRequests,
-} from "@/utils/detalle-empleado.utils";
+import EmployeeUtils from "@/utils/employee.utils";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const TIPOS = [
   { value: "Nomina", label: "Nómina" },
@@ -132,7 +128,7 @@ const EmployeeAdminCard = ({
             <div>
               <Type variant="metric-label" as="p">Días Trabajados</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {countWorkdayDays(employeeWorkdays)}
+                {EmployeeUtils.countWorkdayDays(employeeWorkdays)}
               </Type>
             </div>
             <div className="min-w-0 sm:ml-auto sm:text-right">
@@ -146,7 +142,7 @@ const EmployeeAdminCard = ({
                 />
               </div>
               <Type variant="metric-value" as="p" className="mt-0.5 sm:text-right">
-                {countWorkdaysHours(employeeWorkdays)}
+                {EmployeeUtils.countWorkdaysHours(employeeWorkdays)}
               </Type>
             </div>
           </div>
@@ -157,7 +153,7 @@ const EmployeeAdminCard = ({
                 <div key={w.workdayId} className="w-full flex justify-between">
                   <Type variant="metric-label">{w.name}</Type>
                   <Type variant="metric-label">
-                    {`${parseUTCDateToHours(w.start)} - ${parseUTCDateToHours(w.end)}`}
+                    {`${Dates.parseUTCDateToHours(w.start)} - ${Dates.parseUTCDateToHours(w.end)}`}
                   </Type>
                 </div>
               ))}
@@ -174,7 +170,7 @@ const EmployeeAdminCard = ({
             <div className="min-w-0 sm:text-right">
               <Type variant="metric-label" as="p">Días</Type>
               <Type variant="metric-value" as="p" className="mt-0.5">
-                {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12 Usados`}
+                {`${EmployeeUtils.totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12 Usados`}
               </Type>
             </div>
           </div>

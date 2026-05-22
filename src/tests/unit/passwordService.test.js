@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  changePasswordFirstLoginService,
-  changePasswordService,
-} from "../../services/passwordService";
+import PasswordService from "../../services/password.service";
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({
@@ -25,7 +22,7 @@ beforeEach(() => {
 describe("changePasswordFirstLoginService", () => {
   it("lanza error cuando no existe FIRST_LOGIN en localStorage", async () => {
     await expect(
-      changePasswordFirstLoginService("Nueva123", "Nueva123"),
+      PasswordService.changePasswordFirstLogin("Nueva123", "Nueva123"),
     ).rejects.toThrow("No se encontró token de primer inicio de sesión");
   });
 
@@ -40,7 +37,7 @@ describe("changePasswordFirstLoginService", () => {
       },
     });
 
-    await changePasswordFirstLoginService("Nueva123", "Nueva123");
+    await PasswordService.changePasswordFirstLogin("Nueva123", "Nueva123");
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/auth/first-login/change-password"),
@@ -61,7 +58,7 @@ describe("changePasswordFirstLoginService", () => {
   it("elimina FIRST_LOGIN y guarda token y user cuando el cambio es exitoso", async () => {
     seedLocalStorage({ FIRST_LOGIN: "first-token-123" });
 
-    await changePasswordFirstLoginService("Nueva123", "Nueva123");
+    await PasswordService.changePasswordFirstLogin("Nueva123", "Nueva123");
 
     mockFetch({
       success: true,
@@ -83,7 +80,7 @@ describe("changePasswordFirstLoginService", () => {
       },
     });
 
-    const result = await changePasswordFirstLoginService(
+    const result = await PasswordService.changePasswordFirstLogin(
       "Nueva123",
       "Nueva123",
     );
@@ -110,7 +107,7 @@ describe("changePasswordFirstLoginService", () => {
     );
 
     await expect(
-      changePasswordFirstLoginService("Nueva123", "Nueva123"),
+      PasswordService.changePasswordFirstLogin("Nueva123", "Nueva123"),
     ).rejects.toMatchObject({
       message: "Nueva contraseña no puede ser igual a la actual",
       status: 400,
@@ -122,7 +119,7 @@ describe("changePasswordFirstLoginService", () => {
 describe("changePasswordService", () => {
   it("lanza error cuando no hay token de sesión", async () => {
     await expect(
-      changePasswordService("Actual123", "Nueva123", "Nueva123"),
+      PasswordService.changePassword("Actual123", "Nueva123", "Nueva123"),
     ).rejects.toThrow("No se encontró token de sesión");
   });
 
@@ -135,7 +132,7 @@ describe("changePasswordService", () => {
       data: { employeeId: "EMP001" },
     });
 
-    await changePasswordService("Actual123", "Nueva123", "Nueva123");
+    await PasswordService.changePassword("Actual123", "Nueva123", "Nueva123");
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/auth/change-password"),
@@ -163,7 +160,7 @@ describe("changePasswordService", () => {
       data: { employeeId: "EMP001" },
     });
 
-    const result = await changePasswordService(
+    const result = await PasswordService.changePassword(
       "Actual123",
       "Nueva123",
       "Nueva123",
@@ -190,7 +187,7 @@ describe("changePasswordService", () => {
     );
 
     await expect(
-      changePasswordService("Mal123", "Nueva123", "Nueva123"),
+      PasswordService.changePassword("Mal123", "Nueva123", "Nueva123"),
     ).rejects.toMatchObject({
       message: "Credenciales inválidas",
       status: 401,

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";
-import { loginService, getReadableErrors } from "../../services/authService";
-import { loginSchema } from "../../utils/schema/auth/auth.schemas";
+import AuthService from "../../services/auth.service";
+import { loginSchema } from "../../utils/schemas/auth/auth.schemas";
 import useAuth from "../useAuth";
 import { useState } from "react";
 
@@ -48,7 +48,7 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      const response = await loginService(
+      const response = await AuthService.login(
         result.data.email,
         result.data.password,
       );
@@ -75,7 +75,7 @@ export const useLogin = () => {
       navigate("/app/calendario", { replace: true });
     } catch (err) {
       console.error(err);
-      setErrors(getReadableErrors(err));
+      setErrors(AuthService.getReadableErrors(err));
     } finally {
       setLoading(false);
     }

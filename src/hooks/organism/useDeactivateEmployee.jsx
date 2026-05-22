@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { deactivateEmployeeSchema } from "@/utils/schema/employee/deactivate.schema";
-import {
-  deactivateEmployeeService,
-} from "@/services/deactivateEmployeeService";
+import { deactivateEmployeeSchema } from "@/utils/schemas/employee/deactivate.schema";
+import EmployeeService from "@/services/employee.service";
 
 export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,7 +57,7 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
     setFieldError(null);
 
     try {
-      await deactivateEmployeeService(employeeId, reason, addToBlacklist);
+      await EmployeeService.deactivateEmployee(employeeId, reason, addToBlacklist);
       setIsModalOpen(false);
       setAlert({
         type: "success",

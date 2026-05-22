@@ -18,28 +18,29 @@ vi.mock("../../../src/hooks/useAuth", () => ({
   default: () => ({ login: mockLogin }),
 }));
 
-vi.mock("../../../src/utils/authStorage", () => ({
-  getFirstLoginToken: vi.fn(),
-  setPreTwoFactorAuthToken: vi.fn((token) => {
-    localStorage.setItem("preTwoFactorAuth", token);
-  }),
+vi.mock("../../../src/utils/auth.utils", () => ({
+  default: {
+    getFirstLoginToken: vi.fn(),
+    setPreTwoFactorAuthToken: vi.fn((token) => {
+      localStorage.setItem("preTwoFactorAuth", token);
+    }),
+  },
 }));
 
-vi.mock("../../../src/services/passwordService", () => ({
-  changePasswordFirstLoginService: vi.fn(),
+vi.mock("../../../src/services/password.service", () => ({
+  default: {
+    changePasswordFirstLogin: vi.fn(),
+  },
 }));
 
-vi.mock("../../../src/utils/password/passwordErrorMapper", () => ({
+vi.mock("../../../src/utils/mappers/auth/passwordErrorMapper", () => ({
   mapPasswordApiError: vi.fn(() => [
     "La nueva contraseña debe ser diferente a la temporal",
   ]),
 }));
 
-import {
-  getFirstLoginToken,
-  setPreTwoFactorAuthToken,
-} from "../../utils/authStorage";
-import { changePasswordFirstLoginService } from "../../services/passwordService";
+import AuthUtils from "../../utils/auth.utils";
+import PasswordService from "../../services/password.service";
 
 const renderPage = () =>
   render(
@@ -58,12 +59,12 @@ const fillAndSubmit = async (newPassword, confirmPassword) => {
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getFirstLoginToken.mockReturnValue("first-login-token");
+  AuthUtils.getFirstLoginToken.mockReturnValue("first-login-token");
 });
 
 describe("ChangePassword — integración", () => {
   it("redirige a iniciar sesión si no hay first login token", () => {
-    getFirstLoginToken.mockReturnValue(null);
+    AuthUtils.getFirstLoginToken.mockReturnValue(null);
 
     renderPage();
 
@@ -83,11 +84,11 @@ describe("ChangePassword — integración", () => {
       ).toBeInTheDocument();
     });
 
-    expect(changePasswordFirstLoginService).not.toHaveBeenCalled();
+    expect(PasswordService.changePasswordFirstLogin).not.toHaveBeenCalled();
   });
 
   it("hace login y navega al dashboard cuando el cambio es exitoso", async () => {
-    changePasswordFirstLoginService.mockResolvedValue({
+    PasswordService.changePasswordFirstLogin.mockResolvedValue({
       success: true,
       data: {
         token: "session-token",
@@ -99,7 +100,7 @@ describe("ChangePassword — integración", () => {
     await fillAndSubmit("NuevaPass123", "NuevaPass123");
 
     await waitFor(() => {
-      expect(changePasswordFirstLoginService).toHaveBeenCalledWith(
+      expect(PasswordService.changePasswordFirstLogin).toHaveBeenCalledWith(
         "NuevaPass123",
         "NuevaPass123",
       );
@@ -114,7 +115,7 @@ describe("ChangePassword — integración", () => {
   });
 
   it("navega a /2FA cuando el backend indica VERIFY_2FA", async () => {
-    changePasswordFirstLoginService.mockResolvedValue({
+    PasswordService.changePasswordFirstLogin.mockResolvedValue({
       success: true,
       nextStep: "VERIFY_TWO_FACTOR_AUTH",
       data: {
@@ -126,7 +127,7 @@ describe("ChangePassword — integración", () => {
     await fillAndSubmit("NuevaPass123", "NuevaPass123");
 
     await waitFor(() => {
-      expect(setPreTwoFactorAuthToken).toHaveBeenCalledWith("pre-2fa-token");
+      expect(AuthUtils.setPreTwoFactorAuthToken).toHaveBeenCalledWith("pre-2fa-token");
       expect(localStorage.getItem("preTwoFactorAuth")).toBe("pre-2fa-token");
       expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
     });
@@ -137,7 +138,7 @@ describe("ChangePassword — integración", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    changePasswordFirstLoginService.mockRejectedValue(
+    PasswordService.changePasswordFirstLogin.mockRejectedValue(
       new Error("backend error"),
     );
 

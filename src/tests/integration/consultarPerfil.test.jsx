@@ -3,21 +3,25 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Perfil from "../../pages/perfil";
 
-vi.mock("../../services/profileService", () => ({
-  getUserData:      vi.fn(),
-  getReadableErrors: vi.fn((err) => {
-    if (Array.isArray(err?.errors) && err.errors.length > 0)
-      return err.errors.map((e) => e.message);
-    if (err?.message) return [err.message];
-    return ["Ocurrió un error inesperado"];
-  }),
+vi.mock("../../services/profile.service", () => ({
+  default: {
+    ProfileService.getUserData:      vi.fn(),
+    getReadableErrors: vi.fn((err) => {
+      if (Array.isArray(err?.errors) && err.errors.length > 0)
+        return err.errors.map((e) => e.message);
+      if (err?.message) return [err.message];
+      return ["Ocurrió un error inesperado"];
+    }),
+  },
 }));
 
-vi.mock("../../utils/authStorage", () => ({
-  getToken: vi.fn(() => "fake-token"),
+vi.mock("../../utils/auth.utils", () => ({
+  default: {
+    getToken: vi.fn(() => "fake-token"),
+  },
 }));
 
-import { getUserData } from "../../services/profileService";
+import ProfileService from "../../services/profile.service";
 
 const mockUserRaw = {
   picture:     null,
@@ -53,7 +57,7 @@ describe("Consultar Perfil — integración", () => {
 
   it("muestra el skeleton mientras carga y luego lo oculta", async () => {
     let resolve;
-    getUserData.mockReturnValue(new Promise((res) => { resolve = res; }));
+    ProfileService.getUserData.mockReturnValue(new Promise((res) => { resolve = res; }));
 
     renderPage();
 
@@ -66,7 +70,7 @@ describe("Consultar Perfil — integración", () => {
   });
 
   it("200 — muestra la información del perfil del usuario", async () => {
-    getUserData.mockResolvedValue({ data: mockUserRaw });
+    ProfileService.getUserData.mockResolvedValue({ data: mockUserRaw });
 
     renderPage();
 
@@ -90,21 +94,21 @@ describe("Consultar Perfil — integración", () => {
   });
 
   it("200 — la llamada a la API recibe el token correcto", async () => {
-    getUserData.mockResolvedValue({ data: mockUserRaw });
+    ProfileService.getUserData.mockResolvedValue({ data: mockUserRaw });
 
     renderPage();
     await waitFor(() =>
       expect(screen.getAllByText("Datos del Usuario").length).toBeGreaterThan(0),
     );
 
-    expect(getUserData).toHaveBeenCalledTimes(1);
-    expect(getUserData).toHaveBeenCalledWith("fake-token");
+    expect(ProfileService.getUserData).toHaveBeenCalledTimes(1);
+    expect(ProfileService.getUserData).toHaveBeenCalledWith("fake-token");
   });
 
   it("401 — muestra error de permisos sin botón de reintentar", async () => {
     const err = new Error("No tienes permisos para ver esta información.");
     err.status = 401;
-    getUserData.mockRejectedValue(err);
+    ProfileService.getUserData.mockRejectedValue(err);
 
     renderPage();
 
@@ -120,7 +124,7 @@ describe("Consultar Perfil — integración", () => {
   it("404 — muestra error de ruta no encontrada con botón de reintentar", async () => {
     const err = new Error("Ruta no encontrada.");
     err.status = 404;
-    getUserData.mockRejectedValue(err);
+    ProfileService.getUserData.mockRejectedValue(err);
 
     renderPage();
 
@@ -133,7 +137,7 @@ describe("Consultar Perfil — integración", () => {
   it("501 — muestra error del servidor con botón de reintentar", async () => {
     const err = new Error("Ocurrió un problema al obtener la información.");
     err.status = 501;
-    getUserData.mockRejectedValue(err);
+    ProfileService.getUserData.mockRejectedValue(err);
 
     renderPage();
 
@@ -149,7 +153,7 @@ describe("Consultar Perfil — integración", () => {
   it("reintentar — vuelve a llamar a la API y muestra el perfil al resolverse", async () => {
     const err = new Error("Ruta no encontrada.");
     err.status = 404;
-    getUserData
+    ProfileService.getUserData
       .mockRejectedValueOnce(err)
       .mockResolvedValueOnce({ data: mockUserRaw });
 
@@ -165,7 +169,7 @@ describe("Consultar Perfil — integración", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Datos del Usuario").length).toBeGreaterThan(0);
     });
-    expect(getUserData).toHaveBeenCalledTimes(2);
+    expect(ProfileService.getUserData).toHaveBeenCalledTimes(2);
   });
 
 });

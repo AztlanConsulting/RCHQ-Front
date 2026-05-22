@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  downloadHouseLogsReportService,
-  getHouseLogsService,
-  getLogsActionsService,
-} from "../../services/logsService";
+import LogsService from "../../services/logs.service";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 
 const MOBILE_BREAKPOINT = 640;
@@ -121,7 +117,7 @@ export const useHouseLogs = () => {
     setError("");
 
     try {
-      const result = await getHouseLogsService({
+      const result = await LogsService.getLogs({
         page: pageToFetch,
         limit,
         responsible: responsibleSearch,
@@ -146,7 +142,7 @@ export const useHouseLogs = () => {
   useEffect(() => {
     const fetchActions = async () => {
       try {
-        const actions = await getLogsActionsService();
+        const actions = await LogsService.getActions();
         setActionOptions(
           actions.map((action) => ({
             value: action.actionId,
@@ -237,7 +233,7 @@ export const useHouseLogs = () => {
     setError("");
 
     try {
-      const { blob, fileName } = await downloadHouseLogsReportService({
+      const { blob, fileName } = await LogsService.downloadReport({
         month: reportMonth,
         year: reportYear,
       });

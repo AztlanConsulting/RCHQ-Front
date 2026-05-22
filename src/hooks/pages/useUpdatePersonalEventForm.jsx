@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { updatePersonalEvent } from "../../services/updateEventService";
-import { getEventTypes, getEmployeesForSelector } from "../../services/eventService";
-import { getCalendarViewerRole } from "../../services/calendarService";
-import { normalizeDateOnly } from "../../utils/calendarEventDetail";
+import EventService from "../../services/event.service";
+import AuthUtils from "../../utils/auth.utils";
+import Dates from "@/utils/helpers/dates.helpers";
 import {
     buildPersonalPayload,
     personalEventSchema,
-} from "../../utils/schema/evento/personalEvent.schema";
+} from "../../utils/schemas/calendar/personalEvent.schema";
 
 const DEFAULT_FORM = {
     name: "",
@@ -30,7 +29,7 @@ const getTimeValue = (value) => {
 
 const getInitialForm = (event) => {
     if (!event) return DEFAULT_FORM;
-    const date = normalizeDateOnly(event.date ?? event.start);
+    const date = Dates.normalizeDateOnly(event.date ?? event.start);
     return {
         name: event.title ?? "",
         eventTypeId: event.eventTypeId ?? "",
@@ -88,7 +87,7 @@ export const useUpdatePersonalEventForm = ({
     const personalEventId = useMemo(() => event?.eventId ?? "", [event]);
 
     useEffect(() => {
-        const role = getCalendarViewerRole();
+        const role = AuthUtils.getCalendarViewerRole();
         setIsCoordinator(role === "Coordinador");
     }, []);
 
@@ -108,7 +107,7 @@ export const useUpdatePersonalEventForm = ({
 
     useEffect(() => {
         if (!isOpen) return;
-        getEventTypes()
+        EventService.getEventTypes()
             .then((types) => {
                 const options = types.map((t) => ({
                     value: t.eventTypeId,
@@ -132,12 +131,12 @@ export const useUpdatePersonalEventForm = ({
         async (query) => {
             if (!isCoordinator) return;
             try {
-                const results = await getEmployeesForSelector(
+                const results = await EventService.getEmployeesForSelector(
                     query ? { search: query } : {},
                 );
                 setEmployees(results);
-            } catch (error){
-                console.error(error)
+            } catch (error) {
+                console.error(error);
             }
         },
         [isCoordinator],
@@ -205,7 +204,10 @@ export const useUpdatePersonalEventForm = ({
         setIsSubmitting(true);
         setServerError(null);
         try {
-            const response = await updatePersonalEvent(personalEventId, payload);
+            const response = await EventService.updatePersonalEvent(
+                personalEventId,
+                payload,
+            );
 
             if (
                 !response.success &&
@@ -242,10 +244,13 @@ export const useUpdatePersonalEventForm = ({
     const handleForceOverlap = async () => {
         setOverlapState((prev) => ({ ...prev, isForcing: true }));
         try {
-            const response = await updatePersonalEvent(personalEventId, {
-                ...overlapState.pendingPayload,
-                forceOverlap: true,
-            });
+            const response = await EventService.updatePersonalEvent(
+                personalEventId,
+                {
+                    ...overlapState.pendingPayload,
+                    forceOverlap: true,
+                },
+            );
 
             onSuccess?.(response.data);
             onClose?.();

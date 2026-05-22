@@ -22,7 +22,7 @@ describe("vacationService", () => {
             getVacationEmployees,
             getRemainingVacations,
             registerEmployeeVacation,
-        } = await import("../../services/vacationService"));
+        } = await import("../../services/vacation.service"));
     };
 
     beforeEach(async () => {

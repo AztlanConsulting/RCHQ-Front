@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { getUserData, getReadableErrors } from "../services/profileService";
-import { getToken } from "../utils/authStorage";
+import ProfileService from "../services/profile.service";
+import AuthUtils from "../utils/auth.utils";
 import ProfileCard from "../components/organism/profileCard";
 
 const STATUS_MAP = {
@@ -65,8 +65,8 @@ const Perfil = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = getToken();
-      const data  = await getUserData(token);
+      const token = AuthUtils.getToken();
+      const data  = await ProfileService.getUserData(token);
       const raw   = data?.data ?? data;
       setUser({
         foto:           raw?.picture     ?? "",
@@ -86,7 +86,7 @@ const Perfil = () => {
           : "",
       });
     } catch (err) {
-      setError({ status: err?.status ?? "default", messages: getReadableErrors(err) });
+      setError({ status: err?.status ?? "default", messages: ProfileService.getReadableErrors(err) });
     } finally {
       setLoading(false);
     }

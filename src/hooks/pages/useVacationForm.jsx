@@ -3,8 +3,8 @@ import {
     getVacationEmployees,
     getRemainingVacations,
     registerEmployeeVacation,
-} from "../../services/vacationService";
-import { getVacationFormErrors } from "../../utils/schema/vacation/vacation.schema";
+} from "../../services/vacation.service";
+import { getVacationFormErrors } from "../../utils/schemas/calendar/vacation.schema";
 
 const EMPTY_FORM = {
     employeeId: "",

@@ -15,27 +15,31 @@ import DetalleEmpleado from "../../pages/detalleEmpleado";
 // Mocks
 // ══════════════════════════════════════════════════════════════════════════════
 
-vi.mock("../../services/employeeUpdateService", () => ({
-  getUpdateFormService:     vi.fn(),
-  updateBasicInfoService:   vi.fn(),
-  updateContactInfoService: vi.fn(),
-  updateAdminInfoService:   vi.fn(),
+vi.mock("../../services/employee.service", () => ({
+  default: {
+    getUpdateForm:     vi.fn(),
+    updateBasicInfo:   vi.fn(),
+    updateContactInfo: vi.fn(),
+    updateAdminInfo:   vi.fn(),
+  },
 }));
 
-vi.mock("../../services/documentService", () => ({
-  getDocumentsService:     vi.fn().mockResolvedValue({ success: true, body: null }),
-  getDocumentTypesService: vi.fn().mockResolvedValue([]),
-  uploadDocumentService:   vi.fn(),
-  updateDocumentService:   vi.fn(),
-  deleteDocumentService:   vi.fn(),
-  DOCUMENT_TYPES:          [],
+vi.mock("../../services/document.service", () => ({
+  default: {
+    getDocuments:     vi.fn().mockResolvedValue({ success: true, body: null }),
+    getTypes:         vi.fn().mockResolvedValue([]),
+    upload:           vi.fn(),
+    update:           vi.fn(),
+    delete:           vi.fn(),
+    DOCUMENT_TYPES:   [],
+  },
 }));
 
 vi.mock("../../hooks/pages/useEmployeeDetail", () => ({
   useEmployeeDetail: vi.fn(),
 }));
 
-vi.mock("../../utils/schema/employee/update.schema", () => ({
+vi.mock("../../utils/schemas/employee/update.schema", () => ({
   employeeBasicUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeContactUpdateSchema: { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeAdminUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
@@ -45,12 +49,7 @@ vi.mock("../../utils/schema/employee/update.schema", () => ({
   }),
 }));
 
-import {
-  getUpdateFormService,
-  updateBasicInfoService,
-  updateContactInfoService,
-  updateAdminInfoService,
-} from "../../services/employeeUpdateService";
+import EmployeeService from "../../services/employee.service";
 import { useEmployeeDetail } from "../../hooks/pages/useEmployeeDetail";
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -148,7 +147,7 @@ beforeEach(() => {
   localStorage.clear();
   setupEmployeeDetail();
 
-  getUpdateFormService.mockResolvedValue({
+  EmployeeService.getUpdateForm.mockResolvedValue({
     roles:    [{ roleId: "r1", name: "Administrador" }, { roleId: "r2", name: "Coordinador" }],
     houses:   [{ houseId: "h1", name: "Desarrollo" }],
     workdays: [
@@ -156,9 +155,9 @@ beforeEach(() => {
       { workdayId: "wd2", name: "Martes" },
     ],
   });
-  updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
-  updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
-  updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
+  EmployeeService.updateBasicInfo.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
+  EmployeeService.updateContactInfo.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
+  EmployeeService.updateAdminInfo.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -252,7 +251,7 @@ describe("DetalleEmpleado — editar información básica", () => {
     });
 
     await waitFor(() => {
-      expect(updateBasicInfoService).toHaveBeenCalledWith(
+      expect(EmployeeService.updateBasicInfo).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
         expect.any(Object),
       );
@@ -280,7 +279,7 @@ describe("DetalleEmpleado — editar información básica", () => {
   });
 
   it("muestra el error en la tarjeta cuando updateBasicInfoService falla", async () => {
-    updateBasicInfoService.mockRejectedValue(
+    EmployeeService.updateBasicInfo.mockRejectedValue(
       Object.assign(new Error("Datos inválidos"), { status: 400 }),
     );
     renderPage();
@@ -333,7 +332,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     });
 
     await waitFor(() => {
-      expect(updateContactInfoService).toHaveBeenCalledWith(
+      expect(EmployeeService.updateContactInfo).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
         expect.objectContaining({ email: "nuevo@mail.com" }),
       );
@@ -361,7 +360,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
   });
 
   it("muestra error en la tarjeta cuando updateContactInfoService falla", async () => {
-    updateContactInfoService.mockRejectedValue(
+    EmployeeService.updateContactInfo.mockRejectedValue(
       Object.assign(new Error("Email inválido"), { status: 400 }),
     );
     renderPage();
@@ -396,7 +395,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => {
-      expect(getUpdateFormService).toHaveBeenCalledTimes(1);
+      expect(EmployeeService.getUpdateForm).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -438,7 +437,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     });
 
     await waitFor(() => {
-      expect(updateAdminInfoService).toHaveBeenCalledWith(
+      expect(EmployeeService.updateAdminInfo).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
         expect.objectContaining({ salary: 20000 }),
       );
@@ -471,7 +470,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("muestra error en la tarjeta cuando updateAdminInfoService falla", async () => {
-    updateAdminInfoService.mockRejectedValueOnce(
+    EmployeeService.updateAdminInfo.mockRejectedValueOnce(
       Object.assign(new Error("Salario inválido"), { status: 400 }),
     );
     renderPage();
@@ -491,7 +490,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("deshabilita Guardar mientras carga catálogos", async () => {
-    getUpdateFormService.mockImplementation(
+    EmployeeService.getUpdateForm.mockImplementation(
       () => new Promise((resolve) =>
         setTimeout(() => resolve({ roles: [], houses: [], workdays: [] }), 500)
       ),

@@ -1,55 +1,51 @@
 import { describe, it, expect } from "vitest";
-import {
-    formatDate,
-    getSafeText,
-    getStatusClassName,
-} from "../../utils/vacationRequests";
+import Dates from "../../utils/helpers/dates.helpers";
+import Strings from "../../utils/helpers/strings.helpers";
+import CalendarUtils from "../../utils/calendar.utils";
 
-describe("vacationRequests utils", () => {
-    describe("formatDate", () => {
-        it("formatea fechas válidas en formato es-MX", () => {
-            expect(formatDate("2026-05-15T00:00:00.000Z")).toBe("15/05/2026");
-        });
-
-        it("regresa guion cuando no hay fecha", () => {
-            expect(formatDate(null)).toBe("-");
-            expect(formatDate(undefined)).toBe("-");
-            expect(formatDate("")).toBe("-");
-        });
-
-        it("regresa guion cuando la fecha es inválida", () => {
-            expect(formatDate("fecha inválida")).toBe("-");
-        });
+describe("Dates.formatDate", () => {
+    it("formatea fechas válidas en formato es-MX", () => {
+        expect(Dates.formatDate("2026-05-15T00:00:00.000Z")).toBe("15/05/2026");
     });
 
-    describe("getSafeText", () => {
-        it("regresa el texto limpio cuando existe", () => {
-            expect(getSafeText("  Ana Pendiente  ")).toBe("Ana Pendiente");
-        });
-
-        it("regresa fallback cuando el valor es null, undefined o vacío", () => {
-            expect(getSafeText(null)).toBe("-");
-            expect(getSafeText(undefined)).toBe("-");
-            expect(getSafeText("   ")).toBe("-");
-        });
-
-        it("permite fallback personalizado", () => {
-            expect(getSafeText("", "Sin dato")).toBe("Sin dato");
-        });
+    it("regresa guion cuando no hay fecha", () => {
+        expect(Dates.formatDate(null)).toBe("-");
+        expect(Dates.formatDate(undefined)).toBe("-");
+        expect(Dates.formatDate("")).toBe("-");
     });
 
-    describe("getStatusClassName", () => {
-        it("regresa clase verde para aprobada", () => {
-            expect(getStatusClassName(1)).toContain("green");
-        });
+    it("regresa guion cuando la fecha es inválida", () => {
+        expect(Dates.formatDate("fecha inválida")).toBe("-");
+    });
+});
 
-        it("regresa clase roja para rechazada", () => {
-            expect(getStatusClassName(2)).toContain("red");
-        });
+describe("Strings.getSafeText", () => {
+    it("regresa el texto limpio cuando existe", () => {
+        expect(Strings.getSafeText("  Ana Pendiente  ")).toBe("Ana Pendiente");
+    });
 
-        it("regresa clase amarilla para pendiente o estado desconocido", () => {
-            expect(getStatusClassName(0)).toContain("yellow");
-            expect(getStatusClassName(999)).toContain("yellow");
-        });
+    it("regresa fallback cuando el valor es null, undefined o vacío", () => {
+        expect(Strings.getSafeText(null)).toBe("-");
+        expect(Strings.getSafeText(undefined)).toBe("-");
+        expect(Strings.getSafeText("   ")).toBe("-");
+    });
+
+    it("permite fallback personalizado", () => {
+        expect(Strings.getSafeText("", "Sin dato")).toBe("Sin dato");
+    });
+});
+
+describe("CalendarUtils.getVacationStatusClassName", () => {
+    it("regresa clase verde para aprobada", () => {
+        expect(CalendarUtils.getVacationStatusClassName(1)).toContain("green");
+    });
+
+    it("regresa clase roja para rechazada", () => {
+        expect(CalendarUtils.getVacationStatusClassName(2)).toContain("red");
+    });
+
+    it("regresa clase amarilla para pendiente o estado desconocido", () => {
+        expect(CalendarUtils.getVacationStatusClassName(0)).toContain("yellow");
+        expect(CalendarUtils.getVacationStatusClassName(999)).toContain("yellow");
     });
 });

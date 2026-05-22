@@ -2,14 +2,14 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAbsenceForm } from "../../hooks/pages/useAbsenceForm";
-import {
-    createAbsenceService,
-    getAbsenceAddData,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 
-vi.mock("../../services/calendarService", () => ({
-    createAbsenceService: vi.fn(),
-    getAbsenceAddData: vi.fn(),
+vi.mock("../../services/calendar.service", () => ({
+    __esModule: true,
+    default: {
+        createAbsenceService: vi.fn(),
+        getAbsenceAddData: vi.fn(),
+    },
 }));
 
 const employees = [
@@ -110,11 +110,11 @@ const submitForm = async (result) => {
 describe("useAbsenceForm", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        getAbsenceAddData.mockResolvedValue({
+        CalendarService.getAbsenceAddData.mockResolvedValue({
             employees,
             absenceTypes,
         });
-        createAbsenceService.mockResolvedValue({
+        CalendarService.createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
     });
@@ -122,7 +122,7 @@ describe("useAbsenceForm", () => {
     it("carga empleados y tipos de ausencia para registrar", async () => {
         const { result } = await setupHook();
 
-        expect(getAbsenceAddData).toHaveBeenCalledTimes(1);
+        expect(CalendarService.getAbsenceAddData).toHaveBeenCalledTimes(1);
         expect(result.current.employeeOptions).toEqual([
             {
                 value: "emp-1",
@@ -157,7 +157,7 @@ describe("useAbsenceForm", () => {
             expect(onValidationAlert).toHaveBeenLastCalledWith(
                 expect.stringContaining("Campo obligatorio"),
             );
-            expect(createAbsenceService).not.toHaveBeenCalled();
+            expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
         },
     );
 
@@ -172,7 +172,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.endDate).toBe(
             "Fecha de fin no puede ser mayor a un año.",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("rechaza fecha de inicio menor a un mes desde el dia actual", async () => {
@@ -186,7 +186,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.startDate).toBe(
             "Fecha de inicio no puede ser menor a un mes antes del día actual.",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -201,7 +201,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.startDate).toBe(
             "Fecha de inicio no puede ser mayor a la de fin",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("rechaza fechas con formato distinto a YYYY-MM-DD", async () => {
@@ -215,7 +215,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.startDate).toBe(
             "Fecha solo puede tener un formato YYYY-MM-DD",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("rechaza fechas con tamanio diferente a 10 caracteres", async () => {
@@ -229,7 +229,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.startDate).toBe(
             "El tama\u00f1o de la fecha debe ser de 10 caracteres",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("rechaza descripcion mayor a 200 caracteres", async () => {
@@ -243,7 +243,7 @@ describe("useAbsenceForm", () => {
         expect(result.current.errors.description).toBe(
             "Descripci\u00f3n no puede ser mayor a 200 caracteres",
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("no inserta emojis ni caracteres especiales en la descripcion", async () => {
@@ -262,7 +262,7 @@ describe("useAbsenceForm", () => {
 
         await submitForm(result);
 
-        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+        expect(CalendarService.createAbsenceService).toHaveBeenCalledWith("emp-1", {
             absenceTypeId: form.absenceTypeId,
             startDate: form.startDate,
             endDate: form.endDate,
@@ -286,7 +286,7 @@ describe("useAbsenceForm", () => {
         await submitForm(result);
 
         expect(result.current.errors.file).toBe("Formato invalido de ausencias");
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("rechaza evidencia con tamanio superior a 10mb", async () => {
@@ -306,7 +306,7 @@ describe("useAbsenceForm", () => {
         await submitForm(result);
 
         expect(result.current.errors.file).toBe("tama\u00f1o superior a 10mb");
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -366,11 +366,11 @@ describe("useAbsenceForm", () => {
         async (_caseName, override, error, expectedMessage) => {
             const { result, onClose, onSuccess } = await setupHook();
 
-            createAbsenceService.mockRejectedValueOnce(error);
+            CalendarService.createAbsenceService.mockRejectedValueOnce(error);
             fillAbsenceForm(result, override);
             await submitForm(result);
 
-            expect(createAbsenceService).toHaveBeenCalledTimes(1);
+            expect(CalendarService.createAbsenceService).toHaveBeenCalledTimes(1);
             expect(result.current.serverError).toBe(expectedMessage);
             expect(onSuccess).not.toHaveBeenCalled();
             expect(onClose).not.toHaveBeenCalled();
@@ -385,11 +385,11 @@ describe("useAbsenceForm", () => {
             absenceTypeId: "type-medica",
         };
 
-        createAbsenceService.mockResolvedValueOnce(absence);
+        CalendarService.createAbsenceService.mockResolvedValueOnce(absence);
         const form = fillAbsenceForm(result);
         await submitForm(result);
 
-        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+        expect(CalendarService.createAbsenceService).toHaveBeenCalledWith("emp-1", {
             absenceTypeId: form.absenceTypeId,
             startDate: form.startDate,
             endDate: form.endDate,
@@ -410,7 +410,7 @@ describe("useAbsenceForm", () => {
             type: "application/pdf",
         });
 
-        createAbsenceService.mockResolvedValueOnce({
+        CalendarService.createAbsenceService.mockResolvedValueOnce({
             absenceId: "absence-with-file",
         });
         const form = fillAbsenceForm(result);
@@ -421,7 +421,7 @@ describe("useAbsenceForm", () => {
         });
         await submitForm(result);
 
-        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+        expect(CalendarService.createAbsenceService).toHaveBeenCalledWith("emp-1", {
             absenceTypeId: form.absenceTypeId,
             startDate: form.startDate,
             endDate: form.endDate,

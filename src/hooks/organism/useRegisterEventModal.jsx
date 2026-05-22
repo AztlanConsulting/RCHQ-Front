@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { getCalendarViewerRole } from "../../services/calendarService";
+import AuthUtils from "../../utils/auth.utils";
 
 const CATEGORY_OPTIONS = [
     { value: "global", label: "Global", icon: "globe" },
@@ -44,7 +44,7 @@ export const useRegisterEventModal = (isOpen, categoryForms) => {
     const [validationAlert, setValidationAlert] = useState(null);
     const [animationKey, setAnimationKey] = useState(0);
 
-    const viewerRole = getCalendarViewerRole();
+    const viewerRole = AuthUtils.getCalendarViewerRole();
 
     const visibleCategoryOptions = useMemo(() => {
         return CATEGORY_OPTIONS.filter(

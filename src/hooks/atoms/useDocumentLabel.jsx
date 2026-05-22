@@ -1,9 +1,8 @@
 // hooks/Atoms/useDocumentLabel.js
-import { DOCUMENT_TYPES } from "../../services/documentService";
 
-export const useDocumentLabel = () => {
+export const useDocumentLabel = (documentTypes = []) => {
   const getLabel = (typeValue) => {
-    const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
+    const found = documentTypes.find((dt) => dt.value === typeValue);
     return found ? found.label : typeValue;
   };
 

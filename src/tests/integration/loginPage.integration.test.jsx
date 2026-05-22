@@ -16,15 +16,16 @@ vi.mock("../../../src/hooks/useAuth", () => ({
   default: () => ({ login: mockLogin }),
 }));
 
-// ← mockear AuthService pero con implementaciones controladas
-vi.mock("../../../src/services/authService", () => ({
-  loginService: vi.fn(),
-  getReadableErrors: vi.fn((err) => [
-    err?.message || "Ocurrió un error inesperado",
-  ]),
+vi.mock("../../../src/services/auth.service", () => ({
+  default: {
+    login: vi.fn(),
+    getReadableErrors: vi.fn((err) => [
+      err?.message || "Ocurrió un error inesperado",
+    ]),
+  },
 }));
 
-import { loginService } from "../../services/authService";
+import AuthService from "../../services/auth.service";
 
 const renderLogin = () =>
   render(
@@ -51,7 +52,7 @@ beforeEach(() => {
 describe("LoginPage + AuthService — flujo de login", () => {
   it("guarda el token en localStorage y navega al dashboard cuando el login es exitoso", async () => {
     // Arrange
-    loginService.mockResolvedValue({
+    AuthService.login.mockResolvedValue({
       success: true,
       isActiveTwoFactorAuth: false,
       data: { token: "real-token-123", user: { id: 1, name: "Test" } },
@@ -75,7 +76,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
 
   it("guarda preTwoFactorAuth en localStorage y navega a /2FA cuando el usuario tiene TwoFactorAuth activo", async () => {
     // Arrange
-    loginService.mockResolvedValue({
+    AuthService.login.mockResolvedValue({
       success: true,
       isActiveTwoFactorAuth: true,
       preTwoFactorAuthToken: "pre-token-abc",
@@ -97,7 +98,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
     error.status = 401;
     error.code = "INVALID_CREDENTIALS";
     error.errors = [];
-    loginService.mockRejectedValue(error);
+    AuthService.login.mockRejectedValue(error);
     renderLogin();
 
     // Act
@@ -117,7 +118,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
     await fillAndSubmit("no-es-email", "pass");
 
     // Assert
-    await waitFor(() => expect(loginService).not.toHaveBeenCalled());
+    await waitFor(() => expect(AuthService.login).not.toHaveBeenCalled());
   });
 
   it("muestra error de bloqueo temporal cuando el servidor responde 423", async () => {
@@ -127,7 +128,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
     );
     error.status = 423;
     error.errors = [];
-    loginService.mockRejectedValue(error);
+    AuthService.login.mockRejectedValue(error);
     renderLogin();
 
     // Act
@@ -140,7 +141,7 @@ describe("LoginPage + AuthService — flujo de login", () => {
   });
 
   it("navega a primer inicio cuando el backend indica cambio de contraseña obligatorio", async () => {
-    loginService.mockResolvedValue({
+    AuthService.login.mockResolvedValue({
       success: true,
       nextStep: "CHANGE_PASSWORD_FIRST_LOGIN",
       data: {
