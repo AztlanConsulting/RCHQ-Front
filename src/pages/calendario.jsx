@@ -331,40 +331,45 @@ const Calendario = () => {
                                 />
                             );
 
-                        default:
+                        default: {
+                            const scope = selectedEvent?.scope;
+                            const isPersonal = scope === "personal";
+                            const isHouse = scope === "house";
+
                             return (
                                 <EventDetail
                                     event={selectedEvent}
                                     onEdit={openEventEdit}
                                     onDelete={openEventDelete}
                                     isDeleteOpen={
-                                        selectedEvent?.scope === "personal"
-                                            ? isDeletePersonalEventOpen
-                                            : isDeleteHouseEventOpen
+                                        isPersonal ? isDeletePersonalEventOpen
+                                        : isHouse   ? isDeleteHouseEventOpen
+                                        : false
                                     }
                                     onCancelDelete={
-                                        selectedEvent?.scope === "personal"
-                                            ? cancelDeletePersonalEvent
-                                            : cancelDeleteHouseEvent
+                                        isPersonal ? cancelDeletePersonalEvent
+                                        : isHouse   ? cancelDeleteHouseEvent
+                                        : undefined
                                     }
                                     onConfirmDelete={
-                                        selectedEvent?.scope === "personal"
-                                            ? confirmDeletePersonalEvent
-                                            : confirmDeleteHouseEvent
+                                        isPersonal ? confirmDeletePersonalEvent
+                                        : isHouse   ? confirmDeleteHouseEvent
+                                        : undefined
                                     }
                                     isDeleting={
-                                        selectedEvent?.scope === "personal"
-                                            ? isDeletingPersonalEvent
-                                            : isDeletingHouseEvent
+                                        isPersonal ? isDeletingPersonalEvent
+                                        : isHouse   ? isDeletingHouseEvent
+                                        : false
                                     }
                                     deleteError={
-                                        selectedEvent?.scope === "personal"
-                                            ? deletePersonalEventError
-                                            : deleteHouseEventError
+                                        isPersonal ? deletePersonalEventError
+                                        : isHouse   ? deleteHouseEventError
+                                        : ""
                                     }
                                     viewerRole={viewerRole}
                                 />
                             );
+                        }
                     }
                 })()}
             </Modal>
