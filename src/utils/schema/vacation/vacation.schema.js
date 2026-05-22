@@ -107,3 +107,45 @@ export const getVacationFormErrors = (form) => {
         errors,
     };
 };
+
+export const VACATION_REJECTION_FEEDBACK_MAX_LENGTH = 200;
+
+export const vacationRejectionFeedbackSchema = z.object({
+    feedback: z
+        .string()
+        .trim()
+        .max(
+            VACATION_REJECTION_FEEDBACK_MAX_LENGTH,
+            `La retroalimentación no puede exceder ${VACATION_REJECTION_FEEDBACK_MAX_LENGTH} caracteres`,
+        )
+        .optional()
+        .default(""),
+});
+
+export const getVacationRejectionFeedbackErrors = (form) => {
+    const result = vacationRejectionFeedbackSchema.safeParse(form);
+
+    if (result.success) {
+        return {
+            success: true,
+            data: result.data,
+            errors: {},
+        };
+    }
+
+    const errors = result.error.issues.reduce((acc, issue) => {
+        const field = issue.path[0];
+
+        if (field && !acc[field]) {
+            acc[field] = issue.message;
+        }
+
+        return acc;
+    }, {});
+
+    return {
+        success: false,
+        data: null,
+        errors,
+    };
+};

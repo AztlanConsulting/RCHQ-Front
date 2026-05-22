@@ -19,11 +19,11 @@ const ConfirmApproveVacationModal = ({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="confirm-approve-vacation-title"
-                className="relative flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-8 shadow-xl"
+                className="relative flex w-full max-w-sm flex-col gap-4 rounded-xl bg-white p-6 shadow-xl"
             >
                 <h3
                     id="confirm-approve-vacation-title"
-                    className="text-lg font-semibold text-slate-900"
+                    className="text-2xl font-bold text-[#121212]"
                 >
                     Aprobar solicitud
                 </h3>
@@ -43,35 +43,35 @@ const ConfirmApproveVacationModal = ({
                     ) : null}
                 </div>
 
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-center gap-3 pt-1">
                     <Button
                         text="Cancelar"
                         onClick={onCancel}
                         disabled={loading}
-                        bgColor="bg-transparent"
-                        hoverColor="hover:bg-slate-100"
-                        activeColor="active:bg-slate-200"
-                        textColor="text-slate-600"
                         width="w-auto"
-                        height="h-[42px]"
+                        height="h-[38px]"
                         textSize="text-sm"
-                        fontWeight="font-medium"
-                        className="px-4"
+                        fontWeight="font-bold"
+                        bgColor="bg-white"
+                        textColor="text-[#121212]"
+                        hoverColor="hover:bg-slate-50"
+                        activeColor="active:bg-slate-100"
+                        className="px-5 border border-slate-200 shadow-md"
                     />
 
                     <Button
                         text={loading ? "Aprobando..." : "Aprobar"}
                         onClick={onConfirm}
                         disabled={loading}
+                        width="w-auto"
+                        height="h-[38px]"
+                        textSize="text-sm"
+                        fontWeight="font-bold"
                         bgColor="bg-[#1F3664]"
+                        textColor="text-white"
                         hoverColor="hover:bg-[#15284A]"
                         activeColor="active:bg-[#0E1B33]"
-                        textColor="text-white"
-                        width="w-auto"
-                        height="h-[42px]"
-                        textSize="text-sm"
-                        fontWeight="font-semibold"
-                        className="px-4"
+                        className="px-5 shadow-md"
                     />
                 </div>
             </div>

@@ -90,14 +90,14 @@ const VacationRequests = () => {
         setRequestToReject(null);
     };
 
-    const handleConfirmReject = async () => {
+    const handleConfirmReject = async (feedback) => {
         if (!requestToReject?.vacationRequestId) return;
 
         setRejectModalError("");
         setSuccessMessage("");
 
         try {
-            await handleRejectRequest(requestToReject.vacationRequestId);
+            await handleRejectRequest(requestToReject.vacationRequestId, feedback);
             setRequestToReject(null);
             setSuccessMessage("Solicitud de vacaciones rechazada con éxito");
         } catch (err) {

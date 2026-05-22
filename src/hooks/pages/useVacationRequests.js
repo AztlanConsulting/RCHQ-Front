@@ -153,14 +153,15 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         }
     };
 
-    const handleRejectRequest = async (vacationRequestId) => {
+    const handleRejectRequest = async (vacationRequestId, feedback) => {
         if (!vacationRequestId || approvingRequestId || rejectingRequestId) return;
 
         setRejectingRequestId(vacationRequestId);
         setError("");
 
         try {
-            await rejectVacationRequest(vacationRequestId);
+            await rejectVacationRequest(vacationRequestId, feedback);
+
             const currentPage = Math.max(page, 1);
 
             const nextPage =
