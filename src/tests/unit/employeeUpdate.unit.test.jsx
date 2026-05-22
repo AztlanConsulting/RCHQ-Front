@@ -17,6 +17,35 @@ vi.mock("../utils/apiErrors", () => ({
   buildApiError: vi.fn((res, data, msg) => new Error(data?.message ?? msg)),
 }));
 
+vi.mock("../../components/organism/employeeScheduleCalendar", () => ({
+  default: ({
+    referenceSchedules = [],
+    visibleReferenceEmployeeIds = [],
+    onToggleReference,
+    onCopySchedule,
+    onSelectRange,
+    onClearDay,
+  }) => (
+    <div>
+      <span>EmployeeScheduleCalendar</span>
+      <span>{`Referencias: ${referenceSchedules.length}`}</span>
+      <span>{`Visibles: ${visibleReferenceEmployeeIds.length}`}</span>
+      <button type="button" onClick={() => onToggleReference?.("emp-ref-1")}>
+        Toggle referencia
+      </button>
+      <button type="button" onClick={() => onCopySchedule?.("emp-ref-1")}>
+        Copiar referencia
+      </button>
+      <button type="button" onClick={() => onSelectRange?.("Lunes", "09:00", "17:30")}>
+        Seleccionar horario
+      </button>
+      <button type="button" onClick={() => onClearDay?.("Lunes")}>
+        Limpiar horario
+      </button>
+    </div>
+  ),
+}));
+
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
 import { getToken } from "../../utils/authStorage";
@@ -576,6 +605,16 @@ describe("EmployeeAdminCard", () => {
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
     employeeAbsenceUsedDays: 0,
+    referenceSchedules: [
+      {
+        employeeId: "emp-ref-1",
+        name: "Empleado Referencia",
+        roleId: "r1",
+        roleName: "Admin",
+        workdays: mockWorkdays,
+      },
+    ],
+    visibleReferenceEmployeeIds: ["emp-ref-1"],
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
     loadingCatalogues:       false,
@@ -585,6 +624,10 @@ describe("EmployeeAdminCard", () => {
     setAdminField:  vi.fn(),
     toggleWorkday:  vi.fn(),
     setWorkdayTime: vi.fn(),
+    toggleReferenceSchedule: vi.fn(),
+    copyReferenceSchedule: vi.fn(),
+    applyScheduleSelection: vi.fn(),
+    clearScheduleSelection: vi.fn(),
     saving:         false,
     saveError:      null,
     onOpenEdit:     vi.fn(),
@@ -619,13 +662,14 @@ describe("EmployeeAdminCard", () => {
 
     it("muestra el número de días trabajados", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
+      expect(screen.getByText("2 días trabajados")).toBeInTheDocument();
     });
 
     it("muestra los días hábiles de ausencias", () => {
       render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
       expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
-      expect(screen.getByText("5 Días Hábiles")).toBeInTheDocument();
+      expect(screen.getByText("Días hábiles aplicados")).toBeInTheDocument();
+      expect(screen.getByText("5")).toBeInTheDocument();
     });
 
     it("muestra 0 solicitudes de vacaciones", () => {
@@ -672,42 +716,38 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
-    it("muestra los checkboxes de días de trabajo", () => {
+    it("muestra el schedule calendar separado", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Lunes")).toBeInTheDocument();
-      expect(screen.getByText("Martes")).toBeInTheDocument();
+      expect(screen.getByText("EmployeeScheduleCalendar")).toBeInTheDocument();
+      expect(screen.getByText("Referencias: 1")).toBeInTheDocument();
     });
 
-    it("el checkbox de Lunes está marcado (selected=true)", () => {
+    it("llama a toggleReferenceSchedule desde el calendario de horarios", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[0]).toBeChecked(); // Lunes
+      fireEvent.click(screen.getByText("Toggle referencia"));
+      expect(editingProps.toggleReferenceSchedule).toHaveBeenCalledWith("emp-ref-1");
     });
 
-    it("el checkbox de Martes NO está marcado (selected=false)", () => {
+    it("llama a copyReferenceSchedule desde el calendario de horarios", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[1]).not.toBeChecked(); // Martes
+      fireEvent.click(screen.getByText("Copiar referencia"));
+      expect(editingProps.copyReferenceSchedule).toHaveBeenCalledWith("emp-ref-1");
     });
 
-    it("llama a toggleWorkday al hacer click en un checkbox", () => {
+    it("llama a applyScheduleSelection desde el calendario de horarios", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[1]); // Martes
-      expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
+      fireEvent.click(screen.getByText("Seleccionar horario"));
+      expect(editingProps.applyScheduleSelection).toHaveBeenCalledWith(
+        "Lunes",
+        "09:00",
+        "17:30",
+      );
     });
 
-    it("muestra inputs de hora cuando el día está seleccionado", () => {
+    it("llama a clearScheduleSelection desde el calendario de horarios", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const timeInputs = screen.getAllByDisplayValue("08:00");
-      expect(timeInputs.length).toBeGreaterThan(0);
-    });
-
-    it("llama a setWorkdayTime al cambiar la hora de inicio", () => {
-      render(<EmployeeAdminCard {...editingProps} />);
-      const timeInputs = screen.getAllByDisplayValue("08:00");
-      fireEvent.change(timeInputs[0], { target: { value: "09:00" } });
-      expect(editingProps.setWorkdayTime).toHaveBeenCalledWith("wd1", "start", "09:00");
+      fireEvent.click(screen.getByText("Limpiar horario"));
+      expect(editingProps.clearScheduleSelection).toHaveBeenCalledWith("Lunes");
     });
 
     it("llama a onCancel al hacer click en Cancelar", () => {

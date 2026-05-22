@@ -36,9 +36,13 @@ const DetalleEmpleado = () => {
     basicForm, contactForm, adminForm,
     roles,
     frecuentPaymentTypes,
+    referenceSchedules,
+    visibleReferenceEmployeeIds,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
+    toggleReferenceSchedule, copyReferenceSchedule,
+    applyScheduleSelection, clearScheduleSelection,
     submitBasic, submitContact, submitAdmin,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
@@ -211,6 +215,8 @@ const DetalleEmpleado = () => {
             employeeWorkdays={employeeWorkdays}
             employeeVacationRequests={employeeVacationRequests}
             employeeAbsenceUsedDays={employeeAbsenceUsedDays}
+            referenceSchedules={referenceSchedules}
+            visibleReferenceEmployeeIds={visibleReferenceEmployeeIds}
             workdaysDrawer={workdaysDrawer}
             isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}
@@ -220,6 +226,10 @@ const DetalleEmpleado = () => {
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
+            toggleReferenceSchedule={toggleReferenceSchedule}
+            copyReferenceSchedule={copyReferenceSchedule}
+            applyScheduleSelection={applyScheduleSelection}
+            clearScheduleSelection={clearScheduleSelection}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}

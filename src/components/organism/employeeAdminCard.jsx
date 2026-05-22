@@ -3,6 +3,7 @@ import Loader from "../atoms/loader";
 import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
+import EmployeeScheduleCalendar from "./employeeScheduleCalendar";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -35,6 +36,8 @@ const EmployeeAdminCard = ({
   employeeWorkdays,
   employeeVacationRequests,
   employeeAbsenceUsedDays,
+  referenceSchedules,
+  visibleReferenceEmployeeIds,
   workdaysDrawer,
   isEditing,
   loadingCatalogues,
@@ -44,6 +47,10 @@ const EmployeeAdminCard = ({
   setAdminField,
   toggleWorkday,
   setWorkdayTime,
+  toggleReferenceSchedule,
+  copyReferenceSchedule,
+  applyScheduleSelection,
+  clearScheduleSelection,
   saving,
   saveError,
   onOpenEdit,
@@ -262,48 +269,16 @@ const EmployeeAdminCard = ({
                 />
               </div>
             </div>
-
             {adminForm.selectedWorkdays.length > 0 && (
-              <div>
-                <Type variant="metric-label" as="p" className="mb-2">
-                  Días y horario de trabajo
-                </Type>
-                <div className="flex flex-col gap-1.5">
-                  {adminForm.selectedWorkdays.map((w) => (
-                    <div
-                      key={w.workdayId}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                        w.selected ? "bg-slate-50 border border-slate-200" : ""
-                      }`}
-                    >
-                      <label className="flex items-center gap-2 cursor-pointer w-28 shrink-0">
-                        <input
-                          type="checkbox"
-                          checked={w.selected}
-                          onChange={() => toggleWorkday(w.workdayId)}
-                          className="h-4 w-4 rounded border-slate-300 accent-slate-800"
-                        />
-                        <span className="text-sm font-semibold text-slate-700">{w.name}</span>
-                      </label>
-                      {w.selected && (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time" value={w.start}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "start", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
-                          />
-                          <span className="text-slate-400 text-xs">—</span>
-                          <input
-                            type="time" value={w.end}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "end", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <EmployeeScheduleCalendar
+                assignedWorkdays={adminForm.selectedWorkdays}
+                referenceSchedules={referenceSchedules}
+                visibleReferenceEmployeeIds={visibleReferenceEmployeeIds}
+                onToggleReference={toggleReferenceSchedule}
+                onCopySchedule={copyReferenceSchedule}
+                onSelectRange={applyScheduleSelection}
+                onClearDay={clearScheduleSelection}
+              />
             )}
           </div>
         )

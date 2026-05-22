@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { 
   employeeBasicUpdateSchema, 
   employeeContactUpdateSchema, 
@@ -13,6 +13,27 @@ import {
 } from "../../services/employeeUpdateService";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
+  const getMinutesFromTime = (timeValue) => {
+    const [hours = 0, minutes = 0] = String(timeValue).split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const getTimeValue = (value, fallback) => {
+    if (!value) return fallback;
+    const normalized = String(value);
+    return normalized.length >= 16 ? normalized.slice(11, 16) : normalized.slice(0, 5);
+  };
+
+  const getDefaultVisibleReferenceIds = (schedules, roleId) =>
+    schedules
+      .filter((schedule) =>
+        String(schedule.roleId) === String(roleId) &&
+        Array.isArray(schedule.workdays) &&
+        schedule.workdays.length > 0,
+      )
+      .slice(0, 2)
+      .map((schedule) => schedule.employeeId);
+
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
@@ -21,6 +42,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [roles, setRoles]       = useState([]);
   const [allWorkdays, setAllWorkdays] = useState([]);
   const [frecuentPaymentTypes, setFrecuentPaymentTypes] = useState([]);
+  const [referenceSchedules, setReferenceSchedules] = useState([]);
+  const [visibleReferenceEmployeeIds, setVisibleReferenceEmployeeIds] = useState([]);
 
   const [basicForm, setBasicFormState] = useState({
     name: "", surname: "", curp: "", rfc: "",
@@ -75,6 +98,13 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       setRoles(formData?.roles ?? []);
       setAllWorkdays(formData?.workdays ?? []);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
+      const nextReferenceSchedules = (formData?.referenceSchedules ?? []).filter(
+        (schedule) => String(schedule.employeeId) !== String(employee?.employeeId),
+      );
+      setReferenceSchedules(nextReferenceSchedules);
+      setVisibleReferenceEmployeeIds(
+        getDefaultVisibleReferenceIds(nextReferenceSchedules, employee?.roleId),
+      );
 
       const preselected = (formData?.workdays ?? []).map((wd) => {
         const wdId    = wd.workdayId ?? wd.workday_id;
@@ -83,8 +113,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
           workdayId: wdId,
           name:      wd.name,
           selected:  !!existing,
-          start:     existing ? String(existing.start).slice(11, 16) : "08:00",
-          end:       existing ? String(existing.end).slice(11, 16)   : "17:00",
+          start:     getTimeValue(existing?.start, "08:00"),
+          end:       getTimeValue(existing?.end, "17:00"),
         };
       });
 
@@ -175,8 +205,13 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "salary") {
       finalValue = value.replace(/[^\d.]/g, ""); 
     }
+    if (field === "roleId") {
+      setVisibleReferenceEmployeeIds(
+        getDefaultVisibleReferenceIds(referenceSchedules, finalValue),
+      );
+    }
     setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
-  }, []);
+  }, [referenceSchedules]);
 
   const toggleWorkday = useCallback((workdayId) => {
     setAdminFormState((prev) => ({
@@ -192,6 +227,84 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       ...prev,
       selectedWorkdays: prev.selectedWorkdays.map((w) =>
         w.workdayId === workdayId ? { ...w, [timeField]: value } : w
+      ),
+    }));
+  }, []);
+
+  const filteredReferenceSchedules = useMemo(
+    () =>
+      referenceSchedules.filter(
+        (schedule) => String(schedule.roleId) === String(adminForm.roleId),
+      ),
+    [adminForm.roleId, referenceSchedules],
+  );
+
+  const toggleReferenceSchedule = useCallback((referenceEmployeeId) => {
+    setVisibleReferenceEmployeeIds((prev) =>
+      prev.includes(referenceEmployeeId)
+        ? prev.filter((employeeId) => employeeId !== referenceEmployeeId)
+        : [...prev, referenceEmployeeId],
+    );
+  }, []);
+
+  const copyReferenceSchedule = useCallback((referenceEmployeeId) => {
+    const sourceSchedule = filteredReferenceSchedules.find(
+      (schedule) => String(schedule.employeeId) === String(referenceEmployeeId),
+    );
+
+    if (!sourceSchedule) return;
+
+    setAdminFormState((prev) => ({
+      ...prev,
+      selectedWorkdays: prev.selectedWorkdays.map((workday) => {
+        const matchingWorkday = sourceSchedule.workdays.find(
+          (referenceWorkday) =>
+            String(referenceWorkday.workdayId) === String(workday.workdayId),
+        );
+
+        if (!matchingWorkday) {
+          return {
+            ...workday,
+            selected: false,
+          };
+        }
+
+        return {
+          ...workday,
+          selected: true,
+          start: getTimeValue(matchingWorkday.start, workday.start),
+          end: getTimeValue(matchingWorkday.end, workday.end),
+        };
+      }),
+    }));
+  }, [filteredReferenceSchedules]);
+
+  const applyScheduleSelection = useCallback((workdayName, start, end) => {
+    setAdminFormState((prev) => ({
+      ...prev,
+      selectedWorkdays: prev.selectedWorkdays.map((workday) =>
+        workday.name === workdayName
+          ? {
+              ...workday,
+              selected: true,
+              start,
+              end,
+            }
+          : workday,
+      ),
+    }));
+  }, []);
+
+  const clearScheduleSelection = useCallback((workdayName) => {
+    setAdminFormState((prev) => ({
+      ...prev,
+      selectedWorkdays: prev.selectedWorkdays.map((workday) =>
+        workday.name === workdayName
+          ? {
+              ...workday,
+              selected: false,
+            }
+          : workday,
       ),
     }));
   }, []);
@@ -272,22 +385,21 @@ export const useEditEmployee = (employeeId, onSuccess) => {
           throw new Error(`Debes asignar un horario completo para el día ${name}.`);
         }
 
-      const [sh] = start.split(":").map(Number);
-      const [eh] = end.split(":").map(Number);
+        const startMinutes = getMinutesFromTime(start);
+        const endMinutes = getMinutesFromTime(end);
+        const isOvernight = endMinutes <= startMinutes;
+        const durationMinutes = isOvernight
+          ? (24 * 60 - startMinutes) + endMinutes
+          : endMinutes - startMinutes;
 
-      const isOvernight = end <= start;
-      const durationHours = isOvernight
-        ? (24 - sh) + eh
-        : eh - sh;
+        if (durationMinutes < 60) {
+          throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
+        }
+        if (durationMinutes > 24 * 60) {
+          throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
+        }
 
-      if (durationHours < 1) {
-        throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
-      }
-      if (durationHours > 24) {
-        throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
-      }
-
-      return { workdayId, start, end };
+        return { workdayId, start, end };
       });
 
       payload.workdays = workdaysToSend;
@@ -312,9 +424,15 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
     roles, allWorkdays, frecuentPaymentTypes,
+    referenceSchedules: filteredReferenceSchedules,
+    visibleReferenceEmployeeIds,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
+    toggleReferenceSchedule,
+    copyReferenceSchedule,
+    applyScheduleSelection,
+    clearScheduleSelection,
     submitBasic, submitContact, submitAdmin,
   };
 };

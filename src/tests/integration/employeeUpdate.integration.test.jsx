@@ -156,6 +156,15 @@ beforeEach(() => {
       { workdayId: "wd1", name: "Lunes" },
       { workdayId: "wd2", name: "Martes" },
     ],
+    referenceSchedules: [
+      {
+        employeeId: "emp-ref-1",
+        name: "Empleado Referencia",
+        roleId: "r1",
+        roleName: "Administrador",
+        workdays: mockWorkdays,
+      },
+    ],
   });
   updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
   updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
@@ -177,18 +186,18 @@ describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el título de la página", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("Gestión de Empleados")).toBeInTheDocument();
+      expect(screen.getAllByText("Gestión de Empleados").length).toBeGreaterThan(0);
     });
   });
 
-  it("muestra el tab Overview por defecto", async () => {
+  it("muestra el tab Resumen por defecto", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Resumen" })).toBeInTheDocument();
     });
   });
 
-  it("muestra las tarjetas de Contacto e Info Administrativa en el tab Overview", async () => {
+  it("muestra las tarjetas de Contacto e Info Administrativa en el tab Resumen", async () => {
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("Contacto")).toBeInTheDocument();
