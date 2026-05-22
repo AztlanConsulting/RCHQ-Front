@@ -10,9 +10,9 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import EventDetail from "../../components/molecules/calendarCards/eventDetail";
-import { deleteHouseEvent } from "../../services/deleteEventService";
+import { deleteHouseEvent } from "../../services/event.service";
 
-vi.mock("../../services/deleteEventService", () => ({
+vi.mock("../../services/event.service", () => ({
     deleteHouseEvent: vi.fn(),
 }));
 

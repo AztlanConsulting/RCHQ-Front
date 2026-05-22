@@ -1,17 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 
-import {
-    createPersonalEvent,
-    getEventTypes,
-    getEmployeesForSelector,
-} from "../../services/eventService";
+import EventService from "../../services/event.service";
 
-import { getCalendarViewerRole } from "../../services/calendarService";
+import AuthUtils from "../../utils/auth.utils";
 
 import {
     personalEventSchema,
     buildPersonalPayload,
-} from "../../utils/schema/evento/personalEvent.schema";
+} from "../../utils/schemas/calendar/personalEvent.schema";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -48,14 +44,14 @@ export const usePersonalForm = ({
     });
 
     useEffect(() => {
-        const role = getCalendarViewerRole();
+        const role = AuthUtils.getCalendarViewerRole();
         setIsCoordinator(role === "Coordinador");
     }, []);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        EventService.getEventTypes()
             .then((types) =>
                 setEventTypes(
                     types.map((t) => ({
@@ -71,7 +67,7 @@ export const usePersonalForm = ({
         async (query) => {
             if (!isCoordinator) return;
             try {
-                const results = await getEmployeesForSelector(
+                const results = await EventService.getEmployeesForSelector(
                     query ? { search: query } : {},
                 );
                 setEmployees(results);
@@ -168,7 +164,7 @@ export const usePersonalForm = ({
         setIsSubmitting(true);
 
         try {
-            const response = await createPersonalEvent(payload);
+            const response = await EventService.createPersonalEvent(payload);
 
             if (
                 !response.success &&
@@ -210,7 +206,7 @@ export const usePersonalForm = ({
         setOverlapState((prev) => ({ ...prev, isForcing: true }));
 
         try {
-            const response = await createPersonalEvent({
+            const response = await EventService.createPersonalEvent({
                 ...overlapState.pendingPayload,
                 forceOverlap: true,
             });

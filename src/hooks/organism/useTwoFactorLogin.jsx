@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  validateLoginTwoFactorAuthService,
-  getToken,
-} from "../../services/authService";
+import AuthService from "../../services/auth.service";
 import { useAuthContext } from "../../context/authContext";
 import { useField } from "../atoms/useField";
 import { useToggle } from "../atoms/useToggle";
@@ -17,7 +14,7 @@ export const useTwoFactorLogin = () => {
   const { value: isBlocked, toggle: blockToggle } = useToggle(false);
 
   useEffect(() => {
-    const sessionToken = getToken();
+    const sessionToken = AuthService.getToken();
     if (sessionToken) {
       navigate("/app/calendario", { replace: true });
     }
@@ -35,7 +32,7 @@ export const useTwoFactorLogin = () => {
     setError("");
 
     try {
-      const response = await validateLoginTwoFactorAuthService(codeField.value);
+      const response = await AuthService.validateLoginTwoFactor(codeField.value);
 
       if (response.nextStep === "LOGIN_COMPLETE") {
         localStorage.removeItem("preTwoFactorAuth");

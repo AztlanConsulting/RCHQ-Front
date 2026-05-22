@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { updateHouseEvent } from "../../services/updateEventService";
-import { getEventTypes } from "../../services/eventService";
-import {
-    addDaysToDateOnly,
-    normalizeDateOnly,
-} from "../../utils/calendarEventDetail";
+import EventService from "../../services/event.service";
+import Dates from "@/utils/helpers/dates.helpers";
 import {
     buildPayload,
     houseEventSchema,
-} from "../../utils/schema/evento/houseEvent.schema";
+} from "../../utils/schemas/calendar/houseEvent.schema";
 
 const DEFAULT_FORM = {
     name: "",
@@ -47,13 +43,13 @@ const getTimeValue = (value) => {
 const getInitialForm = (event) => {
     if (!event) return DEFAULT_FORM;
 
-    const startDate = normalizeDateOnly(event.startDate ?? event.start);
-    const rawEndDate = normalizeDateOnly(
+    const startDate = Dates.normalizeDateOnly(event.startDate ?? event.start);
+    const rawEndDate = Dates.normalizeDateOnly(
         event.endDate ?? event.end ?? event.start,
     );
     const endDate =
         event.allDay && rawEndDate > startDate
-            ? addDaysToDateOnly(rawEndDate, -1)
+            ? Dates.addDaysToDateOnly(rawEndDate, -1)
             : rawEndDate;
 
     return {
@@ -121,7 +117,7 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        EventService.getEventTypes()
             .then((types) => {
                 const options = types.map((type) => ({
                     value: type.eventTypeId,
@@ -210,7 +206,7 @@ export const useUpdateHouseEventForm = ({
         setServerError(null);
 
         try {
-            const response = await updateHouseEvent(houseEventId, payload);
+            const response = await EventService.updateHouseEvent(houseEventId, payload);
 
             if (!response.success && response.data?.collisions?.length) {
                 setOverlapState({
@@ -246,7 +242,7 @@ export const useUpdateHouseEventForm = ({
         setOverlapState((prev) => ({ ...prev, isForcing: true }));
 
         try {
-            const response = await updateHouseEvent(houseEventId, {
+            const response = await EventService.updateHouseEvent(houseEventId, {
                 ...overlapState.pendingPayload,
                 forceOverlap: true,
             });

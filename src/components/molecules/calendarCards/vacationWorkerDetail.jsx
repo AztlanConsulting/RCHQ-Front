@@ -1,10 +1,6 @@
 import Button from "../../atoms/button";
-import DateField from "../../atoms/dateField";
-import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
-import { isPastDate } from "../../../utils/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const VacationWorkerDetail = ({
     event,
@@ -12,7 +8,27 @@ const VacationWorkerDetail = ({
     onEdit,
     onDelete,
 }) => {
-    const isPast = isPastDate(event.start);
+    const isPast = Dates.isPastDate(event.start);
+    const status = Number(event.status);
+
+    const isPending = status === 0;
+    const isApproved = status === 1;
+    const isRejected = status === 2;
+
+    const title = isPending
+        ? "Solicitud de Vacaciones"
+        : isRejected
+            ? "Vacaciones Rechazadas"
+            : "Vacaciones";
+
+    const statusLabel = isApproved
+        ? "Aprobada"
+        : isRejected
+            ? "Rechazada"
+            : "En espera";
+
+    const feedback = event.feedback || event.vacationFeedback || "";
+    const shouldShowFeedback = Boolean(feedback);
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -21,7 +37,7 @@ const VacationWorkerDetail = ({
                 className="mb-5 text-[2rem] leading-none"
                 as="h2"
             >
-                Solicitud de Vacaciones
+                {title}
             </Type>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
@@ -35,7 +51,9 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableStart) || "—"}
+                        {Dates.formatEventDate(
+                            event.readableStart || event.startDate || event.start,
+                        )}
                     </Type>
                 </div>
                 <div>
@@ -49,7 +67,9 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableEnd) || "—"}
+                        {Dates.formatEventDate(
+                            event.readableEnd || event.endDate || event.end,
+                        )}
                     </Type>
                 </div>
                 <div>
@@ -63,7 +83,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.totalDays}
+                        {event.totalDays || "-"}
                     </Type>
                 </div>
                 <div>
@@ -77,7 +97,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.usedDays}
+                        {event.usedDays ?? "-"}
                     </Type>
                 </div>
                 <div className="sm:col-span-2">
@@ -91,23 +111,25 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.status == 1 ? "Aceptado" : "Pendiente"}
+                        {statusLabel}
                     </Type>
                 </div>
-                <div className="sm:col-span-2">
-                    <Type
-                        variant="metric-label"
-                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
-                    >
-                        Retroalimentación:
-                    </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
-                        {event.feedback || "N/A"}
-                    </Type>
-                </div>
+                {shouldShowFeedback ? (
+                    <div className="sm:col-span-2">
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Retroalimentación:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {feedback}
+                        </Type>
+                    </div>
+                ) : null}
             </div>
 
             {isPast ? (
@@ -143,7 +165,7 @@ const VacationWorkerDetail = ({
                         className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
                         onClick={onDelete}
                     />
-                    {event.status == 0 ? (
+                    {isPending ? (
                         <Button
                             type="button"
                             text="Editar"

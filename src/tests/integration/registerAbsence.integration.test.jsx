@@ -8,22 +8,30 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import {
-    createAbsenceService,
-    getAbsenceAddData,
-    getCalendarViewerRole,
-} from "../../services/calendarService";
-import { getEventTypes } from "../../services/eventService";
+import CalendarService from "../../services/calendar.service";
+import AuthUtils from "../../utils/auth.utils";
+import EventService from "../../services/event.service";
 
-vi.mock("../../services/calendarService", () => ({
-    createAbsenceService: vi.fn(),
-    getAbsenceAddData: vi.fn(),
-    getCalendarViewerRole: vi.fn(),
+vi.mock("../../services/calendar.service", () => ({
+    __esModule: true,
+    default: {
+        createAbsenceService: vi.fn(),
+        getAbsenceAddData: vi.fn(),
+    },
 }));
 
-vi.mock("../../services/eventService", () => ({
-    createHouseEvent: vi.fn(),
-    getEventTypes: vi.fn(),
+vi.mock("../../utils/auth.utils", () => ({
+    __esModule: true,
+    default: {
+        getCalendarViewerRole: vi.fn(),
+    },
+}));
+
+vi.mock("../../services/event.service", () => ({
+    default: {
+        createHouseEvent: vi.fn(),
+        getEventTypes: vi.fn(),
+    },
 }));
 
 vi.mock("../../components/atoms/alerts", () => ({
@@ -136,7 +144,7 @@ const openAbsenceForm = async () => {
     fireEvent.click(screen.getByRole("radio", { name: "Ausencias" }));
 
     await waitFor(() => {
-        expect(getAbsenceAddData).toHaveBeenCalledTimes(1);
+        expect(CalendarService.getAbsenceAddData).toHaveBeenCalledTimes(1);
     });
 
     await waitFor(() => {
@@ -170,13 +178,13 @@ const submitAbsence = async () => {
 describe("Integracion: coordinador registra una ausencia", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        getCalendarViewerRole.mockReturnValue("Coordinador");
-        getEventTypes.mockResolvedValue([]);
-        getAbsenceAddData.mockResolvedValue({
+        AuthUtils.getCalendarViewerRole.mockReturnValue("Coordinador");
+        EventService.getEventTypes.mockResolvedValue([]);
+        CalendarService.getAbsenceAddData.mockResolvedValue({
             employees,
             absenceTypes,
         });
-        createAbsenceService.mockResolvedValue({
+        CalendarService.createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
     });
@@ -211,7 +219,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
             employeeId: "emp-1",
             absenceTypeId: "type-medica",
         };
-        createAbsenceService.mockResolvedValueOnce(absence);
+        CalendarService.createAbsenceService.mockResolvedValueOnce(absence);
         const { dates, onClose, onFeedback, onSuccess } = renderModal();
 
         await openAbsenceForm();
@@ -219,10 +227,10 @@ describe("Integracion: coordinador registra una ausencia", () => {
         await submitAbsence();
 
         await waitFor(() => {
-            expect(createAbsenceService).toHaveBeenCalledTimes(1);
+            expect(CalendarService.createAbsenceService).toHaveBeenCalledTimes(1);
         });
 
-        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+        expect(CalendarService.createAbsenceService).toHaveBeenCalledWith("emp-1", {
             absenceTypeId: "type-medica",
             startDate: dates.startDate,
             endDate: dates.endDate,
@@ -251,10 +259,10 @@ describe("Integracion: coordinador registra una ausencia", () => {
         await submitAbsence();
 
         await waitFor(() => {
-            expect(createAbsenceService).toHaveBeenCalledTimes(1);
+            expect(CalendarService.createAbsenceService).toHaveBeenCalledTimes(1);
         });
 
-        expect(createAbsenceService).toHaveBeenCalledWith("emp-1", {
+        expect(CalendarService.createAbsenceService).toHaveBeenCalledWith("emp-1", {
             absenceTypeId: "type-medica",
             startDate: dates.startDate,
             endDate: dates.endDate,
@@ -275,12 +283,12 @@ describe("Integracion: coordinador registra una ausencia", () => {
         expect(screen.getAllByText("Campo obligatorio").length).toBeGreaterThan(
             0,
         );
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("muestra error de usuario no encontrado cuando el backend rechaza el empleado", async () => {
         const { onClose, onSuccess } = renderModal();
-        createAbsenceService.mockRejectedValueOnce(
+        CalendarService.createAbsenceService.mockRejectedValueOnce(
             apiError("usuario no encontrado", 404),
         );
 
@@ -297,7 +305,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
 
     it("muestra error de permisos insuficientes si el servicio rechaza la operacion", async () => {
         const { onClose, onSuccess } = renderModal();
-        createAbsenceService.mockRejectedValueOnce(
+        CalendarService.createAbsenceService.mockRejectedValueOnce(
             apiError("Permisos insuficientes", 403),
         );
 
@@ -329,11 +337,11 @@ describe("Integracion: coordinador registra una ausencia", () => {
         expect(
             screen.getAllByText("Formato invalido de ausencias").length,
         ).toBeGreaterThan(0);
-        expect(createAbsenceService).not.toHaveBeenCalled();
+        expect(CalendarService.createAbsenceService).not.toHaveBeenCalled();
     });
 
     it("oculta la opcion de ausencias para un rol diferente a coordinador o admin", () => {
-        getCalendarViewerRole.mockReturnValue("Trabajador");
+        AuthUtils.getCalendarViewerRole.mockReturnValue("Trabajador");
 
         renderModal();
 

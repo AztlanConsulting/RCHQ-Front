@@ -1,7 +1,6 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
-import { isPastDate } from "../../../utils/dates";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const VacationDetail = ({
     event,
@@ -11,7 +10,7 @@ const VacationDetail = ({
     onApprove,
     onReject,
 }) => {
-    const isPast = isPastDate(event.start);
+    const isPast = Dates.isPastDate(event.start);
     const status = Number(event.status);
 
     const isPending = status === 0;
@@ -82,7 +81,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableStart || event.startDate || event.start)}
+                        {Dates.formatEventDate(event.readableStart || event.startDate || event.start)}
                     </Type>
                 </div>
                 <div>
@@ -96,7 +95,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableEnd || event.endDate || event.end)}
+                        {Dates.formatEventDate(event.readableEnd || event.endDate || event.end)}
                     </Type>
                 </div>
                 <div>

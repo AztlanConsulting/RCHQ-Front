@@ -1,13 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useField } from "../atoms/useField";
 import { useDocumentFile } from "../atoms/useDocumentFile";
-import {
-  getDocumentsService,
-  getDocumentTypesService,
-  uploadDocumentService,
-  updateDocumentService,
-  deleteDocumentService,
-} from "../../services/documentService";
+import DocumentService from "../../services/document.service";
 
 const getUserInfoFromToken = () => {
   try {
@@ -44,7 +38,7 @@ export const useDocuments = (employeeId) => {
   const displayError = localError || fileError;
 
   useEffect(() => {
-    getDocumentTypesService()
+    DocumentService.getTypes()
       .then(setDocumentTypes)
       .catch(() => setFetchError("Error al cargar tipos de documento"));
   }, []);
@@ -71,7 +65,7 @@ export const useDocuments = (employeeId) => {
     setLoadingDocs(true);
     setFetchError("");
     try {
-      const response = await getDocumentsService(employeeId);
+      const response = await DocumentService.getDocuments(employeeId);
       setDocuments(response.data || []);
     } catch (err) {
       setFetchError(err.message || "Error al cargar los documentos");
@@ -99,10 +93,10 @@ export const useDocuments = (employeeId) => {
     setModalError("");
     try {
       if (isEditing) {
-        await updateDocumentService(employeeId, editingDocument.documentId, formData);
+        await DocumentService.update(employeeId, editingDocument.documentId, formData);
         setSuccessMessage("Documento actualizado correctamente.");
       } else {
-        await uploadDocumentService(employeeId, formData);
+        await DocumentService.upload(employeeId, formData);
         setSuccessMessage("Documento subido correctamente.");
       }
       setShowUploadModal(false);
@@ -125,7 +119,7 @@ export const useDocuments = (employeeId) => {
     if (!conflictDocument) return;
     setModalLoading(true);
     try {
-      await updateDocumentService(employeeId, conflictDocument.field, conflictDocument.formData);
+      await DocumentService.update(employeeId, conflictDocument.field, conflictDocument.formData);
       setSuccessMessage("Documento reemplazado correctamente.");
       fetchDocuments();
     } catch (err) {
@@ -142,7 +136,7 @@ export const useDocuments = (employeeId) => {
     if (!canModify || !docToDelete) return;
     setDeletingId(docToDelete.documentId);
     try {
-      await deleteDocumentService(employeeId, docToDelete.documentId);
+      await DocumentService.delete(employeeId, docToDelete.documentId);
       setDocuments((prev) => prev.filter((d) => d.documentId !== docToDelete.documentId));
       setSuccessMessage("Documento eliminado correctamente.");
     } catch (err) {

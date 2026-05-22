@@ -13,7 +13,7 @@ const CalendarFiltersModal = ({ open, onClose, ...filterProps }) => (
     <CalendarFilters
       {...filterProps}
       showPageHeading={false}
-      stackMaxHeightClass="max-h-none"
+      containScroll={false}
       className="!mb-0 !p-0"
     />
   </Modal>

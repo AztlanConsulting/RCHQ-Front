@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-    createAbsenceService,
-    getAbsenceAddData,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
 import {
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,
-} from "../../utils/schema/evento/absence.schema";
+} from "../../utils/schemas/calendar/absence.schema";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const DEFAULT_FORM = {
@@ -134,7 +131,7 @@ export const useAbsenceForm = ({
 
         let isEffectActive = true;
 
-        getAbsenceAddData()
+        CalendarService.getAbsenceAddData()
             .then(({ employees = [], absenceTypes = [] }) => {
                 if (!isEffectActive) return;
 
@@ -263,7 +260,7 @@ export const useAbsenceForm = ({
         setServerError(null);
 
         try {
-            const absence = await createAbsenceService(validated.employeeId, {
+            const absence = await CalendarService.createAbsenceService(validated.employeeId, {
                 absenceTypeId: validated.absenceTypeId,
                 startDate: validated.startDate,
                 endDate: validated.endDate,

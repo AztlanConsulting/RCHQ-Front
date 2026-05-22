@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getFirstLoginToken,
-  setPreTwoFactorAuthToken,
-} from "../../utils/authStorage";
-import { changePasswordFirstLoginService } from "../../services/passwordService";
+import AuthUtils from "../../utils/auth.utils";
+import PasswordService from "../../services/password.service";
 import useAuth from "../useAuth";
 import {
   firstLoginChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/schema/auth/password.schemas";
-import { mapPasswordApiError } from "../../utils/password/passwordErrorMapper";
+} from "../../utils/schemas/auth/password.schemas";
+import { mapPasswordApiError } from "@/utils/mappers/auth/passwordErrorMapper";
 
 export const useChangePassword = () => {
   const navigate = useNavigate();
@@ -26,7 +23,7 @@ export const useChangePassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const token = getFirstLoginToken();
+    const token = AuthUtils.getFirstLoginToken();
     if (!token) {
       navigate("/iniciar-sesion", { replace: true });
     }
@@ -53,7 +50,7 @@ export const useChangePassword = () => {
     }
 
     try {
-      const response = await changePasswordFirstLoginService(
+      const response = await PasswordService.changePasswordFirstLogin(
         newPassword,
         confirmPassword,
       );
@@ -68,7 +65,7 @@ export const useChangePassword = () => {
           return;
         }
 
-        setPreTwoFactorAuthToken(preTwoFactorAuthToken);
+        AuthUtils.setPreTwoFactorAuthToken(preTwoFactorAuthToken);
         navigate("/2FA", { replace: true });
         return;
       }

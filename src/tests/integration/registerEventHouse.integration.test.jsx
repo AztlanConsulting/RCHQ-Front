@@ -8,11 +8,13 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import { createHouseEvent, getEventTypes } from "../../services/eventService";
+import EventService from "../../services/event.service";
 
-vi.mock("../../services/eventService", () => ({
-    createHouseEvent: vi.fn(),
-    getEventTypes: vi.fn(),
+vi.mock("../../services/event.service", () => ({
+    default: {
+        createHouseEvent: vi.fn(),
+        getEventTypes: vi.fn(),
+    },
 }));
 
 vi.mock("../../components/atoms/alerts", () => ({
@@ -125,9 +127,9 @@ describe("Integración: agregar evento de casa", () => {
         localStorage.clear();
         localStorage.setItem("user", JSON.stringify({ role: "Coordinador" }));
 
-        getEventTypes.mockResolvedValue(mockEventTypes);
+        EventService.getEventTypes.mockResolvedValue(mockEventTypes);
 
-        createHouseEvent.mockResolvedValue({
+        EventService.createHouseEvent.mockResolvedValue({
             success: true,
             data: {
                 houseEventId: "evt-1",
@@ -139,7 +141,7 @@ describe("Integración: agregar evento de casa", () => {
     it("obtiene y muestra los tipos de evento al abrir el modal", async () => {
         await renderModal();
 
-        expect(getEventTypes).toHaveBeenCalled();
+        expect(EventService.getEventTypes).toHaveBeenCalled();
 
         expect(
             await screen.findByRole("option", { name: /limpieza/i }),
@@ -180,10 +182,10 @@ describe("Integración: agregar evento de casa", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createHouseEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createHouseEvent).toHaveBeenCalledTimes(1);
         });
 
-        expect(createHouseEvent).toHaveBeenCalledWith({
+        expect(EventService.createHouseEvent).toHaveBeenCalledWith({
             eventTypeId: EVENT_TYPE_ID,
             name: "Limpieza profunda",
             start: "2026-05-05T09:00:00.000-06:00",
@@ -215,7 +217,7 @@ describe("Integración: agregar evento de casa", () => {
         expect(
             screen.getByText("El titulo es obligatorio"),
         ).toBeInTheDocument();
-        expect(createHouseEvent).not.toHaveBeenCalled();
+        expect(EventService.createHouseEvent).not.toHaveBeenCalled();
     });
 
     it("crea un evento de todo el día", async () => {
@@ -229,10 +231,10 @@ describe("Integración: agregar evento de casa", () => {
         await clickFormConfirm();
 
         await waitFor(() => {
-            expect(createHouseEvent).toHaveBeenCalledTimes(1);
+            expect(EventService.createHouseEvent).toHaveBeenCalledTimes(1);
         });
 
-        expect(createHouseEvent).toHaveBeenCalledWith(
+        expect(EventService.createHouseEvent).toHaveBeenCalledWith(
             expect.objectContaining({
                 allDay: true,
                 start: "2026-05-05",
@@ -242,7 +244,7 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("muestra el modal de empalme cuando el backend regresa colisiones", async () => {
-        createHouseEvent.mockResolvedValueOnce({
+        EventService.createHouseEvent.mockResolvedValueOnce({
             success: false,
             data: {
                 collisions: [
@@ -274,7 +276,7 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("permite forzar el registro cuando hay empalme", async () => {
-        createHouseEvent
+        EventService.createHouseEvent
             .mockResolvedValueOnce({
                 success: false,
                 data: {
@@ -310,10 +312,10 @@ describe("Integración: agregar evento de casa", () => {
         await clickLastConfirm();
 
         await waitFor(() => {
-            expect(createHouseEvent).toHaveBeenCalledTimes(2);
+            expect(EventService.createHouseEvent).toHaveBeenCalledTimes(2);
         });
 
-        expect(createHouseEvent).toHaveBeenLastCalledWith(
+        expect(EventService.createHouseEvent).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 forceOverlap: true,
             }),
@@ -328,7 +330,7 @@ describe("Integración: agregar evento de casa", () => {
     });
 
     it("muestra error del servidor si falla createHouseEvent", async () => {
-        createHouseEvent.mockRejectedValueOnce(
+        EventService.createHouseEvent.mockRejectedValueOnce(
             new Error("Error al registrar evento"),
         );
 

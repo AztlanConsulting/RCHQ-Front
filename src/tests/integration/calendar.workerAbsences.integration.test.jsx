@@ -8,26 +8,28 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
-import {
-    getAbsenceTypes,
-    getCalendarViewerRole,
-    getEventsTypes,
-    getHouseEmployees,
-    updateAbsenceService,
-} from "../../services/calendarService";
+import CalendarService from "../../services/calendar.service";
+import AuthUtils from "../../utils/auth.utils";
 
 vi.mock("../../hooks/organism/useBaseCalendar", () => ({
     useBaseCalendar: vi.fn(),
 }));
 
-vi.mock("../../services/calendarService", () => ({
-    getAbsenceTypes: vi.fn(),
-    getCalendarViewerRole: vi.fn(() => "Trabajador"),
-    getEventsTypes: vi.fn(),
-    getHouseEmployees: vi.fn(),
-    updateAbsenceService: vi.fn(),
-    getCalendarViewerRole: vi.fn(),
-    buildAbsenceEvidenceUrl: vi.fn((link) => link),
+vi.mock("../../services/calendar.service", () => ({
+    __esModule: true,
+    default: {
+        getAbsenceTypes: vi.fn(),
+        getEventsTypes: vi.fn(),
+        getHouseEmployees: vi.fn(),
+        updateAbsenceService: vi.fn(),
+    },
+}));
+
+vi.mock("../../utils/auth.utils", () => ({
+    __esModule: true,
+    default: {
+        getCalendarViewerRole: vi.fn(() => "Trabajador"),
+    },
 }));
 
 vi.mock("../../components/organism/baseCalendar", () => ({
@@ -116,16 +118,16 @@ const setWorkerCalendar = ({
 describe("Integración: trabajador consulta sus ausencias", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        getCalendarViewerRole.mockReturnValue("Trabajador");
-        getEventsTypes.mockResolvedValue([{ name: "General" }]);
-        getAbsenceTypes.mockResolvedValue([
+        AuthUtils.getCalendarViewerRole.mockReturnValue("Trabajador");
+        CalendarService.getEventsTypes.mockResolvedValue([{ name: "General" }]);
+        CalendarService.getAbsenceTypes.mockResolvedValue([
             { absenceTypeId: "type-medica", name: "Médica" },
             { absenceTypeId: "type-paternidad", name: "Paternidad" },
         ]);
-        getHouseEmployees.mockResolvedValue([
+        CalendarService.getHouseEmployees.mockResolvedValue([
             { employeeId: "other-worker", name: "Otro trabajador" },
         ]);
-        updateAbsenceService.mockResolvedValue({});
+        CalendarService.updateAbsenceService.mockResolvedValue({});
     });
 
     afterEach(() => {
@@ -155,7 +157,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
 
         const dialog = await screen.findByRole("dialog");
 
-        expect(getHouseEmployees).not.toHaveBeenCalled();
+        expect(CalendarService.getHouseEmployees).not.toHaveBeenCalled();
         expect(screen.queryByText("TRABAJADOR")).not.toBeInTheDocument();
         expect(within(dialog).getByText("Ausencia")).toBeInTheDocument();
         expect(
