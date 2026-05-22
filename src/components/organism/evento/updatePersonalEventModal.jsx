@@ -1,0 +1,222 @@
+import Alert from "../../atoms/alerts";
+import Button from "../../atoms/button";
+import CheckboxField from "../../atoms/checkboxField";
+import DateField from "../../atoms/dateField";
+import EmployeeSearchSelect from "../../atoms/employeeSearchSelect";
+import ErrorText from "../../atoms/errorText";
+import Modal from "../../atoms/modal";
+import SelectField from "../../atoms/selectField";
+import TextField from "../../atoms/textField";
+import TimeField from "../../atoms/timeField";
+import PersonalOverlapModal from "../personalOverlapModal";
+import { useUpdatePersonalEventForm } from "../../../hooks/pages/useUpdatePersonalEventForm";
+
+const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
+    const {
+        form,
+        errors,
+        serverError,
+        eventTypes,
+        employees,
+        selectedEmployees,
+        isSubmitting,
+        isCoordinator,
+        overlapState,
+        setField,
+        setServerError,
+        searchEmployees,
+        handleSelectEmployee,
+        handleRemoveEmployee,
+        handleSubmit,
+        handleForceOverlap,
+        handleCancelOverlap,
+        getTimeContainerStyle,
+    } = useUpdatePersonalEventForm({ event, isOpen, onClose, onSuccess });
+
+    const showTimeFields = !form.allDay;
+
+    return (
+        <>
+            <Modal
+                open={isOpen}
+                onClose={onClose}
+                grayBackground
+                placement="center"
+                className="w-full max-w-[560px] rounded-xl p-6"
+                backdropClassName="bg-black/40"
+            >
+                <div
+                    key={event?.eventId ?? event?.id ?? "update-personal"}
+                    className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
+                >
+                    <h2 className="text-2xl font-bold text-[#121212]">
+                        Modificar evento personal
+                    </h2>
+
+                    <TextField
+                        id="update-personal-event-name"
+                        value={form.name}
+                        setValue={(value) => setField("name", value)}
+                        placeholder="Evento personal"
+                        maxLength={120}
+                        labelClassName="hidden"
+                    />
+                    {errors.name && <ErrorText>{errors.name}</ErrorText>}
+
+                    <div className="flex flex-col gap-2">
+                        <div>
+                            <DateField
+                                label="Fecha"
+                                labelColor="text-[#374151]"
+                                value={form.date}
+                                onChange={(e) =>
+                                    setField("date", e.target.value)
+                                }
+                                placeholder="dd / mm / yyyy"
+                            />
+                            {errors.date && (
+                                <ErrorText>{errors.date}</ErrorText>
+                            )}
+                        </div>
+
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: "8px",
+                                alignItems: "flex-end",
+                            }}
+                        >
+                            <div style={getTimeContainerStyle(showTimeFields)}>
+                                <TimeField
+                                    value={form.startTime}
+                                    onChange={(value) =>
+                                        setField("startTime", value)
+                                    }
+                                    placeholder="Inicio"
+                                    disabled={form.allDay}
+                                />
+                                {showTimeFields && errors.startTime && (
+                                    <ErrorText>{errors.startTime}</ErrorText>
+                                )}
+                            </div>
+                            <div style={getTimeContainerStyle(showTimeFields)}>
+                                <TimeField
+                                    value={form.endTime}
+                                    onChange={(value) =>
+                                        setField("endTime", value)
+                                    }
+                                    minTime={form.startTime}
+                                    placeholder="Fin"
+                                    disabled={form.allDay}
+                                />
+                                {showTimeFields && errors.endTime && (
+                                    <ErrorText>{errors.endTime}</ErrorText>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-5 pb-1">
+                        <CheckboxField
+                            id="update-personal-event-all-day"
+                            label="Todo el día"
+                            checked={form.allDay}
+                            onChange={(value) => setField("allDay", value)}
+                        />
+                    </div>
+
+                    <SelectField
+                        value={form.eventTypeId}
+                        setValue={(value) => setField("eventTypeId", value)}
+                        options={eventTypes}
+                        placeholder="General"
+                    />
+                    {errors.eventTypeId && (
+                        <ErrorText>{errors.eventTypeId}</ErrorText>
+                    )}
+
+                    {isCoordinator && (
+                        <EmployeeSearchSelect
+                            label="Agregar empleados"
+                            placeholder="Buscar por nombre..."
+                            employees={employees}
+                            selected={selectedEmployees}
+                            onSelect={handleSelectEmployee}
+                            onRemove={handleRemoveEmployee}
+                            onSearch={searchEmployees}
+                        />
+                    )}
+
+                    <div className="flex w-full flex-col gap-1.5">
+                        <label className="text-sm font-bold text-[#374151]">
+                            Descripción
+                        </label>
+                        <textarea
+                            placeholder="Agregar descripción ..."
+                            value={form.description}
+                            onChange={(e) =>
+                                setField("description", e.target.value)
+                            }
+                            maxLength={250}
+                            rows={4}
+                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
+                        />
+                        {errors.description && (
+                            <ErrorText>{errors.description}</ErrorText>
+                        )}
+                    </div>
+
+                    {serverError && (
+                        <Alert
+                            type="error"
+                            message={serverError}
+                            onClose={() => setServerError(null)}
+                        />
+                    )}
+
+                    <div className="flex justify-center gap-3 pt-1">
+                        <Button
+                            text="Cancelar"
+                            onClick={onClose}
+                            disabled={isSubmitting}
+                            width="w-auto"
+                            height="h-[38px]"
+                            textSize="text-sm"
+                            fontWeight="font-bold"
+                            bgColor="bg-white"
+                            textColor="text-[#121212]"
+                            hoverColor="hover:bg-slate-50"
+                            activeColor="active:bg-slate-100"
+                            className="px-5 border border-slate-200 shadow-md"
+                        />
+                        <Button
+                            text={isSubmitting ? "Modificando..." : "Modificar"}
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            width="w-auto"
+                            height="h-[38px]"
+                            textSize="text-sm"
+                            fontWeight="font-bold"
+                            bgColor="bg-[#1F3664]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#15284A]"
+                            activeColor="active:bg-[#0E1B33]"
+                            className="px-5 shadow-md"
+                        />
+                    </div>
+                </div>
+            </Modal>
+
+            <PersonalOverlapModal
+                isOpen={overlapState.show}
+                overlappedEmployees={overlapState.overlappedEmployees}
+                onConfirm={handleForceOverlap}
+                onCancel={handleCancelOverlap}
+                isLoading={overlapState.isForcing}
+                isCoordinator={isCoordinator}
+            />
+        </>
+    );
+};
+
+export default UpdatePersonalEventModal;
