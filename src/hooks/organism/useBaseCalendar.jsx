@@ -208,6 +208,8 @@ export const useBaseCalendar = () => {
             return title;
         }
 
+        const isDay = viewType == "Day";
+
         const startDay = currentStatus.start.day;
         const startMonthNumber = currentStatus.start.month;
         const isFullStartMonthName = false;
@@ -216,9 +218,10 @@ export const useBaseCalendar = () => {
 
         const endDay = currentStatus.end.day;
         const endMonthNumber = currentStatus.end.month;
-        const isFullEndMonthName = viewType == "Day";
-        const endMonth = getMonth(endMonthNumber, isFullEndMonthName);
+        const endMonth = getMonth(endMonthNumber, isDay);
         const endYear = currentStatus.end.year;
+        
+        const monthDescriber = isDay ? " de" : "";
 
         const startMonthText = startMonth != endMonth ? ` ${startMonth}` : "";
         const startYearText = startYear != endYear ? ` ${startYear}` : "";
@@ -226,7 +229,7 @@ export const useBaseCalendar = () => {
             viewType == "Week"
                 ? `${startDay}${startMonthText}${startYearText} - `
                 : "";
-        const title = `${startText}${endDay} ${endMonth} ${endYear}`;
+        const title = `${startText}${endDay}${monthDescriber} ${endMonth} ${endYear}`;
 
         return title;
     };
@@ -240,17 +243,18 @@ export const useBaseCalendar = () => {
         return cellWidth;
     };
 
-    const validateShortenedSize = () => {
+    const validateShortenedSize = (hasNumber) => {
         if (viewType == "Day") return false;
 
         const currentDayWidth = getDayWidth();
 
-        if (currentDayWidth < 96) return true;
+        if (currentDayWidth < (hasNumber ? 106 : 96)) return true;
 
         return false;
     };
 
     const getWeekDayName = (currentDay) => {
+        console.log(currentDay);
         const weekDayIndex = currentDay.dow;
         const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
         const fullDays = [
@@ -262,10 +266,14 @@ export const useBaseCalendar = () => {
             "Viernes",
             "Sábado",
         ];
-        const weekDay = validateShortenedSize()
+
+        const hasNumber = viewType == "Week";
+        const weekDay = validateShortenedSize(hasNumber)
             ? shortenedDays[weekDayIndex]
             : fullDays[weekDayIndex];
-        return weekDay;
+        const dayNumber = hasNumber ? ` ${currentDay.date.getUTCDate()}` : "";
+        const viewableString = `${weekDay}${dayNumber}`;
+        return viewableString;
     };
 
     const resizeHandler = (calendarRef) => {
