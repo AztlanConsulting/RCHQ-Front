@@ -2,10 +2,12 @@ import { render, screen, fireEvent, act, waitFor } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmployee";
 import ReasonCard from "../../components/organism/reasonCard";
-import { deactivateEmployeeService } from "../../services/deactivateEmployeeService";
+import EmployeeService from "../../services/employee.service";
 
-vi.mock("../../services/deactivateEmployeeService", () => ({
-  deactivateEmployeeService: vi.fn(),
+vi.mock("../../services/employee.service", () => ({
+  default: {
+    deactivateEmployee: vi.fn(),
+  },
 }));
 
 const TestIntegrationComponent = ({ employeeId, employeeName, setAlertMock, isActive = true, onSuccessMock }) => {
@@ -74,7 +76,7 @@ describe("Integración: Dar de baja a un empleado", () => {
     });
 
     expect(await screen.findByText('El campo "Razón" es obligatorio.')).toBeInTheDocument();
-    expect(deactivateEmployeeService).not.toHaveBeenCalled();
+    expect(EmployeeService.deactivateEmployee).not.toHaveBeenCalled();
   });
 
   it("no abre el modal y muestra alerta si el empleado ya está inactivo", async () => {
@@ -97,7 +99,7 @@ describe("Integración: Dar de baja a un empleado", () => {
   });
 
   it("envía la petición correctamente sin activar lista negra", async () => {
-    deactivateEmployeeService.mockResolvedValueOnce({ success: true });
+    EmployeeService.deactivateEmployee.mockResolvedValueOnce({ success: true });
     await renderAndOpenModal();
 
     fireEvent.change(screen.getByPlaceholderText("Escribe la razón de la baja..."), {
@@ -108,7 +110,7 @@ describe("Integración: Dar de baja a un empleado", () => {
       fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
     });
 
-    expect(deactivateEmployeeService).toHaveBeenCalledWith(employeeId, "Término de contrato", false);
+    expect(EmployeeService.deactivateEmployee).toHaveBeenCalledWith(employeeId, "Término de contrato", false);
     
     expect(setAlertMock).toHaveBeenCalledWith({
       type: "success",
@@ -118,7 +120,7 @@ describe("Integración: Dar de baja a un empleado", () => {
   });
 
   it("envía la petición correctamente activando la lista negra", async () => {
-    deactivateEmployeeService.mockResolvedValueOnce({ success: true });
+    EmployeeService.deactivateEmployee.mockResolvedValueOnce({ success: true });
     await renderAndOpenModal();
 
     fireEvent.change(screen.getByPlaceholderText("Escribe la razón de la baja..."), {
@@ -131,7 +133,7 @@ describe("Integración: Dar de baja a un empleado", () => {
       fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
     });
 
-    expect(deactivateEmployeeService).toHaveBeenCalledWith(employeeId, "Faltas graves", true);
+    expect(EmployeeService.deactivateEmployee).toHaveBeenCalledWith(employeeId, "Faltas graves", true);
     expect(setAlertMock).toHaveBeenCalledWith({
       type: "success",
       message: '"María Gómez" ha sido dado de baja y agregado a la lista negra.',
@@ -140,7 +142,7 @@ describe("Integración: Dar de baja a un empleado", () => {
   });
 
   it("maneja correctamente un error del servicio (ej. API falla)", async () => {
-    deactivateEmployeeService.mockRejectedValueOnce(new Error("No puedes darte de baja a ti mismo"));
+    EmployeeService.deactivateEmployee.mockRejectedValueOnce(new Error("No puedes darte de baja a ti mismo"));
     await renderAndOpenModal();
 
     fireEvent.change(screen.getByPlaceholderText("Escribe la razón de la baja..."), {

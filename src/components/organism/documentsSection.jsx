@@ -3,18 +3,7 @@ import Button from "../atoms/button";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
-
-const formatDocumentDate = (dateString) => {
-  if (!dateString) return "";
-  return new Date(dateString).toLocaleDateString("es-MX", {
-    day: "numeric", month: "numeric", year: "numeric",
-  });
-};
-
-const isDocumentPdf = (doc) => {
-  const url = doc?.url || "";
-  return url.toLowerCase().endsWith(".pdf");
-};
+import Documents from "../../utils/helpers/documents.helpers";
 
 const DocumentsSection = ({
   documents,
@@ -77,9 +66,9 @@ const DocumentsSection = ({
               key={doc.documentId}
               doc={doc}
               label={doc.name}
-              date={formatDocumentDate(doc.uploadedAt)}
-              fileUrl={doc.url}
-              isPdf={isDocumentPdf(doc)}
+              date={Documents.formatDocumentDate(doc.uploadedAt)}
+              fileUrl={Documents.getDocumentFileUrl(doc)}
+              isPdf={Documents.isDocumentPdf(doc)}
               onEdit={handleOpenEdit}
               onDelete={setDocToDelete}
               isBeingDeleted={deletingId === doc.documentId}

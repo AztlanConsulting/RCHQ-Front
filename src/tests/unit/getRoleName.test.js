@@ -1,28 +1,41 @@
 import { describe, it, expect } from "vitest";
-import { getRoleName, hasRole } from "../../utils/auth/getRoleName";
+import AuthUtils from "../../utils/auth.utils";
 
-describe("getRoleName", () => {
+describe("AuthUtils.getRoleName", () => {
     it("obtiene el rol desde role.name", () => {
-        expect(getRoleName({ role: { name: "Coordinador" } })).toBe("coordinador");
+        expect(AuthUtils.getRoleName({ role: { name: "Coordinador" } })).toBe(
+            "coordinador",
+        );
     });
 
     it("obtiene el rol desde roleName", () => {
-        expect(getRoleName({ roleName: "Administrador" })).toBe("Administrador");
+        expect(AuthUtils.getRoleName({ roleName: "Administrador" })).toBe(
+            "administrador",
+        );
     });
 
     it("obtiene el rol desde role como string", () => {
-        expect(getRoleName({ role: "Coordinador" })).toBe("coordinador");
+        expect(AuthUtils.getRoleName({ role: "Coordinador" })).toBe(
+            "coordinador",
+        );
     });
 
     it("regresa string vacío si no hay rol", () => {
-        expect(getRoleName({})).toBe("");
-        expect(getRoleName(null)).toBe("");
+        expect(AuthUtils.getRoleName({})).toBe("");
+        expect(AuthUtils.getRoleName(null)).toBe("");
     });
 });
 
-describe("hasRole", () => {
+describe("AuthUtils.hasRole", () => {
     it("compara roles sin importar mayúsculas/minúsculas", () => {
-        expect(hasRole({ role: { name: "Coordinador" } }, "coordinador")).toBe(true);
-        expect(hasRole({ role: { name: "Administrador" } }, "Coordinador")).toBe(false);
+        expect(
+            AuthUtils.hasRole({ role: { name: "Coordinador" } }, "coordinador"),
+        ).toBe(true);
+        expect(
+            AuthUtils.hasRole(
+                { role: { name: "Administrador" } },
+                "Coordinador",
+            ),
+        ).toBe(false);
     });
 });

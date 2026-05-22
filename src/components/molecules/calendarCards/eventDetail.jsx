@@ -1,10 +1,7 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import {
-    formatEventDateRange,
-    formatEventTime,
-} from "../../../utils/calendarEventDetail";
+import Dates from "@/utils/helpers/dates.helpers";
 
 const canDelete = (scope, role) => {
     if (scope === "global") return role === "Administrador";
@@ -34,7 +31,7 @@ const EventDetail = ({
     const showDelete = canDelete(event.scope, viewerRole);
     const showEdit = canEdit(event.scope, viewerRole);
 
-    const dayText = formatEventDateRange(
+    const dayText = Dates.formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
         event.date || event.endDate || event.end || event.endStr,
         { endExclusive: Boolean(event.allDay) && !event.date },
@@ -88,7 +85,7 @@ const EventDetail = ({
                             Inicio:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.start ?? event.startStr)}
+                            {Dates.formatEventTime(event.start ?? event.startStr)}
                         </p>
                     </div>
                     <div className="w-full flex items-center justify-between gap-4 mb-4">
@@ -96,7 +93,7 @@ const EventDetail = ({
                             Fin:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.end ?? event.endStr)}
+                            {Dates.formatEventTime(event.end ?? event.endStr)}
                         </p>
                     </div>
                 </>
@@ -108,13 +105,17 @@ const EventDetail = ({
                 </Type>
             ) : null}
 
-            {event.peopleInsideEvent
-                ? event.peopleInsideEvent.map((person, idx) => (
-                      <p key={idx}>
-                          {person?.name} - {person?.id}
-                      </p>
-                  ))
-                : null}
+            {event.peopleInsideEvent &&
+            Array.isArray(event.peopleInsideEvent) &&
+            event.peopleInsideEvent.length > 0 ? (
+                <div className="mb-4">
+                    {event.peopleInsideEvent.map((person, idx) => (
+                        <p key={`${person?.id}-${idx}`} className="text-sm">
+                            {person?.name} - {person?.id}
+                        </p>
+                    ))}
+                </div>
+            ) : null}
 
             {(showDelete || showEdit) ? (
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">

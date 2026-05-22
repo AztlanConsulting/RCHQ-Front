@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    getPendingVacationRequests,
-    getReviewedVacationRequests,
-    approveVacationRequest,
-    rejectVacationRequest,
-} from "../../services/vacationRequestService";
+import VacationRequestService from "../../services/vacation.service";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacation.schema";
 
@@ -71,8 +66,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
             try {
                 const fetcher =
                     view === "pending"
-                        ? getPendingVacationRequests
-                        : getReviewedVacationRequests;
+                        ? VacationRequestService.getPending.bind(VacationRequestService)
+                        : VacationRequestService.getReviewed.bind(VacationRequestService);
 
                 const result = await fetcher({
                     page: pageToFetch,
@@ -136,7 +131,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         setError("");
 
         try {
-            await approveVacationRequest(vacationRequestId);
+            await VacationRequestService.approve(vacationRequestId);
             const currentPage = Math.max(page, 1);
 
             const nextPage =
@@ -160,7 +155,7 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         setError("");
 
         try {
-            await rejectVacationRequest(vacationRequestId);
+            await VacationRequestService.reject(vacationRequestId);
             const currentPage = Math.max(page, 1);
 
             const nextPage =

@@ -70,10 +70,14 @@ const CalendarFilters = ({
   canSwitchCalendarMode = false,
   className = "",
   showPageHeading = true,
-  stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
+  containScroll = true,
 }) => {
+  const scrollShellClass = containScroll
+    ? "max-h-[calc(100vh-8rem)] min-w-0 overflow-y-auto overflow-x-hidden scrollbar-hide"
+    : "min-w-0 overflow-visible";
+
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
+    <div className={`pl-2 pr-2 flex flex-col gap-1 mb-auto ${className}`}>
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario
@@ -84,114 +88,116 @@ const CalendarFilters = ({
           {houseName}
         </Type>
       )}
-      {canSwitchCalendarMode ? (
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {calendarModeOptions.map((option) => {
-            const isActive = option.value === calendarMode;
+      <div className={scrollShellClass}>
+        {canSwitchCalendarMode ? (
+          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {calendarModeOptions.map((option) => {
+              const isActive = option.value === calendarMode;
 
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => onCalendarModeChange?.(option.value)}
-                className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
-                  isActive
-                    ? "bg-[#1F3664] text-white shadow-sm"
-                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
-      <div className={`flex flex-col gap-4 mt-4`}>
-        <FilterGroup
-          label="ENFOQUE"
-          name="focus"
-          options={focusOptions}
-          values={focusFilters}
-          setValues={setFocusFilters}
-          renderTrailing={focusTrailing}
-        />
-        <div className="border border-b  border-[#1F3664]"></div>
-        {viewerRole === "Coordinador" && calendarMode === "house" ? (
-          <>
-            <SearchableCheckboxDropdown
-              label="TRABAJADOR"
-              name="employee"
-              filteredOptions={filteredEmployeeOptions}
-              values={employeeFilters}
-              search={employeeSearch}
-              selectedLabel={selectedEmployeeLabel}
-              onSearchChange={setEmployeeSearch}
-              onToggleValue={toggleEmployeeValue}
-              onClearSelection={clearEmployeeSelection}
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onCalendarModeChange?.(option.value)}
+                  className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
+                    isActive
+                      ? "bg-[#1F3664] text-white shadow-sm"
+                      : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+        <div className={`flex flex-col gap-4 mt-4 `}>
+          <FilterGroup
+            label="ENFOQUE"
+            name="focus"
+            options={focusOptions}
+            values={focusFilters}
+            setValues={setFocusFilters}
+            renderTrailing={focusTrailing}
+          />
+          <div className="border border-b  border-[#1F3664]"></div>
+          {viewerRole === "Coordinador" && calendarMode === "house" ? (
+            <>
+              <SearchableCheckboxDropdown
+                label="TRABAJADOR"
+                name="employee"
+                filteredOptions={filteredEmployeeOptions}
+                values={employeeFilters}
+                search={employeeSearch}
+                selectedLabel={selectedEmployeeLabel}
+                onSearchChange={setEmployeeSearch}
+                onToggleValue={toggleEmployeeValue}
+                onClearSelection={clearEmployeeSelection}
+              />
+              <div className="border border-b border-[#EAEAEA]"></div>
+            </>
+          ) : null}
+          <div className="flex flex-col gap-4">
+            <FilterGroup
+              label="VISIBILIDAD"
+              name="scope"
+              options={scopeOptions}
+              values={scopeFilters}
+              setValues={setScopeFilters}
+              renderTrailing={scopeTrailing}
             />
             <div className="border border-b border-[#EAEAEA]"></div>
-          </>
-        ) : null}
-        <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
-          <FilterGroup
-            label="VISIBILIDAD"
-            name="scope"
-            options={scopeOptions}
-            values={scopeFilters}
-            setValues={setScopeFilters}
-            renderTrailing={scopeTrailing}
-          />
-          <div className="border border-b border-[#EAEAEA]"></div>
-          {showEventFilters && (
-            <>
-              <FilterGroup
-                label="CATEGORIA"
-                name="tipo-evento"
-                options={eventTypeOptions}
-                values={eventTypeFilters}
-                setValues={setEventTypeFilters}
-              />
-              <div className="border border-b border-[#EAEAEA]"></div>
-            </>
-          )}
-          {showVacationFilters && (
-            <>
-              <FilterGroup
-                label="ESTATUS DE VACACIONES"
-                name="vacaciones"
-                options={vacationStatusOptions}
-                values={vacationStatusFilters}
-                setValues={setVacationStatusFilters}
-                renderTrailing={vacationTrailing}
-              />
-              <div className="border border-b border-[#EAEAEA]"></div>
-            </>
-          )}
-          {showAbscenceFilters && (
-            <>
-              <FilterGroup
-                label="TIPO DE AUSENCIA"
-                name="absence-type"
-                options={absenceTypeOptions}
-                values={absenceTypeFilters}
-                setValues={setAbsenceTypeFilters}
-              />
-              <FilterGroup
-                label="ESTATUS"
-                name="absence-status"
-                options={absenceStatusOptions}
-                values={absenceStatusFilters}
-                setValues={setAbsenceStatusFilters}
-              />
-              <FilterGroup
-                label="EVIDENCIA"
-                name="absence-evidence"
-                options={absenceEvidenceOptions}
-                values={absenceEvidenceFilters}
-                setValues={setAbsenceEvidenceFilters}
-              />
-            </>
-          )}
+            {showEventFilters && (
+              <>
+                <FilterGroup
+                  label="CATEGORIA"
+                  name="tipo-evento"
+                  options={eventTypeOptions}
+                  values={eventTypeFilters}
+                  setValues={setEventTypeFilters}
+                />
+                <div className="border border-b border-[#EAEAEA]"></div>
+              </>
+            )}
+            {showVacationFilters && (
+              <>
+                <FilterGroup
+                  label="ESTATUS DE VACACIONES"
+                  name="vacaciones"
+                  options={vacationStatusOptions}
+                  values={vacationStatusFilters}
+                  setValues={setVacationStatusFilters}
+                  renderTrailing={vacationTrailing}
+                />
+                <div className="border border-b border-[#EAEAEA]"></div>
+              </>
+            )}
+            {showAbscenceFilters && (
+              <>
+                <FilterGroup
+                  label="TIPO DE AUSENCIA"
+                  name="absence-type"
+                  options={absenceTypeOptions}
+                  values={absenceTypeFilters}
+                  setValues={setAbsenceTypeFilters}
+                />
+                <FilterGroup
+                  label="ESTATUS"
+                  name="absence-status"
+                  options={absenceStatusOptions}
+                  values={absenceStatusFilters}
+                  setValues={setAbsenceStatusFilters}
+                />
+                <FilterGroup
+                  label="EVIDENCIA"
+                  name="absence-evidence"
+                  options={absenceEvidenceOptions}
+                  values={absenceEvidenceFilters}
+                  setValues={setAbsenceEvidenceFilters}
+                />
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

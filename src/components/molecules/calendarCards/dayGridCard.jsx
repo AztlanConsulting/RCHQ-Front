@@ -1,18 +1,8 @@
-const getStartHour = (timestamp) => {
-    if (timestamp == null) return "";
-    const base =
-        timestamp instanceof Date
-            ? new Date(timestamp.getTime())
-            : new Date(timestamp);
-    if (Number.isNaN(base.getTime())) return "";
-    const h = base.getUTCHours();
-    const m = base.getUTCMinutes();
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-};
+import Dates from "@/utils/helpers/dates.helpers";
 
 const DayGridCard = ({ arg }) => {
     const start = arg.event.start;
-    const timeLabel = start != null ? getStartHour(start) : "";
+    const timeLabel = start != null ? Dates.getStartHour(start) : "";
     const showDayLabel = arg.event.allDay || timeLabel === "00:00";
 
     return (

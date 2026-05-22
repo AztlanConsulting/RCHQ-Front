@@ -5,8 +5,10 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // ── Mocks globales ─────────────────────────────────────────────────────────────
 
-vi.mock("../../utils/authStorage", () => ({
-  getToken: vi.fn(() => "mock-token"),
+vi.mock("../../utils/auth.utils", () => ({
+  default: {
+    getToken: vi.fn(() => "mock-token"),
+  },
 }));
 
 vi.mock("@/utils/secureFetchWrapper", () => ({
@@ -19,14 +21,9 @@ vi.mock("../utils/apiErrors", () => ({
 
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
-import { getToken } from "../../utils/authStorage";
+import AuthUtils from "../../utils/auth.utils";
 import { secureFetch } from "@/utils/secureFetchWrapper";
-import {
-  getUpdateFormService,
-  updateBasicInfoService,
-  updateContactInfoService,
-  updateAdminInfoService,
-} from "../../services/employeeUpdateService";
+import EmployeeService from "../../services/employee.service";
 
 import EmployeeContactCard from "../../components/organism/employeeContactCard";
 import EmployeeBasicCard   from "../../components/organism/employeeBasicCard";
@@ -50,21 +47,21 @@ describe("employeeUpdateService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    getToken.mockReturnValue("mock-token");
+    AuthUtils.getToken.mockReturnValue("mock-token");
   });
 
   // ── getUpdateFormService ───────────────────────────────────────────────────
 
   describe("getUpdateFormService", () => {
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(getUpdateFormService()).rejects.toThrow("No se encontró token de sesión");
+      AuthUtils.getToken.mockReturnValue(null);
+      await expect(EmployeeService.getUpdateForm()).rejects.toThrow("No se encontró token de sesión");
       expect(secureFetch).not.toHaveBeenCalled();
     });
 
     it("llama al endpoint correcto con el token", async () => {
       mockFetch(true, { roles: [], houses: [], workdays: [] });
-      await getUpdateFormService();
+      await EmployeeService.getUpdateForm();
       expect(secureFetch).toHaveBeenCalledWith(
         expect.stringContaining("/employee/update-form"),
         expect.objectContaining({
@@ -76,13 +73,13 @@ describe("employeeUpdateService", () => {
     it("retorna los datos cuando la respuesta es ok", async () => {
       const mockData = { roles: [{ roleId: "r1" }], houses: [], workdays: [] };
       mockFetch(true, mockData);
-      const result = await getUpdateFormService();
+      const result = await EmployeeService.getUpdateForm();
       expect(result).toEqual(mockData);
     });
 
     it("lanza error cuando la respuesta no es ok", async () => {
       mockFetch(false, { message: "Forbidden" }, 403);
-      await expect(getUpdateFormService()).rejects.toThrow();
+      await expect(EmployeeService.getUpdateForm()).rejects.toThrow();
     });
   });
 
@@ -93,13 +90,13 @@ describe("employeeUpdateService", () => {
     const body   = { name: "Juan", surname: "Pérez" };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
+      AuthUtils.getToken.mockReturnValue(null);
+      await expect(EmployeeService.updateBasicInfo(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 
     it("llama al endpoint PUT correcto", async () => {
       mockFetch(true, { success: true });
-      await updateBasicInfoService(EMP_ID, body);
+      await EmployeeService.updateBasicInfo(EMP_ID, body);
       expect(secureFetch).toHaveBeenCalledWith(
         expect.stringContaining(`/employee/${EMP_ID}/basic-info`),
         expect.objectContaining({
@@ -111,7 +108,7 @@ describe("employeeUpdateService", () => {
 
     it("serializa el body como JSON", async () => {
       mockFetch(true, { success: true });
-      await updateBasicInfoService(EMP_ID, body);
+      await EmployeeService.updateBasicInfo(EMP_ID, body);
       const call = secureFetch.mock.calls[0][1];
       expect(JSON.parse(call.body)).toEqual(body);
     });
@@ -119,23 +116,23 @@ describe("employeeUpdateService", () => {
     it("retorna los datos si la respuesta es ok", async () => {
       const mockData = { success: true, message: "Actualizado" };
       mockFetch(true, mockData);
-      const result = await updateBasicInfoService(EMP_ID, body);
+      const result = await EmployeeService.updateBasicInfo(EMP_ID, body);
       expect(result).toEqual(mockData);
     });
 
     it("lanza error si la respuesta no es ok (400)", async () => {
       mockFetch(false, { message: "Datos inválidos" }, 400);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow();
+      await expect(EmployeeService.updateBasicInfo(EMP_ID, body)).rejects.toThrow();
     });
 
     it("lanza error si la respuesta no es ok (404)", async () => {
       mockFetch(false, { message: "No encontrado" }, 404);
-      await expect(updateBasicInfoService(EMP_ID, {})).rejects.toThrow();
+      await expect(EmployeeService.updateBasicInfo(EMP_ID, {})).rejects.toThrow();
     });
 
     it("lanza error si la respuesta no es ok (500)", async () => {
       mockFetch(false, { message: "Server error" }, 500);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow();
+      await expect(EmployeeService.updateBasicInfo(EMP_ID, body)).rejects.toThrow();
     });
   });
 
@@ -146,13 +143,13 @@ describe("employeeUpdateService", () => {
     const body   = { email: "juan@mail.com", phoneNumber: "4421234567" };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
+      AuthUtils.getToken.mockReturnValue(null);
+      await expect(EmployeeService.updateContactInfo(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 
     it("llama al endpoint PUT de contact-info", async () => {
       mockFetch(true, { success: true });
-      await updateContactInfoService(EMP_ID, body);
+      await EmployeeService.updateContactInfo(EMP_ID, body);
       expect(secureFetch).toHaveBeenCalledWith(
         expect.stringContaining(`/employee/${EMP_ID}/contact-info`),
         expect.objectContaining({ method: "PUT" }),
@@ -162,13 +159,13 @@ describe("employeeUpdateService", () => {
     it("retorna datos si ok", async () => {
       const mockData = { success: true };
       mockFetch(true, mockData);
-      const result = await updateContactInfoService(EMP_ID, body);
+      const result = await EmployeeService.updateContactInfo(EMP_ID, body);
       expect(result).toEqual(mockData);
     });
 
     it("lanza error si no ok", async () => {
       mockFetch(false, { message: "Error contacto" }, 400);
-      await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow();
+      await expect(EmployeeService.updateContactInfo(EMP_ID, body)).rejects.toThrow();
     });
   });
 
@@ -179,13 +176,13 @@ describe("employeeUpdateService", () => {
     const body   = { type: "tiempo_completo", salary: 15000 };
 
     it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
+      AuthUtils.getToken.mockReturnValue(null);
+      await expect(EmployeeService.updateAdminInfo(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
     });
 
     it("llama al endpoint PUT de admin-info", async () => {
       mockFetch(true, { success: true });
-      await updateAdminInfoService(EMP_ID, body);
+      await EmployeeService.updateAdminInfo(EMP_ID, body);
       expect(secureFetch).toHaveBeenCalledWith(
         expect.stringContaining(`/employee/${EMP_ID}/admin-info`),
         expect.objectContaining({ method: "PUT" }),
@@ -194,7 +191,7 @@ describe("employeeUpdateService", () => {
 
     it("serializa el body como JSON", async () => {
       mockFetch(true, { success: true });
-      await updateAdminInfoService(EMP_ID, body);
+      await EmployeeService.updateAdminInfo(EMP_ID, body);
       const call = secureFetch.mock.calls[0][1];
       expect(JSON.parse(call.body)).toEqual(body);
     });
@@ -202,13 +199,13 @@ describe("employeeUpdateService", () => {
     it("retorna datos si ok", async () => {
       const mockData = { success: true };
       mockFetch(true, mockData);
-      const result = await updateAdminInfoService(EMP_ID, body);
+      const result = await EmployeeService.updateAdminInfo(EMP_ID, body);
       expect(result).toEqual(mockData);
     });
 
     it("lanza error si no ok", async () => {
       mockFetch(false, { message: "Error admin" }, 400);
-      await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow();
+      await expect(EmployeeService.updateAdminInfo(EMP_ID, body)).rejects.toThrow();
     });
   });
 });

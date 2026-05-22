@@ -1,13 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import {
-  calendarItemToDetail,
-  eventApiToDetail,
-} from "../../utils/calendarEventDetail";
-import {
-  deleteAbsenceService,
-  buildAbsenceEvidenceUrl,
-  updateAbsenceService,
-} from "../../services/calendarService";
+import CalendarUtils from "../../utils/calendar.utils";
+import Dates from "@/utils/helpers/dates.helpers";
+import CalendarService from "../../services/calendar.service";
 import { deleteHouseEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
@@ -121,7 +115,7 @@ export const useCalendarPage = ({
   }, []);
 
   const handleEventClick = useCallback((info) => {
-    const detail = eventApiToDetail(info?.event);
+    const detail = CalendarUtils.eventApiToDetail(info?.event);
     selectedEventRef.current = detail;
     setSelectedEvent(detail);
     setIsAbsenceEditing(false);
@@ -140,7 +134,7 @@ export const useCalendarPage = ({
   const openAbsenceEvidence = useCallback(() => {
     if (!selectedEvent?.link) return;
     window.open(
-      buildAbsenceEvidenceUrl(selectedEvent.link),
+      CalendarUtils.buildAbsenceEvidenceUrl(selectedEvent.link),
       "_blank",
       "noopener,noreferrer",
     );
@@ -152,8 +146,8 @@ export const useCalendarPage = ({
 
     setAbsenceForm({
       absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
-      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      startDate: Dates.isoDatePrefix(currentSelectedEvent.startDate),
+      endDate: Dates.isoDatePrefix(currentSelectedEvent.endDate),
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? ""),
     });
     setIsDeleteAbsenceOpen(false);
@@ -201,8 +195,8 @@ export const useCalendarPage = ({
 
     const original = {
       absenceTypeId: inferAbsenceTypeId(currentSelectedEvent, absenceTypeOptions),
-      startDate: String(currentSelectedEvent.startDate ?? "").slice(0, 10),
-      endDate: String(currentSelectedEvent.endDate ?? "").slice(0, 10),
+      startDate: Dates.isoDatePrefix(currentSelectedEvent.startDate),
+      endDate: Dates.isoDatePrefix(currentSelectedEvent.endDate),
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 
@@ -263,7 +257,7 @@ export const useCalendarPage = ({
     setAbsenceEditError("");
 
     try {
-      const updatedAbsence = await updateAbsenceService(
+      const updatedAbsence = await CalendarService.updateAbsenceService(
         currentSelectedEvent.absenceId,
         payload,
       );
@@ -277,7 +271,7 @@ export const useCalendarPage = ({
 
       const nextSelectedEvent =
         refreshedAbsence
-          ? calendarItemToDetail(refreshedAbsence)
+          ? CalendarUtils.calendarItemToDetail(refreshedAbsence)
           : {
               ...currentSelectedEvent,
               absenceId: updatedAbsence?.absenceId ?? currentSelectedEvent.absenceId,
@@ -327,7 +321,7 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
 
     try {
-      await deleteAbsenceService(selectedEvent.absenceId);
+      await CalendarService.deleteAbsenceService(selectedEvent.absenceId);
       closeDetail();
 
       try {
@@ -439,7 +433,7 @@ export const useCalendarPage = ({
     );
 
     if (refreshedEvent) {
-      showEventDetail(calendarItemToDetail(refreshedEvent));
+      showEventDetail(CalendarUtils.calendarItemToDetail(refreshedEvent));
     }
 
     setAlert({
@@ -462,7 +456,7 @@ export const useCalendarPage = ({
     );
 
     if (refreshedEvent) {
-      showEventDetail(calendarItemToDetail(refreshedEvent));
+      showEventDetail(CalendarUtils.calendarItemToDetail(refreshedEvent));
     }
 
     setAlert({
