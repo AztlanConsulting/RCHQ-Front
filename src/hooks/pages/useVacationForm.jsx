@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getCalendarViewerRole, getOwnEmployeeId } from "../../services/calendarService";
 import {
     getVacationEmployees,
     getRemainingVacations,
     registerEmployeeVacation,
+    requestEmployeeVacation,
 } from "../../services/vacationService";
 import { getVacationFormErrors } from "../../utils/schema/vacation/vacation.schema";
 
@@ -61,6 +63,9 @@ export const useVacationForm = ({
         [employees],
     );
 
+    const viewerRole = getCalendarViewerRole();
+    const ownEmployeeId = getOwnEmployeeId();
+
     const setField = useCallback((field, value) => {
         setForm((current) => ({
             ...current,
@@ -90,7 +95,7 @@ export const useVacationForm = ({
         }
 
         setForm({
-            employeeId: "",
+            employeeId: viewerRole !== "Coordinador" ? ownEmployeeId : "",
             startDate: toDateInputValue(initialStartDate),
             endDate: toDateInputValue(initialEndDate),
         });
@@ -111,8 +116,8 @@ export const useVacationForm = ({
             }
         };
 
-        loadEmployees();
-    }, [isOpen, initialStartDate, initialEndDate]);
+        if (viewerRole === "Coordinador") loadEmployees();
+    }, [isOpen, initialStartDate, initialEndDate, viewerRole, ownEmployeeId]);
 
     useEffect(() => {
         if (!form.employeeId) {
@@ -154,11 +159,12 @@ export const useVacationForm = ({
         setIsSubmitting(true);
 
         try {
-            await registerEmployeeVacation(validation.data);
+            if (viewerRole !== "Coordinador") await requestEmployeeVacation(validation.data);
+            else await registerEmployeeVacation(validation.data);
 
             onFeedback?.({
                 type: "success",
-                message: "Vacaciones registradas correctamente",
+                message: `Vacaciones ${viewerRole === "Coordinador" ? "registradas" : "solicitadas"} correctamente`,
             });
 
             await onSuccess?.();
