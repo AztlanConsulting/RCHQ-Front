@@ -86,16 +86,32 @@ export const employeeContactUpdateSchema = z
       .max(60, "El correo es demasiado largo")
       .optional(),
 
-    phoneNumber: z.string().trim().max(10).transform(emptyToNull).nullable()
-    .refine((val) => val === null || val.length === 10, { 
-    message: "El número de teléfono debe tener exactamente 10 dígitos" 
+    phoneNumber: z.string().trim().max(10, "El número de teléfono no puede exceder 10 dígitos").transform(emptyToNull).nullable()
+    .refine((val) => val === null || val.length === 10, {
+    message: "El número de teléfono debe tener exactamente 10 dígitos"
     })
     .optional(),
 
-    street:     z.string().trim().max(200).transform(emptyToNull).nullable().optional(),
-    municipio:  z.string().trim().max(120).transform(emptyToNull).nullable().optional(),
-    city:       z.string().trim().max(100).transform(emptyToNull).nullable().optional(),
-    postalCode: z.string().trim().max(10).transform(emptyToNull).nullable().optional(),
+    street: z.string().trim()
+      .max(50, "La calle y número no pueden exceder 50 caracteres")
+      .transform(emptyToNull)
+      .nullable()
+      .optional(),
+    municipio: z.string().trim()
+      .max(50, "El municipio no puede exceder 50 caracteres")
+      .transform(emptyToNull)
+      .nullable()
+      .optional(),
+    city: z.string().trim()
+      .max(50, "La ciudad no puede exceder 50 caracteres")
+      .transform(emptyToNull)
+      .nullable()
+      .optional(),
+    postalCode: z.string().trim()
+      .max(5, "El código postal no puede exceder 5 dígitos")
+      .transform(emptyToNull)
+      .nullable()
+      .optional(),
   })
   .strict()
   .refine(

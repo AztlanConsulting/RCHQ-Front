@@ -154,10 +154,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     
     if (field === "email") finalValue = finalValue.slice(0, 60);
     if (field === "phoneNumber") finalValue = finalValue.slice(0, 10);
-    if (field === "street") finalValue = finalValue.slice(0, 200);
-    if (field === "municipio") finalValue = finalValue.slice(0, 120);
-    if (field === "city") finalValue = finalValue.slice(0, 100);
-    if (field === "postalCode") finalValue = finalValue.slice(0, 10);
+    if (field === "street") finalValue = finalValue.slice(0, 50);
+    if (field === "municipio") finalValue = finalValue.slice(0, 50);
+    if (field === "city") finalValue = finalValue.slice(0, 50);
+    if (field === "postalCode") finalValue = finalValue.slice(0, 5);
 
     setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
