@@ -17,6 +17,7 @@ import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbs
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
+import { useCalendarSearchParams } from "../hooks/pages/useCalendarSearchParams";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -27,6 +28,7 @@ const Calendario = () => {
     const {
         employeeHouseName,
         allEvents,
+        rawCalendarEvents,
         isList,
         viewType,
         currentCalendarView,
@@ -136,6 +138,7 @@ const Calendario = () => {
         cancelDeletePersonalEvent,
         confirmDeletePersonalEvent,
         onHouseEventEditSuccess,
+        openCalendarItemDetail,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -145,6 +148,12 @@ const Calendario = () => {
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
+
+    useCalendarSearchParams({
+        calendarRef,
+        rawCalendarEvents,
+        openCalendarItemDetail,
+    });
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,

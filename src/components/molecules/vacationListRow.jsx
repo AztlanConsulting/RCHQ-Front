@@ -18,10 +18,6 @@ const VacationListRow = ({
     const canDelete = isFutureView;
     const description = getSafeText(request.description ?? request.feedback);
 
-    const handleViewDetail = () => {
-        onViewDetail?.(request);
-    };
-
     return (
         <tr className="border-b border-gray-200 last:border-b-0">
             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-600">
@@ -56,7 +52,7 @@ const VacationListRow = ({
                 <div className="flex items-center justify-center gap-2">
                     <Button
                         title="Ver detalle"
-                        onClick={handleViewDetail}
+                        onClick={() => onViewDetail(request)}
                         bgColor="bg-transparent"
                         hoverColor="hover:bg-gray-100"
                         activeColor="active:bg-gray-200"
@@ -102,7 +98,7 @@ const VacationListRow = ({
                             className="rounded-full"
                         >
                             <img
-                                src="/crossMark.svg"
+                                src="/trash.svg"
                                 alt="Borrar vacación"
                                 className="h-5 w-5"
                             />

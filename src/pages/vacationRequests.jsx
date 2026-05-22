@@ -34,6 +34,7 @@ const VacationRequests = () => {
         handleNextPage,
         handlePrevPage,
         clearFilters,
+        onViewDetail,
     } = useVacationRequests();
 
     const [requestToApprove, setRequestToApprove] = useState(null);
@@ -169,9 +170,7 @@ const VacationRequests = () => {
                 loading={loading}
                 approvingRequestId={approvingRequestId}
                 rejectingRequestId={rejectingRequestId}
-                onViewDetail={(request) => {
-                    setSelectedRequest(request);
-                }}
+                onViewDetail={onViewDetail}
                 onOpenApproveModal={handleOpenApproveModal}
                 onOpenRejectModal={handleOpenRejectModal}
             />

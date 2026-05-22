@@ -119,6 +119,11 @@ export const useCalendarPage = ({
     setDeletePersonalEventError("");
   }, []);
 
+  const openCalendarItemDetail = useCallback((item) => {
+    const detail = calendarItemToDetail(item);
+    showEventDetail(detail);
+  }, [showEventDetail]);
+
   const showCalendarAlert = useCallback((nextAlert) => {
     setAlert(nextAlert);
   }, []);
@@ -570,6 +575,7 @@ export const useCalendarPage = ({
     confirmDeleteHouseEvent,
     cancelDeletePersonalEvent,
     confirmDeletePersonalEvent,
-    onHouseEventEditSuccess,
-  };
+        onHouseEventEditSuccess,
+        openCalendarItemDetail,
+    };
 };

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
@@ -9,6 +10,7 @@ import {
 } from "../../services/vacationRequestService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
 import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacation.schema";
+import { normalizeDateOnly } from "../../utils/calendarEventDetail";
 
 const LIMIT = 6;
 
@@ -42,6 +44,8 @@ const useVacationRequestsBase = ({
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const clearError = () => {
         setError("");
@@ -130,6 +134,15 @@ const useVacationRequestsBase = ({
         onReset();
     };
 
+    const onViewDetail = (request) => {
+        const vacationId = request.vacationRequestId;
+        const date = normalizeDateOnly(request.startDate);
+
+        if (!vacationId || !date) return;
+
+        navigate(`/app/calendario?type=vacacion&date=${date}&id=${vacationId}`);
+    };
+
     return {
         view,
         setView: handleChangeView,
@@ -153,6 +166,7 @@ const useVacationRequestsBase = ({
         handlePrevPage,
         clearFilters,
         refetch: (pageToFetch = page) => fetchRequests(pageToFetch),
+        onViewDetail,
     };
 };
 

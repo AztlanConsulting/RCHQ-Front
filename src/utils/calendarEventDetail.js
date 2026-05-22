@@ -39,6 +39,18 @@ export const addDaysToDateOnly = (value, days) => {
     return normalizeDateOnly(baseDate);
 };
 
+const getTotalDays = (start, end) => {
+    const startDate = dateOnlyToLocalDate(start);
+    const endDate = dateOnlyToLocalDate(end);
+
+    if (!startDate || !endDate) return "";
+
+    const diffMs = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffMs / 86400000) + 1;
+
+    return diffDays > 0 ? diffDays : "";
+};
+
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
@@ -92,6 +104,9 @@ export const eventApiToDetail = (ev) => {
 export const calendarItemToDetail = (item) => {
     if (!item) return null;
 
+    const startDate = normalizeDateOnly(item.startDate ?? item.start);
+    const endDate = normalizeDateOnly(item.endDate ?? item.end);
+
     return {
         id: item.id ?? item.absenceId ?? item.employeeId ?? item.name,
         houseEventId: item.houseEventId,
@@ -99,6 +114,10 @@ export const calendarItemToDetail = (item) => {
         eventTypeId: item.eventTypeId,
         absenceId: item.absenceId,
         absenceTypeId: item.absenceTypeId,
+        vacationId: item.vacationId,
+        vacationStatus: item.status,
+        vacationFeedback: item.feedback,
+        feedback: item.feedback ?? "",
         employeeId: item.employeeId,
         title:
             item.focus === "ausencias" ? `Ausencia de ${item.name}` : item.name,
@@ -109,6 +128,8 @@ export const calendarItemToDetail = (item) => {
             ? (item.start.toISOString?.() ?? String(item.start))
             : "",
         endStr: item.end ? (item.end.toISOString?.() ?? String(item.end)) : "",
+        readableStart: item.startReadableDate ?? startDate,
+        readableEnd: item.endReadableDate ?? endDate,
         allDay: Boolean(item.allDay),
         backgroundColor: item.backgroundColor ?? item.color,
         borderColor: item.borderColor ?? item.color ?? item.backgroundColor,
@@ -125,9 +146,10 @@ export const calendarItemToDetail = (item) => {
         status: item.status,
         curp: item.curp ?? "",
         usedDays: item.usedDays,
+        totalDays: item.totalDays ?? getTotalDays(startDate, endDate),
         link: item.link ?? "",
-        startDate: normalizeDateOnly(item.startDate ?? item.start),
-        endDate: normalizeDateOnly(item.endDate ?? item.end),
+        startDate,
+        endDate,
         isDeleted: item.isDeleted,
         peopleInsideEvent: item.peopleInsideEvent ?? null,
     };

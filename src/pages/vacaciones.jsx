@@ -24,6 +24,7 @@ const VacationList = () => {
         handleNextPage,
         handlePrevPage,
         clearFilters,
+        onViewDetail,
     } = useVacationList();
 
     const isFutureView = view === "future";
@@ -77,7 +78,7 @@ const VacationList = () => {
                 requests={requests}
                 view={view}
                 loading={loading}
-                onViewDetail={() => {}}
+                onViewDetail={onViewDetail}
             />
 
             <Pagination

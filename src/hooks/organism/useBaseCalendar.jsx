@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     getCalendarViewerRole,
     getEmployeeHouseName,
@@ -320,6 +320,12 @@ export const useBaseCalendar = () => {
         return rawEvents ?? [];
     }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
+    useEffect(() => {
+        reloadCurrentRange().catch((err) => {
+            console.error(err);
+        });
+    }, [reloadCurrentRange]);
+
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         const currentDate = dateInfo.view.calendar.getDate();
@@ -399,6 +405,7 @@ export const useBaseCalendar = () => {
     return {
         employeeHouseName,
         allEvents: filteredCalendarEvents,
+        rawCalendarEvents: allEvents,
         isList,
         viewType,
         currentCalendarView,
