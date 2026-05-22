@@ -122,6 +122,50 @@ export const getReviewedVacationRequests = async ({
     return parseVacationRequestsResponse(res);
 };
 
+export const getFutureVacationRequests = async ({
+    page = 1,
+    limit = 6,
+    startDate = "",
+    endDate = "",
+    status = "all",
+}) => {
+    const query = buildQueryParams({
+        page,
+        limit,
+        startDate,
+        endDate,
+        status,
+    });
+
+    const res = await secureFetch(`${API_URL}/vacation/requests/future?${query}`, {
+        method: "GET",
+    });
+
+    return parseVacationRequestsResponse(res);
+};
+
+export const getPastVacationRequests = async ({
+    page = 1,
+    limit = 6,
+    startDate = "",
+    endDate = "",
+    status = "all",
+}) => {
+    const query = buildQueryParams({
+        page,
+        limit,
+        startDate,
+        endDate,
+        status,
+    });
+
+    const res = await secureFetch(`${API_URL}/vacation/requests/past?${query}`, {
+        method: "GET",
+    });
+
+    return parseVacationRequestsResponse(res);
+};
+
 export const approveVacationRequest = async (vacationRequestId) => {
     const res = await secureFetch(
         `${API_URL}/vacation/request/${vacationRequestId}/approve`,
