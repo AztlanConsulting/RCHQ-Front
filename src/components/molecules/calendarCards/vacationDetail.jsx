@@ -256,7 +256,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.totalDays ?? "-"}
+                        {event.totalDays === "" || event.totalDays == null ? "-" : event.totalDays}
                     </Type>
                 </div>
                 <div>
@@ -270,7 +270,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.usedDays ?? "-"}
+                        {event.usedDays === "" || event.usedDays == null ? "-" : event.usedDays}
                     </Type>
                 </div>
                 <div className="sm:col-span-2">

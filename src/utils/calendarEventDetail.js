@@ -43,7 +43,7 @@ export const calculateDateRangeDays = (startDate, endDate) => {
     const start = dateOnlyToLocalDate(startDate);
     const end = dateOnlyToLocalDate(endDate);
 
-    if (!start || !end || end < start) return "";
+    if (!start || !end || end < start) return null;
 
     return Math.round((end - start) / 86400000) + 1;
 };
@@ -112,7 +112,7 @@ export const calendarItemToDetail = (item) => {
         item.totalDays ??
         (shouldCalculateTotalDays && startDate && endDate
             ? calculateDateRangeDays(startDate, endDate)
-            : "");
+            : null);
 
     return {
         id: item.id ?? item.absenceId ?? item.employeeId ?? item.name,
