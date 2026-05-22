@@ -302,9 +302,15 @@ svg {
 
 .fc .fc-list-day-text,
 .fc .fc-list-day-side-text {
+    display: inline-block;
     font-size: 0.95rem;
     font-weight: 700;
     color: #121212;
+}
+
+.fc .fc-list-day-text::first-letter,
+.fc .fc-list-day-side-text::first-letter {
+    text-transform: uppercase;
 }
 
 .fc .fc-list-event:hover td {
