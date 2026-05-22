@@ -335,10 +335,17 @@ svg {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 10;
-
+    z-index: 2;
     border: 1px solid var(--fc-border-color);
     border-radius: 8px 8px 0 0;
+}
+
+.fc .fc-list-day th .fc-cell-shaded{
+    border: 1px solid var(--fc-border-color);
+}
+
+.fc .fc-list-table .fc-list-day th {
+    border: none;
 }
 
 .fc .active-btn {
@@ -427,6 +434,10 @@ svg {
 
 .fc tbody tr {
     height: 10px !important; 
+}
+
+.fc .fc-list-table th{
+    z-index: 2;
 }
 
 /* Thin (100) */
