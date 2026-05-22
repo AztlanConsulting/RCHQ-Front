@@ -168,6 +168,39 @@ class EventService {
 
     return response;
   }
+
+  static async deleteHouseEvent(houseEventId) {
+    const token = AuthUtils.getToken();
+
+    if (!token) {
+      throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(
+      `${BASE_URL}/event/house/${houseEventId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+      throw buildApiError(
+        rawResponse,
+        response,
+        "No se pudo eliminar el evento de casa",
+      );
+    }
+
+    return response;
+  }
 }
+
+export const deleteHouseEvent = (...args) => EventService.deleteHouseEvent(...args);
 
 export default EventService;

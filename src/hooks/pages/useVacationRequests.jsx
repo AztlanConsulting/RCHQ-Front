@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import VacationRequestService from "../../services/vacation.service";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
-import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacation.schema";
+import { getVacationRequestFiltersError } from "../../utils/schemas/calendar/vacation.schema";
 
 const LIMIT = 6;
 

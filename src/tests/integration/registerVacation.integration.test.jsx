@@ -13,13 +13,13 @@ import {
     getVacationEmployees,
     getRemainingVacations,
     registerEmployeeVacation,
-} from "../../services/vacationService";
+} from "../../services/vacation.service";
 
 vi.mock("../../services/calendarService", () => ({
     getCalendarViewerRole: vi.fn(),
 }));
 
-vi.mock("../../services/vacationService", () => ({
+vi.mock("../../services/vacation.service", () => ({
     getVacationEmployees: vi.fn(),
     getRemainingVacations: vi.fn(),
     registerEmployeeVacation: vi.fn(),
