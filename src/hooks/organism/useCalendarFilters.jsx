@@ -218,6 +218,7 @@ const getFilteredEvents = (
                     absenceId: rawEvent.absenceId,
                     absenceTypeId: rawEvent.absenceTypeId,
                     vacationId: rawEvent.vacationId,
+                    vacationRequestId: rawEvent.vacationRequestId,
                     vacationStatus: rawEvent.status,
                     vacationFeedback: rawEvent.feedback,
                     employeeId: rawEvent.employeeId,

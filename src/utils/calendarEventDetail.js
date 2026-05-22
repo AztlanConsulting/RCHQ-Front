@@ -39,6 +39,15 @@ export const addDaysToDateOnly = (value, days) => {
     return normalizeDateOnly(baseDate);
 };
 
+export const calculateDateRangeDays = (startDate, endDate) => {
+    const start = dateOnlyToLocalDate(startDate);
+    const end = dateOnlyToLocalDate(endDate);
+
+    if (!start || !end || end < start) return "";
+
+    return Math.round((end - start) / 86400000) + 1;
+};
+
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
@@ -52,6 +61,7 @@ export const eventApiToDetail = (ev) => {
         absenceId: x.absenceId,
         absenceTypeId: x.absenceTypeId,
         vacationId: x.vacationId,
+        vacationRequestId: x.vacationRequestId,
         vacationStatus: x.vacationStatus,
         vacationFeedback: x.vacationFeedback,
         feedback: x.vacationFeedback ?? x.feedback ?? "",
@@ -92,6 +102,18 @@ export const eventApiToDetail = (ev) => {
 export const calendarItemToDetail = (item) => {
     if (!item) return null;
 
+    const startDate = normalizeDateOnly(item.startDate ?? item.start);
+    const endDate = normalizeDateOnly(item.endDate ?? item.end);
+
+    const shouldCalculateTotalDays =
+        item.focus === "vacaciones" || item.focus === "ausencias";
+
+    const totalDays =
+        item.totalDays ??
+        (shouldCalculateTotalDays && startDate && endDate
+            ? calculateDateRangeDays(startDate, endDate)
+            : "");
+
     return {
         id: item.id ?? item.absenceId ?? item.employeeId ?? item.name,
         houseEventId: item.houseEventId,
@@ -99,6 +121,13 @@ export const calendarItemToDetail = (item) => {
         eventTypeId: item.eventTypeId,
         absenceId: item.absenceId,
         absenceTypeId: item.absenceTypeId,
+
+        vacationId: item.vacationId,
+        vacationRequestId: item.vacationRequestId,
+        vacationStatus: item.vacationStatus ?? item.status,
+        vacationFeedback: item.vacationFeedback ?? item.feedback,
+        feedback: item.vacationFeedback ?? item.feedback ?? "",
+
         employeeId: item.employeeId,
         title:
             item.focus === "ausencias" ? `Ausencia de ${item.name}` : item.name,
@@ -125,9 +154,12 @@ export const calendarItemToDetail = (item) => {
         status: item.status,
         curp: item.curp ?? "",
         usedDays: item.usedDays,
+        totalDays,
         link: item.link ?? "",
-        startDate: normalizeDateOnly(item.startDate ?? item.start),
-        endDate: normalizeDateOnly(item.endDate ?? item.end),
+        startDate,
+        endDate,
+        readableStart: item.startReadableDate ?? startDate,
+        readableEnd: item.endReadableDate ?? endDate,
         isDeleted: item.isDeleted,
         peopleInsideEvent: item.peopleInsideEvent ?? null,
     };

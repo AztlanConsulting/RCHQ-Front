@@ -130,6 +130,16 @@ const Calendario = () => {
         cancelDeleteHouseEvent,
         confirmDeleteHouseEvent,
         onHouseEventEditSuccess,
+        isVacationEditing,
+        vacationForm,
+        vacationEditError,
+        isSavingVacation,
+        startVacationEdit,
+        cancelVacationEdit,
+        setVacationField,
+        submitVacationEdit,
+        vacationRemainingInfo,
+        isLoadingVacationRemaining,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -311,11 +321,20 @@ const Calendario = () => {
                             return isManagementRole(viewerRole) ? (
                                 <VacationDetail
                                     event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
-                                    onEdit={() => {}}
-                                    onDelete={() => {}}
-                                    onApprove={() => {}}
-                                    onReject={() => {}}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
+                                    onDelete={() => { }}
+                                    onApprove={() => { }}
+                                    onReject={() => { }}
                                 />
                             ) : (
                                 <VacationWorkerDetail
