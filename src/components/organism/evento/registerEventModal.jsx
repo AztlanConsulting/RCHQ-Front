@@ -81,7 +81,7 @@ const RegisterEventModal = ({
                         maxWidth: "560px",
                         boxSizing: "border-box",
                         maxHeight: "90vh",
-                        overflow: "hidden",
+                        overflow: "visible",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
@@ -134,7 +134,7 @@ const RegisterEventModal = ({
                     <div
                         style={{
                             flex: 1,
-                            overflowY: "auto",
+                            overflowY: effectiveCategoryKey === "vacaciones" ? "visible" : "auto",
                             minHeight: 0,
                             display: "flex",
                             flexDirection: "column",
