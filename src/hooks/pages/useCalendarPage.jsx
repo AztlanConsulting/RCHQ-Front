@@ -10,6 +10,7 @@ import {
 } from "../../services/calendarService";
 import { deleteHouseEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
+import { useVacationFormEdit } from "./useVacationFormEdit";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -82,6 +83,25 @@ export const useCalendarPage = ({
   const [isDeletingHouseEvent, setIsDeletingHouseEvent] = useState(false);
   const [deleteHouseEventError, setDeleteHouseEventError] = useState("");
   const {
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    vacationRemainingInfo,
+    isLoadingVacationRemaining,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    resetVacationEdit,
+  } = useVacationFormEdit({
+    selectedEvent,
+    selectedEventRef,
+    reloadCurrentRange,
+    setSelectedEvent,
+    setAlert,
+  });
+  const {
     file: absenceEvidenceFile,
     fileName: absenceEvidenceFileName,
     error: absenceEvidenceError,
@@ -99,7 +119,8 @@ export const useCalendarPage = ({
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
     resetAbsenceEvidence();
-  }, [resetAbsenceEvidence]);
+    resetVacationEdit();
+  }, [resetAbsenceEvidence, resetVacationEdit]);
 
   const showEventDetail = useCallback((detail) => {
     selectedEventRef.current = detail;
@@ -110,7 +131,8 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
-  }, []);
+    resetVacationEdit();
+  }, [resetVacationEdit]);
 
   const showCalendarAlert = useCallback((nextAlert) => {
     setAlert(nextAlert);
@@ -130,7 +152,8 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
-  }, []);
+    resetVacationEdit();
+  }, [resetVacationEdit]);
 
   const absenceEvidenceLabel = useMemo(
     () => getAbsenceEvidenceLabel(selectedEvent, viewerRole),
@@ -512,5 +535,15 @@ export const useCalendarPage = ({
     cancelDeleteHouseEvent,
     confirmDeleteHouseEvent,
     onHouseEventEditSuccess,
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    vacationRemainingInfo,
+    isLoadingVacationRemaining,
   };
 };
