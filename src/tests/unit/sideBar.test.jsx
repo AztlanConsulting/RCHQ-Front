@@ -62,7 +62,9 @@ describe("SideBar", () => {
     expect(screen.getAllByText("TOCHAN").length).toBeGreaterThan(0);
   });
 
-  it("renderiza todos los nav items base", () => {
+  it("renderiza todos los nav items administrativos para Administrador", () => {
+    setupSideBar({ user: { role: { name: "Administrador" } } });
+
     renderSideBar();
 
     const labels = [
@@ -122,6 +124,15 @@ describe("SideBar", () => {
     ).toHaveAttribute("href", "/app/acciones/casa");
   });
 
+  it("oculta Casas Hogares y Donaciones para Coordinador", () => {
+    setupSideBar({ user: { role: { name: "Coordinador" } } });
+
+    renderSideBar();
+
+    expect(screen.queryByRole("link", { name: "Casas Hogares" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Donaciones" })).toBeNull();
+  });
+
   it("no muestra Acciones registradas para roles distintos de Coordinador", () => {
     setupSideBar({ user: { role: { name: "Administrador" } } });
 
@@ -137,10 +148,9 @@ describe("SideBar", () => {
 
     renderSideBar();
 
-    expect(screen.getAllByRole("link", { name: "Vacaciones" })[0]).toHaveAttribute(
-      "href",
-      "/app/vacaciones/solicitudes",
-    );
+    expect(
+      screen.getAllByRole("link", { name: "Vacaciones" })[0],
+    ).toHaveAttribute("href", "/app/vacaciones/solicitudes");
   });
 
   it("redirige Vacaciones al módulo general para rol no Coordinador", () => {
@@ -148,10 +158,23 @@ describe("SideBar", () => {
 
     renderSideBar();
 
-    expect(screen.getAllByRole("link", { name: "Vacaciones" })[0]).toHaveAttribute(
-      "href",
-      "/app/vacaciones",
-    );
+    expect(
+      screen.getAllByRole("link", { name: "Vacaciones" })[0],
+    ).toHaveAttribute("href", "/app/vacaciones");
+  });
+
+  it("oculta items administrativos para roles distintos de Administrador o Coordinador", () => {
+    setupSideBar({ user: { role: { name: "Trabajador" } } });
+
+    renderSideBar();
+
+    expect(
+      screen.getAllByRole("link", { name: "Calendario" }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "Personal" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Casas Hogares" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Vacaciones" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Donaciones" })).toBeNull();
   });
 });
 

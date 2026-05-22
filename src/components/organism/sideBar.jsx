@@ -16,14 +16,33 @@ const Icon = ({ name, className }) => (
 
 const getNavItems = (user) => {
   const isCoordinator = hasRole(user, "coordinador");
-  const vacationPath = isCoordinator ? "/app/vacaciones/solicitudes" : "/app/vacaciones";
+  const isAdministrator = hasRole(user, "administrador");
+  const vacationPath = isCoordinator
+    ? "/app/vacaciones/solicitudes"
+    : "/app/vacaciones";
   const navItems = [
     { to: "/app/calendario", label: "Calendario", icon: "calendar" },
-    { to: "/app/personal", label: "Personal", icon: "employee" },
-    { to: "/app/casas", label: "Casas Hogares", icon: "home" },
-    { to: vacationPath, label: "Vacaciones", icon: "vacation" },
-    { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
   ];
+
+  if (isCoordinator || isAdministrator) {
+    navItems.push({ to: "/app/personal", label: "Personal", icon: "employee" });
+  }
+
+  if (isAdministrator) {
+    navItems.push({ to: "/app/casas", label: "Casas Hogares", icon: "home" });
+  }
+
+  if (isCoordinator || isAdministrator) {
+    navItems.push({ to: vacationPath, label: "Vacaciones", icon: "vacation" });
+  }
+
+  if (isAdministrator) {
+    navItems.push({
+      to: "/app/donaciones",
+      label: "Donaciones",
+      icon: "donations",
+    });
+  }
 
   if (isCoordinator) {
     navItems.push({
