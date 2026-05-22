@@ -29,7 +29,7 @@ const VacationWorkerDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de Inicio:
+                        Fecha de inicio:
                     </Type>
                     <Type
                         variant="body"
@@ -43,7 +43,7 @@ const VacationWorkerDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de final:
+                        Fecha de fin:
                     </Type>
                     <Type
                         variant="body"
