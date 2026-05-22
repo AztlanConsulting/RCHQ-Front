@@ -8,7 +8,7 @@ import {
   buildAbsenceEvidenceUrl,
   updateAbsenceService,
 } from "../../services/calendarService";
-import { deleteHouseEvent } from "../../services/deleteEventService";
+import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
@@ -81,6 +81,9 @@ export const useCalendarPage = ({
   const [isDeleteHouseEventOpen, setIsDeleteHouseEventOpen] = useState(false);
   const [isDeletingHouseEvent, setIsDeletingHouseEvent] = useState(false);
   const [deleteHouseEventError, setDeleteHouseEventError] = useState("");
+  const [isDeletePersonalEventOpen, setIsDeletePersonalEventOpen] = useState(false);
+  const [isDeletingPersonalEvent, setIsDeletingPersonalEvent] = useState(false);
+  const [deletePersonalEventError, setDeletePersonalEventError] = useState("");
   const {
     file: absenceEvidenceFile,
     fileName: absenceEvidenceFileName,
@@ -98,6 +101,8 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
@@ -110,6 +115,8 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
   }, []);
 
   const showCalendarAlert = useCallback((nextAlert) => {
@@ -130,6 +137,8 @@ export const useCalendarPage = ({
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
   }, []);
 
   const absenceEvidenceLabel = useMemo(
@@ -382,12 +391,23 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
+    if (focus === "eventos" && scope === "personal") {
+      setDeletePersonalEventError("");
+      setIsDeletePersonalEventOpen(true);
+      return;
+    }
+
+    // TODO: agregar handler para scope "global" cuando esté disponible
   }, [selectedEvent]);
 
   const cancelDeleteHouseEvent = useCallback(() => {
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
+  }, []);
+
+  const cancelDeletePersonalEvent = useCallback(() => {
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
   }, []);
 
   const confirmDeleteHouseEvent = useCallback(async () => {
@@ -422,6 +442,40 @@ export const useCalendarPage = ({
       );
     } finally {
       setIsDeletingHouseEvent(false);
+    }
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
+
+  const confirmDeletePersonalEvent = useCallback(async () => {
+    const personalEventId = selectedEvent?.eventId;
+    if (!personalEventId) return;
+
+    setIsDeletingPersonalEvent(true);
+    setDeletePersonalEventError("");
+
+    try {
+      await deletePersonalEvent(personalEventId);
+      setIsDeletePersonalEventOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar el evento.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Evento eliminado exitosamente",
+      });
+    } catch (err) {
+      setDeletePersonalEventError(
+        err?.message ?? "Error al eliminar el evento",
+      );
+    } finally {
+      setIsDeletingPersonalEvent(false);
     }
   }, [closeDetail, reloadCurrentRange, selectedEvent]);
 
@@ -507,10 +561,15 @@ export const useCalendarPage = ({
     isDeleteHouseEventOpen,
     isDeletingHouseEvent,
     deleteHouseEventError,
+    isDeletePersonalEventOpen,
+    isDeletingPersonalEvent,
+    deletePersonalEventError,
     openEventEdit,
     openEventDelete,
     cancelDeleteHouseEvent,
     confirmDeleteHouseEvent,
+    cancelDeletePersonalEvent,
+    confirmDeletePersonalEvent,
     onHouseEventEditSuccess,
   };
 };
