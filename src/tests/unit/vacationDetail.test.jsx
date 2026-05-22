@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import VacationDetail from "../../components/molecules/calendarCards/vacationDetail";
 
@@ -134,5 +134,40 @@ describe("VacationDetail", () => {
         expect(
             screen.queryByRole("button", { name: /rechazar/i }),
         ).not.toBeInTheDocument();
+    });
+
+    it("llama a onEdit al hacer click en editar", () => {
+        const onEdit = vi.fn();
+
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                vacationId: "vacation-1",
+                employeeId: "emp-1",
+                startDate: "2026-06-05",
+                endDate: "2026-06-10",
+                status: 1,
+            },
+            onEdit,
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /editar/i }));
+
+        expect(onEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra fechas actualizadas desde readableStart y readableEnd", () => {
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                readableStart: "2026-07-01",
+                readableEnd: "2026-07-03",
+                startDate: "2026-07-01",
+                endDate: "2026-07-03",
+            },
+        });
+
+        expect(screen.getByText("1 de julio de 2026")).toBeInTheDocument();
+        expect(screen.getByText("3 de julio de 2026")).toBeInTheDocument();
     });
 });
