@@ -125,10 +125,15 @@ const Calendario = () => {
         isDeleteHouseEventOpen,
         isDeletingHouseEvent,
         deleteHouseEventError,
+        isDeletePersonalEventOpen,
+        isDeletingPersonalEvent,
+        deletePersonalEventError,
         openEventEdit,
         openEventDelete,
         cancelDeleteHouseEvent,
         confirmDeleteHouseEvent,
+        cancelDeletePersonalEvent,
+        confirmDeletePersonalEvent,
         onHouseEventEditSuccess,
         isVacationEditing,
         vacationForm,
@@ -345,20 +350,45 @@ const Calendario = () => {
                                 />
                             );
 
-                        default:
+                        default: {
+                            const scope = selectedEvent?.scope;
+                            const isPersonal = scope === "personal";
+                            const isHouse = scope === "house";
+
                             return (
                                 <EventDetail
                                     event={selectedEvent}
                                     onEdit={openEventEdit}
                                     onDelete={openEventDelete}
-                                    isDeleteOpen={isDeleteHouseEventOpen}
-                                    onCancelDelete={cancelDeleteHouseEvent}
-                                    onConfirmDelete={confirmDeleteHouseEvent}
-                                    isDeleting={isDeletingHouseEvent}
-                                    deleteError={deleteHouseEventError}
+                                    isDeleteOpen={
+                                        isPersonal ? isDeletePersonalEventOpen
+                                        : isHouse   ? isDeleteHouseEventOpen
+                                        : false
+                                    }
+                                    onCancelDelete={
+                                        isPersonal ? cancelDeletePersonalEvent
+                                        : isHouse   ? cancelDeleteHouseEvent
+                                        : undefined
+                                    }
+                                    onConfirmDelete={
+                                        isPersonal ? confirmDeletePersonalEvent
+                                        : isHouse   ? confirmDeleteHouseEvent
+                                        : undefined
+                                    }
+                                    isDeleting={
+                                        isPersonal ? isDeletingPersonalEvent
+                                        : isHouse   ? isDeletingHouseEvent
+                                        : false
+                                    }
+                                    deleteError={
+                                        isPersonal ? deletePersonalEventError
+                                        : isHouse   ? deleteHouseEventError
+                                        : ""
+                                    }
                                     viewerRole={viewerRole}
                                 />
                             );
+                        }
                     }
                 })()}
             </Modal>
