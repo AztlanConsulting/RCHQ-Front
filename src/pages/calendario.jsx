@@ -125,10 +125,15 @@ const Calendario = () => {
         isDeleteHouseEventOpen,
         isDeletingHouseEvent,
         deleteHouseEventError,
+        isDeletePersonalEventOpen,
+        isDeletingPersonalEvent,
+        deletePersonalEventError,
         openEventEdit,
         openEventDelete,
         cancelDeleteHouseEvent,
         confirmDeleteHouseEvent,
+        cancelDeletePersonalEvent,
+        confirmDeletePersonalEvent,
         onHouseEventEditSuccess,
     } = useCalendarPage({
         absenceTypeOptions,
@@ -332,11 +337,31 @@ const Calendario = () => {
                                     event={selectedEvent}
                                     onEdit={openEventEdit}
                                     onDelete={openEventDelete}
-                                    isDeleteOpen={isDeleteHouseEventOpen}
-                                    onCancelDelete={cancelDeleteHouseEvent}
-                                    onConfirmDelete={confirmDeleteHouseEvent}
-                                    isDeleting={isDeletingHouseEvent}
-                                    deleteError={deleteHouseEventError}
+                                    isDeleteOpen={
+                                        selectedEvent?.scope === "personal"
+                                            ? isDeletePersonalEventOpen
+                                            : isDeleteHouseEventOpen
+                                    }
+                                    onCancelDelete={
+                                        selectedEvent?.scope === "personal"
+                                            ? cancelDeletePersonalEvent
+                                            : cancelDeleteHouseEvent
+                                    }
+                                    onConfirmDelete={
+                                        selectedEvent?.scope === "personal"
+                                            ? confirmDeletePersonalEvent
+                                            : confirmDeleteHouseEvent
+                                    }
+                                    isDeleting={
+                                        selectedEvent?.scope === "personal"
+                                            ? isDeletingPersonalEvent
+                                            : isDeletingHouseEvent
+                                    }
+                                    deleteError={
+                                        selectedEvent?.scope === "personal"
+                                            ? deletePersonalEventError
+                                            : deleteHouseEventError
+                                    }
                                     viewerRole={viewerRole}
                                 />
                             );
