@@ -77,6 +77,7 @@ export const useCalendarPage = ({
   const [isLoadingWhileDeleting, setIsLoadingWhileDeleting] = useState(false);
   const [alert, setAlert] = useState(null);
   const [editingHouseEvent, setEditingHouseEvent] = useState(null);
+  const [editingPersonalEvent, setEditingPersonalEvent] = useState(null);
   const [isDeleteHouseEventOpen, setIsDeleteHouseEventOpen] = useState(false);
   const [isDeletingHouseEvent, setIsDeletingHouseEvent] = useState(false);
   const [deleteHouseEventError, setDeleteHouseEventError] = useState("");
@@ -358,7 +359,13 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handlers para scope "global" y "personal" cuando estén disponibles
+    if (focus === "eventos" && scope === "personal") {
+      setEditingPersonalEvent(selectedEvent);
+      closeDetail();
+      return;
+    }
+
+    // TODO: agregar handler para scope "global" cuando esté disponible
     setAlert({
       type: "error",
       message: "No se puede modificar este tipo de evento.",
@@ -441,6 +448,29 @@ export const useCalendarPage = ({
     });
   }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
 
+  const onPersonalEventEditSuccess = useCallback(async () => {
+    const personalEventId = editingPersonalEvent?.eventId;
+    setEditingPersonalEvent(null);
+
+    const rawEvents = await reloadCurrentRange?.();
+
+    const refreshedEvent = rawEvents?.find(
+      (ev) =>
+        ev.focus === "eventos" &&
+        ev.scope === "personal" &&
+        String(ev.eventId) === String(personalEventId),
+    );
+
+    if (refreshedEvent) {
+      showEventDetail(calendarItemToDetail(refreshedEvent));
+    }
+
+    setAlert({
+      type: "success",
+      message: "Evento modificado exitosamente",
+    });
+  }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
+
   return {
     selectedEvent,
     isAbsenceEditing,
@@ -471,6 +501,9 @@ export const useCalendarPage = ({
     clearCalendarAlert,
     editingHouseEvent,
     setEditingHouseEvent,
+    editingPersonalEvent,
+    setEditingPersonalEvent,
+    onPersonalEventEditSuccess,
     isDeleteHouseEventOpen,
     isDeletingHouseEvent,
     deleteHouseEventError,

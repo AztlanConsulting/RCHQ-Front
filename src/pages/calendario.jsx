@@ -12,6 +12,7 @@ import VacationWorkerDetail from "../components/molecules/calendarCards/vacation
 import RegisterHouseEventModal from "../components/organism/evento/registerEventModal";
 import RegisterEventModal from "../components/organism/evento/registerEventModal";
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
+import UpdatePersonalEventModal from "../components/organism/evento/updatePersonalEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
@@ -118,6 +119,9 @@ const Calendario = () => {
         clearCalendarAlert,
         editingHouseEvent,
         setEditingHouseEvent,
+        editingPersonalEvent,
+        setEditingPersonalEvent,
+        onPersonalEventEditSuccess,
         isDeleteHouseEventOpen,
         isDeletingHouseEvent,
         deleteHouseEventError,
@@ -345,6 +349,13 @@ const Calendario = () => {
                 isOpen={editingHouseEvent != null}
                 onClose={() => setEditingHouseEvent(null)}
                 onSuccess={onHouseEventEditSuccess}
+            />
+
+            <UpdatePersonalEventModal
+                event={editingPersonalEvent}
+                isOpen={editingPersonalEvent != null}
+                onClose={() => setEditingPersonalEvent(null)}
+                onSuccess={onPersonalEventEditSuccess}
             />
 
             <RegisterEventModal

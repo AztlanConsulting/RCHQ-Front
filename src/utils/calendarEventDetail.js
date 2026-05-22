@@ -125,6 +125,7 @@ export const calendarItemToDetail = (item) => {
         startDate: normalizeDateOnly(item.startDate ?? item.start),
         endDate: normalizeDateOnly(item.endDate ?? item.end),
         isDeleted: item.isDeleted,
+        peopleInsideEvent: item.peopleInsideEvent ?? null,
     };
 };
 
