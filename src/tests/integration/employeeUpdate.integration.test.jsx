@@ -109,6 +109,7 @@ const setupEmployeeDetail = (overrides = {}) => {
     employeeFaults:          [],
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
+    employeeAbsenceUsedDays: 0,
     isLoading:               false,
     currentTab:              "overview",
     setCurrentTab:           vi.fn(),

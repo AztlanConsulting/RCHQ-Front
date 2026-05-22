@@ -576,6 +576,7 @@ describe("EmployeeAdminCard", () => {
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
     employeeFaults:          [],
+    employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
     loadingCatalogues:       false,
@@ -627,6 +628,11 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("0")).toBeInTheDocument();
     });
 
+    it("muestra los días hábiles de ausencias", () => {
+      render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
+      expect(screen.getByText("5 Días Hábiles")).toBeInTheDocument();
+    });
+
     it("muestra 0 solicitudes de vacaciones", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
       expect(screen.getByText("0 Solicitudes")).toBeInTheDocument();
@@ -661,14 +667,14 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
     });
 
-    it("muestra el select de Casa con la opción correcta", () => {
+    it("muestra el select de Frecuencia de pago con la opción por defecto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Casa Test")).toBeInTheDocument();
+      expect(screen.getByText("Sin asignar")).toBeInTheDocument();
     });
 
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Administrador")).toBeInTheDocument();
+      expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
     it("muestra los checkboxes de días de trabajo", () => {

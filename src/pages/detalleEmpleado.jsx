@@ -26,7 +26,7 @@ const DetalleEmpleado = () => {
 
   const {
     employee, employeeAddress, employeeHouse,
-    employeeFaults, employeeWorkdays, employeeVacationRequests,
+    employeeFaults, employeeWorkdays, employeeVacationRequests, employeeAbsenceUsedDays,
     isLoading, currentTab, setCurrentTab,
     alert, setAlert, getEmployeeDetail,
   } = useEmployeeDetail(employeeId);
@@ -116,28 +116,31 @@ const DetalleEmpleado = () => {
           </svg>
         </button>
 
-        <Type variant="page-title" as="h2" className="min-w-0 flex-1 truncate">
-          Gestión de Empleados
-        </Type>
+        <div className="flex min-w-0 flex-1 items-center gap-4 md:gap-8">
+          <Type variant="page-title" as="h2" className="min-w-0 shrink-0 truncate">
+            Gestión de Empleados
+          </Type>
 
-        <div className="min-w-0 shrink md:hidden max-w-[min(11rem,38%)]">
-          <NativeSelect
-            size="sm" aria-label="Tabs" value={currentTab}
-            onChange={(e) => setCurrentTab(e.target.value)}
-            options={tabs.map((t) => ({ label: t.label, value: t.id }))}
-          />
+          <div className="min-w-0 shrink md:hidden max-w-[min(11rem,38%)]">
+            <NativeSelect
+              size="sm" aria-label="Tabs" value={currentTab}
+              onChange={(e) => setCurrentTab(e.target.value)}
+              options={tabs.map((t) => ({ label: t.label, value: t.id }))}
+            />
+          </div>
+
+          <Tabs
+            selectedKey={currentTab}
+            onSelectionChange={(key) => setCurrentTab(key)}
+            className="w-max max-md:hidden shrink-0"
+          >
+            <Tabs.List type="underline">
+              {tabs.map((tab) => (
+                <Tabs.Item key={tab.id} id={tab.id} label={tab.label} />
+              ))}
+            </Tabs.List>
+          </Tabs>
         </div>
-        <Tabs
-          selectedKey={currentTab}
-          onSelectionChange={(key) => setCurrentTab(key)}
-          className="w-max max-md:hidden shrink-0 ml-0 md:ml-6"
-        >
-          <Tabs.List type="underline">
-            {tabs.map((tab) => (
-              <Tabs.Item key={tab.id} id={tab.id} label={tab.label} />
-            ))}
-          </Tabs.List>
-        </Tabs>
 
         <button
           type="button"
@@ -183,6 +186,7 @@ const DetalleEmpleado = () => {
             employeeWorkdays={employeeWorkdays}
             employeeVacationRequests={employeeVacationRequests}
             employeeFaults={employeeFaults}
+            employeeAbsenceUsedDays={employeeAbsenceUsedDays}
             workdaysDrawer={workdaysDrawer}
             isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}

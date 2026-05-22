@@ -29,6 +29,7 @@ const EmployeeAdminCard = ({
   employeeWorkdays,
   employeeVacationRequests,
   employeeFaults,
+  employeeAbsenceUsedDays,
   workdaysDrawer,
   isEditing,
   loadingCatalogues,
@@ -179,11 +180,19 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          <div>
-            <Type variant="metric-label" as="p">Faltas</Type>
-            <Type variant="metric-value" as="p" className="mt-0.5">
-              {employeeFaults?.length ?? 0}
-            </Type>
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-between">
+            <div>
+              <Type variant="metric-label" as="p">Faltas</Type>
+              <Type variant="metric-value" as="p" className="mt-0.5">
+                {employeeFaults?.length ?? 0}
+              </Type>
+            </div>
+            <div className="min-w-0 sm:text-right">
+              <Type variant="metric-label" as="p">Ausencias</Type>
+              <Type variant="metric-value" as="p" className="mt-0.5">
+                {`${employeeAbsenceUsedDays ?? 0} Días Hábiles`}
+              </Type>
+            </div>
           </div>
         </div>
       )}

@@ -137,11 +137,19 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     let finalValue = value;
     
     if (field === "municipio" || field === "city") {
-      finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+      finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s?¡¿!]/g, "");
     }
 
     if (field === "email" || field === "street") {
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
+    }
+
+    if (field === "email") {
+      finalValue = finalValue.replace(/[^A-Za-z0-9._@-]/g, "");
+    }
+
+    if (field === "street") {
+      finalValue = finalValue.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s?¡¿!]/g, "");
     }
 
     if (field === "phoneNumber") {
