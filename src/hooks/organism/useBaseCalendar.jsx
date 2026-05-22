@@ -7,7 +7,6 @@ import {
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
-import { eventApiToDetail } from "../../utils/calendarEventDetail";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -18,6 +17,7 @@ export const useBaseCalendar = () => {
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
+    const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -31,11 +31,6 @@ export const useBaseCalendar = () => {
 
     const canViewHouseEvents = (role) =>
         role === "Administrador" || role === "Coordinador";
-
-    const isCoordinator = useMemo(
-        () => effectiveViewerRole === "Coordinador",
-        [effectiveViewerRole],
-    );
 
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseEvents(effectiveViewerRole),
@@ -320,6 +315,13 @@ export const useBaseCalendar = () => {
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
+        const currentDate = dateInfo.view.calendar.getDate();
+        setCurrentCalendarDate((previousDate) =>
+            previousDate?.getTime?.() === currentDate.getTime()
+                ? previousDate
+                : currentDate,
+        );
+
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
@@ -393,6 +395,7 @@ export const useBaseCalendar = () => {
         isList,
         viewType,
         currentCalendarView,
+        currentCalendarDate,
         viewerRole,
         calendarMode,
         setCalendarMode,

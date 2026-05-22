@@ -155,9 +155,12 @@ svg {
     font-weight: 600;
     font-size: clamp(0.75rem, 0.35vw + 0.7rem, 0.8125rem);
     line-height: 1.2;
-    box-shadow: 0 1px 2px rgb(0 47 142 / 0.2);
     padding: 0.35rem 0.65rem;
     border: none;
+}
+
+.fc .fc-header-toolbar .fc-toolbar-chunk .fc-button, .fc .fc-header-toolbar .fc-toolbar-chunk .active-btn {
+    box-shadow: 0 1px 2px rgb(0 47 142 / 0.2) !important;
 }
 
 .fc .fc-icon {
