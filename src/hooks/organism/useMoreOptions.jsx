@@ -6,7 +6,7 @@ import PasswordService from "../../services/password.service";
 import {
   selfServiceChangePasswordSchema,
   getFirstSchemaError,
-} from "../../utils/schemas/password.schemas";
+} from "../../utils/schemas/auth/password.schemas";
 import { mapPasswordApiError } from "../../utils/mappers/auth/passwordErrorMapper";
 
 export const useTwoFactorAuthOptions = () => {

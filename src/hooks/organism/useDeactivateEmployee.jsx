@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deactivateEmployeeSchema } from "@/utils/schemas/deactivate.schema";
+import { deactivateEmployeeSchema } from "@/utils/schemas/employee/deactivate.schema";
 import DeactivateEmployeeService from "@/services/deactivate.service";
 
 export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {

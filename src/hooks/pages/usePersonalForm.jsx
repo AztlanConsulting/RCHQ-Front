@@ -7,7 +7,7 @@ import AuthUtils from "../../utils/auth.utils";
 import {
     personalEventSchema,
     buildPersonalPayload,
-} from "../../utils/schemas/personalEvent.schema";
+} from "../../utils/schemas/calendar/personalEvent.schema";
 
 const DEFAULT_FORM = {
     eventTypeId: "",

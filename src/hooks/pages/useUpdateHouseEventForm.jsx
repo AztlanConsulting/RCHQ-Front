@@ -9,7 +9,7 @@ import Dates from "@/utils/helpers/dates.helpers";
 import {
     buildPayload,
     houseEventSchema,
-} from "../../utils/schemas/houseEvent.schema";
+} from "../../utils/schemas/calendar/houseEvent.schema";
 
 const DEFAULT_FORM = {
     name: "",

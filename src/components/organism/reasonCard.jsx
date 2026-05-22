@@ -1,4 +1,4 @@
-import { INVALID_REASON_CHARS_REGEX } from "../../utils/schemas/deactivate.schema";
+import { INVALID_REASON_CHARS_REGEX } from "../../utils/schemas/employee/deactivate.schema";
 
 const MAX_CHARS = 250;
 

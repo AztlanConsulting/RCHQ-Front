@@ -5,7 +5,7 @@ import EventService from "../../services/event.service";
 import {
     houseEventSchema,
     buildPayload,
-} from "../../utils/schemas/houseEvent.schema";
+} from "../../utils/schemas/calendar/houseEvent.schema";
 
 const DEFAULT_FORM = {
     eventTypeId: "",

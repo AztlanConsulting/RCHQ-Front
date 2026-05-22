@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EmployeeService from "../../services/employee.service";
-import { employeeCreateSchema } from "../../utils/schemas/employeeAdd.schema";
+import { employeeCreateSchema } from "../../utils/schemas/employee/employeeAdd.schema";
 
 const INITIAL_FORM = {
     roleId: "",

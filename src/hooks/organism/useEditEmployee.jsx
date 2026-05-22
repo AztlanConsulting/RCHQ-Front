@@ -4,7 +4,7 @@ import {
   employeeContactUpdateSchema, 
   employeeAdminUpdateSchema,
   normalizeEmployeeContractType,
-} from "../../utils/schemas/update.schema";
+} from "../../utils/schemas/employee/update.schema";
 import EmployeeService from "../../services/employee.service";
 
 export const useEditEmployee = (employeeId, onSuccess) => {

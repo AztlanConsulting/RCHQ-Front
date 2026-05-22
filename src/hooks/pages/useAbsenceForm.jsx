@@ -4,7 +4,7 @@ import CalendarService from "../../services/calendar.service";
 import {
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,
-} from "../../utils/schemas/absence.schema";
+} from "../../utils/schemas/calendar/absence.schema";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 
 const DEFAULT_FORM = {

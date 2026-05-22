@@ -39,7 +39,7 @@ vi.mock("../../hooks/pages/useEmployeeDetail", () => ({
   useEmployeeDetail: vi.fn(),
 }));
 
-vi.mock("../../utils/schemas/update.schema", () => ({
+vi.mock("../../utils/schemas/employee/update.schema", () => ({
   employeeBasicUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeContactUpdateSchema: { safeParse: vi.fn((data) => ({ success: true, data })) },
   employeeAdminUpdateSchema:   { safeParse: vi.fn((data) => ({ success: true, data })) },
