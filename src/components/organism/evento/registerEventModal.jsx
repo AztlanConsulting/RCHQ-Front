@@ -6,6 +6,7 @@ import CasaForm from "./forms/houseForm";
 import PersonalForm from "./forms/personalForm";
 import VacationForm from "./forms/vacationForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
+import { getCalendarViewerRole } from "../../../services/calendarService";
 
 const CATEGORY_FORMS = {
     ausencias: AusenciaForm,
@@ -38,7 +39,11 @@ const RegisterEventModal = ({
 
     if (!isOpen) return null;
 
-    const shouldShowNameField = effectiveCategoryKey !== "ausencias" && effectiveCategoryKey !== "vacaciones";
+    const viewerRole = getCalendarViewerRole();
+
+    const shouldShowNameField =
+        effectiveCategoryKey !== "ausencias" &&
+        effectiveCategoryKey !== "vacaciones";
 
     return (
         <>
@@ -119,7 +124,11 @@ const RegisterEventModal = ({
                                 lineHeight: 1.15,
                             }}
                         >
-                                {effectiveCategoryKey === "vacaciones" ? "Vacaciones" : "Ausencias"}
+                            {(() => {
+                                if (effectiveCategoryKey == "ausencias") return "Ausencias"
+                                const verb = viewerRole === "Coordinador" ? "Registro" : "Solicitud";
+                                return `${verb} de Vacaciones`
+                            })()}
                         </h2>
                     )}
 

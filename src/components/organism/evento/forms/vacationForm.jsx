@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCalendarViewerRole } from "../../../../services/calendarService";
 
 import Alert from "../../../atoms/alerts";
 import Button from "../../../atoms/button";
@@ -25,40 +26,44 @@ const VacationForm = (props) => {
 
     const [openDropdown, setOpenDropdown] = useState(null);
 
+    const viewerRole = getCalendarViewerRole();
+
     return (
         <>
-            <SingleSelectDropdown
-                id="vacation-employee"
-                label="Empleado"
-                placeholder={
-                    isLoadingOptions
-                        ? "Cargando empleados ..."
-                        : "Selecciona el empleado ..."
-                }
-                value={form.employeeId}
-                options={employeeOptions}
-                isOpen={openDropdown === "employee"}
-                disabled={isLoadingOptions}
-                onToggle={() =>
-                    setOpenDropdown((current) =>
-                        current === "employee" ? null : "employee",
-                    )
-                }
-                onClose={() => setOpenDropdown(null)}
-                onChange={(value) => {
-                    setField("employeeId", value);
-                    setOpenDropdown(null);
-                }}
-                renderOption={(option) => (
-                    <EmployeeSelectOption
-                        option={option}
-                        isSelected={false}
-                    />
-                )}
-                renderSelected={(option) => (
-                    <EmployeeSelectOption option={option} isSelected />
-                )}
-            />
+            {viewerRole === "Coordinador" ? (
+                <SingleSelectDropdown
+                    id="vacation-employee"
+                    label="Empleado"
+                    placeholder={
+                        isLoadingOptions
+                            ? "Cargando empleados ..."
+                            : "Selecciona el empleado ..."
+                    }
+                    value={form.employeeId}
+                    options={employeeOptions}
+                    isOpen={openDropdown === "employee"}
+                    disabled={isLoadingOptions}
+                    onToggle={() =>
+                        setOpenDropdown((current) =>
+                            current === "employee" ? null : "employee",
+                        )
+                    }
+                    onClose={() => setOpenDropdown(null)}
+                    onChange={(value) => {
+                        setField("employeeId", value);
+                        setOpenDropdown(null);
+                    }}
+                    renderOption={(option) => (
+                        <EmployeeSelectOption
+                            option={option}
+                            isSelected={false}
+                        />
+                    )}
+                    renderSelected={(option) => (
+                        <EmployeeSelectOption option={option} isSelected />
+                    )}
+                />
+            ) : null}
 
             {errors.employeeId && (
                 <FormErrorText>{errors.employeeId}</FormErrorText>
@@ -78,8 +83,8 @@ const VacationForm = (props) => {
                             </p>
                             <p className="text-xs text-slate-500">
                                 Periodo actual:{" "}
-                                {String(remainingInfo.startDate).split("T")[0]} a{" "}
-                                {String(remainingInfo.endDate).split("T")[0]}
+                                {String(remainingInfo.startDate).split("T")[0]}{" "}
+                                a {String(remainingInfo.endDate).split("T")[0]}
                             </p>
                         </>
                     ) : (
@@ -121,9 +126,12 @@ const VacationForm = (props) => {
                 </div>
             </div>
 
-            <p className="mb-5 text-xs text-slate-400">
-                Las vacaciones registradas por coordinación quedarán aprobadas automáticamente.
-            </p>
+            {viewerRole === "Coordinador" ? (
+                <p className="mb-5 text-xs text-slate-400">
+                    Las vacaciones registradas por coordinación quedarán
+                    aprobadas automáticamente.
+                </p>
+            ) : null}
 
             {serverError && (
                 <div className="mb-5">

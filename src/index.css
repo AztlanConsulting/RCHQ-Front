@@ -14,6 +14,7 @@
 
     /* FullCalendar custom CSS */
     --fc-border-color: #a3a3a3;
+    --fc-border-clear-color: #d3d3d3;
 
     --fc-button-bg-color: #1f3664;
     --fc-button-hover-bg-color: #162d4a;
@@ -154,9 +155,12 @@ svg {
     font-weight: 600;
     font-size: clamp(0.75rem, 0.35vw + 0.7rem, 0.8125rem);
     line-height: 1.2;
-    box-shadow: 0 1px 2px rgb(0 47 142 / 0.2);
     padding: 0.35rem 0.65rem;
     border: none;
+}
+
+.fc .fc-header-toolbar .fc-toolbar-chunk .fc-button, .fc .fc-header-toolbar .fc-toolbar-chunk .active-btn {
+    box-shadow: 0 1px 2px rgb(0 47 142 / 0.2) !important;
 }
 
 .fc .fc-icon {
@@ -298,9 +302,15 @@ svg {
 
 .fc .fc-list-day-text,
 .fc .fc-list-day-side-text {
+    display: inline-block;
     font-size: 0.95rem;
     font-weight: 700;
     color: #121212;
+}
+
+.fc .fc-list-day-text::first-letter,
+.fc .fc-list-day-side-text::first-letter {
+    text-transform: uppercase;
 }
 
 .fc .fc-list-event:hover td {
@@ -335,10 +345,21 @@ svg {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 10;
-
+    z-index: 2;
     border: 1px solid var(--fc-border-color);
     border-radius: 8px 8px 0 0;
+}
+
+.fc .fc-list-day th .fc-cell-shaded{
+    border: 1px solid var(--fc-border-color);
+}
+
+.fc .fc-list-table .fc-list-day th, .fc .fc-list-table .fc-list-event-title, .fc .fc-list-table .fc-list-event-time {
+    border: none;
+}
+
+.fc .fc-list-table .fc-list-event + .fc-list-event {
+    border-top: 1px solid var(--fc-border-clear-color);
 }
 
 .fc .active-btn {
@@ -427,6 +448,10 @@ svg {
 
 .fc tbody tr {
     height: 10px !important; 
+}
+
+.fc .fc-list-table th{
+    z-index: 2;
 }
 
 /* Thin (100) */
