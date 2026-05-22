@@ -32,9 +32,7 @@ const getNavItems = (user) => {
     navItems.push({ to: "/app/casas", label: "Casas Hogares", icon: "home" });
   }
 
-  if (isCoordinator || isAdministrator) {
-    navItems.push({ to: vacationPath, label: "Vacaciones", icon: "vacation" });
-  }
+  navItems.push({ to: vacationPath, label: "Vacaciones", icon: "vacation" });
 
   if (isAdministrator) {
     navItems.push({

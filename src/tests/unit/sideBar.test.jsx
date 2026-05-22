@@ -163,7 +163,7 @@ describe("SideBar", () => {
     ).toHaveAttribute("href", "/app/vacaciones");
   });
 
-  it("oculta items administrativos para roles distintos de Administrador o Coordinador", () => {
+  it("muestra Vacaciones y oculta items administrativos para roles distintos de Administrador o Coordinador", () => {
     setupSideBar({ user: { role: { name: "Trabajador" } } });
 
     renderSideBar();
@@ -171,9 +171,11 @@ describe("SideBar", () => {
     expect(
       screen.getAllByRole("link", { name: "Calendario" }).length,
     ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("link", { name: "Vacaciones" })[0],
+    ).toHaveAttribute("href", "/app/vacaciones");
     expect(screen.queryByRole("link", { name: "Personal" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Casas Hogares" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Vacaciones" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Donaciones" })).toBeNull();
   });
 });
