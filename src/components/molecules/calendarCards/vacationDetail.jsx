@@ -109,6 +109,7 @@ const VacationDetail = ({
                         }
                         labelColor="text-[#121212]"
                         popupAlign="left"
+                        popupPlacement="top"
                         popupSize="compact"
                     />
 
@@ -129,6 +130,7 @@ const VacationDetail = ({
                         }
                         labelColor="text-[#121212]"
                         popupAlign="right"
+                        popupPlacement="top"
                         popupSize="compact"
                     />
                 </div>
