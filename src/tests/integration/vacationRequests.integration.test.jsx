@@ -538,6 +538,8 @@ describe("Integración: VacationRequests", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
+        expect(screen.getByLabelText("Retroalimentación")).toBeInTheDocument();
+        expect(screen.getByText("0/200")).toBeInTheDocument();
 
         expect(rejectVacationRequest).not.toHaveBeenCalled();
     });
@@ -583,10 +585,17 @@ describe("Integración: VacationRequests", () => {
             screen.getByRole("dialog", { name: "Rechazar solicitud" }),
         ).toBeInTheDocument();
 
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         await waitFor(() => {
-            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No hay disponibilidad para esas fechas",
+            );
         });
 
         await waitFor(() => {
@@ -600,6 +609,36 @@ describe("Integración: VacationRequests", () => {
         expect(screen.queryByText("Ana Pendiente")).toBeNull();
     });
 
+    it("permite rechazar una solicitud sin retroalimentación", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
+
+        render(<VacationRequests />);
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001", "");
+        });
+
+        expect(
+            await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
+        ).toBeInTheDocument();
+    });
+
     it("muestra error dentro del modal si falla el rechazo", async () => {
         rejectVacationRequest.mockRejectedValueOnce(
             new Error("La solicitud ya fue revisada"),
@@ -611,7 +650,18 @@ describe("Integración: VacationRequests", () => {
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
 
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "No procede por empalme de fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No procede por empalme de fechas",
+            );
+        });
 
         expect(
             await screen.findByText("La solicitud ya fue revisada"),
@@ -632,7 +682,19 @@ describe("Integración: VacationRequests", () => {
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "No se puede aprobar en estas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No se puede aprobar en estas fechas",
+            );
+        });
 
         expect(
             await screen.findByText("No se pudo rechazar la solicitud"),
@@ -663,12 +725,20 @@ describe("Integración: VacationRequests", () => {
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         expect(
             await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
         ).toBeInTheDocument();
 
-        expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+        expect(rejectVacationRequest).toHaveBeenCalledWith(
+            "vac-001",
+            "No hay disponibilidad para esas fechas",
+        );
     });
 });

@@ -137,7 +137,7 @@ export const approveVacationRequest = async (vacationRequestId) => {
     return parseVacationRequestActionResponse(res);
 };
 
-export const rejectVacationRequest = async (vacationRequestId) => {
+export const rejectVacationRequest = async (vacationRequestId, feedback) => {
     const res = await secureFetch(
         `${API_URL}/vacation/request/${vacationRequestId}/reject`,
         {
@@ -145,7 +145,7 @@ export const rejectVacationRequest = async (vacationRequestId) => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({}),
+            body: JSON.stringify({ feedback }),
         },
     );
 

@@ -23,7 +23,7 @@ describe("ConfirmRejectVacationModal", () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it("muestra la información de confirmación", () => {
+    it("muestra la información de confirmación y el campo de retroalimentación", () => {
         render(
             <ConfirmRejectVacationModal
                 request={request}
@@ -40,6 +40,8 @@ describe("ConfirmRejectVacationModal", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
+        expect(screen.getByLabelText("Retroalimentación")).toBeInTheDocument();
+        expect(screen.getByText("0/200")).toBeInTheDocument();
     });
 
     it("llama onCancel al presionar Cancelar", () => {
@@ -58,7 +60,7 @@ describe("ConfirmRejectVacationModal", () => {
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
-    it("llama onConfirm al presionar Rechazar", () => {
+    it("llama onConfirm con feedback vacío al presionar Rechazar sin escribir retroalimentación", () => {
         const onConfirm = vi.fn();
 
         render(
@@ -72,9 +74,49 @@ describe("ConfirmRejectVacationModal", () => {
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onConfirm).toHaveBeenCalledWith("");
     });
 
-    it("muestra estado loading y deshabilita botones", () => {
+    it("llama onConfirm con la retroalimentación escrita", () => {
+        const onConfirm = vi.fn();
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onConfirm).toHaveBeenCalledWith(
+            "No hay disponibilidad para esas fechas",
+        );
+    });
+
+    it("actualiza el contador de caracteres de la retroalimentación", () => {
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={vi.fn()}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+            target: { value: "Motivo" },
+        });
+
+        expect(screen.getByText("6/200")).toBeInTheDocument();
+    });
+
+    it("muestra estado loading y deshabilita botones y textarea", () => {
         render(
             <ConfirmRejectVacationModal
                 request={request}
@@ -86,6 +128,7 @@ describe("ConfirmRejectVacationModal", () => {
 
         expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
         expect(screen.getByRole("button", { name: "Rechazando..." })).toBeDisabled();
+        expect(screen.getByLabelText("Retroalimentación")).toBeDisabled();
     });
 
     it("muestra error si se recibe error", () => {
