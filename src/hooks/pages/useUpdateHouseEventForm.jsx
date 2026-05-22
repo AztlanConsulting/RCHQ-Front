@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import EventService from "../../services/event.service";
-// import {
-//     Dates.addDaysToDateOnly,
-//     normalizeDateOnly,
-// } from "../../utils/calendarEventDetail";
 import Dates from "@/utils/helpers/dates.helpers";
 import {
     buildPayload,
