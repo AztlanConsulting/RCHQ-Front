@@ -108,6 +108,58 @@ export const getVacationFormErrors = (form) => {
     };
 };
 
+export const vacationEditDatesSchema = z
+    .object({
+        vacationRequestId: z
+            .string()
+            .trim()
+            .min(1, "No se encontró la solicitud de vacaciones")
+            .max(80, "Identificador de solicitud inválido"),
+
+        startDate: requiredDate("Selecciona la fecha de inicio"),
+
+        endDate: requiredDate("Selecciona la fecha de fin"),
+    })
+    .superRefine((data, ctx) => {
+        if (!data.startDate || !data.endDate) return;
+
+        if (data.startDate > data.endDate) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["endDate"],
+                message: "La fecha de inicio no puede ser posterior a la fecha de fin",
+            });
+        }
+    });
+
+export const getVacationEditDatesErrors = (form) => {
+    const result = vacationEditDatesSchema.safeParse(form);
+
+    if (result.success) {
+        return {
+            success: true,
+            data: result.data,
+            errors: {},
+        };
+    }
+
+    const errors = result.error.issues.reduce((acc, issue) => {
+        const field = issue.path[0];
+
+        if (field && !acc[field]) {
+            acc[field] = issue.message;
+        }
+
+        return acc;
+    }, {});
+
+    return {
+        success: false,
+        data: null,
+        errors,
+    };
+};
+
 export const VACATION_REJECTION_FEEDBACK_MAX_LENGTH = 200;
 
 export const vacationRejectionFeedbackSchema = z.object({
