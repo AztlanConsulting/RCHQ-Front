@@ -13,6 +13,12 @@ import {
 } from "../../services/employeeUpdateService";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
+  const revokePreviewUrl = (url) => {
+    if (url?.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
@@ -26,6 +32,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     name: "", surname: "", curp: "", rfc: "",
     nss: "", bankAccount: "", birthDate: "",
   });
+  const [basicPictureFile, setBasicPictureFile] = useState(null);
+  const [basicPicturePreview, setBasicPicturePreview] = useState("");
 
   const [contactForm, setContactFormState] = useState({
     email: "", phoneNumber: "",
@@ -40,6 +48,9 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(null);
+    setBasicPicturePreview("");
     setBasicFormState({
       name:        employee?.name ?? "",
       surname:     employee?.surname ?? "",
@@ -50,7 +61,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       birthDate:   employee?.birthDate ? String(employee.birthDate).slice(0, 10) : "",
     });
     setEditSection("basic");
-  }, []);
+  }, [basicPicturePreview]);
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
@@ -105,9 +116,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const closeEdit = useCallback(() => {
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(null);
+    setBasicPicturePreview("");
     setEditSection(null);
     setSaveError(null);
-  }, []);
+  }, [basicPicturePreview]);
 
   const setBasicField = useCallback((field, value) => {
     let finalValue = value;
@@ -132,6 +146,31 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
     setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
+
+  const setBasicPicture = useCallback((file) => {
+    if (!file) {
+      revokePreviewUrl(basicPicturePreview);
+      setBasicPictureFile(null);
+      setBasicPicturePreview("");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      setSaveError("Solo se permiten imágenes JPG, JPEG o PNG.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveError("La imagen no puede pesar más de 5MB.");
+      return;
+    }
+
+    setSaveError(null);
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(file);
+    setBasicPicturePreview(URL.createObjectURL(file));
+  }, [basicPicturePreview]);
 
   const setContactField = useCallback((field, value) => {
     let finalValue = value;
@@ -206,7 +245,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
       }
 
-      await updateBasicInfoService(employeeId, validation.data);
+      const formData = new FormData();
+      Object.entries(validation.data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value);
+        }
+      });
+      if (basicPictureFile) {
+        formData.append("picture", basicPictureFile);
+      }
+
+      await updateBasicInfoService(employeeId, formData);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
     } catch (err) {
@@ -214,7 +263,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [basicForm, employeeId, closeEdit, onSuccess]);
+  }, [basicForm, basicPictureFile, employeeId, closeEdit, onSuccess]);
 
   const submitContact = useCallback(async () => {
     setSaving(true);
@@ -311,9 +360,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   return {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
+    basicPicturePreview,
     roles, allWorkdays, frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
-    setBasicField, setContactField, setAdminField,
+    setBasicField, setBasicPicture, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
     submitBasic, submitContact, submitAdmin,
   };

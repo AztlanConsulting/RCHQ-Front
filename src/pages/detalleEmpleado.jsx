@@ -34,10 +34,11 @@ const DetalleEmpleado = () => {
   const {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
+    basicPicturePreview,
     roles,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
-    setBasicField, setContactField, setAdminField,
+    setBasicField, setBasicPicture, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime,
     submitBasic, submitContact, submitAdmin,
   } = useEditEmployee(employeeId, (msg) => {
@@ -182,7 +183,9 @@ const DetalleEmpleado = () => {
         employeeHouse={employeeHouse}
         isEditing={editSection === "basic"}
         basicForm={basicForm}
+        basicPicturePreview={basicPicturePreview}
         setBasicField={setBasicField}
+        setBasicPicture={setBasicPicture}
         saving={saving}
         saveError={editSection === "basic" ? saveError : null}
         infoDrawer={infoDrawer}

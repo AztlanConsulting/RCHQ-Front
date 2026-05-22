@@ -116,6 +116,19 @@ describe("employeeUpdateService", () => {
       expect(JSON.parse(call.body)).toEqual(body);
     });
 
+    it("envía FormData sin Content-Type manual cuando se actualiza foto", async () => {
+      mockFetch(true, { success: true });
+      const formData = new FormData();
+      formData.append("name", "Juan");
+      formData.append("picture", new Blob(["avatar"], { type: "image/jpeg" }), "avatar.jpg");
+
+      await updateBasicInfoService(EMP_ID, formData);
+
+      const call = secureFetch.mock.calls[0][1];
+      expect(call.body).toBe(formData);
+      expect(call.headers["Content-Type"]).toBeUndefined();
+    });
+
     it("retorna los datos si la respuesta es ok", async () => {
       const mockData = { success: true, message: "Actualizado" };
       mockFetch(true, mockData);

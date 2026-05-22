@@ -12,7 +12,9 @@ const EmployeeBasicCard = ({
   employeeHouse,
   isEditing,
   basicForm,
+  basicPicturePreview,
   setBasicField,
+  setBasicPicture,
   saving,
   saveError,
   infoDrawer,
@@ -20,14 +22,15 @@ const EmployeeBasicCard = ({
   onSubmit,
   onCancel,
 }) => {
-  const image_url = `${API_URL}/${employee.picture}`;
+  const currentImageUrl = employee?.picture ? `${API_URL}/${employee.picture}` : null;
+  const displayImageUrl = basicPicturePreview || currentImageUrl || AVATAR_PLACEHOLDER;
 
   return (
     <div className="relative flex w-full flex-col gap-5 rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-start sm:gap-7 sm:px-6 sm:py-5">
       <div className="mt-1 flex shrink-0 justify-center sm:justify-start">
         <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
           <img
-            src={image_url?.trim() ? image_url : AVATAR_PLACEHOLDER}
+            src={displayImageUrl}
             alt=""
             className="h-full w-full object-cover rounded-full ring-1 ring-slate-200"
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = AVATAR_PLACEHOLDER; }}
@@ -121,6 +124,37 @@ const EmployeeBasicCard = ({
         {isEditing && (
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Type variant="metric-label" as="p" className="mb-2">Foto de perfil</Type>
+                <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center">
+                  <div className="mx-auto h-20 w-20 overflow-hidden rounded-full ring-1 ring-slate-200 sm:mx-0">
+                    <img
+                      src={displayImageUrl}
+                      alt="Vista previa de foto de perfil"
+                      className="h-full w-full object-cover"
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = AVATAR_PLACEHOLDER; }}
+                    />
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <label
+                      htmlFor="basic-picture"
+                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg bg-[#24375e] px-4 py-2 text-sm font-semibold text-white hover:bg-[#162d4a] sm:w-fit"
+                    >
+                      Cambiar foto
+                    </label>
+                    <input
+                      id="basic-picture"
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg"
+                      className="hidden"
+                      onChange={(e) => setBasicPicture(e.target.files?.[0] ?? null)}
+                    />
+                    <p className="text-xs text-slate-500">
+                      JPG o PNG, máximo 5MB.
+                    </p>
+                  </div>
+                </div>
+              </div>
               {[
                 { label: "Nombre",   field: "name", type: "text" },
                 { label: "Apellido", field: "surname", type: "text" },

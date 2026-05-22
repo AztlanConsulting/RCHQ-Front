@@ -272,11 +272,11 @@ const EmployeeAdminCard = ({
                   {adminForm.selectedWorkdays.map((w) => (
                     <div
                       key={w.workdayId}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
+                      className={`flex flex-col gap-3 rounded-lg px-3 py-3 transition-colors sm:flex-row sm:items-center ${
                         w.selected ? "bg-slate-50 border border-slate-200" : ""
                       }`}
                     >
-                      <label className="flex items-center gap-2 cursor-pointer w-28 shrink-0">
+                      <label className="flex w-full cursor-pointer items-center gap-2 sm:w-32 sm:shrink-0">
                         <input
                           type="checkbox"
                           checked={w.selected}
@@ -286,17 +286,17 @@ const EmployeeAdminCard = ({
                         <span className="text-sm font-semibold text-slate-700">{w.name}</span>
                       </label>
                       {w.selected && (
-                        <div className="flex items-center gap-2">
+                        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:items-center">
                           <input
                             type="time" value={w.start}
                             onChange={(e) => setWorkdayTime(w.workdayId, "start", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
+                            className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400 sm:w-auto"
                           />
-                          <span className="text-slate-400 text-xs">—</span>
+                          <span className="hidden text-slate-400 text-xs sm:inline">—</span>
                           <input
                             type="time" value={w.end}
                             onChange={(e) => setWorkdayTime(w.workdayId, "end", e.target.value)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400"
+                            className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400 sm:w-auto"
                           />
                         </div>
                       )}
