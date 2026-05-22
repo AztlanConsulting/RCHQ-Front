@@ -1,4 +1,3 @@
-// src/tests/unit/sideBar.test.jsx
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -63,7 +62,7 @@ describe("SideBar", () => {
     expect(screen.getAllByText("TOCHAN").length).toBeGreaterThan(0);
   });
 
-  it("renderiza todos los nav items", () => {
+  it("renderiza todos los nav items base", () => {
     renderSideBar();
 
     const labels = [
@@ -109,24 +108,50 @@ describe("SideBar", () => {
     ).toBeInTheDocument();
   });
 
-  it("muestra Registros para Coordinador", () => {
+  it("muestra Acciones registradas para Coordinador", () => {
     setupSideBar({ user: { role: { name: "Coordinador" } } });
+
     renderSideBar();
 
     expect(
       screen.getAllByRole("link", { name: "Acciones registradas" }).length,
     ).toBeGreaterThan(0);
-    expect(screen.getAllByRole("link", { name: "Acciones registradas" })[0]).toHaveAttribute(
+
+    expect(
+      screen.getAllByRole("link", { name: "Acciones registradas" })[0],
+    ).toHaveAttribute("href", "/app/acciones/casa");
+  });
+
+  it("no muestra Acciones registradas para roles distintos de Coordinador", () => {
+    setupSideBar({ user: { role: { name: "Administrador" } } });
+
+    renderSideBar();
+
+    expect(
+      screen.queryByRole("link", { name: "Acciones registradas" }),
+    ).toBeNull();
+  });
+
+  it("redirige Vacaciones a solicitudes para Coordinador", () => {
+    setupSideBar({ user: { role: { name: "Coordinador" } } });
+
+    renderSideBar();
+
+    expect(screen.getAllByRole("link", { name: "Vacaciones" })[0]).toHaveAttribute(
       "href",
-      "/app/acciones/casa",
+      "/app/vacaciones/solicitudes",
     );
   });
 
-  it("no muestra Registros para roles distintos de Coordinador", () => {
+  it("redirige Vacaciones al módulo general para rol no Coordinador", () => {
     setupSideBar({ user: { role: { name: "Administrador" } } });
+
     renderSideBar();
 
-    expect(screen.queryByRole("link", { name: "Acciones registradas" })).toBeNull();
+    expect(screen.getAllByRole("link", { name: "Vacaciones" })[0]).toHaveAttribute(
+      "href",
+      "/app/vacaciones",
+    );
   });
 });
 

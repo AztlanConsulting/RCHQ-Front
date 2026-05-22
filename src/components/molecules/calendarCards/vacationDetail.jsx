@@ -1,8 +1,5 @@
 import Button from "../../atoms/button";
-import DateField from "../../atoms/dateField";
-import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 
@@ -15,6 +12,26 @@ const VacationDetail = ({
     onReject,
 }) => {
     const isPast = isPastDate(event.start);
+    const status = Number(event.status);
+
+    const isPending = status === 0;
+    const isApproved = status === 1;
+    const isRejected = status === 2;
+
+    const title = isPending
+        ? "Solicitud de Vacaciones"
+        : isRejected
+            ? "Vacaciones Rechazadas"
+            : "Vacaciones";
+
+    const statusLabel = isApproved
+        ? "Aprobadas"
+        : isRejected
+            ? "Rechazadas"
+            : "En espera";
+
+    const feedback = event.feedback || event.vacationFeedback || "";
+    const shouldShowFeedback = Boolean(feedback);
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -23,7 +40,7 @@ const VacationDetail = ({
                 className="mb-5 text-[2rem] leading-none"
                 as="h2"
             >
-                Solicitud de Vacaciones
+                {title}
             </Type>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
@@ -65,7 +82,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableStart) || "—"}
+                        {formatEventDate(event.readableStart || event.startDate || event.start)}
                     </Type>
                 </div>
                 <div>
@@ -79,7 +96,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {formatEventDate(event.readableEnd) || "—"}
+                        {formatEventDate(event.readableEnd || event.endDate || event.end)}
                     </Type>
                 </div>
                 <div>
@@ -93,7 +110,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.totalDays}
+                        {event.totalDays || "-"}
                     </Type>
                 </div>
                 <div>
@@ -107,7 +124,7 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.usedDays}
+                        {event.usedDays ?? "-"}
                     </Type>
                 </div>
                 <div className="sm:col-span-2">
@@ -121,23 +138,25 @@ const VacationDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.status == 1 ? "Aceptado" : "Pendiente"}
+                        {statusLabel}
                     </Type>
                 </div>
-                <div className="sm:col-span-2">
-                    <Type
-                        variant="metric-label"
-                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
-                    >
-                        Retroalimentación:
-                    </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
-                        {event.feedback || "Sin retroalimentación por el momento"}
-                    </Type>
-                </div>
+                {shouldShowFeedback ? (
+                    <div className="sm:col-span-2">
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Retroalimentación:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {feedback}
+                        </Type>
+                    </div>
+                ) : null}
             </div>
 
             {isPast ? (

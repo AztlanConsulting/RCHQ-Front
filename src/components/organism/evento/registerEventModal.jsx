@@ -4,10 +4,12 @@ import ButtonGroup from "../../molecules/buttonGroup";
 import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
 import PersonalForm from "./forms/personalForm";
+import VacationForm from "./forms/vacationForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 
 const CATEGORY_FORMS = {
     ausencias: AusenciaForm,
+    vacaciones: VacationForm,
     casa: CasaForm,
     personal: PersonalForm,
 };
@@ -36,7 +38,7 @@ const RegisterEventModal = ({
 
     if (!isOpen) return null;
 
-    const shouldShowNameField = effectiveCategoryKey !== "ausencias";
+    const shouldShowNameField = effectiveCategoryKey !== "ausencias" && effectiveCategoryKey !== "vacaciones";
 
     return (
         <>
@@ -79,7 +81,7 @@ const RegisterEventModal = ({
                         maxWidth: "560px",
                         boxSizing: "border-box",
                         maxHeight: "90vh",
-                        overflow: "hidden",
+                        overflow: "visible",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
@@ -117,7 +119,7 @@ const RegisterEventModal = ({
                                 lineHeight: 1.15,
                             }}
                         >
-                            Ausencias
+                                {effectiveCategoryKey === "vacaciones" ? "Vacaciones" : "Ausencias"}
                         </h2>
                     )}
 
@@ -132,7 +134,7 @@ const RegisterEventModal = ({
                     <div
                         style={{
                             flex: 1,
-                            overflowY: "auto",
+                            overflowY: effectiveCategoryKey === "vacaciones" ? "visible" : "auto",
                             minHeight: 0,
                             display: "flex",
                             flexDirection: "column",

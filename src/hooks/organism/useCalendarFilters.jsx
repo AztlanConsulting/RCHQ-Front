@@ -254,14 +254,14 @@ const getFilteredEvents = (
                     isDeleted: Boolean(rawEvent.isDeleted),
                     currentDayIndex: rawEvent.currentDayIndex,
                     totalDays:
-                        rawEvent.totalDays || rawEvent.startDate
-                            ? calculateTotalDays(
-                                  rawEvent.startDate,
-                                  rawEvent.endDate,
-                              )
-                            : "",
-                    startReadableDate: rawEvent.startDate,
-                    endReadableDate: rawEvent.endDate,
+                        rawEvent.totalDays ??
+                        (
+                            normalizedStartDate && normalizedEndDate
+                                ? calculateTotalDays(normalizedStartDate, normalizedEndDate)
+                                : ""
+                        ),
+                    startReadableDate: normalizedStartDate || rawEvent.startDate || rawEvent.start || "",
+                    endReadableDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || "",
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
                 },
             };
