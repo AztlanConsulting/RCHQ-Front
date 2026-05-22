@@ -34,3 +34,34 @@ export const deleteHouseEvent = async (houseEventId) => {
 
     return response;
 };
+
+export const deletePersonalEvent = async (personalEventId) => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    const rawResponse = await secureFetch(
+        `${API_URL}/event/personal/${personalEventId}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudo eliminar el evento de personal",
+        );
+    }
+
+    return response;
+};
