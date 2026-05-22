@@ -46,8 +46,12 @@ const VacationDetail = ({
     if (isEditing) {
         return (
             <div key="vacation-edit" className="px-2 text-left sm:px-3">
-                <Type variant="page-title" className="mb-3" as="h2">
-                    Vacaciones
+                <Type
+                    variant="page-title"
+                    className="mb-5 text-[2rem] leading-none"
+                    as="h2"
+                >
+                    {title}
                 </Type>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
