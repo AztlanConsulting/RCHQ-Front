@@ -24,6 +24,12 @@ const isAdminRole = (roleName = "") =>
     .toLowerCase()
     .includes("Administrador");
 
+const formatContractTypeLabel = (value) => {
+  if (!value) return "N/A";
+  if (value === "Nomina") return "Nómina";
+  return value;
+};
+
 const EmployeeAdminCard = ({
   employee,
   employeeWorkdays,
@@ -113,7 +119,7 @@ const EmployeeAdminCard = ({
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Tipo</Type>
               <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
-                {employee?.type ?? "N/A"}
+                {formatContractTypeLabel(employee?.type)}
               </Type>
             </div>
             <div className="min-w-0 sm:text-right">
@@ -140,7 +146,7 @@ const EmployeeAdminCard = ({
                 <Type variant="metric-value" as="p" className="text-[1.15rem]">
                   {`${countWorkdayDays(employeeWorkdays)} días trabajados`}
                 </Type>
-                <Type variant="metric-value" as="p" className="text-[1.15rem] text-slate-700">
+                <Type variant="metric-value" as="p" className="text-[1.15rem]">
                   {`${countWorkdaysHours(employeeWorkdays)} horas semanales`}
                 </Type>
               </div>
