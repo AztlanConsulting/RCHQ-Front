@@ -6,7 +6,7 @@ import {
     rejectVacationRequest,
 } from "../../services/vacationRequestService";
 import { useDebouncedVacationSearch } from "../molecules/useDebouncedVacationSearch";
-import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacationRequests.schema";
+import { getVacationRequestFiltersError } from "../../utils/schema/vacation/vacation.schema";
 
 const LIMIT = 6;
 

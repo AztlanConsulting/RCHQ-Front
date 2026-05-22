@@ -4,6 +4,7 @@ import {
     getRemainingVacations,
     registerEmployeeVacation,
 } from "../../services/vacationService";
+import { getVacationFormErrors } from "../../utils/schema/vacation/vacation.schema";
 
 const EMPTY_FORM = {
     employeeId: "",
@@ -35,12 +36,6 @@ const normalizeEmployeeOption = (employee) => {
         label: name,
         employee,
     };
-};
-
-const isInvalidDateRange = (startDate, endDate) => {
-    if (!startDate || !endDate) return false;
-
-    return startDate > endDate;
 };
 
 export const useVacationForm = ({
@@ -141,50 +136,25 @@ export const useVacationForm = ({
         loadRemainingVacations();
     }, [form.employeeId]);
 
-    const validate = () => {
-        const nextErrors = {};
-
-        if (!form.employeeId) {
-            nextErrors.employeeId = "Selecciona un empleado";
-        }
-
-        if (!form.startDate) {
-            nextErrors.startDate = "Selecciona la fecha de inicio";
-        }
-
-        if (!form.endDate) {
-            nextErrors.endDate = "Selecciona la fecha de fin";
-        }
-
-        if (isInvalidDateRange(form.startDate, form.endDate)) {
-            nextErrors.endDate =
-                "La fecha de inicio no puede ser posterior a la fecha de fin";
-        }
-
-        setErrors(nextErrors);
-
-        return Object.keys(nextErrors).length === 0;
-    };
-
     const handleSubmit = async () => {
         if (isSubmitting) return;
 
         setServerError("");
         onValidationAlert?.(null);
 
-        if (!validate()) {
+        const validation = getVacationFormErrors(form);
+
+        if (!validation.success) {
+            setErrors(validation.errors);
             onValidationAlert?.("Revisa los campos marcados antes de continuar");
             return;
         }
 
+        setErrors({});
         setIsSubmitting(true);
 
         try {
-            await registerEmployeeVacation({
-                employeeId: form.employeeId,
-                startDate: form.startDate,
-                endDate: form.endDate,
-            });
+            await registerEmployeeVacation(validation.data);
 
             onFeedback?.({
                 type: "success",
