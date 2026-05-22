@@ -17,11 +17,6 @@ class Dates {
     scrollTime: "08:00:00",
   });
 
-  static isDateOnlyString(value) {
-    if (value == null || value === "" || value instanceof Date) return false;
-    return /^\d{4}-\d{2}-\d{2}$/.test(String(value).trim());
-  }
-
   static normalizeUTCDateOnly(value) {
     if (value == null || value === "") return "";
     if (typeof value === "string") {
@@ -140,93 +135,6 @@ class Dates {
     return Dates.normalizeDateOnly(baseDate);
   }
 
-  /** ISO string, Date, or YYYY-MM-DD (anchored UTC noon). */
-  static coerceEventDateInput(value) {
-    if (value == null || value === "") return null;
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value;
-    }
-    const s = String(value).trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-      const [y, mo, d] = s.split("-").map(Number);
-      return new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
-    }
-    const d = new Date(s);
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
-
-  /** Día en rejilla: "Jueves 30 de Abril 2026" (zona México sobre el instante). */
-  static formatEventCalendarDate(value) {
-    if (!value) return "—";
-    const d = value instanceof Date ? value : new Date(String(value));
-    if (Number.isNaN(d.getTime())) return "—";
-    const weekday = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { weekday: "long", timeZone: Dates.MEXICO_TZ }).format(d),
-    );
-    const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: Dates.MEXICO_TZ }).format(d);
-    const month = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: Dates.MEXICO_TZ }).format(d),
-    );
-    const year = new Intl.DateTimeFormat("es-MX", { year: "numeric", timeZone: Dates.MEXICO_TZ }).format(d);
-    return `${weekday} ${dayNum} de ${month} ${year}`;
-  }
-
-  /** Inicio/fin en zona México (usa el instante UTC ya normalizado en el cliente). */
-  static formatEventDateTime(value) {
-    if (!value) return "—";
-    const raw = value instanceof Date ? value : new Date(String(value));
-    if (Number.isNaN(raw.getTime())) return "—";
-    const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: Dates.MEXICO_TZ }).format(raw);
-    const month = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: Dates.MEXICO_TZ }).format(raw),
-    );
-    const timeRaw = new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: Dates.MEXICO_TZ,
-    }).format(raw);
-    return `${dayNum} de ${month}, ${timeRaw.toLowerCase().replace(/\s/g, "")}`;
-  }
-
-  /** p.ej. "Martes 5 de Mayo 2026". */
-  static formatMexicoLongWeekdayCalendarDate(value) {
-    const d0 = Dates.coerceEventDateInput(value);
-    if (!d0) return "—";
-    const dateOnly = Dates.isDateOnlyString(value);
-    const d = dateOnly ? new Date(d0.getTime() + Dates.CALENDAR_DISPLAY_OFFSET_MS) : d0;
-    const tz = dateOnly ? "UTC" : Dates.MEXICO_TZ;
-    const weekday = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { weekday: "long", timeZone: tz }).format(d),
-    );
-    const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: tz }).format(d);
-    const month = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: tz }).format(d),
-    );
-    const year = new Intl.DateTimeFormat("es-MX", { year: "numeric", timeZone: tz }).format(d);
-    return `${weekday} ${dayNum} de ${month} ${year}`;
-  }
-
-  /** p.ej. "1 de Mayo, 3:00pm". */
-  static formatMexicoDayMonthCommaTime12h(value) {
-    const d0 = Dates.coerceEventDateInput(value);
-    if (!d0) return "—";
-    const dateOnly = Dates.isDateOnlyString(value);
-    const d = dateOnly ? new Date(d0.getTime() + Dates.CALENDAR_DISPLAY_OFFSET_MS) : d0;
-    const tz = dateOnly ? "UTC" : Dates.MEXICO_TZ;
-    const dayNum = new Intl.DateTimeFormat("es-MX", { day: "numeric", timeZone: tz }).format(d);
-    const month = Dates.capitalizeEs(
-      new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: tz }).format(d),
-    );
-    const timeRaw = new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: tz,
-    }).format(d);
-    return `${dayNum} de ${month}, ${timeRaw.toLowerCase().replace(/\s/g, "")}`;
-  }
-
   static parseUTCDateToHours(isoString) {
     if (!isoString) return "N/A";
     const d = new Date(isoString);
@@ -287,12 +195,6 @@ class Dates {
     const end = Dates.dateOnlyToLocalDate(endValue);
     if (!start || !end) return 0;
     return Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
-  }
-
-  static capitalizeEs(word) {
-    if (!word) return word;
-    const w = word.trim();
-    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
   }
 
   static formatDate(value) {
