@@ -7,7 +7,6 @@ import {
     getOwnEmployeeId,
 } from "../../services/calendarService";
 import { normalToUTCWithOffset } from "../../utils/dates";
-import { eventApiToDetail } from "../../utils/calendarEventDetail";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -18,6 +17,7 @@ export const useBaseCalendar = () => {
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
+    const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -31,11 +31,6 @@ export const useBaseCalendar = () => {
 
     const canViewHouseEvents = (role) =>
         role === "Administrador" || role === "Coordinador";
-
-    const isCoordinator = useMemo(
-        () => effectiveViewerRole === "Coordinador",
-        [effectiveViewerRole],
-    );
 
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseEvents(effectiveViewerRole),
@@ -213,6 +208,8 @@ export const useBaseCalendar = () => {
             return title;
         }
 
+        const isDay = viewType == "Day";
+
         const startDay = currentStatus.start.day;
         const startMonthNumber = currentStatus.start.month;
         const isFullStartMonthName = false;
@@ -221,9 +218,10 @@ export const useBaseCalendar = () => {
 
         const endDay = currentStatus.end.day;
         const endMonthNumber = currentStatus.end.month;
-        const isFullEndMonthName = viewType == "Day";
-        const endMonth = getMonth(endMonthNumber, isFullEndMonthName);
+        const endMonth = getMonth(endMonthNumber, isDay);
         const endYear = currentStatus.end.year;
+        
+        const monthDescriber = isDay ? " de" : "";
 
         const startMonthText = startMonth != endMonth ? ` ${startMonth}` : "";
         const startYearText = startYear != endYear ? ` ${startYear}` : "";
@@ -231,7 +229,7 @@ export const useBaseCalendar = () => {
             viewType == "Week"
                 ? `${startDay}${startMonthText}${startYearText} - `
                 : "";
-        const title = `${startText}${endDay} ${endMonth} ${endYear}`;
+        const title = `${startText}${endDay}${monthDescriber} ${endMonth} ${endYear}`;
 
         return title;
     };
@@ -245,12 +243,12 @@ export const useBaseCalendar = () => {
         return cellWidth;
     };
 
-    const validateShortenedSize = () => {
+    const validateShortenedSize = (hasNumber) => {
         if (viewType == "Day") return false;
 
         const currentDayWidth = getDayWidth();
 
-        if (currentDayWidth < 96) return true;
+        if (currentDayWidth < (hasNumber ? 106 : 96)) return true;
 
         return false;
     };
@@ -267,10 +265,14 @@ export const useBaseCalendar = () => {
             "Viernes",
             "Sábado",
         ];
-        const weekDay = validateShortenedSize()
+
+        const hasNumber = viewType == "Week";
+        const weekDay = validateShortenedSize(hasNumber)
             ? shortenedDays[weekDayIndex]
             : fullDays[weekDayIndex];
-        return weekDay;
+        const dayNumber = hasNumber ? ` ${currentDay.date.getUTCDate()}` : "";
+        const viewableString = `${weekDay}${dayNumber}`;
+        return viewableString;
     };
 
     const resizeHandler = (calendarRef) => {
@@ -320,6 +322,13 @@ export const useBaseCalendar = () => {
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
+        const currentDate = dateInfo.view.calendar.getDate();
+        setCurrentCalendarDate((previousDate) =>
+            previousDate?.getTime?.() === currentDate.getTime()
+                ? previousDate
+                : currentDate,
+        );
+
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
@@ -393,6 +402,7 @@ export const useBaseCalendar = () => {
         isList,
         viewType,
         currentCalendarView,
+        currentCalendarDate,
         viewerRole,
         calendarMode,
         setCalendarMode,

@@ -30,6 +30,7 @@ const Calendario = () => {
         isList,
         viewType,
         currentCalendarView,
+        currentCalendarDate,
         handleDatesSet,
         loadButtonsAtStart,
         viewerRole,
@@ -222,6 +223,7 @@ const Calendario = () => {
                 <BaseCalendar
                     key={`${viewType}-${isList}`}
                     initialView={currentCalendarView}
+                    initialDate={currentCalendarDate}
                     loadButtonsAtStart={loadButtonsAtStart}
                     calendarRef={calendarRef}
                     toggleList={toggleList}
