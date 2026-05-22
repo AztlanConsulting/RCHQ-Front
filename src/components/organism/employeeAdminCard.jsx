@@ -106,59 +106,58 @@ const EmployeeAdminCard = ({
 
       {/* Modo lectura */}
       {!isEditing && (
-        <div className="mt-6 w-full flex flex-col gap-5">
+        <div className="mt-6 w-full flex flex-col gap-7">
 
           {/* Fila 1: Tipo | Salario */}
-          <div className="flex w-full items-start justify-between">
-            <div>
-              <Type variant="metric-label" as="p" className="text-slate-500">Tipo</Type>
-              <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+            <div className="min-w-0">
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Tipo</Type>
+              <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
                 {employee?.type ?? "N/A"}
               </Type>
             </div>
-            <div className="text-right">
-              <Type variant="metric-label" as="p" className="text-slate-500">Salario</Type>
-              <Type variant="metric-value" as="p" className="mt-0.5 text-[1.15rem] font-semibold">
+            <div className="min-w-0 sm:text-right">
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Salario</Type>
+              <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem] font-semibold">
                 {employee?.salary ? `$${employee.salary}` : "N/A"}
               </Type>
             </div>
           </div>
 
           {/* Fila 2: Frecuencia de Pago */}
-          <div>
-            <Type variant="metric-label" as="p" className="text-slate-500">Frecuencia de Pago</Type>
-            <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
+          <div className="min-w-0">
+            <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Frecuencia de pago</Type>
+            <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
               {employee?.frequencyOfPaymentName ?? "N/A"}
             </Type>
           </div>
 
-{/* Fila 3: Días Trabajados | Horas Semanales */}
-<div className="flex w-full justify-between">
-  <div className="flex flex-col">
-    <Type variant="metric-label" as="p" className="text-slate-500">Días Trabajados</Type>
-    <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
-      {countWorkdayDays(employeeWorkdays)}
-    </Type>
-  </div>
-  <div className="flex flex-col self-start">
-    <div className="flex items-center gap-1.5">
-      <Type variant="metric-label" as="p" className="text-slate-500">Horas Semanales</Type>
-      <Drawer.Toggle
-        isOpen={workdaysDrawer.isOpen}
-        onToggle={workdaysDrawer.toggle}
-        ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
-        className="shrink-0"
-      />
-    </div>
-    <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
-      {countWorkdaysHours(employeeWorkdays)}
-    </Type>
-  </div>
-</div>
+          {/* Fila 3: Resumen de horario */}
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+            <div className="min-w-0">
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Horario</Type>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-6 gap-y-1">
+                <Type variant="metric-value" as="p" className="text-[1.15rem]">
+                  {`${countWorkdayDays(employeeWorkdays)} días trabajados`}
+                </Type>
+                <Type variant="metric-value" as="p" className="text-[1.15rem] text-slate-700">
+                  {`${countWorkdaysHours(employeeWorkdays)} horas semanales`}
+                </Type>
+              </div>
+            </div>
+            <div className="min-w-0 sm:text-right">
+              <Drawer.Toggle
+                isOpen={workdaysDrawer.isOpen}
+                onToggle={workdaysDrawer.toggle}
+                ariaLabel={workdaysDrawer.isOpen ? "Cerrar horario" : "Ver horario"}
+                className="shrink-0"
+              />
+            </div>
+          </div>
 
           {/* Drawer días */}
           {workdaysDrawer.isOpen && (
-            <div className="-mt-2">
+            <div className="-mt-3">
               <Drawer isOpen={workdaysDrawer.isOpen}>
                 <div className="flex flex-col gap-1 rounded-lg bg-slate-50 px-4 py-3">
                   {employeeWorkdays?.length > 0 && employeeWorkdays.map((w) => (
@@ -175,29 +174,33 @@ const EmployeeAdminCard = ({
           )}
 
           {/* Fila 4: Ausencias justificadas | número */}
-          <div className="flex w-full items-end justify-between">
-            <div>
-              <Type variant="metric-label" as="p" className="text-slate-500">Ausencias justificadas</Type>
-              <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
-                Días Hábiles Aplicados
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div className="min-w-0">
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Ausencias justificadas</Type>
+              <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
+                Días hábiles aplicados
               </Type>
             </div>
-            <Type variant="metric-value" as="p" className="text-[1.6rem] font-semibold text-[#a31111] leading-none">
-              {employeeAbsenceUsedDays ?? 0}
-            </Type>
+            <div className="min-w-0 sm:text-right">
+              <Type variant="metric-value" as="p" className="text-[1.6rem] font-semibold leading-none text-[#a31111] sm:text-right">
+                {employeeAbsenceUsedDays ?? 0}
+              </Type>
+            </div>
           </div>
 
           {/* Fila 5: Vacaciones | Días usados */}
-          <div className="flex w-full items-end justify-between">
-            <div>
-              <Type variant="metric-label" as="p" className="text-slate-500">Vacaciones</Type>
-              <Type variant="metric-value" as="p" className="mt-0.5 text-[1.05rem]">
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div className="min-w-0">
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Vacaciones</Type>
+              <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
                 {`${employeeVacationRequests?.length ?? 0} Solicitudes`}
               </Type>
             </div>
-            <Type variant="metric-value" as="p" className="text-[1.3rem] font-semibold text-[#24375e] leading-none">
-              {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12`}
-            </Type>
+            <div className="min-w-0 sm:text-right">
+              <Type variant="metric-value" as="p" className="text-[1.3rem] font-semibold leading-none text-[#24375e] sm:text-right">
+                {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12`}
+              </Type>
+            </div>
           </div>
 
         </div>
