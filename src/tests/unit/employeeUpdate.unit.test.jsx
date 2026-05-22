@@ -575,7 +575,6 @@ describe("EmployeeAdminCard", () => {
     employee:                mockEmployee,
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
-    employeeFaults:          [],
     employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
@@ -623,13 +622,9 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
     });
 
-    it("muestra 0 faltas", () => {
-      render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("0")).toBeInTheDocument();
-    });
-
     it("muestra los días hábiles de ausencias", () => {
       render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
+      expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
       expect(screen.getByText("5 Días Hábiles")).toBeInTheDocument();
     });
 

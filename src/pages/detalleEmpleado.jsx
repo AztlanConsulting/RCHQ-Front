@@ -26,7 +26,7 @@ const DetalleEmpleado = () => {
 
   const {
     employee, employeeAddress, employeeHouse,
-    employeeFaults, employeeWorkdays, employeeVacationRequests, employeeAbsenceUsedDays,
+    employeeWorkdays, employeeVacationRequests, employeeAbsenceUsedDays,
     isLoading, currentTab, setCurrentTab,
     alert, setAlert, getEmployeeDetail,
   } = useEmployeeDetail(employeeId);
@@ -185,7 +185,6 @@ const DetalleEmpleado = () => {
             employee={employee}
             employeeWorkdays={employeeWorkdays}
             employeeVacationRequests={employeeVacationRequests}
-            employeeFaults={employeeFaults}
             employeeAbsenceUsedDays={employeeAbsenceUsedDays}
             workdaysDrawer={workdaysDrawer}
             isEditing={editSection === "Administrador"}

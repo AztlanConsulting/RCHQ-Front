@@ -5,7 +5,6 @@ export const useEmployeeDetail = (employeeId) => {
   const [employee, setEmployee]                       = useState({});
   const [employeeAddress, setEmployeeAddress]         = useState({});
   const [employeeHouse, setEmployeeHouse]             = useState({});
-  const [employeeFaults, setEmployeeFaults]           = useState([]);
   const [employeeWorkdays, setEmployeeWorkdays]       = useState([]);
   const [employeeVacationRequests, setEmployeeVacationRequests] = useState([]);
   const [employeeAbsenceUsedDays, setEmployeeAbsenceUsedDays]   = useState(0);
@@ -28,7 +27,6 @@ export const useEmployeeDetail = (employeeId) => {
       setEmployee(basicInfo.employee);
       setEmployeeAddress(basicInfo.address);
       setEmployeeHouse(basicInfo.house);
-      setEmployeeFaults(adminInfo.faults   ?? []);
       setEmployeeWorkdays(adminInfo.workdays ?? []);
       setEmployeeVacationRequests(adminInfo.vacationRequests ?? []);
       setEmployeeAbsenceUsedDays(adminInfo.absenceUsedDays ?? 0);
@@ -47,7 +45,6 @@ export const useEmployeeDetail = (employeeId) => {
     employee,
     employeeAddress,
     employeeHouse,
-    employeeFaults,
     employeeWorkdays,
     employeeVacationRequests,
     employeeAbsenceUsedDays,
