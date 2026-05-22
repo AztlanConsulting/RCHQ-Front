@@ -22,11 +22,10 @@ const normalizeRole = (role) =>
 const canViewCategory = (option, role) => {
     const normalizedRole = normalizeRole(role);
 
-    if (
-        option.value === "casa" ||
-        option.value === "ausencias" ||
-        option.value === "vacaciones"
-    ) {
+    if (option.value === "vacaciones")
+        return true;
+
+    if (option.value === "casa" || option.value === "ausencias") {
         return normalizedRole === "coordinador";
     }
 

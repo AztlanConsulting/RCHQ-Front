@@ -8,21 +8,27 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
-import { getCalendarViewerRole } from "../../services/calendarService";
+import {
+    getCalendarViewerRole,
+    getOwnEmployeeId,
+} from "../../services/calendarService";
 import {
     getVacationEmployees,
     getRemainingVacations,
     registerEmployeeVacation,
+    requestEmployeeVacation,
 } from "../../services/vacationService";
 
 vi.mock("../../services/calendarService", () => ({
     getCalendarViewerRole: vi.fn(),
+    getOwnEmployeeId: vi.fn(),
 }));
 
 vi.mock("../../services/vacationService", () => ({
     getVacationEmployees: vi.fn(),
     getRemainingVacations: vi.fn(),
     registerEmployeeVacation: vi.fn(),
+    requestEmployeeVacation: vi.fn(),
 }));
 
 vi.mock("../../services/eventService", () => ({
@@ -106,6 +112,14 @@ const openVacationForm = async () => {
     });
 };
 
+const openWorkerVacationForm = async (employeeId = "own-employee") => {
+    fireEvent.click(screen.getByRole("radio", { name: "Vacaciones" }));
+
+    await waitFor(() => {
+        expect(getRemainingVacations).toHaveBeenCalledWith(employeeId);
+    });
+};
+
 const selectEmployee = async (employeeName = "Ana López") => {
     fireEvent.click(
         screen.getByRole("button", { name: /selecciona el empleado/i }),
@@ -126,6 +140,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         vi.clearAllMocks();
 
         getCalendarViewerRole.mockReturnValue("Coordinador");
+        getOwnEmployeeId.mockReturnValue("own-employee");
 
         getVacationEmployees.mockResolvedValue(employees);
 
@@ -148,16 +163,6 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         expect(
             screen.getByRole("radio", { name: "Vacaciones" }),
         ).toBeInTheDocument();
-    });
-
-    it("oculta la opción de vacaciones para un rol no coordinador", () => {
-        getCalendarViewerRole.mockReturnValue("Trabajador");
-
-        renderModal();
-
-        expect(
-            screen.queryByRole("radio", { name: "Vacaciones" }),
-        ).not.toBeInTheDocument();
     });
 
     it("carga empleados elegibles al abrir el formulario de vacaciones", async () => {
@@ -270,6 +275,303 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         expect(await screen.findByRole("alert")).toHaveTextContent(
             "No hay días suficientes",
         );
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+});
+
+describe("Integración: trabajador solicita vacaciones desde calendario", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+
+        getCalendarViewerRole.mockReturnValue("Trabajador");
+        getOwnEmployeeId.mockReturnValue("own-employee");
+
+        getVacationEmployees.mockResolvedValue([]);
+
+        getRemainingVacations.mockResolvedValue({
+            remainingVacations: 6,
+            startDate: "2026-01-01T00:00:00.000Z",
+            endDate: "2026-12-31T00:00:00.000Z",
+        });
+
+        requestEmployeeVacation.mockResolvedValue({
+            vacationRequestId: "vac-request-1",
+            employeeId: "own-employee",
+            status: 0,
+        });
+    });
+
+    it("muestra la opción de vacaciones para el trabajador", () => {
+        renderModal();
+
+        expect(
+            screen.getByRole("radio", { name: "Vacaciones" }),
+        ).toBeInTheDocument();
+    });
+
+    it("consulta días disponibles del empleado de la sesión al abrir vacaciones", async () => {
+        renderModal();
+
+        await openWorkerVacationForm();
+
+        expect(getVacationEmployees).not.toHaveBeenCalled();
+        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
+        expect(screen.getByText("6")).toBeInTheDocument();
+        expect(screen.getByText(/periodo actual:/i)).toBeInTheDocument();
+    });
+
+    it("solicita vacaciones con los datos del formulario", async () => {
+        const { onClose, onSuccess, onFeedback } = renderModal();
+
+        await openWorkerVacationForm();
+
+        expect(
+            screen.queryByRole("button", { name: /selecciona el empleado/i }),
+        ).not.toBeInTheDocument();
+        expect(getVacationEmployees).not.toHaveBeenCalled();
+        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledTimes(1);
+        });
+
+        expect(requestEmployeeVacation).toHaveBeenCalledWith({
+            employeeId: "own-employee",
+            startDate: "2026-05-05",
+            endDate: "2026-05-07",
+        });
+        expect(registerEmployeeVacation).not.toHaveBeenCalled();
+
+        expect(onFeedback).toHaveBeenCalledWith({
+            type: "success",
+            message: "Vacaciones solicitadas correctamente",
+        });
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra validación local si la fecha de inicio es posterior a la fecha de fin", async () => {
+        renderModal({
+            initialStartDate: "2026-05-10",
+            initialEndDate: "2026-05-07",
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        expect(
+            screen.getByText(
+                "La fecha de inicio no puede ser posterior a la fecha de fin",
+            ),
+        ).toBeInTheDocument();
+
+        expect(requestEmployeeVacation).not.toHaveBeenCalled();
+    });
+
+    it("muestra validación local si las fechas tienen formato inválido", async () => {
+        renderModal({
+            initialStartDate: "2026-6-1",
+            initialEndDate: "2026-06-03",
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        expect(screen.getByText("Selecciona una fecha válida")).toBeInTheDocument();
+        expect(requestEmployeeVacation).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si el empleado no tiene días de trabajo registrados", async () => {
+        getOwnEmployeeId.mockReturnValue("worker-without-workdays");
+        const { onClose, onSuccess } = renderModal();
+        const message = "Se necesitan tener registrados los días de trabajo";
+
+        requestEmployeeVacation.mockImplementation(async ({ employeeId }) => {
+            if (employeeId === "worker-without-workdays") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm("worker-without-workdays");
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledTimes(1);
+        });
+
+        expect(requestEmployeeVacation).toHaveBeenCalledWith({
+            employeeId: "worker-without-workdays",
+            startDate: "2026-05-05",
+            endDate: "2026-05-07",
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si las vacaciones están fuera del periodo laboral", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2027-01-05",
+            initialEndDate: "2027-01-07",
+        });
+        const message =
+            "No se pueden solicitar vacaciones fuera del periodo actual de trabajo";
+
+        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
+            if (startDate === "2027-01-05" && endDate === "2027-01-07") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledWith({
+                employeeId: "own-employee",
+                startDate: "2027-01-05",
+                endDate: "2027-01-07",
+            });
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si las vacaciones son en el pasado o el mismo día", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2026-01-05",
+            initialEndDate: "2026-01-07",
+        });
+        const message =
+            "No se pueden pedir vacaciones en el pasado ni para el mismo día";
+
+        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
+            if (startDate === "2026-01-05" && endDate === "2026-01-07") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledWith({
+                employeeId: "own-employee",
+                startDate: "2026-01-05",
+                endDate: "2026-01-07",
+            });
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si el rango no contiene días hábiles de vacaciones", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2026-06-06",
+            initialEndDate: "2026-06-07",
+        });
+        const message =
+            "Dentro del rango seleccionado no hay ningún día hábil de vacaciones";
+
+        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
+            if (startDate === "2026-06-06" && endDate === "2026-06-07") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledWith({
+                employeeId: "own-employee",
+                startDate: "2026-06-06",
+                endDate: "2026-06-07",
+            });
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si no hay suficientes días disponibles", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2026-06-01",
+            initialEndDate: "2026-06-30",
+        });
+        const message =
+            "No se tienen suficientes días disponibles para solicitar las vacaciones";
+
+        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
+            if (startDate === "2026-06-01" && endDate === "2026-06-30") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledWith({
+                employeeId: "own-employee",
+                startDate: "2026-06-01",
+                endDate: "2026-06-30",
+            });
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("muestra error del backend si ya hay una solicitud cubriendo los días", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2026-07-01",
+            initialEndDate: "2026-07-03",
+        });
+        const message =
+            "Ya hay una solicitud de vacaciones cubriendo los días solicitados";
+
+        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
+            if (startDate === "2026-07-01" && endDate === "2026-07-03") {
+                throw new Error(message);
+            }
+
+            return null;
+        });
+
+        await openWorkerVacationForm();
+        await submitVacation();
+
+        await waitFor(() => {
+            expect(requestEmployeeVacation).toHaveBeenCalledWith({
+                employeeId: "own-employee",
+                startDate: "2026-07-01",
+                endDate: "2026-07-03",
+            });
+        });
+        expect(await screen.findByRole("alert")).toHaveTextContent(message);
 
         expect(onSuccess).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();

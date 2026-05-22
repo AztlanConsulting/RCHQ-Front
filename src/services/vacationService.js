@@ -69,3 +69,26 @@ export const registerEmployeeVacation = async ({
 
     return data?.data?.vacationRequest ?? null;
 };
+
+export const requestEmployeeVacation = async ({
+    startDate,
+    endDate,
+}) => {
+    const res = await secureFetch(
+        `${API_URL}/vacation/request`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                startDate,
+                endDate,
+            }),
+        },
+    );
+
+    const data = await parseJson(res);
+
+    return data?.data?.vacationRequest ?? null;
+};
