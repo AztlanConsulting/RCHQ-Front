@@ -136,7 +136,8 @@ export const useUpdatePersonalEventForm = ({
                     query ? { search: query } : {},
                 );
                 setEmployees(results);
-            } catch {
+            } catch (error){
+                console.error(error)
             }
         },
         [isCoordinator],
