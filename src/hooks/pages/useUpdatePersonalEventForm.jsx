@@ -137,7 +137,6 @@ export const useUpdatePersonalEventForm = ({
                 );
                 setEmployees(results);
             } catch {
-                // silently ignore
             }
         },
         [isCoordinator],
