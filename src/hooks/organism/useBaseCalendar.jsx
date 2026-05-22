@@ -254,7 +254,6 @@ export const useBaseCalendar = () => {
     };
 
     const getWeekDayName = (currentDay) => {
-        console.log(currentDay);
         const weekDayIndex = currentDay.dow;
         const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
         const fullDays = [
