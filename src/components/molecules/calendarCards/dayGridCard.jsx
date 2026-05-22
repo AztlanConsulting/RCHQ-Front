@@ -3,7 +3,7 @@ import Dates from "@/utils/helpers/dates.helpers";
 const DayGridCard = ({ arg }) => {
     const start = arg.event.start;
     const timeLabel = start != null ? Dates.getStartHour(start) : "";
-    const showDayLabel = arg.event.allDay || timeLabel === "00:00";
+    const showDayLabel = arg.event.allDay 
 
     return (
         <div
