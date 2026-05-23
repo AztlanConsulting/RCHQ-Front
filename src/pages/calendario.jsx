@@ -346,8 +346,17 @@ const Calendario = () => {
                             ) : (
                                 <VacationWorkerDetail
                                     event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
-                                    onEdit={() => {}}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
                                     onDelete={() => {}}
                                 />
                             );
