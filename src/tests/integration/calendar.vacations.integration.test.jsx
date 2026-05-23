@@ -38,6 +38,20 @@ vi.mock("../../components/organism/evento/registerEventModal", () => ({
     default: () => null,
 }));
 
+vi.mock("../../components/atoms/dateField", () => ({
+    default: ({ label, name, value = "", onChange }) => (
+        <label>
+            {label}
+            <input
+                aria-label={label}
+                name={name}
+                value={value}
+                onChange={onChange}
+            />
+        </label>
+    ),
+}));
+
 const setOwnCalendar = vi.fn();
 
 const baseVacation = {
@@ -57,6 +71,7 @@ const baseVacation = {
 const setCalendarHooks = ({
     viewerRole = "Coordinador",
     event = baseVacation,
+    isVacationEditing = false,
 } = {}) => {
     const startVacationEdit = vi.fn();
     const cancelVacationEdit = vi.fn();
@@ -156,12 +171,18 @@ const setCalendarHooks = ({
         submitAbsenceEdit: vi.fn(),
         showCalendarAlert: vi.fn(),
         clearCalendarAlert: vi.fn(),
-        isVacationEditing: false,
+        isVacationEditing,
         vacationForm: {
             startDate: "2026-06-05",
             endDate: "2026-06-10",
         },
         vacationEditError: "",
+        vacationRemainingInfo: {
+            remainingVacations: 8,
+            startDate: "2026-04-09T00:00:00.000Z",
+            endDate: "2027-04-08T00:00:00.000Z",
+        },
+        isLoadingVacationRemaining: false,
         isSavingVacation: false,
         startVacationEdit,
         cancelVacationEdit,
@@ -239,5 +260,31 @@ describe("Integración: Calendario - vacaciones", () => {
         render(<Calendario />);
         fireEvent.click(screen.getByRole("button", { name: /editar/i }));
         expect(startVacationEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra la edición de una vacación propia sin nombre ni CURP", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+
+        setCalendarHooks({
+            viewerRole: "Cocinero",
+            isVacationEditing: true,
+        });
+
+        render(<Calendario />);
+
+        expect(screen.getByRole("dialog")).toBeInTheDocument();
+        expect(
+            screen.queryByText("Nombre del trabajador"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText("CURP")).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue(
+            "2026-06-05",
+        );
+        expect(screen.getByLabelText("Fecha de fin")).toHaveValue(
+            "2026-06-10",
+        );
+        expect(
+            screen.getByRole("button", { name: /guardar/i }),
+        ).toBeInTheDocument();
     });
 });
