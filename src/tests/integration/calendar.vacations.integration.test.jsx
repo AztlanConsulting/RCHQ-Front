@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../../hooks/organism/useCalendarFilters";
@@ -15,6 +16,10 @@ vi.mock("../../hooks/organism/useCalendarFilters", () => ({
 
 vi.mock("../../hooks/pages/useCalendarPage", () => ({
     useCalendarPage: vi.fn(),
+}));
+
+vi.mock("../../hooks/pages/useCalendarSearchParams", () => ({
+    useCalendarSearchParams: vi.fn(),
 }));
 
 vi.mock("../../components/organism/baseCalendar", () => ({
@@ -38,7 +43,22 @@ vi.mock("../../components/organism/evento/registerEventModal", () => ({
     default: () => null,
 }));
 
+vi.mock("../../components/organism/evento/updateHouseEventModal", () => ({
+    default: () => null,
+}));
+
+vi.mock("../../components/organism/evento/updatePersonalEventModal", () => ({
+    default: () => null,
+}));
+
 const setOwnCalendar = vi.fn();
+
+const renderCalendar = () =>
+    render(
+        <MemoryRouter>
+            <Calendario />
+        </MemoryRouter>,
+    );
 
 const baseVacation = {
     focus: "vacaciones",
@@ -169,7 +189,7 @@ describe("Integración: Calendario - vacaciones", () => {
 
         setCalendarHooks({ viewerRole: "Coordinador" });
 
-        render(<Calendario />);
+        renderCalendar();
 
         expect(screen.getByRole("dialog")).toBeInTheDocument();
         expect(screen.getByText("Nombre del trabajador")).toBeInTheDocument();
@@ -188,7 +208,7 @@ describe("Integración: Calendario - vacaciones", () => {
 
         setCalendarHooks({ viewerRole: "Cocinero" });
 
-        render(<Calendario />);
+        renderCalendar();
 
         expect(screen.getByRole("dialog")).toBeInTheDocument();
         expect(
