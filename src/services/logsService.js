@@ -144,7 +144,7 @@ export const getLogsActionsService = async () => {
   return Array.isArray(data?.data) ? data.data : [];
 };
 
-export const downloadHouseLogsReportService = async ({ month, year }) => {
+export const downloadHouseLogsReportService = async ({ currentYear, year }) => {
   const token = getToken();
 
   if (!token) {
@@ -152,7 +152,7 @@ export const downloadHouseLogsReportService = async ({ month, year }) => {
   }
 
   const params = new URLSearchParams({
-    month: String(month),
+    currentYear: String(currentYear),
     year: String(year),
   });
 
@@ -176,6 +176,6 @@ export const downloadHouseLogsReportService = async ({ month, year }) => {
     blob,
     fileName:
       match?.[1]
-      || `reporte-logs-${year}-${String(month).padStart(2, "0")}.pdf`,
+      || `reporte-logs-${Math.min(currentYear, year)}-${Math.max(currentYear, year)}.pdf`,
   };
 };

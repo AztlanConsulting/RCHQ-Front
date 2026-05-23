@@ -29,10 +29,9 @@ const LogsHouse = () => {
     isReportModalOpen,
     openReportModal,
     closeReportModal,
-    reportMonth,
-    setReportMonth,
     reportYear,
     setReportYear,
+    currentYear,
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
@@ -97,10 +96,9 @@ const LogsHouse = () => {
       <LogReportModal
         open={isReportModalOpen}
         onClose={closeReportModal}
-        month={reportMonth}
-        onMonthChange={setReportMonth}
         year={reportYear}
         onYearChange={setReportYear}
+        currentYear={currentYear}
         yearOptions={yearOptions}
         onConfirm={handleDownloadReport}
         loading={isDownloadingReport}

@@ -2,29 +2,13 @@ import Button from "../atoms/button";
 import Modal from "../atoms/modal";
 import NativeSelect from "../atoms/nativeSelect";
 
-const monthOptions = [
-  { value: 1, label: "Enero" },
-  { value: 2, label: "Febrero" },
-  { value: 3, label: "Marzo" },
-  { value: 4, label: "Abril" },
-  { value: 5, label: "Mayo" },
-  { value: 6, label: "Junio" },
-  { value: 7, label: "Julio" },
-  { value: 8, label: "Agosto" },
-  { value: 9, label: "Septiembre" },
-  { value: 10, label: "Octubre" },
-  { value: 11, label: "Noviembre" },
-  { value: 12, label: "Diciembre" },
-];
-
 const LogReportModal = ({
   open,
   onClose,
-  month,
-  onMonthChange,
   year,
   onYearChange,
   yearOptions,
+  currentYear,
   onConfirm,
   loading,
 }) => {
@@ -37,21 +21,11 @@ const LogReportModal = ({
     >
       <div className="space-y-6">
         <p className="text-sm text-slate-600">
-          Selecciona el mes y el año del reporte que quieres descargar en PDF.
+          Selecciona el año desde el cual quieres incluir registros. El PDF se
+          generará desde {currentYear} hasta el año seleccionado.
         </p>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Mes
-            </label>
-            <NativeSelect
-              value={month}
-              onChange={(event) => onMonthChange(Number(event.target.value))}
-              options={monthOptions}
-            />
-          </div>
-
+        <div className="grid gap-4">
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
               Año
