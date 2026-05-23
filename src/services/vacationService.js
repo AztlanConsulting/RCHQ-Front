@@ -110,3 +110,20 @@ export const requestEmployeeVacation = async ({ startDate, endDate }) => {
 
     return data?.data?.vacationRequest ?? null;
 };
+
+export const deleteVacationRequest = async (vacationRequestId) => {
+    const res = await secureFetch(
+        `${API_URL}/vacation/request/${vacationRequestId}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+        },
+    );
+
+    const data = await parseJson(res);
+
+    return data?.data?.vacationRequest ?? null;
+};
