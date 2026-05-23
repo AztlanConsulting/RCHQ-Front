@@ -36,12 +36,14 @@ export const formatLogMoment = (momentValue) => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   }).format(date);
 
   const timePart = new Intl.DateTimeFormat("es-MX", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
+    timeZone: "UTC",
   })
     .format(date)
     .replace(/\s+/g, " ")

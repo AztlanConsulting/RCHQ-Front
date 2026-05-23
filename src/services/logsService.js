@@ -52,6 +52,7 @@ const formatMoment = (momentValue) => {
   return new Intl.DateTimeFormat("es-MX", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "UTC",
   }).format(date);
 };
 
