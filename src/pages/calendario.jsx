@@ -138,6 +138,16 @@ const Calendario = () => {
         cancelDeletePersonalEvent,
         confirmDeletePersonalEvent,
         onHouseEventEditSuccess,
+        isVacationEditing,
+        vacationForm,
+        vacationEditError,
+        isSavingVacation,
+        startVacationEdit,
+        cancelVacationEdit,
+        setVacationField,
+        submitVacationEdit,
+        vacationRemainingInfo,
+        isLoadingVacationRemaining,
         openCalendarItemDetail,
     } = useCalendarPage({
         absenceTypeOptions,
@@ -328,11 +338,20 @@ const Calendario = () => {
                             return isManagementRole(viewerRole) ? (
                                 <VacationDetail
                                     event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
-                                    onEdit={() => {}}
-                                    onDelete={() => {}}
-                                    onApprove={() => {}}
-                                    onReject={() => {}}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
+                                    onDelete={() => { }}
+                                    onApprove={() => { }}
+                                    onReject={() => { }}
                                 />
                             ) : (
                                 <VacationWorkerDetail

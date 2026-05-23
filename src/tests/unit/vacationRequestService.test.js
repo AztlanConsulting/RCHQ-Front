@@ -253,7 +253,7 @@ describe("vacationRequestService", () => {
         );
     });
 
-    it("rejectVacationRequest llama al endpoint correcto con PATCH", async () => {
+    it("rejectVacationRequest llama al endpoint correcto con PATCH y feedback", async () => {
         secureFetch.mockResolvedValue({
             ok: true,
             json: vi.fn().mockResolvedValue({
@@ -263,12 +263,16 @@ describe("vacationRequestService", () => {
                     vacationRequest: {
                         vacationRequestId: "vac-001",
                         status: 2,
+                        feedback: "No hay disponibilidad para esas fechas",
                     },
                 },
             }),
         });
 
-        const result = await rejectVacationRequest("vac-001");
+        const result = await rejectVacationRequest(
+            "vac-001",
+            "No hay disponibilidad para esas fechas",
+        );
 
         expect(secureFetch).toHaveBeenCalledWith(
             expect.stringContaining("/vacation/request/vac-001/reject"),
@@ -277,7 +281,9 @@ describe("vacationRequestService", () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({}),
+                body: JSON.stringify({
+                    feedback: "No hay disponibilidad para esas fechas",
+                }),
             },
         );
 
@@ -286,6 +292,7 @@ describe("vacationRequestService", () => {
             vacationRequest: {
                 vacationRequestId: "vac-001",
                 status: 2,
+                feedback: "No hay disponibilidad para esas fechas",
             },
         });
     });

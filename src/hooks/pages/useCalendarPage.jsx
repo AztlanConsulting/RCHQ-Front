@@ -10,6 +10,7 @@ import {
 } from "../../services/calendarService";
 import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
+import { useVacationFormEdit } from "./useVacationFormEdit";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -85,6 +86,25 @@ export const useCalendarPage = ({
   const [isDeletingPersonalEvent, setIsDeletingPersonalEvent] = useState(false);
   const [deletePersonalEventError, setDeletePersonalEventError] = useState("");
   const {
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    vacationRemainingInfo,
+    isLoadingVacationRemaining,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    resetVacationEdit,
+  } = useVacationFormEdit({
+    selectedEvent,
+    selectedEventRef,
+    reloadCurrentRange,
+    setSelectedEvent,
+    setAlert,
+  });
+  const {
     file: absenceEvidenceFile,
     fileName: absenceEvidenceFileName,
     error: absenceEvidenceError,
@@ -104,7 +124,8 @@ export const useCalendarPage = ({
     setIsDeletePersonalEventOpen(false);
     setDeletePersonalEventError("");
     resetAbsenceEvidence();
-  }, [resetAbsenceEvidence]);
+    resetVacationEdit();
+  }, [resetAbsenceEvidence, resetVacationEdit]);
 
   const showEventDetail = useCallback((detail) => {
     selectedEventRef.current = detail;
@@ -117,7 +138,8 @@ export const useCalendarPage = ({
     setDeleteHouseEventError("");
     setIsDeletePersonalEventOpen(false);
     setDeletePersonalEventError("");
-  }, []);
+    resetVacationEdit();
+  }, [resetVacationEdit]);
 
   const openCalendarItemDetail = useCallback((item) => {
     const detail = calendarItemToDetail(item);
@@ -144,7 +166,8 @@ export const useCalendarPage = ({
     setDeleteHouseEventError("");
     setIsDeletePersonalEventOpen(false);
     setDeletePersonalEventError("");
-  }, []);
+    resetVacationEdit();
+  }, [resetVacationEdit]);
 
   const absenceEvidenceLabel = useMemo(
     () => getAbsenceEvidenceLabel(selectedEvent, viewerRole),
@@ -575,7 +598,17 @@ export const useCalendarPage = ({
     confirmDeleteHouseEvent,
     cancelDeletePersonalEvent,
     confirmDeletePersonalEvent,
-        onHouseEventEditSuccess,
-        openCalendarItemDetail,
-    };
+    onHouseEventEditSuccess,
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    vacationRemainingInfo,
+    isLoadingVacationRemaining,
+    openCalendarItemDetail,
+  };
 };

@@ -185,4 +185,62 @@ describe("useCalendarFilters - vacaciones", () => {
             "self-vacation",
         ]);
     });
+
+    it("conserva los campos necesarios para abrir detalle y editar vacaciones", async () => {
+        const vacation = buildVacation({
+            vacationId: "vacation-edit-1",
+            employeeId: "employee-self",
+            status: 1,
+            startDate: "2026-06-05",
+            endDate: "2026-06-10",
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarFilters([vacation], {
+                isList: false,
+                viewerRole: "Coordinador",
+                calendarMode: "personal",
+            }),
+        );
+
+        await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
+
+        const [visibleVacation] = result.current.visibleEvents;
+
+        expect(visibleVacation.extendedProps).toMatchObject({
+            vacationId: "vacation-edit-1",
+            employeeId: "employee-self",
+            status: 1,
+            startDate: "2026-06-05",
+            endDate: "2026-06-10",
+            focus: "vacaciones",
+        });
+    });
+
+    it("no muestra vacaciones rechazadas en calendario", async () => {
+        const events = [
+            buildVacation({
+                vacationId: "approved-vacation",
+                status: 1,
+            }),
+            buildVacation({
+                vacationId: "rejected-vacation",
+                status: 2,
+            }),
+        ];
+
+        const { result } = renderHook(() =>
+            useCalendarFilters(events, {
+                isList: false,
+                viewerRole: "Coordinador",
+                calendarMode: "personal",
+            }),
+        );
+
+        await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
+
+        expect(getVacationIds(result.current.visibleEvents)).toEqual([
+            "approved-vacation",
+        ]);
+    });
 });

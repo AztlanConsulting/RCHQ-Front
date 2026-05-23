@@ -13,6 +13,7 @@ const DateField = ({
     native = false,
     popupAlign = "left",
     popupSize = "default",
+    popupPlacement = "bottom",
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
@@ -79,8 +80,15 @@ const DateField = ({
         );
     }
 
+    const popupHorizontalClass = popupAlign === "right" ? "right-0" : "left-0";
+
+    const popupVerticalClass =
+        popupPlacement === "top"
+            ? "!top-auto !bottom-full mb-2"
+            : "!top-10 !bottom-auto pt-2";
+
     return (
-        <div className="date-field-wrapper flex w-full flex-col gap-1.5">
+        <div className="date-field-wrapper relative flex w-full flex-col gap-1.5">
             <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
                 {label}
             </label>
@@ -114,7 +122,7 @@ const DateField = ({
 
                     popup: {
                         root: {
-                            base: `absolute top-10 z-50 block pt-2 ${popupAlign === "right" ? "right-0" : "left-0"}`,
+                            base: `absolute ${popupVerticalClass} ${popupHorizontalClass} z-[80] block`,
                             inline: "relative top-0 z-auto",
                             inner: `inline-block rounded-lg bg-white shadow-lg dark:bg-gray-700 ${isCompactPopup ? "p-3" : "p-4"}`,
                         },
