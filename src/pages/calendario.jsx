@@ -28,7 +28,6 @@ const Calendario = () => {
     const {
         employeeHouseName,
         allEvents,
-        rawCalendarEvents,
         isList,
         viewType,
         currentCalendarView,
@@ -54,6 +53,7 @@ const Calendario = () => {
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,
+        reloadVisibleRange,
     } = useBaseCalendar();
 
     const {
@@ -151,8 +151,9 @@ const Calendario = () => {
 
     useCalendarSearchParams({
         calendarRef,
-        rawCalendarEvents,
         openCalendarItemDetail,
+        reloadVisibleRange,
+        setCalendarMode,
     });
 
     const calendarFiltersProps = {

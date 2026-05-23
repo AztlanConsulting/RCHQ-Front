@@ -137,10 +137,25 @@ const useVacationRequestsBase = ({
     const onViewDetail = (request) => {
         const vacationId = request.vacationRequestId;
         const date = normalizeDateOnly(request.startDate);
+        const employeeId =
+            request.employeeId ??
+            request.employee?.employeeId ??
+            request.employee?.id ??
+            "";
 
         if (!vacationId || !date) return;
 
-        navigate(`/app/calendario?type=vacacion&date=${date}&id=${vacationId}`);
+        const params = new URLSearchParams({
+            type: "vacacion",
+            date,
+            id: vacationId,
+        });
+
+        if (employeeId) {
+            params.set("employeeId", employeeId);
+        }
+
+        navigate(`/app/calendario?${params.toString()}`);
     };
 
     return {
