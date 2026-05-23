@@ -1,6 +1,7 @@
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
+import DateField from "../atoms/dateField";
 import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
 
@@ -165,15 +166,27 @@ const EmployeeBasicCard = ({
                 { label: "Fecha de Nacimiento", field: "birthDate", type: "date" },
               ].map(({ label, field, type }) => (
                 <div key={field} className="flex flex-col gap-1">
-                  <Type variant="metric-label" as="p">{label}</Type>
-                  <TextField
-                    id={field}
-                    type={type}
-                    value={basicForm[field]}
-                    setValue={(v) => setBasicField(field, v)}
-                    labelClassName="hidden"
-                    text=""
-                  />
+                  {field === "birthDate" ? (
+                    <DateField
+                      label={label}
+                      name={field}
+                      value={basicForm[field]}
+                      onChange={(e) => setBasicField(field, e.target.value)}
+                      maxDate={new Date()}
+                    />
+                  ) : (
+                    <>
+                      <Type variant="metric-label" as="p">{label}</Type>
+                      <TextField
+                        id={field}
+                        type={type}
+                        value={basicForm[field]}
+                        setValue={(v) => setBasicField(field, v)}
+                        labelClassName="hidden"
+                        text=""
+                      />
+                    </>
+                  )}
                 </div>
               ))}
             </div>

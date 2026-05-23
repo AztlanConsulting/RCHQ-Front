@@ -40,9 +40,9 @@ describe("VacationWorkerDetail", () => {
         renderVacationWorkerDetail();
 
         expect(screen.getByText("Solicitud de Vacaciones")).toBeInTheDocument();
-        expect(screen.getByText("Fecha de Inicio:")).toBeInTheDocument();
+        expect(screen.getByText("Fecha de inicio:")).toBeInTheDocument();
         expect(screen.getByText("5 de junio de 2026")).toBeInTheDocument();
-        expect(screen.getByText("Fecha de final:")).toBeInTheDocument();
+        expect(screen.getByText("Fecha de fin:")).toBeInTheDocument();
         expect(screen.getByText("10 de junio de 2026")).toBeInTheDocument();
         expect(screen.getByText("5")).toBeInTheDocument();
         expect(screen.getByText("4")).toBeInTheDocument();

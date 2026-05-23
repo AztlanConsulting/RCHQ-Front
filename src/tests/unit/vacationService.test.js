@@ -10,6 +10,7 @@ describe("vacationService", () => {
     let getVacationEmployees;
     let getRemainingVacations;
     let registerEmployeeVacation;
+    let updateVacationRequestDates;
     let requestEmployeeVacation;
 
     const loadService = async () => {
@@ -23,6 +24,7 @@ describe("vacationService", () => {
             getVacationEmployees,
             getRemainingVacations,
             registerEmployeeVacation,
+            updateVacationRequestDates,
             requestEmployeeVacation,
         } = await import("../../services/vacationService"));
     };
@@ -390,6 +392,88 @@ describe("vacationService", () => {
                 endDate: "2026-05-20",
             }),
         ).rejects.toThrow("No hay días suficientes");
+    });
+
+    it("updateVacationRequestDates llama al endpoint correcto con PATCH", async () => {
+        secureFetch.mockResolvedValue(
+            mockOk({
+                success: true,
+                data: {
+                    vacationRequest: {
+                        vacationRequestId: "vac-1",
+                        employeeId: "emp-1",
+                        status: 1,
+                        startDate: "2026-06-01",
+                        endDate: "2026-06-05",
+                    },
+                },
+            }),
+        );
+
+        const result = await updateVacationRequestDates({
+            vacationRequestId: "vac-1",
+            startDate: "2026-06-01",
+            endDate: "2026-06-05",
+        });
+
+        expect(secureFetch).toHaveBeenCalledWith(
+            "http://api.test/vacation/request/vac-1/dates",
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    startDate: "2026-06-01",
+                    endDate: "2026-06-05",
+                }),
+            },
+        );
+
+        expect(result).toEqual({
+            vacationRequestId: "vac-1",
+            employeeId: "emp-1",
+            status: 1,
+            startDate: "2026-06-01",
+            endDate: "2026-06-05",
+        });
+    });
+
+    it("updateVacationRequestDates regresa null si no viene vacationRequest", async () => {
+        secureFetch.mockResolvedValue(
+            mockOk({
+                success: true,
+                data: {},
+            }),
+        );
+
+        const result = await updateVacationRequestDates({
+            vacationRequestId: "vac-1",
+            startDate: "2026-06-01",
+            endDate: "2026-06-05",
+        });
+
+        expect(result).toBeNull();
+    });
+
+    it("updateVacationRequestDates lanza error de validación si backend responde errors", async () => {
+        secureFetch.mockResolvedValue(
+            mockFail({
+                errors: [
+                    {
+                        message: "La fecha final no puede ser anterior",
+                    },
+                ],
+            }),
+        );
+
+        await expect(
+            updateVacationRequestDates({
+                vacationRequestId: "vac-1",
+                startDate: "2026-06-10",
+                endDate: "2026-06-05",
+            }),
+        ).rejects.toThrow("La fecha final no puede ser anterior");
     });
 
     it("lanza error con message si backend responde message", async () => {

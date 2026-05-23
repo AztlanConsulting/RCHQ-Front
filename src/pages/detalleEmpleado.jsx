@@ -39,7 +39,7 @@ const DetalleEmpleado = () => {
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime,
+    toggleWorkday, setWorkdayTime, setWorkdayAllDay,
     submitBasic, submitContact, submitAdmin,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
@@ -223,6 +223,7 @@ const DetalleEmpleado = () => {
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
+            setWorkdayAllDay={setWorkdayAllDay}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}

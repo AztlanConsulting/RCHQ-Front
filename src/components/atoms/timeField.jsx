@@ -10,6 +10,7 @@ const TimeField = ({
     error,
     disabled = false,
     minTime,
+    stepMinutes = 15,
 }) => {
     const {
         isOpen,
@@ -26,6 +27,7 @@ const TimeField = ({
         minTime,
         disabled,
         onChange,
+        stepMinutes,
     });
 
     return (
@@ -88,7 +90,7 @@ const TimeField = ({
                             ref={listRef}
                             role="listbox"
                             style={{
-                                maxHeight: "200px",
+                                maxHeight: `${dropdownPos.maxHeight}px`,
                                 overflowY: "auto",
                                 margin: 0,
                                 padding: "4px 8px",

@@ -3,6 +3,8 @@ import Loader from "../atoms/loader";
 import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
+import TimeField from "../atoms/timeField";
+import CheckboxField from "../atoms/checkboxField";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -44,6 +46,7 @@ const EmployeeAdminCard = ({
   setAdminField,
   toggleWorkday,
   setWorkdayTime,
+  setWorkdayAllDay,
   saving,
   saveError,
   onOpenEdit,
@@ -286,18 +289,37 @@ const EmployeeAdminCard = ({
                         <span className="text-sm font-semibold text-slate-700">{w.name}</span>
                       </label>
                       {w.selected && (
-                        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:items-center">
-                          <input
-                            type="time" value={w.start}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "start", e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400 sm:w-auto"
-                          />
-                          <span className="hidden text-slate-400 text-xs sm:inline">—</span>
-                          <input
-                            type="time" value={w.end}
-                            onChange={(e) => setWorkdayTime(w.workdayId, "end", e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-400 sm:w-auto"
-                          />
+                        <div className="grid w-full grid-cols-1 gap-2">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <div className="w-full sm:w-[208px]">
+                              <TimeField
+                                value={w.start}
+                                onChange={(value) => setWorkdayTime(w.workdayId, "start", value)}
+                                placeholder="--:--"
+                                stepMinutes={30}
+                                disabled={w.allDay}
+                              />
+                            </div>
+                            <span className="hidden text-slate-400 text-xs sm:inline">—</span>
+                            <div className="w-full sm:w-[208px]">
+                              <TimeField
+                                value={w.end}
+                                onChange={(value) => setWorkdayTime(w.workdayId, "end", value)}
+                                minTime={w.start}
+                                placeholder="--:--"
+                                stepMinutes={30}
+                                disabled={w.allDay}
+                              />
+                            </div>
+                          </div>
+                          <div className="pl-0 sm:pl-1">
+                            <CheckboxField
+                              id={`all-day-workday-${w.workdayId}`}
+                              label="Turno de 24 horas"
+                              checked={Boolean(w.allDay)}
+                              onChange={(checked) => setWorkdayAllDay(w.workdayId, checked)}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>

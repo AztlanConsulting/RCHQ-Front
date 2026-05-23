@@ -5,6 +5,10 @@ import {
     deleteAbsenceService,
     updateAbsenceService,
 } from "../../services/calendarService";
+import {
+    getRemainingVacations,
+    updateVacationRequestDates,
+} from "../../services/vacationService";
 
 vi.mock("../../services/calendarService", () => ({
     deleteAbsenceService: vi.fn(),
@@ -48,10 +52,43 @@ const buildCalendarClickInfo = ({
     },
 });
 
+const buildVacationClickInfo = () => ({
+    event: {
+        id: "vacation-1",
+        title: "Vacaciones de Ana López",
+        start: new Date("2026-06-05T00:00:00.000Z"),
+        end: new Date("2026-06-11T00:00:00.000Z"),
+        allDay: true,
+        backgroundColor: "#22C55E",
+        borderColor: "#16A34A",
+        extendedProps: {
+            focus: "vacaciones",
+            vacationId: "vacation-1",
+            employeeId: "emp-1",
+            employeeName: "Ana López",
+            curp: "LOAA900101MDFPPP09",
+            startDate: "2026-06-05",
+            endDate: "2026-06-10",
+            readableStart: "2026-06-05",
+            readableEnd: "2026-06-10",
+            usedDays: 4,
+            totalDays: 6,
+            status: 1,
+            feedback: "",
+        },
+    },
+});
+
 describe("useCalendarPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.stubGlobal("open", vi.fn());
+
+        getRemainingVacations.mockResolvedValue({
+            remainingVacations: 8,
+            startDate: "2026-01-01",
+            endDate: "2026-12-31",
+        });
     });
 
     it("inicializa el formulario de edición con los datos de la ausencia seleccionada", () => {
@@ -349,5 +386,112 @@ describe("useCalendarPage", () => {
             "_blank",
             "noopener,noreferrer",
         );
+    });
+
+    it("inicializa el formulario de edición con los datos de la vacación seleccionada", () => {
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+        });
+
+        act(() => {
+            result.current.startVacationEdit();
+        });
+
+        expect(result.current.isVacationEditing).toBe(true);
+        expect(result.current.vacationForm).toEqual({
+            vacationRequestId: "vacation-1",
+            startDate: "2026-06-05",
+            endDate: "2026-06-10",
+        });
+    });
+
+    it("actualiza la vacación, recarga el rango y muestra alerta de éxito", async () => {
+        const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+
+        updateVacationRequestDates.mockResolvedValue({
+            vacationRequestId: "vacation-1",
+            startDate: "2026-06-06",
+            endDate: "2026-06-12",
+            status: 1,
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange,
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.startVacationEdit();
+            result.current.setVacationField("startDate", "2026-06-06");
+            result.current.setVacationField("endDate", "2026-06-12");
+        });
+
+        await act(async () => {
+            await result.current.submitVacationEdit();
+        });
+
+        expect(updateVacationRequestDates).toHaveBeenCalledWith({
+            vacationRequestId: "vacation-1",
+            startDate: "2026-06-06",
+            endDate: "2026-06-12",
+        });
+        expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+        expect(result.current.isVacationEditing).toBe(false);
+        expect(result.current.alert).toEqual({
+            type: "success",
+            message: "Vacaciones modificadas correctamente",
+        });
+    });
+
+    it("cierra el formulario de edición de vacaciones al cancelar", () => {
+        const { result } = renderHook(() => useCalendarPage());
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.startVacationEdit();
+        });
+
+        expect(result.current.isVacationEditing).toBe(true);
+
+        act(() => {
+            result.current.cancelVacationEdit();
+        });
+
+        expect(result.current.isVacationEditing).toBe(false);
+    });
+
+    it("muestra error si falla la actualización de vacaciones", async () => {
+        updateVacationRequestDates.mockRejectedValue(
+            new Error("No se pudo actualizar vacaciones"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.startVacationEdit();
+            result.current.setVacationField("startDate", "2026-06-06");
+        });
+
+        await act(async () => {
+            await result.current.submitVacationEdit();
+        });
+
+        expect(result.current.vacationEditError).toBe(
+            "No se pudo actualizar vacaciones",
+        );
+        expect(result.current.isVacationEditing).toBe(true);
     });
 });

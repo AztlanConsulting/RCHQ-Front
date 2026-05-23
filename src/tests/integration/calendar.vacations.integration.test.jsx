@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
@@ -58,6 +58,11 @@ const setCalendarHooks = ({
     viewerRole = "Coordinador",
     event = baseVacation,
 } = {}) => {
+    const startVacationEdit = vi.fn();
+    const cancelVacationEdit = vi.fn();
+    const setVacationField = vi.fn();
+    const submitVacationEdit = vi.fn();
+
     useBaseCalendar.mockReturnValue({
         employeeHouseName: "",
         allEvents: [],
@@ -151,7 +156,24 @@ const setCalendarHooks = ({
         submitAbsenceEdit: vi.fn(),
         showCalendarAlert: vi.fn(),
         clearCalendarAlert: vi.fn(),
+        isVacationEditing: false,
+        vacationForm: {
+            startDate: "2026-06-05",
+            endDate: "2026-06-10",
+        },
+        vacationEditError: "",
+        isSavingVacation: false,
+        startVacationEdit,
+        cancelVacationEdit,
+        setVacationField,
+        submitVacationEdit,
     });
+    return {
+        startVacationEdit,
+        cancelVacationEdit,
+        setVacationField,
+        submitVacationEdit,
+    };
 };
 
 describe("Integración: Calendario - vacaciones", () => {
@@ -207,5 +229,15 @@ describe("Integración: Calendario - vacaciones", () => {
         expect(
             screen.queryByRole("button", { name: /rechazar/i }),
         ).not.toBeInTheDocument();
+    });
+
+    it("permite iniciar edición desde el detalle de vacaciones", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        const { startVacationEdit } = setCalendarHooks({
+            viewerRole: "Coordinador",
+        });
+        render(<Calendario />);
+        fireEvent.click(screen.getByRole("button", { name: /editar/i }));
+        expect(startVacationEdit).toHaveBeenCalledTimes(1);
     });
 });
