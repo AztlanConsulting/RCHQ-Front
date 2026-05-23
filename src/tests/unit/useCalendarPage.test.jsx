@@ -550,4 +550,30 @@ describe("useCalendarPage", () => {
         );
         expect(result.current.isDeleteVacationOpen).toBe(true);
     });
+
+    it("muestra error de permisos si el back rechaza la eliminación de vacaciones", async () => {
+        deleteVacationRequest.mockRejectedValue(
+            new Error("No puede acceder a este recurso"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.openDeleteVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(result.current.deleteVacationError).toBe(
+            "No puede acceder a este recurso",
+        );
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+    });
 });
