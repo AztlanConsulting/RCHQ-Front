@@ -3,9 +3,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import Personal from "../../Pages/personal";
 import { useEmployees } from "../../hooks/pages/useGetAllEmployees";
+import { useGetBlacklist } from "../../hooks/pages/useGetBlacklist";
+import { addToBlacklist } from "../../services/blacklistService";
 
 vi.mock("../../hooks/pages/useGetAllEmployees", () => ({
     useEmployees: vi.fn(),
+}));
+vi.mock("../../hooks/pages/useGetBlacklist", () => ({
+    useGetBlacklist: vi.fn(),
+}));
+vi.mock("../../services/blacklistService", () => ({
+    addToBlacklist: vi.fn(),
 }));
 
 const mockNavigate = vi.fn();
@@ -42,9 +50,25 @@ describe("Integración: Componente Personal", () => {
     handlePrevPage: vi.fn(),
   };
 
+  const mockBlacklistData = {
+    employees: [],
+    pagination: { totalPages: 1, total: 0 },
+    loading: false,
+    error: null,
+    searchQuery: "",
+    setSearchQuery: vi.fn(),
+    isBlacklistedFilter: undefined,
+    setIsBlacklistedFilter: vi.fn(),
+    page: 1,
+    handleNextPage: vi.fn(),
+    handlePrevPage: vi.fn(),
+    refresh: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     useEmployees.mockReturnValue(mockData);
+    useGetBlacklist.mockReturnValue(mockBlacklistData);
   });
 
   const renderComponent = () =>
@@ -103,5 +127,12 @@ describe("Integración: Componente Personal", () => {
 
     expect(screen.getByText(/cargando empleados/i)).toBeInTheDocument();
     expect(screen.queryByText(/página 1 de 3/i)).not.toBeInTheDocument();
+  });
+
+  it("debe cambiar a modo lista negra y mostrar el banner al hacer clic en 'Lista Negra'", async () => {
+    renderComponent();
+    const btnListaNegra = screen.getAllByRole("button", { name: /lista negra/i })[0];
+    fireEvent.click(btnListaNegra);
+    expect(await screen.findByText(/Estás en modo de lista negra/i)).toBeInTheDocument();
   });
 });
