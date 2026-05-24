@@ -12,7 +12,6 @@ const VacationDetail = ({
     vacationRemainingInfo = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
-    onClose,
     onEdit,
     onCancelEdit,
     onSubmitEdit,
@@ -27,6 +26,10 @@ const VacationDetail = ({
     const isPending = status === 0;
     const isApproved = status === 1;
     const isRejected = status === 2;
+
+    const canDelete = !isApproved || !isPast;
+    const canEdit = !isPast && !isRejected;
+    const canReview = !isPast && isPending;
 
     const title = isPending
         ? "Solicitud de Vacaciones"
@@ -188,6 +191,7 @@ const VacationDetail = ({
             >
                 {title}
             </Type>
+
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
                     <Type
@@ -196,13 +200,11 @@ const VacationDetail = ({
                     >
                         Nombre del trabajador
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
                         {event.employeeName || "—"}
                     </Type>
                 </div>
+
                 <div>
                     <Type
                         variant="metric-label"
@@ -217,6 +219,7 @@ const VacationDetail = ({
                         {event.curp || "—"}
                     </Type>
                 </div>
+
                 <div>
                     <Type
                         variant="metric-label"
@@ -224,13 +227,11 @@ const VacationDetail = ({
                     >
                         Fecha de inicio:
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
                         {formatEventDate(event.readableStart || event.startDate || event.start)}
                     </Type>
                 </div>
+
                 <div>
                     <Type
                         variant="metric-label"
@@ -238,13 +239,11 @@ const VacationDetail = ({
                     >
                         Fecha de fin:
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
                         {formatEventDate(event.readableEnd || event.endDate || event.end)}
                     </Type>
                 </div>
+
                 <div>
                     <Type
                         variant="metric-label"
@@ -252,13 +251,13 @@ const VacationDetail = ({
                     >
                         Días totales:
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
-                        {event.totalDays === "" || event.totalDays == null ? "-" : event.totalDays}
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                        {event.totalDays === "" || event.totalDays == null
+                            ? "-"
+                            : event.totalDays}
                     </Type>
                 </div>
+
                 <div>
                     <Type
                         variant="metric-label"
@@ -266,13 +265,13 @@ const VacationDetail = ({
                     >
                         Días hábiles:
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
-                        {event.usedDays === "" || event.usedDays == null ? "-" : event.usedDays}
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                        {event.usedDays === "" || event.usedDays == null
+                            ? "-"
+                            : event.usedDays}
                     </Type>
                 </div>
+
                 <div className="sm:col-span-2">
                     <Type
                         variant="metric-label"
@@ -280,13 +279,11 @@ const VacationDetail = ({
                     >
                         Estado:
                     </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
+                    <Type variant="body" className="text-[1.05rem] leading-snug">
                         {statusLabel}
                     </Type>
                 </div>
+
                 {shouldShowFeedback ? (
                     <div className="sm:col-span-2">
                         <Type
@@ -295,55 +292,44 @@ const VacationDetail = ({
                         >
                             Retroalimentación:
                         </Type>
-                        <Type
-                            variant="body"
-                            className="text-[1.05rem] leading-snug"
-                        >
+                        <Type variant="body" className="text-[1.05rem] leading-snug">
                             {feedback}
                         </Type>
                     </div>
                 ) : null}
             </div>
 
-            {isPast ? (
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                    <Button
-                        type="button"
-                        text="Cerrar"
-                        width="w-full sm:w-[7.2rem]"
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#1F3664]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                        onClick={onClose}
-                    />
-                </div>
-            ) : null}
-
-            {!isPast ? (
+            {canDelete || canEdit ? (
                 <div className="mt-6 flex flex-row items-center gap-3 sm:justify-center sm:gap-8">
-                    <Button
-                        type="button"
-                        text="Eliminar"
-                        width={isRejected ? "w-full sm:w-[7.2rem]" : "w-1/2 sm:w-[7.2rem]"}
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#A20000]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#870000]"
-                        activeColor="active:bg-[#6B0000]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
-                        onClick={onDelete}
-                    />
+                    {canDelete ? (
+                        <Button
+                            type="button"
+                            text="Eliminar"
+                            width={
+                                canEdit
+                                    ? "w-1/2 sm:w-[7.2rem]"
+                                    : "w-full sm:w-[7.2rem]"
+                            }
+                            height="h-8"
+                            textSize="text-[0.95rem]"
+                            bgColor="bg-[#A20000]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#870000]"
+                            activeColor="active:bg-[#6B0000]"
+                            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+                            onClick={onDelete}
+                        />
+                    ) : null}
 
-                    {!isRejected ? (
+                    {canEdit ? (
                         <Button
                             type="button"
                             text="Editar"
-                            width="w-1/2 sm:w-[7.2rem]"
+                            width={
+                                canDelete
+                                    ? "w-1/2 sm:w-[7.2rem]"
+                                    : "w-full sm:w-[7.2rem]"
+                            }
                             height="h-8"
                             textSize="text-[0.95rem]"
                             bgColor="bg-[#1F3664]"
@@ -357,7 +343,7 @@ const VacationDetail = ({
                 </div>
             ) : null}
 
-            {!isPast && event.status == 0 ? (
+            {canReview ? (
                 <div>
                     <div className="mt-4 border border-b border-[#EAEAEA]"></div>
 
