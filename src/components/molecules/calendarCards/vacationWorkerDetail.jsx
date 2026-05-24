@@ -1,18 +1,51 @@
 import Button from "../../atoms/button";
-import DateField from "../../atoms/dateField";
-import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
+import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
 
 const VacationWorkerDetail = ({
     event,
+    isEditing = false,
+    vacationForm,
+    vacationEditError = "",
+    vacationRemainingInfo = null,
+    isLoadingVacationRemaining = false,
+    isSaving = false,
     onClose,
     onEdit,
+    onCancelEdit,
+    onSubmitEdit,
+    onVacationFieldChange,
     onDelete,
 }) => {
     const isPast = isPastDate(event.start);
+    const status = Number(event.status);
+    const isApproved = status === 1;
+    const isRejected = status === 2;
+
+    const title =
+        isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
+    const statusLabel =
+        isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+
+    if (isEditing) {
+        return (
+            <VacationEditForm
+                title={title}
+                event={event}
+                vacationForm={vacationForm}
+                vacationEditError={vacationEditError}
+                vacationRemainingInfo={vacationRemainingInfo}
+                isLoadingVacationRemaining={isLoadingVacationRemaining}
+                isSaving={isSaving}
+                onCancelEdit={onCancelEdit}
+                onSubmitEdit={onSubmitEdit}
+                onVacationFieldChange={onVacationFieldChange}
+                showEmployeeInfo={false}
+            />
+        );
+    }
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -21,7 +54,7 @@ const VacationWorkerDetail = ({
                 className="mb-5 text-[2rem] leading-none"
                 as="h2"
             >
-                Solicitud de Vacaciones
+                {title}
             </Type>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
@@ -91,7 +124,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.status == 1 ? "Aceptado" : "Pendiente"}
+                        {statusLabel}
                     </Type>
                 </div>
                 <div className="sm:col-span-2">
@@ -143,7 +176,7 @@ const VacationWorkerDetail = ({
                         className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
                         onClick={onDelete}
                     />
-                    {event.status == 0 ? (
+                    {status === 0 ? (
                         <Button
                             type="button"
                             text="Editar"
