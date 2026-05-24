@@ -1,6 +1,6 @@
 import EmployeeRow from "./employeeRow";
 
-const EmployeeTable = ({ employees, loading, error, isBlacklistMode = false, onAddToBlacklist }) => {
+const EmployeeTable = ({ employees, loading, error, isBlacklistMode = false, onAddToBlacklist, onRemoveFromBlacklist }) => {
   if (loading) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
@@ -58,6 +58,7 @@ const EmployeeTable = ({ employees, loading, error, isBlacklistMode = false, onA
               employee={employee}
               isBlacklistMode={isBlacklistMode}
               onAddToBlacklist={onAddToBlacklist}
+              onRemoveFromBlacklist={onRemoveFromBlacklist}
             />
           ))}
         </tbody>

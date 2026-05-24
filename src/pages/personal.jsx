@@ -5,10 +5,11 @@ import EmployeeFilters from "../components/molecules/employeeFilters";
 import EmployeeTable from "../components/molecules/employeeTable";
 import Pagination from "../components/molecules/pagination";
 import BlacklistModal from "../components/molecules/blacklistModal";
+import RemoveFromBlacklistModal from "../components/molecules/removeFromBlacklistModal";
 import Alert from "../components/atoms/alerts";
 import { useEmployees } from "../hooks/pages/useGetAllEmployees";
 import { useGetBlacklist } from "../hooks/pages/useGetBlacklist";
-import { addToBlacklist } from "../services/blacklistService";
+import { addToBlacklist, removeFromBlacklist } from "../services/blacklistService";
 import warningSvg from "/error.svg";
 
 const BlacklistBanner = ({ className = "", iconSize = "w-5 h-5", textSize = "", padding = "p-4" }) => (
@@ -23,8 +24,10 @@ const BlacklistBanner = ({ className = "", iconSize = "w-5 h-5", textSize = "", 
 const Personal = () => {
     const navigate = useNavigate();
     const [isBlacklistMode, setIsBlacklistMode] = useState(false);
+
     const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [alert, setAlert] = useState(null);
 
@@ -71,15 +74,25 @@ const Personal = () => {
 
     const handleAddToBlacklist = (employee) => {
         setSelectedEmployee(employee);
-        setIsModalOpen(true);
+        setIsAddModalOpen(true);
     };
 
-    const handleModalCancel = () => {
-        setIsModalOpen(false);
+    const handleRemoveFromBlacklist = (employee) => {
+        setSelectedEmployee(employee);
+        setIsRemoveModalOpen(true);
+    };
+
+    const handleAddModalCancel = () => {
+        setIsAddModalOpen(false);
         setSelectedEmployee(null);
     };
 
-    const handleModalConfirm = async (reason) => {
+    const handleRemoveModalCancel = () => {
+        setIsRemoveModalOpen(false);
+        setSelectedEmployee(null);
+    };
+
+    const handleAddModalConfirm = async (reason) => {
         if (!selectedEmployee) return;
         setIsSubmitting(true);
 
@@ -91,7 +104,7 @@ const Personal = () => {
                 showAlert("success", "Empleado agregado a la lista negra correctamente.");
             }
             refreshBlacklist();
-            setIsModalOpen(false);
+            setIsAddModalOpen(false);
             setSelectedEmployee(null);
         } catch (err) {
             const status = err.status;
@@ -106,7 +119,41 @@ const Personal = () => {
             } else {
                 showAlert("error", "Ocurrió un error interno. Intenta de nuevo más tarde.");
             }
-            setIsModalOpen(false);
+            setIsAddModalOpen(false);
+            setSelectedEmployee(null);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleRemoveModalConfirm = async (reason) => {
+        if (!selectedEmployee) return;
+        setIsSubmitting(true);
+
+        try {
+            const data = await removeFromBlacklist(selectedEmployee.curp, reason);
+            if (data.message?.toLowerCase().includes("falló")) {
+                showAlert("warning", "Empleado eliminado de la lista negra, pero falló el registro de auditoría.");
+            } else {
+                showAlert("success", "Empleado eliminado de la lista negra correctamente.");
+            }
+            refreshBlacklist();
+            setIsRemoveModalOpen(false);
+            setSelectedEmployee(null);
+        } catch (err) {
+            const status = err.status;
+            if (status === 400) {
+                showAlert("error", "Datos inválidos. Verifica el formato de la CURP o la razón ingresada.");
+            } else if (status === 403) {
+                showAlert("error", err.message || "No tienes permisos para realizar esta acción.");
+            } else if (status === 404) {
+                showAlert("error", "Empleado no encontrado.");
+            } else if (status === 409) {
+                showAlert("error", "El empleado no se encuentra en la lista negra.");
+            } else {
+                showAlert("error", "Ocurrió un error interno. Intenta de nuevo más tarde.");
+            }
+            setIsRemoveModalOpen(false);
             setSelectedEmployee(null);
         } finally {
             setIsSubmitting(false);
@@ -184,6 +231,7 @@ const Personal = () => {
                     error={activeError}
                     isBlacklistMode={isBlacklistMode}
                     onAddToBlacklist={handleAddToBlacklist}
+                    onRemoveFromBlacklist={handleRemoveFromBlacklist}
                 />
             </div>
 
@@ -198,10 +246,18 @@ const Personal = () => {
             />
 
             <BlacklistModal
-                isOpen={isModalOpen}
+                isOpen={isAddModalOpen}
                 employeeName={selectedEmployee?.fullName ?? ""}
-                onConfirm={handleModalConfirm}
-                onCancel={handleModalCancel}
+                onConfirm={handleAddModalConfirm}
+                onCancel={handleAddModalCancel}
+                isSubmitting={isSubmitting}
+            />
+
+            <RemoveFromBlacklistModal
+                isOpen={isRemoveModalOpen}
+                employeeName={selectedEmployee?.fullName ?? ""}
+                onConfirm={handleRemoveModalConfirm}
+                onCancel={handleRemoveModalCancel}
                 isSubmitting={isSubmitting}
             />
         </div>

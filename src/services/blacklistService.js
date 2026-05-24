@@ -56,3 +56,26 @@ export const addToBlacklist = async (curp, reason) => {
 
   return data;
 };
+
+export const removeFromBlacklist = async (curp, reason) => {
+  const token = getToken();
+
+  const res = await fetch(`${API_URL}/blacklist/delete`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ curp, reason }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const error = new Error(data.message || "Error al eliminar de la lista negra");
+    error.status = res.status;
+    throw error;
+  }
+
+  return data;
+};

@@ -5,8 +5,7 @@ import showEyeIcon from "/showEye.svg";
 import checkMarkIcon from "/add.svg";
 import crossMarkIcon from "/close.svg";
 
-
-const EmployeeRow = ({ employee, isBlacklistMode = false, onAddToBlacklist }) => {
+const EmployeeRow = ({ employee, isBlacklistMode = false, onAddToBlacklist, onRemoveFromBlacklist }) => {
   const navigate = useNavigate();
 
   return (
@@ -42,16 +41,14 @@ const EmployeeRow = ({ employee, isBlacklistMode = false, onAddToBlacklist }) =>
         <div className="flex items-center justify-center h-full">
           {isBlacklistMode ? (
             employee.isBlacklisted ? (
-              <span
-                className="text-gray-400 flex items-center justify-center p-2"
-                title="Ya está en lista negra"
+              <button
+                onClick={() => onRemoveFromBlacklist(employee)}
+                className="text-gray-500 hover:text-[#9b1c1c] transition-colors flex items-center justify-center p-2 rounded-lg hover:bg-red-50"
+                aria-label="Eliminar de lista negra"
+                title="Eliminar de lista negra"
               >
-                <img
-                  src={crossMarkIcon}
-                  alt="En lista negra"
-                  className="w-6 h-6"
-                />
-              </span>
+                <img src={crossMarkIcon} alt="Eliminar de lista negra" className="w-6 h-6" />
+              </button>
             ) : (
               <button
                 onClick={() => onAddToBlacklist(employee)}
@@ -59,11 +56,7 @@ const EmployeeRow = ({ employee, isBlacklistMode = false, onAddToBlacklist }) =>
                 aria-label="Agregar a lista negra"
                 title="Agregar a lista negra"
               >
-                <img
-                  src= {checkMarkIcon}
-                  alt="Agregar"
-                  className="w-6 h-6"
-                />
+                <img src={checkMarkIcon} alt="Agregar" className="w-6 h-6" />
               </button>
             )
           ) : (
