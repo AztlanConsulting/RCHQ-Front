@@ -1,32 +1,18 @@
-import { useState } from "react";
 import Modal from "../atoms/modal";
+import Button from "../atoms/button";
+import useBlacklistModal from "../../hooks/molecules/useBlacklistModal";
 import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/blacklist/create.schema";
 
 const MAX_CHARS = 250;
 
 const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmitting }) => {
-  const [reason, setReason] = useState("");
-  const [fieldError, setFieldError] = useState(null);
-
-  const handleReasonChange = (e) => {
-    const sanitized = e.target.value.replace(INVALID_REASON_CHARS_REGEX, "");
-    setReason(sanitized);
-    if (fieldError) setFieldError(null);
-  };
-
-  const handleConfirm = () => {
-    if (!reason.trim()) {
-      setFieldError("La razón es obligatoria");
-      return;
-    }
-    onConfirm(reason.trim());
-  };
-
-  const handleCancel = () => {
-    setReason("");
-    setFieldError(null);
-    onCancel();
-  };
+  const {
+    reason,
+    fieldError,
+    handleReasonChange,
+    handleConfirm,
+    handleCancel,
+  } = useBlacklistModal({ onConfirm, onCancel, invalidCharsRegex: INVALID_REASON_CHARS_REGEX, isOpen });
 
   return (
     <Modal
@@ -75,22 +61,34 @@ const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmittin
         </div>
 
         <div className="flex gap-3">
-          <button
-            type="button"
+          <Button
+            text={isSubmitting ? "Procesando..." : "Aceptar"}
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="flex-1 rounded-lg bg-[#9b1c1c] py-2.5 text-sm font-semibold text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Procesando..." : "Aceptar"}
-          </button>
-          <button
-            type="button"
+            bgColor="bg-[#9b1c1c]"
+            hoverColor="hover:bg-[#7a1616]"
+            activeColor="active:bg-[#5c1010]"
+            textColor="text-white"
+            width="w-full"
+            height="h-auto"
+            textSize="text-sm"
+            fontWeight="font-semibold"
+            className="flex-1 py-2.5"
+          />
+          <Button
+            text="Cancelar"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="flex-1 rounded-lg border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </button>
+            bgColor="bg-white"
+            hoverColor="hover:bg-gray-50"
+            activeColor="active:bg-gray-100"
+            textColor="text-gray-700"
+            width="w-full"
+            height="h-auto"
+            textSize="text-sm"
+            fontWeight="font-semibold"
+            className="flex-1 py-2.5 border border-gray-300"
+          />
         </div>
       </div>
     </Modal>
