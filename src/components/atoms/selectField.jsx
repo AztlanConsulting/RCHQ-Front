@@ -34,7 +34,7 @@ const SelectField = ({
           }
           disabled={disabled}
           className="h-full w-full cursor-pointer appearance-none rounded-lg border-0 bg-transparent py-0 pl-[19px] pr-10 text-base font-medium outline-none disabled:cursor-not-allowed disabled:opacity-60"
-          style={{ color: value ? "#121212" : "#aaaaaa" }}
+          style={{ color: value !== "" ? "#121212" : "#aaaaaa" }}
         >
           <option value="" disabled hidden>
             {placeholder}

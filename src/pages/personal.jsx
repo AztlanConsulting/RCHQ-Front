@@ -9,6 +9,16 @@ import Alert from "../components/atoms/alerts";
 import { useEmployees } from "../hooks/pages/useGetAllEmployees";
 import { useGetBlacklist } from "../hooks/pages/useGetBlacklist";
 import { addToBlacklist } from "../services/blacklistService";
+import warningSvg from "/error.svg";
+
+const BlacklistBanner = ({ className = "", iconSize = "w-5 h-5", textSize = "", padding = "p-4" }) => (
+    <div className={`flex w-full items-center gap-3 bg-yellow-400 text-black rounded-lg shadow-md ${padding} ${className}`}>
+        <img src={warningSvg} className={`${iconSize} shrink-0`} alt="warning" />
+        <span className={`flex-1 whitespace-pre-line ${textSize}`}>
+            Estás en modo de lista negra
+        </span>
+    </div>
+);
 
 const Personal = () => {
     const navigate = useNavigate();
@@ -17,6 +27,7 @@ const Personal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [alert, setAlert] = useState(null);
+
     const {
         employees,
         pagination,
@@ -38,6 +49,8 @@ const Personal = () => {
         error: blacklistError,
         searchQuery: blacklistSearchQuery,
         setSearchQuery: setBlacklistSearchQuery,
+        isBlacklistedFilter,
+        setIsBlacklistedFilter,
         page: blacklistPage,
         handleNextPage: blacklistNextPage,
         handlePrevPage: blacklistPrevPage,
@@ -50,7 +63,10 @@ const Personal = () => {
 
     const handleToggleBlacklistMode = () => {
         setAlert(null);
-        setIsBlacklistMode((prev) => !prev);
+        setIsBlacklistMode((prev) => {
+            if (!prev) refreshBlacklist();
+            return !prev;
+        });
     };
 
     const handleAddToBlacklist = (employee) => {
@@ -74,13 +90,11 @@ const Personal = () => {
             } else {
                 showAlert("success", "Empleado agregado a la lista negra correctamente.");
             }
-
             refreshBlacklist();
             setIsModalOpen(false);
             setSelectedEmployee(null);
         } catch (err) {
             const status = err.status;
-
             if (status === 400) {
                 showAlert("error", "Datos inválidos. Verifica el formato de la CURP o la razón ingresada.");
             } else if (status === 403) {
@@ -92,13 +106,13 @@ const Personal = () => {
             } else {
                 showAlert("error", "Ocurrió un error interno. Intenta de nuevo más tarde.");
             }
-
             setIsModalOpen(false);
             setSelectedEmployee(null);
         } finally {
             setIsSubmitting(false);
         }
     };
+
     const activeEmployees = isBlacklistMode ? blacklistEmployees : employees;
     const activePagination = isBlacklistMode ? blacklistPagination : pagination;
     const activeLoading = isBlacklistMode ? blacklistLoading : loading;
@@ -110,20 +124,30 @@ const Personal = () => {
     const activeSetSearchQuery = isBlacklistMode ? setBlacklistSearchQuery : setSearchQuery;
 
     return (
-        <div className="p-8 md:flex md:flex-col md:h-full">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="font-bold text-4xl text-[#121212]">Usuarios</h1>
-                <Button
-                    text="Añadir"
-                    onClick={() => navigate("/app/personal/nuevo")}
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    width="w-auto"
-                    className="px-6"
-                />
+        <div className="p-4 md:p-8 md:flex md:flex-col md:h-full">
+            <div className="flex items-center justify-between mb-4 md:mb-8">
+                <h1 className="font-bold text-3xl md:text-4xl text-[#121212]">Usuarios</h1>
+                {!isBlacklistMode && (
+                    <Button
+                        text="Añadir"
+                        onClick={() => navigate("/app/personal/nuevo")}
+                        bgColor="bg-[#24375e]"
+                        hoverColor="hover:bg-[#162d4a]"
+                        activeColor="active:bg-[#0f2035]"
+                        textColor="text-white"
+                        width="w-auto"
+                        className="px-6"
+                    />
+                )}
             </div>
+
+            {isBlacklistMode && (
+                <BlacklistBanner
+                    className="flex md:hidden mb-4"
+                    iconSize="w-4 h-4"
+                    textSize="text-xs"
+                />
+            )}
 
             <EmployeeFilters
                 searchQuery={activeSearchQuery}
@@ -132,35 +156,22 @@ const Personal = () => {
                 setActiveFilter={setActiveFilter}
                 isBlacklistMode={isBlacklistMode}
                 onToggleBlacklistMode={handleToggleBlacklistMode}
+                isBlacklistedFilter={isBlacklistedFilter}
+                setIsBlacklistedFilter={setIsBlacklistedFilter}
             />
 
             {isBlacklistMode && (
-                <div className="flex items-center gap-3 bg-[#F5A623] rounded-lg px-5 py-3 mb-4">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-5 h-5 text-white shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-                        />
-                    </svg>
-                    <span className="font-semibold text-white text-sm">
-                        Estás en modo de lista negra
-                    </span>
-                </div>
+                <BlacklistBanner
+                    className="hidden md:flex mb-2"
+                />
             )}
 
             {alert && (
-                <div className="mb-4">
+                <div className="mb-2">
                     <Alert
                         type={alert.type}
                         message={alert.message}
+                        icon={warningSvg}
                         onClose={() => setAlert(null)}
                     />
                 </div>

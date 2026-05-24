@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "../atoms/modal";
+import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/blacklist/create.schema";
 
 const MAX_CHARS = 250;
 
@@ -8,17 +9,14 @@ const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmittin
   const [fieldError, setFieldError] = useState(null);
 
   const handleReasonChange = (e) => {
-    setReason(e.target.value);
+    const sanitized = e.target.value.replace(INVALID_REASON_CHARS_REGEX, "");
+    setReason(sanitized);
     if (fieldError) setFieldError(null);
   };
 
   const handleConfirm = () => {
     if (!reason.trim()) {
       setFieldError("La razón es obligatoria");
-      return;
-    }
-    if (reason.trim().length > MAX_CHARS) {
-      setFieldError(`Máximo ${MAX_CHARS} caracteres`);
       return;
     }
     onConfirm(reason.trim());

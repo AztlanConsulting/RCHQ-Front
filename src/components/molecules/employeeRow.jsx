@@ -30,7 +30,11 @@ const EmployeeRow = ({ employee, isBlacklistMode = false, onAddToBlacklist }) =>
 
       <td className="px-6 py-4 text-center">
         <div className="flex justify-center">
-          <StatusBadge isActive={employee.status} />
+          <StatusBadge isActive={
+            typeof employee.status === "string"
+              ? employee.status === "Activo"
+              : employee.status
+          } />
         </div>
       </td>
 
