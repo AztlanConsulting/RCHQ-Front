@@ -59,7 +59,7 @@ describe("Integración: Componente Personal", () => {
 
     expect(screen.getByText("Usuarios")).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText(/ingresa nombre o apellido/i),
+      screen.getAllByPlaceholderText(/ingresa nombre o apellido/i)[0],
     ).toBeInTheDocument();
     expect(screen.getByText("Juan Perez")).toBeInTheDocument();
     expect(screen.getByText(/página 1 de 3/i)).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe("Integración: Componente Personal", () => {
 
   it("debe conectar el cambio de búsqueda con la función del hook", () => {
     renderComponent();
-    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
+    const input = screen.getAllByPlaceholderText(/ingresa nombre o apellido/i)[0];
 
     fireEvent.change(input, { target: { value: "Carlos" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });

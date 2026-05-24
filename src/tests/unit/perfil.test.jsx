@@ -10,6 +10,10 @@ vi.mock("../../../src/utils/authStorage", () => ({
   getToken: vi.fn().mockReturnValue("mock-token"),
 }));
 
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 import Perfil from "../../../src/pages/perfil";
 import { getUserData } from "../../../src/services/profileService";
 

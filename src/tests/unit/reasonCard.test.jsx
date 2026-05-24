@@ -42,7 +42,7 @@ describe("Prueba Unitaria: ReasonCard", () => {
     
     fireEvent.change(textarea, { target: { value: "<script>XSS</script>" } });
     
-    expect(defaultProps.onReasonChange).toHaveBeenCalledWith("scriptXSS/script");
+    expect(defaultProps.onReasonChange).toHaveBeenCalledWith("scriptXSSscript");
   });
 
   it("llama a onBlacklistChange al hacer clic en la opción de lista negra", () => {

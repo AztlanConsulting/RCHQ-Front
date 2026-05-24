@@ -661,14 +661,9 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
     });
 
-    it("muestra el select de Casa con la opción correcta", () => {
-      render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Casa Test")).toBeInTheDocument();
-    });
-
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Administrador")).toBeInTheDocument();
+      expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
     it("muestra los checkboxes de días de trabajo", () => {

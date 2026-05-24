@@ -127,16 +127,18 @@ const makeToken = (role = "Administrador") => {
   return `header.${payload}.signature`;
 };
 
-const renderPage = () => {
+const renderPage = async () => {
   localStorage.setItem("token", makeToken("Administrador"));
   
-  return render(
-    <MemoryRouter initialEntries={[`/app/personal/${TEST_EMPLOYEE_ID}`]}>
-      <Routes>
-        <Route path="/app/personal/:employeeId" element={<DetalleEmpleado />} />
-      </Routes>
-    </MemoryRouter>,
-  );
+  await act(async () => {
+    render(
+      <MemoryRouter initialEntries={[`/app/personal/${TEST_EMPLOYEE_ID}`]}>
+        <Routes>
+          <Route path="/app/personal/:employeeId" element={<DetalleEmpleado />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+  });
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -167,28 +169,28 @@ beforeEach(() => {
 
 describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el nombre del empleado", async () => {
-    renderPage();
+    await renderPage();
     await waitFor(() => {
       expect(screen.getByText("Carlos Ramírez")).toBeInTheDocument();
     });
   });
 
   it("muestra el título de la página", async () => {
-    renderPage();
+    await renderPage();
     await waitFor(() => {
       expect(screen.getByText("Gestión de Empleados")).toBeInTheDocument();
     });
   });
 
   it("muestra el tab Overview por defecto", async () => {
-    renderPage();
+    await renderPage();
     await waitFor(() => {
       expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
     });
   });
 
   it("muestra las tarjetas de Contacto e Info Administrativa en el tab Overview", async () => {
-    renderPage();
+    await renderPage();
     await waitFor(() => {
       expect(screen.getByText("Contacto")).toBeInTheDocument();
       expect(screen.getByText("Información Administrativa")).toBeInTheDocument();
@@ -196,16 +198,16 @@ describe("DetalleEmpleado — renderizado base", () => {
   });
 
   it("muestra el botón de regreso a personal", async () => {
-    renderPage();
+    await renderPage();
     await waitFor(() => {
       const buttons = screen.getAllByRole("button");
       expect(buttons.length).toBeGreaterThan(0);
     });
   });
 
-  it("muestra loader cuando isLoading=true", () => {
+  it("muestra loader cuando isLoading=true", async () => {
     setupEmployeeDetail({ isLoading: true });
-    renderPage();
+    await renderPage();
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 });
@@ -216,7 +218,7 @@ describe("DetalleEmpleado — renderizado base", () => {
 
 describe("DetalleEmpleado — editar información básica", () => {
   it("abre el formulario de edición al hacer click en el lápiz de básica", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => {
       expect(screen.getByDisplayValue("Carlos")).toBeInTheDocument();
@@ -224,7 +226,7 @@ describe("DetalleEmpleado — editar información básica", () => {
   });
 
   it("muestra botones Guardar y Cancelar al editar básica", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => {
       expect(screen.getByText("Guardar")).toBeInTheDocument();
@@ -233,7 +235,7 @@ describe("DetalleEmpleado — editar información básica", () => {
   });
 
   it("cancela la edición básica y oculta el formulario", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
@@ -243,7 +245,7 @@ describe("DetalleEmpleado — editar información básica", () => {
   });
 
   it("llama a updateBasicInfoService al guardar cambios básicos", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -263,7 +265,7 @@ describe("DetalleEmpleado — editar información básica", () => {
     const mockSetAlert = vi.fn();
     setupEmployeeDetail({ setAlert: mockSetAlert });
 
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -283,7 +285,7 @@ describe("DetalleEmpleado — editar información básica", () => {
     updateBasicInfoService.mockRejectedValue(
       Object.assign(new Error("Datos inválidos"), { status: 400 }),
     );
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -303,7 +305,7 @@ describe("DetalleEmpleado — editar información básica", () => {
 
 describe("DetalleEmpleado — editar información de contacto", () => {
   it("abre el formulario de edición de contacto", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => {
       expect(screen.getByDisplayValue("carlos@mail.com")).toBeInTheDocument();
@@ -311,7 +313,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
   });
 
   it("cancela la edición de contacto", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
@@ -321,7 +323,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
   });
 
   it("llama a updateContactInfoService al guardar contacto", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -344,7 +346,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     const mockSetAlert = vi.fn();
     setupEmployeeDetail({ setAlert: mockSetAlert });
 
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -364,7 +366,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     updateContactInfoService.mockRejectedValue(
       Object.assign(new Error("Email inválido"), { status: 400 }),
     );
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 
@@ -384,7 +386,7 @@ describe("DetalleEmpleado — editar información de contacto", () => {
 
 describe("DetalleEmpleado — editar información administrativa", () => {
   it("abre el formulario de edición administrativa", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => {
       expect(screen.getByText("Guardar")).toBeInTheDocument();
@@ -393,7 +395,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("carga los catálogos de roles y casas al abrir edición admin", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => {
       expect(getUpdateFormService).toHaveBeenCalledTimes(1);
@@ -401,7 +403,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("muestra las opciones de roles después de cargar catálogos", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     await waitFor(() => {
@@ -414,7 +416,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("cancela la edición administrativa", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
     await waitFor(() => expect(screen.getByText("Cancelar")).toBeInTheDocument());
     fireEvent.click(screen.getByText("Cancelar"));
@@ -424,7 +426,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
   });
 
   it("llama a updateAdminInfoService al guardar admin", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     const saveBtn = await screen.findByRole("button", { name: /guardar/i });
@@ -449,7 +451,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     const mockSetAlert = vi.fn();
     setupEmployeeDetail({ setAlert: mockSetAlert });
 
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
@@ -474,7 +476,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     updateAdminInfoService.mockRejectedValueOnce(
       Object.assign(new Error("Salario inválido"), { status: 400 }),
     );
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     const saveBtn = screen.getByRole("button", { name: /guardar/i });
@@ -496,7 +498,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
         setTimeout(() => resolve({ roles: [], houses: [], workdays: [] }), 500)
       ),
     );
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
 
     const saveBtn = screen.getByText("Guardar").closest("button");
@@ -510,7 +512,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
 
 describe("DetalleEmpleado — aislamiento de edición", () => {
   it("al abrir básica, no muestra formulario de contacto", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByDisplayValue("Carlos")).toBeInTheDocument());
 
@@ -518,7 +520,7 @@ describe("DetalleEmpleado — aislamiento de edición", () => {
   });
 
   it("al abrir contacto, no muestra formulario básico", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar contacto"));
     await waitFor(() =>
       expect(screen.getByDisplayValue("carlos@mail.com")).toBeInTheDocument()
@@ -528,7 +530,7 @@ describe("DetalleEmpleado — aislamiento de edición", () => {
   });
 
   it("solo hay un par Guardar/Cancelar activo a la vez", async () => {
-    renderPage();
+    await renderPage();
     fireEvent.click(await screen.findByLabelText("Editar información básica"));
     await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
 

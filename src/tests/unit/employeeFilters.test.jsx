@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EmployeeFilters from "../../components/molecules/employeeFilters";
 
@@ -20,7 +20,7 @@ describe("EmployeeFilters Component", () => {
   it("debe llamar a setSearchQuery automáticamente cada 3 caracteres", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
-    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre o apellido/i)[0];
 
     fireEvent.change(input, { target: { value: "Ju" } });
     expect(mockSetSearchQuery).not.toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("EmployeeFilters Component", () => {
   it("debe conservar la búsqueda con Enter", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
-    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre o apellido/i)[0];
 
     fireEvent.change(input, { target: { value: "Juan" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
@@ -50,7 +50,7 @@ describe("EmployeeFilters Component", () => {
   it("debe llamar a setActiveFilter cuando se cambia la opción del select", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
-    const select = screen.getByRole("combobox");
+    const select = screen.getAllByRole("combobox")[0];
 
     fireEvent.change(select, { target: { value: "false" } });
 
@@ -66,8 +66,8 @@ describe("EmployeeFilters Component", () => {
 
     render(<EmployeeFilters {...propsConValores} />);
 
-    const input = screen.getByPlaceholderText(/ingresa nombre o apellido/i);
-    const select = screen.getByRole("combobox");
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre o apellido/i)[0];
+    const select = screen.getAllByRole("combobox")[0];
 
     expect(input.value).toBe("Admin");
     expect(select.value).toBe("false");
@@ -76,10 +76,12 @@ describe("EmployeeFilters Component", () => {
   it("debe renderizar todas las opciones del select correctamente", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
-    const options = screen.getAllByRole("option");
+    const select = screen.getAllByRole("combobox")[0];
+    // Buscamos las opciones solo dentro de ese select e incluimos el placeholder oculto
+    const options = within(select).getAllByRole("option", { hidden: true });
 
-    expect(options).toHaveLength(2);
-    expect(options[0]).toHaveTextContent("Activos");
-    expect(options[1]).toHaveTextContent("Inactivos");
+    expect(options).toHaveLength(3); // (1 placeholder + 2 opciones)
+    expect(options[1]).toHaveTextContent("Activos");
+    expect(options[2]).toHaveTextContent("Inactivos");
   });
 });

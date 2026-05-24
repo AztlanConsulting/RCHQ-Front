@@ -103,23 +103,25 @@ const apiError = (message, status) => {
     return error;
 };
 
-const renderModal = (props = {}) => {
+const renderModal = async (props = {}) => {
     const onClose = vi.fn();
     const onSuccess = vi.fn();
     const onFeedback = vi.fn();
     const dates = getValidDates();
 
-    render(
-        <RegisterEventModal
-            isOpen
-            onClose={onClose}
-            onSuccess={onSuccess}
-            onFeedback={onFeedback}
-            initialStartDate={dates.startDate}
-            initialEndDate={dates.endDate}
-            {...props}
-        />,
-    );
+    await act(async () => {
+        render(
+            <RegisterEventModal
+                isOpen
+                onClose={onClose}
+                onSuccess={onSuccess}
+                onFeedback={onFeedback}
+                initialStartDate={dates.startDate}
+                initialEndDate={dates.endDate}
+                {...props}
+            />,
+        );
+    });
 
     return {
         onClose,
@@ -182,7 +184,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
     });
 
     it("muestra la opcion de ausencias y carga empleados/tipos para el coordinador", async () => {
-        renderModal();
+        await renderModal();
 
         expect(
             screen.getByRole("radio", { name: "Ausencias" }),
@@ -212,7 +214,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
             absenceTypeId: "type-medica",
         };
         createAbsenceService.mockResolvedValueOnce(absence);
-        const { dates, onClose, onFeedback, onSuccess } = renderModal();
+        const { dates, onClose, onFeedback, onSuccess } = await renderModal();
 
         await openAbsenceForm();
         await fillRequiredAbsenceFields();
@@ -241,7 +243,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
         const evidenceFile = new File(["pdf"], "evidencia.pdf", {
             type: "application/pdf",
         });
-        const { dates } = renderModal();
+        const { dates } = await renderModal();
 
         await openAbsenceForm();
         await fillRequiredAbsenceFields();
@@ -264,7 +266,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
     });
 
     it("muestra Campo obligatorio y no envia si faltan datos", async () => {
-        renderModal({
+        await renderModal({
             initialStartDate: "",
             initialEndDate: "",
         });
@@ -279,7 +281,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
     });
 
     it("muestra error de usuario no encontrado cuando el backend rechaza el empleado", async () => {
-        const { onClose, onSuccess } = renderModal();
+        const { onClose, onSuccess } = await renderModal();
         createAbsenceService.mockRejectedValueOnce(
             apiError("usuario no encontrado", 404),
         );
@@ -296,7 +298,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
     });
 
     it("muestra error de permisos insuficientes si el servicio rechaza la operacion", async () => {
-        const { onClose, onSuccess } = renderModal();
+        const { onClose, onSuccess } = await renderModal();
         createAbsenceService.mockRejectedValueOnce(
             apiError("Permisos insuficientes", 403),
         );
@@ -317,7 +319,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
             type: "text/plain",
         });
 
-        renderModal();
+        await renderModal();
 
         await openAbsenceForm();
         await fillRequiredAbsenceFields();
@@ -332,10 +334,10 @@ describe("Integracion: coordinador registra una ausencia", () => {
         expect(createAbsenceService).not.toHaveBeenCalled();
     });
 
-    it("oculta la opcion de ausencias para un rol diferente a coordinador o admin", () => {
+    it("oculta la opcion de ausencias para un rol diferente a coordinador o admin", async () => {
         getCalendarViewerRole.mockReturnValue("Trabajador");
 
-        renderModal();
+        await renderModal();
 
         expect(
             screen.queryByRole("radio", { name: "Ausencias" }),

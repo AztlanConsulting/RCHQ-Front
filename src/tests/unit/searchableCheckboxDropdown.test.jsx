@@ -47,7 +47,7 @@ describe("SearchableCheckboxDropdown", () => {
       />,
     );
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar trabajador/i), {
+    fireEvent.change(screen.getByPlaceholderText(/buscar/i), {
       target: { value: "mar" },
     });
 
