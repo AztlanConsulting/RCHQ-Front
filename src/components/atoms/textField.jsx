@@ -17,6 +17,9 @@ const TextField = ({
   inputMode,
   maxLength,
   labelClassName = "text-sm font-bold text-white sm:text-base",
+  wrapperClassName = "",
+  containerClassName = "",
+  inputClassName = "",
 }) => {
   const inputRef = useRef(null);
 
@@ -25,14 +28,14 @@ const TextField = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
       <label htmlFor={htmlFor} className={labelClassName}>
         {text}
       </label>
 
       <div
         onClick={handleContainerClick}
-        className="flex min-h-[50px] w-full cursor-text items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040]"
+        className={`flex min-h-[50px] w-full cursor-text items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${containerClassName}`}
       >
         <input
           ref={inputRef}
@@ -45,7 +48,7 @@ const TextField = ({
           autoComplete={autoComplete}
           inputMode={inputMode}
           maxLength={maxLength}
-          className="h-full w-full flex-1 bg-transparent border-0 outline-none text-sm font-medium text-[#222] placeholder-[#aaaaaa] sm:text-base"
+          className={`h-full w-full flex-1 border-0 bg-transparent text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] sm:text-base ${inputClassName}`}
         />
 
         {iconRight &&

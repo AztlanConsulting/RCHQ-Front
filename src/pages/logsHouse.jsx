@@ -40,8 +40,8 @@ const LogsHouse = () => {
   } = useHouseLogs();
 
   return (
-    <div className="p-8 md:flex md:h-full md:flex-col">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="flex h-full flex-col p-6 md:p-8">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-4xl font-bold text-[#121212]">
             Historial de actividades en Tochan
@@ -60,7 +60,7 @@ const LogsHouse = () => {
         />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <HouseLogsFilters
           responsibleQuery={responsibleQuery}
           setResponsibleQuery={setResponsibleQuery}

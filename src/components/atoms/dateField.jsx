@@ -14,6 +14,10 @@ const DateField = ({
     popupAlign = "left",
     popupSize = "default",
     popupPlacement = "bottom",
+    wrapperClassName = "",
+    inputWrapperClassName = "",
+    inputClassName = "",
+    labelClassName = "",
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
@@ -57,14 +61,14 @@ const DateField = ({
                 : undefined;
 
         return (
-            <div className="date-field-wrapper flex w-full flex-col gap-1.5">
+            <div className={`date-field-wrapper flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
                 <label
-                    className={`text-sm font-bold sm:text-base ${labelColor}`}
+                    className={`text-sm font-bold sm:text-base ${labelColor} ${labelClassName}`}
                 >
                     {label}
                 </label>
 
-                <div className="flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040]">
+                <div className={`flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${inputWrapperClassName}`}>
                     <input
                         type="date"
                         name={name}
@@ -73,7 +77,7 @@ const DateField = ({
                         min={minValue}
                         max={maxValue}
                         onChange={onChange}
-                        className="h-full w-full flex-1 bg-transparent border-0 outline-none text-sm font-medium text-[#222] sm:text-base"
+                        className={`h-full w-full flex-1 border-0 bg-transparent text-sm font-medium text-[#222] outline-none sm:text-base ${inputClassName}`}
                     />
                 </div>
             </div>
@@ -88,8 +92,8 @@ const DateField = ({
             : "!top-10 !bottom-auto pt-2";
 
     return (
-        <div className="date-field-wrapper relative flex w-full flex-col gap-1.5">
-            <label className={`text-sm font-bold sm:text-base ${labelColor}`}>
+        <div className={`date-field-wrapper relative flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
+            <label className={`text-sm font-bold sm:text-base ${labelColor} ${labelClassName}`}>
                 {label}
             </label>
 
@@ -107,10 +111,10 @@ const DateField = ({
                     root: {
                         input: {
                             field: {
-                                base: "flex min-h-[50px] w-full cursor-text items-center rounded-lg bg-neutral-50 shadow-[inset_0px_4px_4px_#00000040] overflow-hidden",
+                                base: `flex min-h-[50px] w-full cursor-text items-center overflow-hidden rounded-lg bg-neutral-50 shadow-[inset_0px_4px_4px_#00000040] ${inputWrapperClassName}`,
 
                                 input: {
-                                    base: "h-full w-full flex-1 bg-transparent border-0 outline-none text-sm font-medium text-[#222] placeholder-[#aaaaaa] sm:text-base focus:ring-0 px-4",
+                                    base: `h-full w-full flex-1 border-0 bg-transparent px-4 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] focus:ring-0 sm:text-base ${inputClassName}`,
 
                                     colors: {
                                         gray: "bg-transparent text-[#222] focus:border-transparent focus:ring-0",

@@ -15,9 +15,10 @@ const SearchableCheckboxDropdown = ({
   labelClassName = "",
   triggerClassName = "",
   menuClassName = "",
+  wrapperClassName = "",
 }) => {
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
       {labelClassName ? (
         <label className={labelClassName}>{label}</label>
       ) : (
