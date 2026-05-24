@@ -10,12 +10,13 @@ vi.mock("react-router-dom", async () => {
 
 describe("EmployeeTable Component", () => {
   const mockEmployees = [
-    { employeeId: "1", fullName: "Alice Smith", role: "Dev", status: true },
+    { employeeId: "1", fullName: "Alice Smith", role: "Dev", status: true, isBlacklisted: false },
     {
       employeeId: "2",
       fullName: "Bob Jones",
       role: "Design",
       status: false,
+      isBlacklisted: true,
     },
   ];
 
@@ -66,5 +67,24 @@ describe("EmployeeTable Component", () => {
 
     expect(screen.getByText("Alice Smith")).toBeInTheDocument();
     expect(screen.getByText("Bob Jones")).toBeInTheDocument();
+  });
+
+  it("debe pasar las props de modo lista negra a las filas correctamente", () => {
+    const mockOnAdd = vi.fn();
+    const mockOnRemove = vi.fn();
+
+    renderWithRouter(
+      <EmployeeTable
+        employees={mockEmployees}
+        loading={false}
+        isBlacklistMode={true}
+        onAddToBlacklist={mockOnAdd}
+        onRemoveFromBlacklist={mockOnRemove}
+      />,
+    );
+
+    // Si las props pasan correctamente a los EmployeeRows, ambos botones deberían existir.
+    expect(screen.getByRole("button", { name: /agregar a lista negra/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /eliminar de lista negra/i })).toBeInTheDocument();
   });
 });

@@ -19,6 +19,7 @@ describe("EmployeeRow Component", () => {
     role: "Software Engineer",
     status: true,
     picture: "path/to/photo.jpg",
+    isBlacklisted: false,
   };
 
   const renderInTable = (component) => {
@@ -58,5 +59,41 @@ describe("EmployeeRow Component", () => {
 
     const avatarImg = screen.getByAltText("Jane Doe");
     expect(avatarImg).toBeInTheDocument();
+  });
+
+  describe("Modo Lista Negra (Blacklist Mode)", () => {
+    it("debe mostrar el botón de agregar a la lista negra cuando el empleado no está en ella", () => {
+      const onAddToBlacklistMock = vi.fn();
+      renderInTable(
+        <EmployeeRow
+          employee={mockEmployee}
+          isBlacklistMode={true}
+          onAddToBlacklist={onAddToBlacklistMock}
+        />,
+      );
+
+      const button = screen.getByRole("button", { name: /agregar a lista negra/i });
+      fireEvent.click(button);
+
+      expect(onAddToBlacklistMock).toHaveBeenCalledWith(mockEmployee);
+    });
+
+    it("debe mostrar el botón de eliminar de la lista negra cuando el empleado ya está en ella", () => {
+      const onRemoveFromBlacklistMock = vi.fn();
+      const blacklistedEmployee = { ...mockEmployee, isBlacklisted: true };
+      
+      renderInTable(
+        <EmployeeRow
+          employee={blacklistedEmployee}
+          isBlacklistMode={true}
+          onRemoveFromBlacklist={onRemoveFromBlacklistMock}
+        />,
+      );
+
+      const button = screen.getByRole("button", { name: /eliminar de lista negra/i });
+      fireEvent.click(button);
+
+      expect(onRemoveFromBlacklistMock).toHaveBeenCalledWith(blacklistedEmployee);
+    });
   });
 });
