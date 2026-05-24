@@ -1,10 +1,7 @@
 import TextField from "../atoms/textField";
 import SelectField from "../atoms/selectField";
-import useSearch from "../../hooks/molecules/useSearch";
+import useEmployeeFilters from "../../hooks/molecules/useEmployeeFilters";
 import Button from "../atoms/button";
-
-const CURP_MAX_LENGTH = 18;
-const CURP_ALLOWED_REGEX = /^[A-ZÑ0-9]{0,18}$/i;
 
 const EmployeeFilters = ({
   searchQuery,
@@ -16,33 +13,15 @@ const EmployeeFilters = ({
   isBlacklistedFilter,
   setIsBlacklistedFilter,
 }) => {
-  const { inputValue, handleChange, handleKeyDown } = useSearch(
-    searchQuery,
-    setSearchQuery,
-  );
-
-  const handleCurpChange = (val) => {
-    const upper = val.toUpperCase();
-    if (upper.length <= CURP_MAX_LENGTH && CURP_ALLOWED_REGEX.test(upper)) {
-      setSearchQuery(upper);
-    }
-  };
-
-  const blacklistFilterOptions = [
-    { value: "", label: "Todos" },
-    { value: "true", label: "En lista negra" },
-    { value: "false", label: "No en lista negra" },
-  ];
-
-  const statusOptions = [
-    { value: "true", label: "Activos" },
-    { value: "false", label: "Inactivos" },
-  ];
-
-  const handleBlacklistFilterChange = (e) => {
-    const val = e.target.value;
-    setIsBlacklistedFilter(val === "" ? undefined : val === "true");
-  };
+  const {
+    inputValue,
+    handleChange,
+    handleKeyDown,
+    handleCurpChange,
+    handleBlacklistFilterChange,
+    blacklistFilterOptions,
+    statusOptions,
+  } = useEmployeeFilters({ searchQuery, setSearchQuery, setIsBlacklistedFilter });
 
   return (
     <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
