@@ -11,6 +11,8 @@ describe("EmployeeFilters Component", () => {
     setSearchQuery: mockSetSearchQuery,
     activeFilter: "true",
     setActiveFilter: mockSetActiveFilter,
+    isBlacklistMode: false,
+    onToggleBlacklistMode: vi.fn(),
   };
 
   beforeEach(() => {
@@ -81,5 +83,19 @@ describe("EmployeeFilters Component", () => {
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent("Activos");
     expect(options[1]).toHaveTextContent("Inactivos");
+  });
+
+  it("muestra los campos de CURP y Filtro cuando está en modo lista negra", () => {
+    render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
+
+    expect(screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0]).toBeInTheDocument();
+    expect(screen.getByText("Lista Empleados")).toBeInTheDocument();
+  });
+
+  it("llama a onToggleBlacklistMode al hacer clic en el botón correspondiente", () => {
+    render(<EmployeeFilters {...defaultProps} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /Lista Negra/i })[0]);
+    expect(defaultProps.onToggleBlacklistMode).toHaveBeenCalledTimes(1);
   });
 });
