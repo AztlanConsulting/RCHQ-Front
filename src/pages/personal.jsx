@@ -4,6 +4,7 @@ import EmployeeFilters from "../components/molecules/employeeFilters";
 import EmployeeTable from "../components/molecules/employeeTable";
 import Pagination from "../components/molecules/pagination";
 import BlacklistModal from "../components/molecules/blacklistModal";
+import RemoveFromBlacklistModal from "../components/molecules/removeFromBlacklistModal";
 import Alert from "../components/atoms/alerts";
 import usePersonal from "../hooks/pages/usePersonal";
 import warningSvg from "/error.svg";
@@ -23,6 +24,7 @@ const Personal = () => {
         isBlacklistMode,
         selectedEmployee,
         isModalOpen,
+        isRemoveModalOpen,
         isSubmitting,
         alert,
         setAlert,
@@ -30,6 +32,9 @@ const Personal = () => {
         handleAddToBlacklist,
         handleModalCancel,
         handleModalConfirm,
+        handleRemoveFromBlacklist,
+        handleRemoveModalCancel,
+        handleRemoveModalConfirm,
         activeEmployees,
         activePagination,
         activeLoading,
@@ -106,6 +111,7 @@ const Personal = () => {
                     error={activeError}
                     isBlacklistMode={isBlacklistMode}
                     onAddToBlacklist={handleAddToBlacklist}
+                    onRemoveFromBlacklist={handleRemoveFromBlacklist}
                 />
             </div>
 
@@ -124,6 +130,14 @@ const Personal = () => {
                 employeeName={selectedEmployee?.fullName ?? ""}
                 onConfirm={handleModalConfirm}
                 onCancel={handleModalCancel}
+                isSubmitting={isSubmitting}
+            />
+
+            <RemoveFromBlacklistModal
+                isOpen={isRemoveModalOpen}
+                employeeName={selectedEmployee?.fullName ?? ""}
+                onConfirm={handleRemoveModalConfirm}
+                onCancel={handleRemoveModalCancel}
                 isSubmitting={isSubmitting}
             />
         </div>

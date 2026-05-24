@@ -1,12 +1,13 @@
 import { useState, useCallback } from "react";
 import { useEmployees } from "./useGetAllEmployees";
 import { useGetBlacklist } from "./useGetBlacklist";
-import { addToBlacklist } from "../../services/blacklistService";
+import { addToBlacklist, removeFromBlacklist } from "../../services/blacklistService";
 
 const usePersonal = () => {
   const [isBlacklistMode, setIsBlacklistMode] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
 
@@ -32,6 +33,16 @@ const usePersonal = () => {
 
   const handleModalCancel = useCallback(() => {
     setIsModalOpen(false);
+    setSelectedEmployee(null);
+  }, []);
+
+  const handleRemoveFromBlacklist = useCallback((employee) => {
+    setSelectedEmployee(employee);
+    setIsRemoveModalOpen(true);
+  }, []);
+
+  const handleRemoveModalCancel = useCallback(() => {
+    setIsRemoveModalOpen(false);
     setSelectedEmployee(null);
   }, []);
 
@@ -72,10 +83,46 @@ const usePersonal = () => {
     [selectedEmployee, blacklistQuery, showAlert],
   );
 
+  const handleRemoveModalConfirm = useCallback(
+    async (reason) => {
+      if (!selectedEmployee) return;
+      setIsSubmitting(true);
+
+      try {
+        const data = await removeFromBlacklist(selectedEmployee.curp, reason);
+        if (data.message?.toLowerCase().includes("falló")) {
+          showAlert("warning", "Empleado eliminado de la lista negra, pero falló el registro de auditoría.");
+        } else {
+          showAlert("success", "Empleado eliminado de la lista negra correctamente.");
+        }
+        blacklistQuery.refresh();
+        setIsRemoveModalOpen(false);
+        setSelectedEmployee(null);
+      } catch (err) {
+        const status = err.status;
+        if (status === 400) {
+          showAlert("error", "Datos inválidos. Verifica el formato de la CURP o la razón ingresada.");
+        } else if (status === 403) {
+          showAlert("error", err.message || "No tienes permisos para realizar esta acción.");
+        } else if (status === 404) {
+          showAlert("error", "Empleado no encontrado.");
+        } else {
+          showAlert("error", "Ocurrió un error interno. Intenta de nuevo más tarde.");
+        }
+        setIsRemoveModalOpen(false);
+        setSelectedEmployee(null);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [selectedEmployee, blacklistQuery, showAlert],
+  );
+
   return {
     isBlacklistMode,
     selectedEmployee,
     isModalOpen,
+    isRemoveModalOpen,
     isSubmitting,
     alert,
     setAlert,
@@ -83,6 +130,9 @@ const usePersonal = () => {
     handleAddToBlacklist,
     handleModalCancel,
     handleModalConfirm,
+    handleRemoveFromBlacklist,
+    handleRemoveModalCancel,
+    handleRemoveModalConfirm,
     activeEmployees: isBlacklistMode ? blacklistQuery.employees : employeesQuery.employees,
     activePagination: isBlacklistMode ? blacklistQuery.pagination : employeesQuery.pagination,
     activeLoading: isBlacklistMode ? blacklistQuery.loading : employeesQuery.loading,
