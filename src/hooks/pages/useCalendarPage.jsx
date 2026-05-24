@@ -8,6 +8,7 @@ import {
   buildAbsenceEvidenceUrl,
   updateAbsenceService,
 } from "../../services/calendarService";
+import { deleteVacationRequest } from "../../services/vacationService";
 import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import { useVacationFormEdit } from "./useVacationFormEdit";
@@ -85,6 +86,9 @@ export const useCalendarPage = ({
   const [isDeletePersonalEventOpen, setIsDeletePersonalEventOpen] = useState(false);
   const [isDeletingPersonalEvent, setIsDeletingPersonalEvent] = useState(false);
   const [deletePersonalEventError, setDeletePersonalEventError] = useState("");
+  const [isDeleteVacationOpen, setIsDeleteVacationOpen] = useState(false);
+  const [isDeletingVacation, setIsDeletingVacation] = useState(false);
+  const [deleteVacationError, setDeleteVacationError] = useState("");
   const {
     isVacationEditing,
     vacationForm,
@@ -125,6 +129,8 @@ export const useCalendarPage = ({
     setDeletePersonalEventError("");
     resetAbsenceEvidence();
     resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
   }, [resetAbsenceEvidence, resetVacationEdit]);
 
   const showEventDetail = useCallback((detail) => {
@@ -139,6 +145,8 @@ export const useCalendarPage = ({
     setIsDeletePersonalEventOpen(false);
     setDeletePersonalEventError("");
     resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
   }, [resetVacationEdit]);
 
   const openCalendarItemDetail = useCallback((item) => {
@@ -167,6 +175,8 @@ export const useCalendarPage = ({
     setIsDeletePersonalEventOpen(false);
     setDeletePersonalEventError("");
     resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
   }, [resetVacationEdit]);
 
   const absenceEvidenceLabel = useMemo(
@@ -552,6 +562,70 @@ export const useCalendarPage = ({
       message: "Evento modificado exitosamente",
     });
   }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
+  const getVacationRequestId = useCallback((event) =>
+    event?.vacationRequestId ??
+    event?.vacationId ??
+    "",
+    [],);
+
+  const openDeleteVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const vacationRequestId = getVacationRequestId(currentSelectedEvent);
+
+    if (!vacationRequestId) return;
+
+    resetVacationEdit();
+    setDeleteVacationError("");
+    setIsDeleteVacationOpen(true);
+  }, [getVacationRequestId, resetVacationEdit, selectedEvent]);
+
+  const cancelDeleteVacation = useCallback(() => {
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
+  }, []);
+
+  const confirmDeleteVacation = useCallback(async () => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const vacationRequestId = getVacationRequestId(currentSelectedEvent);
+
+    if (!vacationRequestId) return;
+
+    setIsDeletingVacation(true);
+    setDeleteVacationError("");
+
+    try {
+      await deleteVacationRequest(vacationRequestId);
+
+      setIsDeleteVacationOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar las vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Vacaciones eliminadas correctamente",
+      });
+    } catch (error) {
+      setDeleteVacationError(
+        error?.message || "No se pudieron eliminar las vacaciones.",
+      );
+    } finally {
+      setIsDeletingVacation(false);
+    }
+  }, [
+    closeDetail,
+    getVacationRequestId,
+    reloadCurrentRange,
+    selectedEvent,
+    selectedEventRef,
+  ]);
 
   return {
     selectedEvent,
@@ -610,5 +684,11 @@ export const useCalendarPage = ({
     vacationRemainingInfo,
     isLoadingVacationRemaining,
     openCalendarItemDetail,
+    isDeleteVacationOpen,
+    isDeletingVacation,
+    deleteVacationError,
+    openDeleteVacation,
+    cancelDeleteVacation,
+    confirmDeleteVacation,
   };
 };

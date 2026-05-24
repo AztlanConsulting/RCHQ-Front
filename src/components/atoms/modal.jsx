@@ -64,7 +64,7 @@ const Modal = ({
                     rounded-xl bg-white shadow-xl
                     p-[30px] md:p-8
                     max-h-[90vh]
-                    overflow-y-auto
+                    overflow-y-visible
                     mx-4
                     ${className}
                 `}

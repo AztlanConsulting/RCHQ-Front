@@ -1,6 +1,6 @@
 import EmployeeRow from "./employeeRow";
 
-const EmployeeTable = ({ employees, loading, error }) => {
+const EmployeeTable = ({ employees, loading, error, isBlacklistMode = false, onAddToBlacklist }) => {
   if (loading) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
@@ -53,7 +53,12 @@ const EmployeeTable = ({ employees, loading, error }) => {
         </thead>
         <tbody>
           {employees.map((employee, index) => (
-            <EmployeeRow key={index} employee={employee} />
+            <EmployeeRow
+              key={index}
+              employee={employee}
+              isBlacklistMode={isBlacklistMode}
+              onAddToBlacklist={onAddToBlacklist}
+            />
           ))}
         </tbody>
       </table>

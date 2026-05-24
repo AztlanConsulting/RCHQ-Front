@@ -14,6 +14,7 @@ import RegisterEventModal from "../components/organism/evento/registerEventModal
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import UpdatePersonalEventModal from "../components/organism/evento/updatePersonalEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
+import ConfirmDeleteVacationModal from "../components/molecules/confirmDeleteVacationModal";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
@@ -149,6 +150,12 @@ const Calendario = () => {
         vacationRemainingInfo,
         isLoadingVacationRemaining,
         openCalendarItemDetail,
+        isDeleteVacationOpen,
+        isDeletingVacation,
+        deleteVacationError,
+        openDeleteVacation,
+        cancelDeleteVacation,
+        confirmDeleteVacation,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -344,20 +351,28 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
-                                    onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}
                                     onVacationFieldChange={setVacationField}
-                                    onDelete={() => { }}
+                                    onDelete={openDeleteVacation}
                                     onApprove={() => { }}
                                     onReject={() => { }}
                                 />
                             ) : (
                                 <VacationWorkerDetail
                                     event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
-                                    onEdit={() => {}}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
                                     onDelete={() => {}}
                                 />
                             );
@@ -404,6 +419,14 @@ const Calendario = () => {
                     }
                 })()}
             </Modal>
+
+            <ConfirmDeleteVacationModal
+                event={isDeleteVacationOpen ? selectedEvent : null}
+                loading={isDeletingVacation}
+                error={deleteVacationError}
+                onCancel={cancelDeleteVacation}
+                onConfirm={confirmDeleteVacation}
+            />
 
             <UpdateHouseEventModal
                 event={editingHouseEvent}
