@@ -63,8 +63,8 @@ const OverlapModal = ({
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
                     <Button
-                        text={isLoading ? "Registrando..." : "Confirmar"}
-                        onClick={onConfirm}
+                        text="Cancelar"
+                        onClick={onCancel}
                         disabled={isLoading}
                         width="w-full sm:w-[146px]"
                         height="h-[41px]"
@@ -77,8 +77,8 @@ const OverlapModal = ({
                         className="border border-[#e5e7eb] px-4 shadow-[0_1px_5px_rgba(0,0,0,0.25)]"
                     />
                     <Button
-                        text="Cancelar"
-                        onClick={onCancel}
+                        text={isLoading ? "Registrando..." : "Confirmar"}
+                        onClick={onConfirm}
                         disabled={isLoading}
                         width="w-full sm:w-[146px]"
                         height="h-[41px]"
