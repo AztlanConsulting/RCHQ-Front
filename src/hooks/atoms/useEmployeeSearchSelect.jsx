@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useExpandableList } from "./useExpandableList";
 
 export const useEmployeeSearchSelect = ({
     employees = [],
     selected = [],
     onSearch,
     onSelect,
+    selectedPreviewLimit = 4,
 }) => {
     const [query, setQuery] = useState("");
     const [isOpen, setIsOpen] = useState(false);
@@ -83,6 +85,7 @@ export const useEmployeeSearchSelect = ({
             (employee) => !selectedIds.has(employee.employeeId),
         );
     }, [employees, selectedIds]);
+    const selectedList = useExpandableList(selected, selectedPreviewLimit);
 
     const sanitizeQuery = (value) =>
         value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]/g, "");
@@ -111,6 +114,10 @@ export const useEmployeeSearchSelect = ({
         containerRef,
         dropdownRef,
         filteredEmployees,
+        visibleSelected: selectedList.visibleItems,
+        hiddenSelectedCount: selectedList.hiddenCount,
+        isSelectedListExpanded: selectedList.isExpanded,
+        toggleSelectedList: selectedList.toggleExpanded,
         handleInputChange,
         openDropdown,
         handleSelect,

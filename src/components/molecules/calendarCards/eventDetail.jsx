@@ -5,6 +5,7 @@ import {
     formatEventDateRange,
     formatEventTime,
 } from "../../../utils/calendarEventDetail";
+import { useExpandableList } from "../../../hooks/atoms/useExpandableList";
 
 const canDelete = (scope, role) => {
     if (scope === "global") return role === "Administrador";
@@ -29,13 +30,25 @@ const EventDetail = ({
     deleteError = "",
     viewerRole = "",
 }) => {
+    const peopleInsideEvent = Array.isArray(event?.peopleInsideEvent)
+        ? event.peopleInsideEvent
+        : [];
+
+    const {
+        visibleItems: visiblePeople,
+        hiddenCount: hiddenPeopleCount,
+        isExpanded: isPeopleListExpanded,
+        toggleExpanded: togglePeopleList,
+    } = useExpandableList(
+        peopleInsideEvent,
+        5,
+        event?.eventId ?? event?.houseEventId ?? event?.id ?? "",
+    );
+
     if (!event) return null;
 
     const showDelete = canDelete(event.scope, viewerRole);
     const showEdit = canEdit(event.scope, viewerRole);
-    const peopleInsideEvent = Array.isArray(event.peopleInsideEvent)
-        ? event.peopleInsideEvent
-        : [];
 
     const dayText = formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
@@ -131,7 +144,7 @@ const EventDetail = ({
                         Empleados ligados al evento:
                     </Type>
                     <div className="space-y-1">
-                        {peopleInsideEvent.map((person, idx) => (
+                        {visiblePeople.map((person, idx) => (
                             <Type
                                 key={person?.id ?? idx}
                                 variant="body"
@@ -141,6 +154,17 @@ const EventDetail = ({
                                 {person?.name || "-"}
                             </Type>
                         ))}
+                        {hiddenPeopleCount > 0 ? (
+                            <button
+                                type="button"
+                                onClick={togglePeopleList}
+                                className="text-sm font-bold text-[#1F3664] hover:underline"
+                            >
+                                {isPeopleListExpanded
+                                    ? "Ver menos"
+                                    : `Ver ${hiddenPeopleCount} más`}
+                            </button>
+                        ) : null}
                     </div>
                 </div>
             ) : null}

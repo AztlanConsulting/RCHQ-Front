@@ -13,6 +13,7 @@ const EmployeeSearchSelect = ({
     onSearch,
     placeholder = "Buscar empleado...",
     label = "Empleados",
+    selectedPreviewLimit = 4,
 }) => {
     const {
         query,
@@ -21,6 +22,10 @@ const EmployeeSearchSelect = ({
         containerRef,
         dropdownRef,
         filteredEmployees,
+        visibleSelected,
+        hiddenSelectedCount,
+        isSelectedListExpanded,
+        toggleSelectedList,
         handleInputChange,
         openDropdown,
         handleSelect,
@@ -29,6 +34,7 @@ const EmployeeSearchSelect = ({
         selected,
         onSearch,
         onSelect,
+        selectedPreviewLimit,
     });
 
     return (
@@ -113,15 +119,8 @@ const EmployeeSearchSelect = ({
             </div>
 
             {selected.length > 0 && (
-                <div
-                    className="flex flex-col gap-1.5"
-                    style={
-                        selected.length > 3
-                            ? { maxHeight: "162px", overflowY: "auto" }
-                            : undefined
-                    }
-                >
-                    {selected.map((emp) => (
+                <div className="flex flex-col gap-1.5">
+                    {visibleSelected.map((emp) => (
                         <div
                             key={emp.employeeId}
                             className="flex items-center gap-3 px-3 bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]"
@@ -152,6 +151,17 @@ const EmployeeSearchSelect = ({
                             </button>
                         </div>
                     ))}
+                    {hiddenSelectedCount > 0 ? (
+                        <button
+                            type="button"
+                            onClick={toggleSelectedList}
+                            className="self-start text-sm font-bold text-[#1F3664] hover:underline"
+                        >
+                            {isSelectedListExpanded
+                                ? "Ver menos"
+                                : `Ver ${hiddenSelectedCount} más`}
+                        </button>
+                    ) : null}
                 </div>
             )}
         </div>
