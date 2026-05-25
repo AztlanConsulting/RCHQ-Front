@@ -29,7 +29,6 @@ const PersonalForm = (props) => {
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     } = usePersonalForm(props);
 
     const isTimeVisible = !form.allDay;
@@ -60,9 +59,15 @@ const PersonalForm = (props) => {
                         display: "flex",
                         gap: "8px",
                         alignItems: "flex-end",
+                        maxHeight: isTimeVisible ? "100px" : "0px",
+                        overflow: "hidden",
+                        opacity: isTimeVisible ? 1 : 0,
+                        marginTop: isTimeVisible ? "0px" : "-8px",
+                        transition:
+                            "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                     }}
                 >
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
+                    <div style={{ flex: 1 }}>
                         <TimeField
                             value={form.startTime}
                             onChange={(value) => setField("startTime", value)}
@@ -72,7 +77,7 @@ const PersonalForm = (props) => {
                         />
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
+                    <div style={{ flex: 1 }}>
                         <TimeField
                             value={form.endTime}
                             onChange={(value) => setField("endTime", value)}
