@@ -5,6 +5,7 @@ import {
     formatEventDateRange,
     formatEventTime,
 } from "../../../utils/calendarEventDetail";
+import { useExpandableList } from "../../../hooks/atoms/useExpandableList";
 
 const canDelete = (scope, role) => {
     if (scope === "global") return role === "Administrador";
@@ -29,6 +30,17 @@ const EventDetail = ({
     deleteError = "",
     viewerRole = "",
 }) => {
+    const {
+        visibleItems: visiblePeople,
+        hiddenCount: hiddenPeopleCount,
+        isExpanded: isPeopleListExpanded,
+        toggleExpanded: togglePeopleList,
+    } = useExpandableList(
+        event?.peopleInsideEvent,
+        5,
+        event?.eventId ?? event?.houseEventId ?? event?.id ?? "",
+    );
+
     if (!event) return null;
 
     const showDelete = canDelete(event.scope, viewerRole);
@@ -103,18 +115,55 @@ const EventDetail = ({
             ) : null}
 
             {event.description ? (
-                <Type variant="body" className="mb-4 block whitespace-pre-wrap">
-                    {event.description}
-                </Type>
+                <div className="mb-4">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Descripción:
+                    </Type>
+                    <Type
+                        variant="body"
+                        className="block whitespace-pre-wrap text-[1.05rem] leading-snug text-[#121212]"
+                    >
+                        {event.description}
+                    </Type>
+                </div>
             ) : null}
 
-            {event.peopleInsideEvent
-                ? event.peopleInsideEvent.map((person, idx) => (
-                      <p key={idx}>
-                          {person?.name} - {person?.id}
-                      </p>
-                  ))
-                : null}
+            {visiblePeople.length > 0 ? (
+                <div className="mb-4">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Empleados ligados al evento:
+                    </Type>
+                    <div className="space-y-1">
+                        {visiblePeople.map((person, idx) => (
+                            <Type
+                                key={person?.id ?? idx}
+                                variant="body"
+                                className="block text-[1.05rem] leading-snug text-[#121212]"
+                                as="p"
+                            >
+                                {person?.name || "-"}
+                            </Type>
+                        ))}
+                        {hiddenPeopleCount > 0 ? (
+                            <button
+                                type="button"
+                                onClick={togglePeopleList}
+                                className="text-sm font-bold text-[#1F3664] hover:underline"
+                            >
+                                {isPeopleListExpanded
+                                    ? "Ver menos"
+                                    : `Ver ${hiddenPeopleCount} más`}
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
 
             {(showDelete || showEdit) ? (
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">

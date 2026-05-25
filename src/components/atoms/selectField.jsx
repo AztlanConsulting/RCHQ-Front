@@ -10,6 +10,7 @@ const SelectField = ({
   required = false,
   labelColor = "text-[#121212]",
   disabled = false,
+  error = false,
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
@@ -24,7 +25,7 @@ const SelectField = ({
         </label>
       )}
 
-      <div className="relative h-[50px] w-full rounded-lg bg-neutral-50 shadow-[inset_0px_4px_4px_#00000040]">
+      <div className="relative h-[50px] w-full rounded-lg bg-neutral-50" style={{ boxShadow: error ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}>
         <select
           id={id}
           name={name || id}

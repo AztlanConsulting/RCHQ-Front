@@ -14,9 +14,13 @@ import RegisterEventModal from "../components/organism/evento/registerEventModal
 import UpdateHouseEventModal from "../components/organism/evento/updateHouseEventModal";
 import UpdatePersonalEventModal from "../components/organism/evento/updatePersonalEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
+import ConfirmDeleteVacationModal from "../components/molecules/confirmDeleteVacationModal";
+import ConfirmApproveVacationModal from "../components/molecules/confirmApproveVacationModal";
+import ConfirmRejectVacationModal from "../components/molecules/confirmRejectVacationModal";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
+import { useCalendarSearchParams } from "../hooks/pages/useCalendarSearchParams";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -52,6 +56,7 @@ const Calendario = () => {
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,
+        reloadVisibleRange,
     } = useBaseCalendar();
 
     const {
@@ -146,6 +151,25 @@ const Calendario = () => {
         submitVacationEdit,
         vacationRemainingInfo,
         isLoadingVacationRemaining,
+        openCalendarItemDetail,
+        isDeleteVacationOpen,
+        isDeletingVacation,
+        deleteVacationError,
+        openDeleteVacation,
+        cancelDeleteVacation,
+        confirmDeleteVacation,
+        approveVacationRequestModal,
+        rejectVacationRequestModal,
+        isApprovingVacation,
+        isRejectingVacation,
+        approveVacationError,
+        rejectVacationError,
+        openApproveVacation,
+        cancelApproveVacation,
+        confirmApproveVacation,
+        openRejectVacation,
+        cancelRejectVacation,
+        confirmRejectVacation,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -155,6 +179,13 @@ const Calendario = () => {
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
+
+    useCalendarSearchParams({
+        calendarRef,
+        openCalendarItemDetail,
+        reloadVisibleRange,
+        setCalendarMode,
+    });
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -268,16 +299,16 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                className={() => {
-                    if (
-                        ["ausencias", "vacaciones"].includes(
-                            selectedEvent?.focus,
-                        )
-                    )
-                        return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
-
-                    return "max-w-[25vw] max-h-[80vh]";
-                }}
+                scrollable={
+                    selectedEvent?.focus === "eventos" ||
+                    selectedEvent?.focus === "ausencias" ||
+                    selectedEvent?.focus === "vacaciones"
+                }
+                className={
+                    ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        : "w-[92vw] max-w-[40rem] max-h-[calc(100vh-2rem)] scrollbar-hide"
+                }
             >
                 {(() => {
                     switch (selectedEvent?.focus) {
@@ -334,21 +365,29 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
+                                    onDelete={openDeleteVacation}
+                                    onApprove={openApproveVacation}
+                                    onReject={openRejectVacation}
+                                />
+                            ) : (
+                                <VacationWorkerDetail
+                                    event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}
                                     onVacationFieldChange={setVacationField}
-                                    onDelete={() => { }}
-                                    onApprove={() => { }}
-                                    onReject={() => { }}
-                                />
-                            ) : (
-                                <VacationWorkerDetail
-                                    event={selectedEvent}
-                                    onClose={closeDetail}
-                                    onEdit={() => {}}
-                                    onDelete={() => {}}
+                                    onDelete={openDeleteVacation}
                                 />
                             );
 
@@ -394,6 +433,31 @@ const Calendario = () => {
                     }
                 })()}
             </Modal>
+
+            <ConfirmDeleteVacationModal
+                event={isDeleteVacationOpen ? selectedEvent : null}
+                loading={isDeletingVacation}
+                error={deleteVacationError}
+                showEmployeeInfo={isManagementRole(viewerRole)}
+                onCancel={cancelDeleteVacation}
+                onConfirm={confirmDeleteVacation}
+            />
+
+            <ConfirmApproveVacationModal
+                request={approveVacationRequestModal}
+                loading={isApprovingVacation}
+                error={approveVacationError}
+                onCancel={cancelApproveVacation}
+                onConfirm={confirmApproveVacation}
+            />
+
+            <ConfirmRejectVacationModal
+                request={rejectVacationRequestModal}
+                loading={isRejectingVacation}
+                error={rejectVacationError}
+                onCancel={cancelRejectVacation}
+                onConfirm={confirmRejectVacation}
+            />
 
             <UpdateHouseEventModal
                 event={editingHouseEvent}

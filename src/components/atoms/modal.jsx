@@ -16,6 +16,7 @@ const Modal = ({
     placement = "center",
     className = "",
     backdropClassName = "bg-black/50",
+    scrollable = false,
 }) => {
     useEffect(() => {
         if (!open) return;
@@ -64,7 +65,7 @@ const Modal = ({
                     rounded-xl bg-white shadow-xl
                     p-[30px] md:p-8
                     max-h-[90vh]
-                    overflow-y-auto
+                    ${scrollable ? "overflow-y-auto" : "overflow-y-visible"}
                     mx-4
                     ${className}
                 `}

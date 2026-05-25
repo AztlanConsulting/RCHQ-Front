@@ -6,9 +6,14 @@ import {
     updateAbsenceService,
 } from "../../services/calendarService";
 import {
+    deleteVacationRequest,
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
+import {
+    approveVacationRequest,
+    rejectVacationRequest,
+} from "../../services/vacationRequestService";
 
 vi.mock("../../services/calendarService", () => ({
     deleteAbsenceService: vi.fn(),
@@ -17,8 +22,14 @@ vi.mock("../../services/calendarService", () => ({
 }));
 
 vi.mock("../../services/vacationService", () => ({
+    deleteVacationRequest: vi.fn(),
     getRemainingVacations: vi.fn(),
     updateVacationRequestDates: vi.fn(),
+}));
+
+vi.mock("../../services/vacationRequestService", () => ({
+    approveVacationRequest: vi.fn(),
+    rejectVacationRequest: vi.fn(),
 }));
 
 const buildCalendarClickInfo = () => ({
@@ -486,5 +497,313 @@ describe("useCalendarPage", () => {
             "No se pudo actualizar vacaciones",
         );
         expect(result.current.isVacationEditing).toBe(true);
+    });
+
+    it("elimina la vacación, recarga el rango y cierra el detalle", async () => {
+        const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+        deleteVacationRequest.mockResolvedValue({
+            vacationRequestId: "vacation-1",
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange,
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+        });
+
+        act(() => {
+            result.current.openDeleteVacation();
+        });
+
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(deleteVacationRequest).toHaveBeenCalledWith("vacation-1");
+        expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+        expect(result.current.selectedEvent).toBe(null);
+        expect(result.current.alert).toEqual({
+            type: "success",
+            message: "Vacaciones eliminadas correctamente",
+        });
+    });
+
+    it("muestra error si falla la eliminación de vacaciones", async () => {
+        deleteVacationRequest.mockRejectedValue(
+            new Error("No se pudo eliminar vacaciones"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.openDeleteVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(result.current.deleteVacationError).toBe(
+            "No se pudo eliminar vacaciones",
+        );
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+    });
+
+    it("muestra error de permisos si el back rechaza la eliminación de vacaciones", async () => {
+        deleteVacationRequest.mockRejectedValue(
+            new Error("No puede acceder a este recurso"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.openDeleteVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(result.current.deleteVacationError).toBe(
+            "No puede acceder a este recurso",
+        );
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+    });
+
+    it("abre el modal de aprobación con los datos de la vacación seleccionada", () => {
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+        });
+
+        act(() => {
+            result.current.openApproveVacation();
+        });
+
+        expect(result.current.approveVacationRequestModal).toEqual(
+            expect.objectContaining({
+                vacationRequestId: "vacation-1",
+                employee: expect.objectContaining({
+                    fullName: "Ana López",
+                    curp: "LOAA900101MDFPPP09",
+                }),
+            }),
+        );
+    });
+
+    it("aprueba la vacación, recarga el rango y cierra el detalle", async () => {
+        const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+
+        approveVacationRequest.mockResolvedValue({
+            vacationRequest: {
+                vacationRequestId: "vacation-1",
+                status: 1,
+            },
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange,
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+            result.current.openApproveVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmApproveVacation();
+        });
+
+        expect(approveVacationRequest).toHaveBeenCalledWith("vacation-1");
+        expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+        expect(result.current.selectedEvent).toBe(null);
+        expect(result.current.approveVacationRequestModal).toBe(null);
+        expect(result.current.alert).toEqual({
+            type: "success",
+            message: "Solicitud de vacaciones aprobada correctamente",
+        });
+    });
+
+    it("muestra error si falla la aprobación de vacaciones", async () => {
+        approveVacationRequest.mockRejectedValue(
+            new Error("No se pudo aprobar"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+            result.current.openApproveVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmApproveVacation();
+        });
+
+        expect(result.current.approveVacationError).toBe("No se pudo aprobar");
+        expect(result.current.approveVacationRequestModal).not.toBe(null);
+    });
+
+    it("abre el modal de rechazo con los datos de la vacación seleccionada", () => {
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+        });
+
+        act(() => {
+            result.current.openRejectVacation();
+        });
+
+        expect(result.current.rejectVacationRequestModal).toEqual(
+            expect.objectContaining({
+                vacationRequestId: "vacation-1",
+                employee: expect.objectContaining({
+                    fullName: "Ana López",
+                    curp: "LOAA900101MDFPPP09",
+                }),
+            }),
+        );
+    });
+
+    it("rechaza la vacación, recarga el rango y cierra el detalle", async () => {
+        const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+
+        rejectVacationRequest.mockResolvedValue({
+            vacationRequest: {
+                vacationRequestId: "vacation-1",
+                status: 2,
+            },
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange,
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+            result.current.openRejectVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmRejectVacation("No hay disponibilidad");
+        });
+
+        expect(rejectVacationRequest).toHaveBeenCalledWith(
+            "vacation-1",
+            "No hay disponibilidad",
+        );
+        expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+        expect(result.current.selectedEvent).toBe(null);
+        expect(result.current.rejectVacationRequestModal).toBe(null);
+        expect(result.current.alert).toEqual({
+            type: "success",
+            message: "Solicitud de vacaciones rechazada correctamente",
+        });
+    });
+
+    it("muestra error si falla el rechazo de vacaciones", async () => {
+        rejectVacationRequest.mockRejectedValue(
+            new Error("No se pudo rechazar"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick({
+                event: {
+                    ...buildVacationClickInfo().event,
+                    extendedProps: {
+                        ...buildVacationClickInfo().event.extendedProps,
+                        status: 0,
+                    },
+                },
+            });
+            result.current.openRejectVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmRejectVacation("No hay disponibilidad");
+        });
+
+        expect(result.current.rejectVacationError).toBe("No se pudo rechazar");
+        expect(result.current.rejectVacationRequestModal).not.toBe(null);
     });
 });

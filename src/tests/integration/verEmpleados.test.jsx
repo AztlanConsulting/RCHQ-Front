@@ -2,10 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import Personal from "../../Pages/personal";
-import { useEmployees } from "../../hooks/pages/useGetAllEmployees";
+import usePersonal from "../../hooks/pages/usePersonal";
 
-vi.mock("../../hooks/pages/useGetAllEmployees", () => ({
-    useEmployees: vi.fn(),
+vi.mock("../../hooks/pages/usePersonal", () => ({
+    default: vi.fn(),
 }));
 
 const mockNavigate = vi.fn();
@@ -15,36 +15,52 @@ vi.mock("react-router-dom", async () => {
 });
 
 describe("Integración: Componente Personal", () => {
-  const mockData = {
-    employees: [
+  const mockPersonalData = {
+    isBlacklistMode: false,
+    selectedEmployee: null,
+    isModalOpen: false,
+    isRemoveModalOpen: false,
+    isSubmitting: false,
+    alert: null,
+    setAlert: vi.fn(),
+    handleToggleBlacklistMode: vi.fn(),
+    handleAddToBlacklist: vi.fn(),
+    handleModalCancel: vi.fn(),
+    handleModalConfirm: vi.fn(),
+    handleRemoveFromBlacklist: vi.fn(),
+    handleRemoveModalCancel: vi.fn(),
+    handleRemoveModalConfirm: vi.fn(),
+    activeEmployees: [
       {
         employeeId: "1",
         fullName: "Juan Perez",
-        role: "Gerente",
+        roleName: "Gerente",
         status: true,
       },
       {
         employeeId: "2",
         fullName: "Maria Lopez",
-        role: "Ventas",
+        roleName: "Ventas",
         status: false,
       },
     ],
-    pagination: { totalPages: 3, total: 20 },
-    loading: false,
-    error: null,
-    searchQuery: "",
-    setSearchQuery: vi.fn(),
+    activePagination: { totalPages: 3, total: 20 },
+    activeLoading: false,
+    activeError: null,
+    activePage: 1,
+    activeNextPage: vi.fn(),
+    activePrevPage: vi.fn(),
+    activeSearchQuery: "",
+    activeSetSearchQuery: vi.fn(),
     activeFilter: "true",
     setActiveFilter: vi.fn(),
-    page: 1,
-    handleNextPage: vi.fn(),
-    handlePrevPage: vi.fn(),
+    isBlacklistedFilter: undefined,
+    setIsBlacklistedFilter: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useEmployees.mockReturnValue(mockData);
+    usePersonal.mockReturnValue(mockPersonalData);
   });
 
   const renderComponent = () =>
@@ -80,7 +96,7 @@ describe("Integración: Componente Personal", () => {
     fireEvent.change(input, { target: { value: "Carlos" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
-    expect(mockData.setSearchQuery).toHaveBeenCalledWith("Carlos");
+    expect(mockPersonalData.activeSetSearchQuery).toHaveBeenCalledWith("Carlos");
   });
 
   it("debe manejar el cambio de página a través del hook", () => {
@@ -89,19 +105,35 @@ describe("Integración: Componente Personal", () => {
 
     fireEvent.click(btnSiguiente);
 
-    expect(mockData.handleNextPage).toHaveBeenCalled();
+    expect(mockPersonalData.activeNextPage).toHaveBeenCalled();
   });
 
   it("debe priorizar el estado de carga (Loading)", () => {
-    useEmployees.mockReturnValue({
-      ...mockData,
-      loading: true,
-      employees: [],
+    usePersonal.mockReturnValue({
+      ...mockPersonalData,
+      activeLoading: true,
+      activeEmployees: [],
     });
 
     renderComponent();
 
     expect(screen.getByText(/cargando empleados/i)).toBeInTheDocument();
     expect(screen.queryByText(/página 1 de 3/i)).not.toBeInTheDocument();
+  });
+
+  it("debe llamar a handleToggleBlacklistMode al hacer clic en 'Lista Negra'", () => {
+    renderComponent();
+    const btnListaNegra = screen.getAllByRole("button", { name: /lista negra/i })[0];
+    fireEvent.click(btnListaNegra);
+    expect(mockPersonalData.handleToggleBlacklistMode).toHaveBeenCalled();
+  });
+
+  it("debe mostrar el banner cuando isBlacklistMode es true", () => {
+    usePersonal.mockReturnValue({
+      ...mockPersonalData,
+      isBlacklistMode: true,
+    });
+    renderComponent();
+    expect(screen.getAllByText(/Estás en modo de lista negra/i)[0]).toBeInTheDocument();
   });
 });

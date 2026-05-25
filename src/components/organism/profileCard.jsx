@@ -72,9 +72,6 @@ const ProfileCard = ({ user }) => {
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3 justify-end">
-        <button className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors">
-          Modificar Perfil
-        </button>
         <button 
           onClick={() => navigate("/app/opciones")}
           className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors"

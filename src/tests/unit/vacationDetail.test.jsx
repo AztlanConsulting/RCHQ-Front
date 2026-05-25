@@ -108,10 +108,11 @@ describe("VacationDetail", () => {
         ).not.toBeInTheDocument();
     });
 
-    it("solo muestra cerrar cuando la solicitud ya está en el pasado", () => {
+    it("no muestra botones de acción cuando la vacación aprobada ya está en el pasado", () => {
         renderVacationDetail({
             event: {
                 ...baseVacation,
+                status: 1,
                 start: new Date(2026, 4, 1, 12),
                 end: new Date(2026, 4, 5, 12),
                 readableStart: "2026-05-01",
@@ -119,11 +120,46 @@ describe("VacationDetail", () => {
             },
         });
 
+        expect(screen.getByText("Vacaciones")).toBeInTheDocument();
+        expect(screen.getByText("Aprobadas")).toBeInTheDocument();
+
         expect(
-            screen.getByRole("button", { name: /cerrar/i }),
-        ).toBeInTheDocument();
+            screen.queryByRole("button", { name: /cerrar/i }),
+        ).not.toBeInTheDocument();
         expect(
             screen.queryByRole("button", { name: /eliminar/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /editar/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /aprobar/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /rechazar/i }),
+        ).not.toBeInTheDocument();
+    });
+
+    it("muestra solo eliminar cuando la solicitud pendiente ya está en el pasado", () => {
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                status: 0,
+                start: new Date(2026, 4, 1, 12),
+                end: new Date(2026, 4, 5, 12),
+                readableStart: "2026-05-01",
+                readableEnd: "2026-05-05",
+            },
+        });
+
+        expect(screen.getByText("Solicitud de Vacaciones")).toBeInTheDocument();
+        expect(screen.getByText("En espera")).toBeInTheDocument();
+
+        expect(
+            screen.getByRole("button", { name: /eliminar/i }),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /cerrar/i }),
         ).not.toBeInTheDocument();
         expect(
             screen.queryByRole("button", { name: /editar/i }),
@@ -203,5 +239,33 @@ describe("VacationDetail", () => {
 
         expect(screen.getByText("1 de julio de 2026")).toBeInTheDocument();
         expect(screen.getByText("3 de julio de 2026")).toBeInTheDocument();
+    });
+
+    it("llama a onApprove al hacer click en aprobar", () => {
+        const onApprove = vi.fn();
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                status: 0,
+            },
+            onApprove,
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /aprobar/i }));
+        expect(onApprove).toHaveBeenCalledTimes(1);
+    });
+
+    it("llama a onReject al hacer click en rechazar", () => {
+        const onReject = vi.fn();
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                status: 0,
+            },
+            onReject,
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /rechazar/i }));
+        expect(onReject).toHaveBeenCalledTimes(1);
     });
 });

@@ -157,6 +157,29 @@ describe("Integración: eliminar evento de personal", () => {
             ).toBeInTheDocument();
         });
 
+        it("muestra 5 empleados ligados y permite ver el resto", async () => {
+            const peopleInsideEvent = Array.from({ length: 6 }, (_, index) => ({
+                id: `emp-${index + 1}`,
+                name: `Empleado ${index + 1}`,
+            }));
+
+            await renderDetail(
+                { ...PERSONAL_EVENT, peopleInsideEvent },
+                "Coordinador",
+            );
+
+            expect(screen.getByText("Empleado 1")).toBeInTheDocument();
+            expect(screen.getByText("Empleado 5")).toBeInTheDocument();
+            expect(screen.queryByText("Empleado 6")).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole("button", { name: /ver 1/i }));
+
+            expect(screen.getByText("Empleado 6")).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /ver menos/i }),
+            ).toBeInTheDocument();
+        });
+
         it("oculta Eliminar y Editar a roles sin permiso en evento personal", async () => {
             await renderDetail(PERSONAL_EVENT, "Empleado");
 

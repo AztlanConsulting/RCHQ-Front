@@ -6,6 +6,7 @@ import {
     waitFor,
     act,
 } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import VacationRequests from "../../pages/vacationRequests";
 import {
     getPendingVacationRequests,
@@ -116,12 +117,18 @@ const singlePendingResponse = {
 };
 
 const renderComponent = async () => {
-    await act(async () => { render(<VacationRequests />); });
+    await act(async () => {
+        render(
+            <MemoryRouter>
+                <VacationRequests />
+            </MemoryRouter>,
+        );
+    });
 };
 
 describe("Integración: VacationRequests", () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
         vi.useRealTimers();
 
         getPendingVacationRequests.mockResolvedValue(pendingResponse);

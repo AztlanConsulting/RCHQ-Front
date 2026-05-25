@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../../hooks/organism/useCalendarFilters";
@@ -15,6 +16,10 @@ vi.mock("../../hooks/organism/useCalendarFilters", () => ({
 
 vi.mock("../../hooks/pages/useCalendarPage", () => ({
   useCalendarPage: vi.fn(),
+}));
+
+vi.mock("../../hooks/pages/useCalendarSearchParams", () => ({
+  useCalendarSearchParams: vi.fn(),
 }));
 
 vi.mock("../../components/organism/baseCalendar", () => ({
@@ -58,6 +63,11 @@ vi.mock("../../components/organism/evento/updateHouseEventModal", () => ({
     isOpen ? <div data-testid="update-house-event-modal" /> : null,
 }));
 
+vi.mock("../../components/organism/evento/updatePersonalEventModal", () => ({
+  default: ({ isOpen }) =>
+    isOpen ? <div data-testid="update-personal-event-modal" /> : null,
+}));
+
 vi.mock("../../components/molecules/calendarCards/eventDetail", () => ({
   default: ({ event }) => <div>Evento: {event?.eventType ?? event?.title}</div>,
 }));
@@ -93,12 +103,20 @@ vi.mock("../../components/molecules/calendarCards/vacationDetail", () => ({
 describe("Integración: Calendario page", () => {
   const setOwnCalendar = vi.fn();
 
+  const renderCalendar = () =>
+    render(
+      <MemoryRouter>
+        <Calendario />
+      </MemoryRouter>,
+    );
+
   const baseCalendarMock = {
     employeeHouseName: "Operaciones CDMX",
     allEvents: [{ id: "1" }],
     isList: false,
     viewType: "Month",
     currentCalendarView: "dayGridMonth",
+    currentCalendarDate: new Date(2026, 4, 1),
     handleDatesSet: vi.fn(),
     loadButtonsAtStart: vi.fn(),
     viewerRole: "Coordinador",
@@ -120,6 +138,7 @@ describe("Integración: Calendario page", () => {
     handleDateDrags: vi.fn(),
     handleDateDragging: vi.fn(),
     reloadCurrentRange: vi.fn(),
+    reloadVisibleRange: vi.fn(),
   };
 
   const calendarFiltersMock = {
@@ -198,7 +217,7 @@ describe("Integración: Calendario page", () => {
   });
 
   it("orquesta filtros, calendario y carga inicial de la page", () => {
-    render(<Calendario />);
+    renderCalendar();
 
     expect(setOwnCalendar).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("calendar-filters")).toHaveTextContent(
@@ -223,7 +242,7 @@ describe("Integración: Calendario page", () => {
       absenceEvidenceLabel: "Subir evidencia",
     });
 
-    render(<Calendario />);
+    renderCalendar();
 
     expect(screen.getByTestId("modal")).toBeInTheDocument();
     expect(screen.getByText("sin-titulo")).toBeInTheDocument();
@@ -247,7 +266,7 @@ describe("Integración: Calendario page", () => {
       absenceEvidenceLabel: "Sin evidencia",
     });
 
-    render(<Calendario />);
+    renderCalendar();
 
     expect(
       screen.getByText(/ausencia trabajador: luis martínez/i),
@@ -267,7 +286,7 @@ describe("Integración: Calendario page", () => {
       },
     });
 
-    render(<Calendario />);
+    renderCalendar();
 
     expect(screen.getByTestId("modal")).toBeInTheDocument();
     expect(screen.getByText("sin-titulo")).toBeInTheDocument();
@@ -284,7 +303,7 @@ describe("Integración: Calendario page", () => {
       },
     });
 
-    render(<Calendario />);
+    renderCalendar();
 
     expect(screen.getByTestId("modal")).toBeInTheDocument();
     expect(screen.getByText("Detalle del evento")).toBeInTheDocument();

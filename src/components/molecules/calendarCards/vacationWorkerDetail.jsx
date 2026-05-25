@@ -1,18 +1,53 @@
 import Button from "../../atoms/button";
-import DateField from "../../atoms/dateField";
-import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
-import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
+import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
 
 const VacationWorkerDetail = ({
     event,
+    isEditing = false,
+    vacationForm,
+    vacationEditError = "",
+    vacationRemainingInfo = null,
+    isLoadingVacationRemaining = false,
+    isSaving = false,
     onClose,
     onEdit,
+    onCancelEdit,
+    onSubmitEdit,
+    onVacationFieldChange,
     onDelete,
 }) => {
     const isPast = isPastDate(event.start);
+    const status = Number(event.status);
+    const isPending = status === 0;
+    const isApproved = status === 1;
+    const isRejected = status === 2;
+    const canDelete = !isApproved || !isPast;
+    const canEdit = !isPast && isPending;
+    const title =
+        isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
+    const statusLabel =
+        isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+
+    if (isEditing) {
+        return (
+            <VacationEditForm
+                title={title}
+                event={event}
+                vacationForm={vacationForm}
+                vacationEditError={vacationEditError}
+                vacationRemainingInfo={vacationRemainingInfo}
+                isLoadingVacationRemaining={isLoadingVacationRemaining}
+                isSaving={isSaving}
+                onCancelEdit={onCancelEdit}
+                onSubmitEdit={onSubmitEdit}
+                onVacationFieldChange={onVacationFieldChange}
+                showEmployeeInfo={false}
+            />
+        );
+    }
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -21,7 +56,7 @@ const VacationWorkerDetail = ({
                 className="mb-5 text-[2rem] leading-none"
                 as="h2"
             >
-                Solicitud de Vacaciones
+                {title}
             </Type>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
@@ -91,7 +126,7 @@ const VacationWorkerDetail = ({
                         variant="body"
                         className="text-[1.05rem] leading-snug"
                     >
-                        {event.status == 1 ? "Aceptado" : "Pendiente"}
+                        {statusLabel}
                     </Type>
                 </div>
                 <div className="sm:col-span-2">
@@ -110,26 +145,8 @@ const VacationWorkerDetail = ({
                 </div>
             </div>
 
-            {isPast ? (
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                    <Button
-                        type="button"
-                        text="Cerrar"
-                        width="w-full sm:w-[7.2rem]"
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#1F3664]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                        onClick={onClose}
-                    />
-                </div>
-            ) : null}
-
-            {!isPast ? (
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                {canDelete ? (
                     <Button
                         type="button"
                         text="Eliminar"
@@ -143,37 +160,38 @@ const VacationWorkerDetail = ({
                         className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
                         onClick={onDelete}
                     />
-                    {event.status == 0 ? (
-                        <Button
-                            type="button"
-                            text="Editar"
-                            width="w-full sm:w-[7.2rem]"
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                            onClick={onEdit}
-                        />
-                    ) : (
-                        <Button
-                            type="button"
-                            text="Cerrar"
-                            width="w-full sm:w-[7.2rem]"
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                            onClick={onClose}
-                        />
-                    )}
-                </div>
-            ) : null}
+                ) : null}
+
+                {canEdit ? (
+                    <Button
+                        type="button"
+                        text="Editar"
+                        width="w-full sm:w-[7.2rem]"
+                        height="h-8"
+                        textSize="text-[0.95rem]"
+                        bgColor="bg-[#1F3664]"
+                        textColor="text-white"
+                        hoverColor="hover:bg-[#15284A]"
+                        activeColor="active:bg-[#0E1B33]"
+                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                        onClick={onEdit}
+                    />
+                ) : (
+                    <Button
+                        type="button"
+                        text="Cerrar"
+                        width="w-full sm:w-[7.2rem]"
+                        height="h-8"
+                        textSize="text-[0.95rem]"
+                        bgColor="bg-[#1F3664]"
+                        textColor="text-white"
+                        hoverColor="hover:bg-[#15284A]"
+                        activeColor="active:bg-[#0E1B33]"
+                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                        onClick={onClose}
+                    />
+                )}
+            </div>
         </div>
     );
 };

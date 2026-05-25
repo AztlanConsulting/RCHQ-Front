@@ -70,21 +70,21 @@ const ConfirmDeleteModal = ({
         aria-labelledby={titleId}
         className={`${cardClass} relative flex flex-col gap-4`}
       >
-        <h3 id={titleId} className="text-lg font-semibold text-slate-900">{resolvedTitle}</h3>
+        <h3 id={titleId} className="text-2xl font-bold text-[#121212]">{resolvedTitle}</h3>
         <div className="text-sm text-slate-500">{body ?? defaultBody}</div>
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-center pt-1">
           <Button
             text="Cancelar"
             onClick={onCancel}
-            bgColor="bg-transparent"
-            hoverColor="hover:bg-slate-100"
-            activeColor="active:bg-slate-200"
+            bgColor="bg-white"
+            hoverColor="hover:bg-slate-50"
+            activeColor="active:bg-slate-100"
             textColor="text-slate-600"
             width="w-auto"
-            height="h-[42px]"
+            height="h-[38px]"
             textSize="text-sm"
-            fontWeight="font-medium"
-            className="px-4"
+            fontWeight="font-bold"
+            className="px-5 border border-slate-200 shadow-md"
           />
           <Button
             text={confirmText}
@@ -95,10 +95,10 @@ const ConfirmDeleteModal = ({
             activeColor={confirmActive}
             textColor="text-white"
             width="w-auto"
-            height="h-[42px]"
+            height="h-[38px]"
             textSize="text-sm"
-            fontWeight="font-semibold"
-            className="px-4"
+            fontWeight="font-bold"
+            className="px-5 shadow-md"
           />
         </div>
       </div>

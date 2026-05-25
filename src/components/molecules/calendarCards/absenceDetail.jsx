@@ -106,7 +106,7 @@ const AbsenceDetail = ({
   if (isEditing) {
     return (
       <div className="px-2 text-left sm:px-3">
-        <Type variant="page-title" className="mb-3" as="h2">
+        <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
           Ausencia
         </Type>
 

@@ -47,7 +47,7 @@ describe("SearchableCheckboxDropdown", () => {
       />,
     );
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar/i), {
+    fireEvent.change(screen.getByRole("textbox", { name: /buscar/i }), {
       target: { value: "mar" },
     });
 
