@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     getCalendarViewerRole,
     getEmployeeHouseName,
@@ -320,6 +320,42 @@ export const useBaseCalendar = () => {
         return rawEvents ?? [];
     }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
+    const reloadVisibleRange = useCallback(
+        async (calendarRef) => {
+            const calendarApi = calendarRef.current?.getApi?.();
+            const currentView = calendarApi?.view;
+
+            if (!currentView) return [];
+            if (
+                effectiveEmployeeId == "" &&
+                !canViewHouseEvents(effectiveViewerRole)
+            )
+                return [];
+
+            const start = currentView.activeStart.toISOString();
+            const end = currentView.activeEnd.toISOString();
+
+            lastFetchedRange.current = { start, end };
+
+            const rawEvents = await loadCalendarEvents(
+                start.split("T")[0],
+                end.split("T")[0],
+                effectiveEmployeeId,
+                effectiveViewerRole,
+            );
+
+            setAllEvents(rawEvents ?? []);
+            return rawEvents ?? [];
+        },
+        [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents],
+    );
+
+    useEffect(() => {
+        reloadCurrentRange().catch((err) => {
+            console.error(err);
+        });
+    }, [reloadCurrentRange]);
+
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         const currentDate = dateInfo.view.calendar.getDate();
@@ -424,5 +460,6 @@ export const useBaseCalendar = () => {
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,
+        reloadVisibleRange,
     };
 };

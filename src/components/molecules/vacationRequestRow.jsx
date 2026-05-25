@@ -20,6 +20,10 @@ const VacationRequestRow = ({
     const isApproving = approvingRequestId === request.vacationRequestId;
     const isRejecting = rejectingRequestId === request.vacationRequestId;
 
+    const handleViewDetail = () => {
+        onViewDetail?.(request);
+    };
+
     return (
         <tr className="border-b border-gray-200 last:border-b-0">
             <td className="px-4 py-3">
