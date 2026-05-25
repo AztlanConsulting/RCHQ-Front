@@ -72,6 +72,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("startDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    error={!!errors.startDate}
                                 />
                             </div>
                             <div style={getTimeContainerStyle(showTimeFields)}>
@@ -81,6 +82,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("startTime", value)
                                     }
                                     placeholder="-- : --"
+                                    error={errors.startTime}
+                                    hideErrorText
                                     disabled={form.allDay}
                                 />
                             </div>
@@ -110,6 +113,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("endDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    error={!!errors.endDate}
                                 />
                             </div>
                             <div style={getTimeContainerStyle(showTimeFields)}>
@@ -124,6 +128,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                             : undefined
                                     }
                                     placeholder="-- : --"
+                                    error={errors.endTime}
+                                    hideErrorText
                                     disabled={form.allDay}
                                 />
                             </div>
@@ -162,24 +168,31 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         setValue={(value) => setField("eventTypeId", value)}
                         options={eventTypes}
                         placeholder="General"
+                        error={!!errors.eventTypeId}
                     />
                     {errors.eventTypeId && (
                         <ErrorText>{errors.eventTypeId}</ErrorText>
                     )}
 
-                    <textarea
-                        placeholder="Este es un evento de casa"
-                        value={form.description}
-                        onChange={(e) =>
-                            setField("description", e.target.value)
-                        }
-                        maxLength={250}
-                        rows={4}
-                        className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
-                    />
-                    {errors.description && (
-                        <ErrorText>{errors.description}</ErrorText>
-                    )}
+                    <div className="flex w-full flex-col gap-1.5">
+                        <label className="text-sm font-bold text-[#374151]">
+                            Descripción
+                        </label>
+                        <textarea
+                            placeholder="Este es un evento de casa"
+                            value={form.description}
+                            onChange={(e) =>
+                                setField("description", e.target.value)
+                            }
+                            maxLength={250}
+                            rows={4}
+                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
+                            style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
+                        />
+                        {errors.description && (
+                            <ErrorText>{errors.description}</ErrorText>
+                        )}
+                    </div>
 
                     {serverError && (
                         <Alert
