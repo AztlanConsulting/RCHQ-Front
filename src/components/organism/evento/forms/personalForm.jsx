@@ -128,15 +128,19 @@ const PersonalForm = (props) => {
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
 
             {isCoordinator && (
-                <EmployeeSearchSelect
-                    label="Agregar empleados"
-                    placeholder="Buscar por nombre..."
-                    employees={employees}
-                    selected={selectedEmployees}
-                    onSelect={handleSelectEmployee}
-                    onRemove={handleRemoveEmployee}
-                    onSearch={searchEmployees}
-                />
+                <div>
+                    <EmployeeSearchSelect
+                        label="Agregar empleados"
+                        placeholder="Buscar por nombre..."
+                        employees={employees}
+                        selected={selectedEmployees}
+                        onSelect={handleSelectEmployee}
+                        onRemove={handleRemoveEmployee}
+                        onSearch={searchEmployees}
+                        error={!!errors.employees}
+                    />
+                    {errors.employees && <ErrorText>{errors.employees}</ErrorText>}
+                </div>
             )}
 
             <div className="flex w-full flex-col gap-1.5">
