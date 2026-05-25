@@ -2,11 +2,21 @@ import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
+import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
 
 const VacationWorkerDetail = ({
     event,
+    isEditing = false,
+    vacationForm,
+    vacationEditError = "",
+    vacationRemainingInfo = null,
+    isLoadingVacationRemaining = false,
+    isSaving = false,
     onClose,
     onEdit,
+    onCancelEdit,
+    onSubmitEdit,
+    onVacationFieldChange,
     onDelete,
 }) => {
     const isPast = isPastDate(event.start);
@@ -16,7 +26,28 @@ const VacationWorkerDetail = ({
     const isRejected = status === 2;
     const canDelete = !isApproved || !isPast;
     const canEdit = !isPast && isPending;
-    const statusLabel = isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+    const title =
+        isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
+    const statusLabel =
+        isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+
+    if (isEditing) {
+        return (
+            <VacationEditForm
+                title={title}
+                event={event}
+                vacationForm={vacationForm}
+                vacationEditError={vacationEditError}
+                vacationRemainingInfo={vacationRemainingInfo}
+                isLoadingVacationRemaining={isLoadingVacationRemaining}
+                isSaving={isSaving}
+                onCancelEdit={onCancelEdit}
+                onSubmitEdit={onSubmitEdit}
+                onVacationFieldChange={onVacationFieldChange}
+                showEmployeeInfo={false}
+            />
+        );
+    }
 
     return (
         <div className="px-1 text-left sm:px-2">
@@ -25,7 +56,7 @@ const VacationWorkerDetail = ({
                 className="mb-5 text-[2rem] leading-none"
                 as="h2"
             >
-                Solicitud de Vacaciones
+                {title}
             </Type>
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>

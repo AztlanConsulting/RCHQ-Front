@@ -2,6 +2,20 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import VacationWorkerDetail from "../../components/molecules/calendarCards/vacationWorkerDetail";
 
+vi.mock("../../components/atoms/dateField", () => ({
+    default: ({ label, name, value = "", onChange }) => (
+        <label>
+            {label}
+            <input
+                aria-label={label}
+                name={name}
+                value={value}
+                onChange={onChange}
+            />
+        </label>
+    ),
+}));
+
 const baseVacation = {
     start: new Date(2026, 5, 5),
     end: new Date(2026, 5, 10),
@@ -159,4 +173,30 @@ describe("VacationWorkerDetail", () => {
 
         expect(onDelete).toHaveBeenCalledTimes(1);
     });
+
+    it("muestra el formulario de edición sin datos del empleado y con sus fechas", () => {
+        renderVacationWorkerDetail({
+            isEditing: true,
+            vacationForm: {
+                startDate: "2026-06-05",
+                endDate: "2026-06-10",
+            },
+            vacationRemainingInfo: {
+                remainingVacations: 8,
+                startDate: "2026-04-09T00:00:00.000Z",
+                endDate: "2027-04-08T00:00:00.000Z",
+            },
+            onCancelEdit: vi.fn(),
+            onSubmitEdit: vi.fn(),
+            onVacationFieldChange: vi.fn(),
+        });
+
+        expect(screen.queryByText("Nombre del trabajador")).not.toBeInTheDocument();
+        expect(screen.queryByText("CURP")).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("2026-06-05");
+        expect(screen.getByLabelText("Fecha de fin")).toHaveValue("2026-06-10");
+        expect(screen.getByRole("button", { name: /cancelar/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /guardar/i })).toBeInTheDocument();
+    });
 });
+
