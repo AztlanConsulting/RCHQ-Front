@@ -27,8 +27,8 @@ const HouseLogsFilters = ({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="flex flex-col justify-end">
           <TextField
             id="house-logs-responsible"
@@ -38,6 +38,8 @@ const HouseLogsFilters = ({
             setValue={handleResponsibleChange}
             maxLength={100}
             labelClassName="text-sm font-bold text-[#121212]"
+            containerClassName="min-h-[44px] px-3.5"
+            inputClassName="text-sm"
           />
         </div>
 
@@ -50,6 +52,8 @@ const HouseLogsFilters = ({
             setValue={handleAffectedChange}
             maxLength={100}
             labelClassName="text-sm font-bold text-[#121212]"
+            containerClassName="min-h-[44px] px-3.5"
+            inputClassName="text-sm"
           />
         </div>
 
@@ -66,7 +70,7 @@ const HouseLogsFilters = ({
             onClearSelection={clearActionSelection}
             searchPlaceholder="Buscar acción"
             labelClassName="font-bold text-[#121212]"
-            triggerClassName="text-[#121212]"
+            triggerClassName="min-h-[44px] px-3.5 py-1.5 text-sm text-[#121212]"
             menuClassName="sm:min-w-[20rem]"
           />
         </div>
@@ -78,6 +82,9 @@ const HouseLogsFilters = ({
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
             labelColor="text-[#121212]"
+            inputWrapperClassName="min-h-[44px]"
+            inputClassName="text-sm"
+            labelClassName="text-sm"
           />
         </div>
       </div>

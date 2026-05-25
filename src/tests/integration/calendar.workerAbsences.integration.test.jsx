@@ -6,6 +6,7 @@ import {
     within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
 import {
@@ -20,13 +21,16 @@ vi.mock("../../hooks/organism/useBaseCalendar", () => ({
     useBaseCalendar: vi.fn(),
 }));
 
+vi.mock("../../hooks/pages/useCalendarSearchParams", () => ({
+    useCalendarSearchParams: vi.fn(),
+}));
+
 vi.mock("../../services/calendarService", () => ({
     getAbsenceTypes: vi.fn(),
     getCalendarViewerRole: vi.fn(() => "Trabajador"),
     getEventsTypes: vi.fn(),
     getHouseEmployees: vi.fn(),
     updateAbsenceService: vi.fn(),
-    getCalendarViewerRole: vi.fn(),
     buildAbsenceEvidenceUrl: vi.fn((link) => link),
 }));
 
@@ -89,6 +93,13 @@ const buildGlobalEvent = (overrides = {}) => ({
     ...overrides,
 });
 
+const renderCalendar = () =>
+    render(
+        <MemoryRouter>
+            <Calendario />
+        </MemoryRouter>,
+    );
+
 const setWorkerCalendar = ({
     allEvents,
     viewerRole = "Mantenimiento",
@@ -146,7 +157,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
             ],
         });
 
-        render(<Calendario />);
+        renderCalendar();
 
         const absenceButton = await screen.findByTestId(
             "calendar-event-absence-with-evidence",
@@ -204,7 +215,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
             ],
         });
 
-        render(<Calendario />);
+        renderCalendar();
 
         fireEvent.click(
             await screen.findByTestId("calendar-event-absence-weird-empty"),
@@ -255,7 +266,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
             allEvents: events,
         });
 
-        render(<Calendario />);
+        renderCalendar();
 
         await screen.findByTestId("calendar-event-absence-evidence");
         await screen.findByTestId("calendar-event-absence-no-evidence");

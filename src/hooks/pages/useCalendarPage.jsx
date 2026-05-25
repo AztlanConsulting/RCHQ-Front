@@ -149,6 +149,11 @@ export const useCalendarPage = ({
     setDeleteVacationError("");
   }, [resetVacationEdit]);
 
+  const openCalendarItemDetail = useCallback((item) => {
+    const detail = calendarItemToDetail(item);
+    showEventDetail(detail);
+  }, [showEventDetail]);
+
   const showCalendarAlert = useCallback((nextAlert) => {
     setAlert(nextAlert);
   }, []);
@@ -678,6 +683,7 @@ export const useCalendarPage = ({
     submitVacationEdit,
     vacationRemainingInfo,
     isLoadingVacationRemaining,
+    openCalendarItemDetail,
     isDeleteVacationOpen,
     isDeletingVacation,
     deleteVacationError,

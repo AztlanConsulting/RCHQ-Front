@@ -18,6 +18,7 @@ import ConfirmDeleteVacationModal from "../components/molecules/confirmDeleteVac
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
+import { useCalendarSearchParams } from "../hooks/pages/useCalendarSearchParams";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -53,6 +54,7 @@ const Calendario = () => {
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,
+        reloadVisibleRange,
     } = useBaseCalendar();
 
     const {
@@ -147,6 +149,7 @@ const Calendario = () => {
         submitVacationEdit,
         vacationRemainingInfo,
         isLoadingVacationRemaining,
+        openCalendarItemDetail,
         isDeleteVacationOpen,
         isDeletingVacation,
         deleteVacationError,
@@ -162,6 +165,13 @@ const Calendario = () => {
     useEffect(() => {
         setOwnCalendar();
     }, [setOwnCalendar]);
+
+    useCalendarSearchParams({
+        calendarRef,
+        openCalendarItemDetail,
+        reloadVisibleRange,
+        setCalendarMode,
+    });
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -352,9 +362,18 @@ const Calendario = () => {
                             ) : (
                                 <VacationWorkerDetail
                                     event={selectedEvent}
+                                    isEditing={isVacationEditing}
+                                    vacationForm={vacationForm}
+                                    vacationEditError={vacationEditError}
+                                    vacationRemainingInfo={vacationRemainingInfo}
+                                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                                    isSaving={isSavingVacation}
                                     onClose={closeDetail}
-                                    onEdit={() => {}}
-                                    onDelete={() => {}}
+                                    onEdit={startVacationEdit}
+                                    onCancelEdit={cancelVacationEdit}
+                                    onSubmitEdit={submitVacationEdit}
+                                    onVacationFieldChange={setVacationField}
+                                    onDelete={openDeleteVacation}
                                 />
                             );
 
@@ -405,6 +424,7 @@ const Calendario = () => {
                 event={isDeleteVacationOpen ? selectedEvent : null}
                 loading={isDeletingVacation}
                 error={deleteVacationError}
+                showEmployeeInfo={isManagementRole(viewerRole)}
                 onCancel={cancelDeleteVacation}
                 onConfirm={confirmDeleteVacation}
             />

@@ -138,6 +138,8 @@ export const calendarItemToDetail = (item) => {
             ? (item.start.toISOString?.() ?? String(item.start))
             : "",
         endStr: item.end ? (item.end.toISOString?.() ?? String(item.end)) : "",
+        readableStart: item.startReadableDate ?? startDate,
+        readableEnd: item.endReadableDate ?? endDate,
         allDay: Boolean(item.allDay),
         backgroundColor: item.backgroundColor ?? item.color,
         borderColor: item.borderColor ?? item.color ?? item.backgroundColor,
@@ -158,8 +160,6 @@ export const calendarItemToDetail = (item) => {
         link: item.link ?? "",
         startDate,
         endDate,
-        readableStart: item.startReadableDate ?? startDate,
-        readableEnd: item.endReadableDate ?? endDate,
         isDeleted: item.isDeleted,
         peopleInsideEvent: item.peopleInsideEvent ?? null,
     };

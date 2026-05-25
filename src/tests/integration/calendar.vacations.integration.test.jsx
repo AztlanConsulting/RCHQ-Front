@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import Calendario from "../../pages/calendario";
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../../hooks/organism/useCalendarFilters";
@@ -15,6 +16,10 @@ vi.mock("../../hooks/organism/useCalendarFilters", () => ({
 
 vi.mock("../../hooks/pages/useCalendarPage", () => ({
     useCalendarPage: vi.fn(),
+}));
+
+vi.mock("../../hooks/pages/useCalendarSearchParams", () => ({
+    useCalendarSearchParams: vi.fn(),
 }));
 
 vi.mock("../../components/organism/baseCalendar", () => ({
@@ -38,7 +43,36 @@ vi.mock("../../components/organism/evento/registerEventModal", () => ({
     default: () => null,
 }));
 
+vi.mock("../../components/organism/evento/updateHouseEventModal", () => ({
+    default: () => null,
+}));
+
+vi.mock("../../components/organism/evento/updatePersonalEventModal", () => ({
+    default: () => null,
+}));
+
+vi.mock("../../components/atoms/dateField", () => ({
+    default: ({ label, name, value = "", onChange }) => (
+        <label>
+            {label}
+            <input
+                aria-label={label}
+                name={name}
+                value={value}
+                onChange={onChange}
+            />
+        </label>
+    ),
+}));
+
 const setOwnCalendar = vi.fn();
+
+const renderCalendar = () =>
+    render(
+        <MemoryRouter>
+            <Calendario />
+        </MemoryRouter>,
+    );
 
 const baseVacation = {
     focus: "vacaciones",
@@ -57,11 +91,14 @@ const baseVacation = {
 const setCalendarHooks = ({
     viewerRole = "Coordinador",
     event = baseVacation,
+    isDeleteVacationOpen = false,
+    isVacationEditing = false,
 } = {}) => {
     const startVacationEdit = vi.fn();
     const cancelVacationEdit = vi.fn();
     const setVacationField = vi.fn();
     const submitVacationEdit = vi.fn();
+    const openDeleteVacation = vi.fn();
 
     useBaseCalendar.mockReturnValue({
         employeeHouseName: "",
@@ -156,23 +193,36 @@ const setCalendarHooks = ({
         submitAbsenceEdit: vi.fn(),
         showCalendarAlert: vi.fn(),
         clearCalendarAlert: vi.fn(),
-        isVacationEditing: false,
+        isVacationEditing,
         vacationForm: {
             startDate: "2026-06-05",
             endDate: "2026-06-10",
         },
         vacationEditError: "",
+        vacationRemainingInfo: {
+            remainingVacations: 8,
+            startDate: "2026-04-09T00:00:00.000Z",
+            endDate: "2027-04-08T00:00:00.000Z",
+        },
+        isLoadingVacationRemaining: false,
         isSavingVacation: false,
         startVacationEdit,
         cancelVacationEdit,
         setVacationField,
         submitVacationEdit,
+        isDeleteVacationOpen,
+        isDeletingVacation: false,
+        deleteVacationError: "",
+        openDeleteVacation,
+        cancelDeleteVacation: vi.fn(),
+        confirmDeleteVacation: vi.fn(),
     });
     return {
         startVacationEdit,
         cancelVacationEdit,
         setVacationField,
         submitVacationEdit,
+        openDeleteVacation,
     };
 };
 
@@ -191,7 +241,7 @@ describe("Integración: Calendario - vacaciones", () => {
 
         setCalendarHooks({ viewerRole: "Coordinador" });
 
-        render(<Calendario />);
+        renderCalendar();
 
         expect(screen.getByRole("dialog")).toBeInTheDocument();
         expect(screen.getByText("Nombre del trabajador")).toBeInTheDocument();
@@ -210,7 +260,7 @@ describe("Integración: Calendario - vacaciones", () => {
 
         setCalendarHooks({ viewerRole: "Cocinero" });
 
-        render(<Calendario />);
+        renderCalendar();
 
         expect(screen.getByRole("dialog")).toBeInTheDocument();
         expect(
@@ -239,5 +289,85 @@ describe("Integración: Calendario - vacaciones", () => {
         render(<Calendario />);
         fireEvent.click(screen.getByRole("button", { name: /editar/i }));
         expect(startVacationEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it("permite abrir eliminación desde el detalle de vacaciones del trabajador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        const { openDeleteVacation } = setCalendarHooks({
+            viewerRole: "Cocinero",
+        });
+
+        render(<Calendario />);
+
+        fireEvent.click(screen.getByRole("button", { name: /eliminar/i }));
+
+        expect(openDeleteVacation).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra nombre y CURP en el modal de eliminación para Coordinador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        setCalendarHooks({
+            viewerRole: "Coordinador",
+            isDeleteVacationOpen: true,
+        });
+
+        render(<Calendario />);
+
+        const deleteDialog = screen
+            .getByRole("heading", { name: /eliminar vacaciones/i })
+            .closest('[role="dialog"]');
+
+        expect(deleteDialog).toBeInTheDocument();
+        expect(within(deleteDialog).getByText("Ana Pendiente")).toBeInTheDocument();
+        expect(within(deleteDialog).getByText(/US170101HDF00003/)).toBeInTheDocument();
+    });
+
+    it("no muestra nombre ni CURP en el modal de eliminación para trabajador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        setCalendarHooks({
+            viewerRole: "Cocinero",
+            isDeleteVacationOpen: true,
+        });
+
+        render(<Calendario />);
+
+        const deleteDialog = screen
+            .getByRole("heading", { name: /eliminar vacaciones/i })
+            .closest('[role="dialog"]');
+
+        expect(deleteDialog).toBeInTheDocument();
+        expect(within(deleteDialog).queryByText("Ana Pendiente")).not.toBeInTheDocument();
+        expect(within(deleteDialog).queryByText(/US170101HDF00003/)).not.toBeInTheDocument();
+        expect(
+            within(deleteDialog).getByText(
+                "Está a punto de eliminar la solicitud de vacaciones. Esta acción no se puede deshacer.",
+            ),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra la edición de una vacación propia sin nombre ni CURP", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+
+        setCalendarHooks({
+            viewerRole: "Cocinero",
+            isVacationEditing: true,
+        });
+
+        render(<Calendario />);
+
+        expect(screen.getByRole("dialog")).toBeInTheDocument();
+        expect(
+            screen.queryByText("Nombre del trabajador"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText("CURP")).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue(
+            "2026-06-05",
+        );
+        expect(screen.getByLabelText("Fecha de fin")).toHaveValue(
+            "2026-06-10",
+        );
+        expect(
+            screen.getByRole("button", { name: /guardar/i }),
+        ).toBeInTheDocument();
     });
 });
