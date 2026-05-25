@@ -36,76 +36,96 @@ const CasaForm = (props) => {
                     gap: "8px",
                 }}
             >
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
-                    }}
-                >
-                    <div style={{ flex: 1 }}>
-                        <DateField
-                            label="Fecha de inicio"
-                            labelColor="text-[#374151]"
-                            value={form.startDate}
-                            placeholder="dd / mm / yyyy"
-                            onChange={(e) =>
-                                setField("startDate", e.target.value)
-                            }
-                        />
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "flex-end",
+                        }}
+                    >
+                        <div style={{ flex: 1 }}>
+                            <DateField
+                                label="Fecha de inicio"
+                                labelColor="text-[#374151]"
+                                value={form.startDate}
+                                placeholder="dd / mm / yyyy"
+                                onChange={(e) =>
+                                    setField("startDate", e.target.value)
+                                }
+                            />
+                        </div>
 
-                        {errors.startDate && (
-                            <ErrorText>{errors.startDate}</ErrorText>
-                        )}
+                        <div style={getTimeContainerStyle(isTimeVisible)}>
+                            <TimeField
+                                value={form.startTime}
+                                onChange={(value) => setField("startTime", value)}
+                                placeholder="-- : --"
+                                error={errors.startTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.startTime}
-                            onChange={(value) => setField("startTime", value)}
-                            placeholder="-- : --"
-                            error={errors.startTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.startDate && <ErrorText>{errors.startDate}</ErrorText>}
+                        </div>
+                        {isTimeVisible && (
+                            <div style={{ flex: 1 }}>
+                                {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
-                    }}
-                >
-                    <div style={{ flex: 1 }}>
-                        <DateField
-                            label="Fecha de fin"
-                            labelColor="text-[#374151]"
-                            value={form.endDate}
-                            placeholder="dd / mm / yyyy"
-                            onChange={(e) =>
-                                setField("endDate", e.target.value)
-                            }
-                        />
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "flex-end",
+                        }}
+                    >
+                        <div style={{ flex: 1 }}>
+                            <DateField
+                                label="Fecha de fin"
+                                labelColor="text-[#374151]"
+                                value={form.endDate}
+                                placeholder="dd / mm / yyyy"
+                                onChange={(e) =>
+                                    setField("endDate", e.target.value)
+                                }
+                            />
+                        </div>
 
-                        {errors.endDate && (
-                            <ErrorText>{errors.endDate}</ErrorText>
-                        )}
+                        <div style={getTimeContainerStyle(isTimeVisible)}>
+                            <TimeField
+                                value={form.endTime}
+                                onChange={(value) => setField("endTime", value)}
+                                placeholder="-- : --"
+                                minTime={
+                                    form.startDate === form.endDate
+                                        ? form.startTime
+                                        : undefined
+                                }
+                                error={errors.endTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.endTime}
-                            onChange={(value) => setField("endTime", value)}
-                            placeholder="-- : --"
-                            minTime={
-                                form.startDate === form.endDate
-                                    ? form.startTime
-                                    : undefined
-                            }
-                            error={errors.endTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.endDate && <ErrorText>{errors.endDate}</ErrorText>}
+                        </div>
+                        {isTimeVisible && (
+                            <div style={{ flex: 1 }}>
+                                {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                            </div>
+                        )}
                     </div>
                 </div>
 

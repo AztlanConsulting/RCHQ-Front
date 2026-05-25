@@ -8,6 +8,7 @@ const TimeField = ({
     onChange,
     placeholder = "Hora",
     error,
+    hideErrorText = false,
     disabled = false,
     minTime,
 }) => {
@@ -65,7 +66,7 @@ const TimeField = ({
                 />
             </button>
 
-            {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+            {error && !hideErrorText && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
             {isOpen &&
                 createPortal(

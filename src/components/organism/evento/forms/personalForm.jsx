@@ -57,9 +57,9 @@ const PersonalForm = (props) => {
                 <div
                     style={{
                         display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
-                        maxHeight: isTimeVisible ? "100px" : "0px",
+                        flexDirection: "column",
+                        gap: "4px",
+                        maxHeight: isTimeVisible ? "150px" : "0px",
                         overflow: "hidden",
                         opacity: isTimeVisible ? 1 : 0,
                         marginTop: isTimeVisible ? "0px" : "-8px",
@@ -67,25 +67,38 @@ const PersonalForm = (props) => {
                             "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                     }}
                 >
-                    <div style={{ flex: 1 }}>
-                        <TimeField
-                            value={form.startTime}
-                            onChange={(value) => setField("startTime", value)}
-                            placeholder="Inicio"
-                            error={errors.startTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                        <div style={{ flex: 1 }}>
+                            <TimeField
+                                value={form.startTime}
+                                onChange={(value) => setField("startTime", value)}
+                                placeholder="Inicio"
+                                error={errors.startTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                            <TimeField
+                                value={form.endTime}
+                                onChange={(value) => setField("endTime", value)}
+                                placeholder="Fin"
+                                minTime={form.startTime}
+                                error={errors.endTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={{ flex: 1 }}>
-                        <TimeField
-                            value={form.endTime}
-                            onChange={(value) => setField("endTime", value)}
-                            placeholder="Fin"
-                            minTime={form.startTime}
-                            error={errors.endTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                        </div>
                     </div>
                 </div>
 
