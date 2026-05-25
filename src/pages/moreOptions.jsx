@@ -105,7 +105,7 @@ const MoreOptions = () => {
               <span className="block whitespace-pre-line text-center text-sm md:text-[0.8rem]">
                 {isTwoFactorAuthActive
                   ? "Desactivar doble\nverificación"
-                  : "Activar 2FA"}
+                  : "Activar doble\nverificación"}
               </span>
             }
             onClick={() => {
