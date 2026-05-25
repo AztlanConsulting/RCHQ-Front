@@ -285,7 +285,10 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                scrollable={selectedEvent?.focus === "eventos"}
+                scrollable={
+                    selectedEvent?.focus === "eventos" ||
+                    selectedEvent?.focus === "ausencias"
+                }
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
                         ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
