@@ -373,7 +373,7 @@ const Calendario = () => {
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}
                                     onVacationFieldChange={setVacationField}
-                                    onDelete={() => {}}
+                                    onDelete={openDeleteVacation}
                                 />
                             );
 
@@ -424,6 +424,7 @@ const Calendario = () => {
                 event={isDeleteVacationOpen ? selectedEvent : null}
                 loading={isDeletingVacation}
                 error={deleteVacationError}
+                showEmployeeInfo={isManagementRole(viewerRole)}
                 onCancel={cancelDeleteVacation}
                 onConfirm={confirmDeleteVacation}
             />

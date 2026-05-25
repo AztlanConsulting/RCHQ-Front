@@ -6,6 +6,7 @@ import {
     updateAbsenceService,
 } from "../../services/calendarService";
 import {
+    deleteVacationRequest,
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
@@ -17,6 +18,7 @@ vi.mock("../../services/calendarService", () => ({
 }));
 
 vi.mock("../../services/vacationService", () => ({
+    deleteVacationRequest: vi.fn(),
     getRemainingVacations: vi.fn(),
     updateVacationRequestDates: vi.fn(),
 }));
@@ -486,5 +488,92 @@ describe("useCalendarPage", () => {
             "No se pudo actualizar vacaciones",
         );
         expect(result.current.isVacationEditing).toBe(true);
+    });
+
+    it("elimina la vacación, recarga el rango y cierra el detalle", async () => {
+        const reloadCurrentRange = vi.fn().mockResolvedValue([]);
+        deleteVacationRequest.mockResolvedValue({
+            vacationRequestId: "vacation-1",
+        });
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange,
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+        });
+
+        act(() => {
+            result.current.openDeleteVacation();
+        });
+
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(deleteVacationRequest).toHaveBeenCalledWith("vacation-1");
+        expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
+        expect(result.current.selectedEvent).toBe(null);
+        expect(result.current.alert).toEqual({
+            type: "success",
+            message: "Vacaciones eliminadas correctamente",
+        });
+    });
+
+    it("muestra error si falla la eliminación de vacaciones", async () => {
+        deleteVacationRequest.mockRejectedValue(
+            new Error("No se pudo eliminar vacaciones"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.openDeleteVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(result.current.deleteVacationError).toBe(
+            "No se pudo eliminar vacaciones",
+        );
+        expect(result.current.isDeleteVacationOpen).toBe(true);
+    });
+
+    it("muestra error de permisos si el back rechaza la eliminación de vacaciones", async () => {
+        deleteVacationRequest.mockRejectedValue(
+            new Error("No puede acceder a este recurso"),
+        );
+
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        act(() => {
+            result.current.handleEventClick(buildVacationClickInfo());
+            result.current.openDeleteVacation();
+        });
+
+        await act(async () => {
+            await result.current.confirmDeleteVacation();
+        });
+
+        expect(result.current.deleteVacationError).toBe(
+            "No puede acceder a este recurso",
+        );
+        expect(result.current.isDeleteVacationOpen).toBe(true);
     });
 });
