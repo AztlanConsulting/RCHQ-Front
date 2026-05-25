@@ -155,11 +155,7 @@ export const usePersonalForm = ({
         setErrors(fieldErrors);
         onNameError?.(fieldErrors.name ?? "");
 
-        const schemaMessages = result.success
-            ? []
-            : [...new Set(result.error.issues.map((i) => i.message))];
-
-        onValidationAlert?.([...schemaMessages, ...extraMessages].join("\n"));
+        onValidationAlert?.("Revisa los campos marcados antes de continuar.");
 
         return null;
     };
