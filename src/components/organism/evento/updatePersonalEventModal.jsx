@@ -42,12 +42,12 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 onClose={onClose}
                 grayBackground
                 placement="center"
-                className="w-full max-w-[560px] rounded-xl p-6"
+                className="w-full max-w-[560px] max-h-[calc(100vh-2rem)] overflow-hidden rounded-xl p-6"
                 backdropClassName="bg-black/40"
             >
                 <div
                     key={event?.eventId ?? event?.id ?? "update-personal"}
-                    className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
+                    className="flex max-h-[calc(100vh-7rem)] flex-col gap-4 overflow-y-auto pr-1 animate-[fadeSlideIn_220ms_ease-in-out]"
                 >
                     <h2 className="text-2xl font-bold text-[#121212]">
                         Modificar evento personal
@@ -174,7 +174,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         />
                     )}
 
-                    <div className="flex justify-center gap-3 pt-1">
+                    <div className="sticky bottom-0 z-10 flex justify-center gap-3 bg-white pt-3 pb-1">
                         <Button
                             text="Cancelar"
                             onClick={onClose}

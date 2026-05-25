@@ -103,18 +103,45 @@ const EventDetail = ({
             ) : null}
 
             {event.description ? (
-                <Type variant="body" className="mb-4 block whitespace-pre-wrap">
-                    {event.description}
-                </Type>
+                <div className="mb-4">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Descripción:
+                    </Type>
+                    <Type
+                        variant="body"
+                        className="block whitespace-pre-wrap text-[1.05rem] leading-snug text-[#121212]"
+                    >
+                        {event.description}
+                    </Type>
+                </div>
             ) : null}
 
-            {event.peopleInsideEvent
-                ? event.peopleInsideEvent.map((person, idx) => (
-                      <p key={idx}>
-                          {person?.name} - {person?.id}
-                      </p>
-                  ))
-                : null}
+            {Array.isArray(event.peopleInsideEvent) &&
+            event.peopleInsideEvent.length > 0 ? (
+                <div className="mb-4">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Empleados ligados al evento:
+                    </Type>
+                    <div className="space-y-1">
+                        {event.peopleInsideEvent.map((person, idx) => (
+                            <Type
+                                key={person?.id ?? idx}
+                                variant="body"
+                                className="block text-[1.05rem] leading-snug text-[#121212]"
+                                as="p"
+                            >
+                                {person?.name || "-"}
+                            </Type>
+                        ))}
+                    </div>
+                </div>
+            ) : null}
 
             {(showDelete || showEdit) ? (
                 <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
