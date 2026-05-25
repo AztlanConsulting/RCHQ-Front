@@ -112,6 +112,7 @@ export const usePersonalForm = ({
 
     const handleSelectEmployee = useCallback((emp) => {
         setSelectedEmployees((prev) => [...prev, emp]);
+        setErrors((prev) => ({ ...prev, employees: undefined }));
     }, []);
 
     const handleRemoveEmployee = useCallback((employeeId) => {
@@ -131,12 +132,7 @@ export const usePersonalForm = ({
 
         const result = personalEventSchema.safeParse(input);
 
-        const extraMessages = [];
-        if (isCoordinator && selectedEmployees.length === 0) {
-            extraMessages.push("Debes seleccionar al menos un empleado");
-        }
-
-        if (result.success && extraMessages.length === 0) {
+        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
             setErrors({});
             return result.data;
         }
@@ -150,6 +146,10 @@ export const usePersonalForm = ({
                     fieldErrors[key] = issue.message;
                 }
             });
+        }
+
+        if (isCoordinator && selectedEmployees.length === 0) {
+            fieldErrors.employees = "Debes seleccionar al menos un empleado.";
         }
 
         setErrors(fieldErrors);
