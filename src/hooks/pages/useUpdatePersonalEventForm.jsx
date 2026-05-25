@@ -147,6 +147,7 @@ export const useUpdatePersonalEventForm = ({
 
     const handleSelectEmployee = useCallback((emp) => {
         setSelectedEmployees((prev) => [...prev, emp]);
+        setErrors((prev) => ({ ...prev, employees: undefined }));
     }, []);
 
     const handleRemoveEmployee = useCallback((employeeId) => {
@@ -161,11 +162,6 @@ export const useUpdatePersonalEventForm = ({
             return null;
         }
 
-        if (isCoordinator && selectedEmployees.length === 0) {
-            setServerError("Debes seleccionar al menos un empleado.");
-            return null;
-        }
-
         const input = {
             ...form,
             categoryKey: "personal",
@@ -175,16 +171,24 @@ export const useUpdatePersonalEventForm = ({
 
         const result = personalEventSchema.safeParse(input);
 
-        if (result.success) {
+        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
             setErrors({});
             return result.data;
         }
 
         const fieldErrors = {};
-        result.error.issues.forEach((issue) => {
-            const key = issue.path[issue.path.length - 1];
-            if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-        });
+
+        if (!result.success) {
+            result.error.issues.forEach((issue) => {
+                const key = issue.path[issue.path.length - 1];
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+            });
+        }
+
+        if (isCoordinator && selectedEmployees.length === 0) {
+            fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
         setErrors(fieldErrors);
         return null;
     };
