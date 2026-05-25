@@ -6,7 +6,7 @@ import EmployeeSearchSelect from "../../../atoms/employeeSearchSelect";
 import ErrorText from "../../../atoms/errorText";
 import SelectField from "../../../atoms/selectField";
 import TimeField from "../../../atoms/timeField";
-import PersonalOverlapModal from "../../personalOverlapModal";
+import OverlapModal from "../../overlapModal";
 
 import { usePersonalForm } from "../../../../hooks/pages/usePersonalForm";
 
@@ -202,7 +202,7 @@ const PersonalForm = (props) => {
                 />
             </div>
 
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen={overlapState.show}
                 overlappedEmployees={overlapState.overlappedEmployees}
                 onConfirm={handleForceOverlap}
