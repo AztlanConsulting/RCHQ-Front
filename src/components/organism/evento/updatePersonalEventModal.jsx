@@ -8,7 +8,7 @@ import Modal from "../../atoms/modal";
 import SelectField from "../../atoms/selectField";
 import TextField from "../../atoms/textField";
 import TimeField from "../../atoms/timeField";
-import PersonalOverlapModal from "../personalOverlapModal";
+import OverlapModal from "../overlapModal";
 import { useUpdatePersonalEventForm } from "../../../hooks/pages/useUpdatePersonalEventForm";
 
 const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
@@ -248,7 +248,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 </div>
             </Modal>
 
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen={overlapState.show}
                 overlappedEmployees={overlapState.overlappedEmployees}
                 onConfirm={handleForceOverlap}
