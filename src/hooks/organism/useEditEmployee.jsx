@@ -13,6 +13,12 @@ import {
 } from "../../services/employeeUpdateService";
 
 export const useEditEmployee = (employeeId, onSuccess) => {
+  const revokePreviewUrl = (url) => {
+    if (url?.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
@@ -26,6 +32,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     name: "", surname: "", curp: "", rfc: "",
     nss: "", bankAccount: "", birthDate: "",
   });
+  const [basicPictureFile, setBasicPictureFile] = useState(null);
+  const [basicPicturePreview, setBasicPicturePreview] = useState("");
 
   const [contactForm, setContactFormState] = useState({
     email: "", phoneNumber: "",
@@ -40,6 +48,9 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(null);
+    setBasicPicturePreview("");
     setBasicFormState({
       name:        employee?.name ?? "",
       surname:     employee?.surname ?? "",
@@ -50,7 +61,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       birthDate:   employee?.birthDate ? String(employee.birthDate).slice(0, 10) : "",
     });
     setEditSection("basic");
-  }, []);
+  }, [basicPicturePreview]);
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
@@ -79,12 +90,29 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const preselected = (formData?.workdays ?? []).map((wd) => {
         const wdId    = wd.workdayId ?? wd.workday_id;
         const existing = currentWorkdays?.find((cw) => (cw.workdayId ?? cw.workday_id) === wdId);
+        const isAllDay = existing
+          ? (() => {
+              const startDate = new Date(existing.start);
+              const endDate = new Date(existing.end);
+              if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+                return false;
+              }
+
+              const diffMs = endDate.getTime() - startDate.getTime();
+              const sameUtcClock =
+                startDate.getUTCHours() === endDate.getUTCHours() &&
+                startDate.getUTCMinutes() === endDate.getUTCMinutes();
+
+              return diffMs === 24 * 60 * 60 * 1000 || sameUtcClock;
+            })()
+          : false;
         return {
           workdayId: wdId,
           name:      wd.name,
           selected:  !!existing,
           start:     existing ? String(existing.start).slice(11, 16) : "08:00",
           end:       existing ? String(existing.end).slice(11, 16)   : "17:00",
+          allDay:    isAllDay,
         };
       });
 
@@ -105,9 +133,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const closeEdit = useCallback(() => {
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(null);
+    setBasicPicturePreview("");
     setEditSection(null);
     setSaveError(null);
-  }, []);
+  }, [basicPicturePreview]);
 
   const setBasicField = useCallback((field, value) => {
     let finalValue = value;
@@ -116,8 +147,18 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
     }
     
-    if (field === "curp" || field === "rfc") {
-      finalValue = value.replace(/\p{Extended_Pictographic}/gu, "").toUpperCase();
+    if (field === "curp") {
+      finalValue = value
+        .replace(/\p{Extended_Pictographic}/gu, "")
+        .replace(/[^A-Za-z0-9]/g, "")
+        .toUpperCase();
+    }
+
+    if (field === "rfc") {
+      finalValue = value
+        .replace(/\p{Extended_Pictographic}/gu, "")
+        .replace(/[^A-Za-z0-9Ññ&]/g, "")
+        .toUpperCase();
     }
     
     if (field === "bankAccount" || field === "nss") {
@@ -133,15 +174,52 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
+  const setBasicPicture = useCallback((file) => {
+    if (!file) {
+      revokePreviewUrl(basicPicturePreview);
+      setBasicPictureFile(null);
+      setBasicPicturePreview("");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      setSaveError("Solo se permiten imágenes JPG, JPEG o PNG.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveError("La imagen no puede pesar más de 5MB.");
+      return;
+    }
+
+    setSaveError(null);
+    revokePreviewUrl(basicPicturePreview);
+    setBasicPictureFile(file);
+    setBasicPicturePreview(URL.createObjectURL(file));
+  }, [basicPicturePreview]);
+
   const setContactField = useCallback((field, value) => {
     let finalValue = value;
     
-    if (field === "municipio" || field === "city") {
-      finalValue = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-    }
-
     if (field === "email" || field === "street") {
       finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
+    }
+
+    if (field === "municipio" || field === "city") {
+      finalValue = value.replace(/\p{Extended_Pictographic}/gu, "");
+    }
+
+    if (field === "email") {
+      finalValue = finalValue.replace(/[^A-Za-z0-9._@-]/g, "");
+    }
+
+    if (field === "street") {
+      finalValue = finalValue.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9.\-\s]/g, "");
+    }
+
+    if (field === "municipio" || field === "city") {
+      finalValue = finalValue.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9.\-\s]/g, "");
     }
 
     if (field === "phoneNumber") {
@@ -154,10 +232,10 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     
     if (field === "email") finalValue = finalValue.slice(0, 60);
     if (field === "phoneNumber") finalValue = finalValue.slice(0, 10);
-    if (field === "street") finalValue = finalValue.slice(0, 200);
-    if (field === "municipio") finalValue = finalValue.slice(0, 120);
-    if (field === "city") finalValue = finalValue.slice(0, 100);
-    if (field === "postalCode") finalValue = finalValue.slice(0, 10);
+    if (field === "street") finalValue = finalValue.slice(0, 70);
+    if (field === "municipio") finalValue = finalValue.slice(0, 70);
+    if (field === "city") finalValue = finalValue.slice(0, 70);
+    if (field === "postalCode") finalValue = finalValue.slice(0, 5);
 
     setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
@@ -165,7 +243,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const setAdminField = useCallback((field, value) => {
     let finalValue = value;
     if (field === "salary") {
-      finalValue = value.replace(/[^\d.]/g, ""); 
+      const sanitized = value.replace(/[^\d.]/g, "");
+      const [integerPart, ...decimalParts] = sanitized.split(".");
+      const mergedDecimals = decimalParts.join("");
+      finalValue =
+        decimalParts.length > 0
+          ? `${integerPart}.${mergedDecimals.slice(0, 2)}`
+          : integerPart;
+
+      if (finalValue !== "" && Number(finalValue) > 1_000_000) {
+        return;
+      }
     }
     setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
@@ -183,7 +271,32 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setAdminFormState((prev) => ({
       ...prev,
       selectedWorkdays: prev.selectedWorkdays.map((w) =>
-        w.workdayId === workdayId ? { ...w, [timeField]: value } : w
+        w.workdayId === workdayId
+          ? {
+              ...w,
+              [timeField]: value,
+              ...(w.allDay ? { end: value } : {}),
+            }
+          : w
+      ),
+    }));
+  }, []);
+
+  const setWorkdayAllDay = useCallback((workdayId, checked) => {
+    setAdminFormState((prev) => ({
+      ...prev,
+      selectedWorkdays: prev.selectedWorkdays.map((w) =>
+        w.workdayId === workdayId
+          ? {
+              ...w,
+              allDay: checked,
+              ...(checked
+                ? { start: "00:00", end: "00:00" }
+                : w.start === "00:00" && w.end === "00:00"
+                  ? { start: "08:00", end: "17:00" }
+                  : {}),
+            }
+          : w
       ),
     }));
   }, []);
@@ -198,7 +311,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
       }
 
-      await updateBasicInfoService(employeeId, validation.data);
+      const formData = new FormData();
+      Object.entries(validation.data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value);
+        }
+      });
+      if (basicPictureFile) {
+        formData.append("picture", basicPictureFile);
+      }
+
+      await updateBasicInfoService(employeeId, formData);
       closeEdit();
       onSuccess?.("Información básica actualizada con éxito");
     } catch (err) {
@@ -206,7 +329,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [basicForm, employeeId, closeEdit, onSuccess]);
+  }, [basicForm, basicPictureFile, employeeId, closeEdit, onSuccess]);
 
   const submitContact = useCallback(async () => {
     setSaving(true);
@@ -246,7 +369,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
       const payload = {
         type:                 adminForm.type,
-        salary:               Number(adminForm.salary),
+        salary:               adminForm.salary,
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 
@@ -259,27 +382,36 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         throw new Error("Debes seleccionar al menos un día de trabajo.");
       }
 
-      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end }) => {
+      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end, allDay }) => {
         if (!start || !end) {
           throw new Error(`Debes asignar un horario completo para el día ${name}.`);
         }
 
-      const [sh] = start.split(":").map(Number);
-      const [eh] = end.split(":").map(Number);
+        const normalizedStart = allDay ? "00:00" : start;
+        const normalizedEnd = allDay ? "00:00" : end;
+        const [sh, sm] = normalizedStart.split(":").map(Number);
+        const [eh, em] = normalizedEnd.split(":").map(Number);
+        const startMinutes = (sh * 60) + sm;
+        const endMinutes = (eh * 60) + em;
+        const durationMinutes = allDay
+          ? 24 * 60
+          : normalizedEnd <= normalizedStart
+            ? (24 * 60 - startMinutes) + endMinutes
+            : endMinutes - startMinutes;
 
-      const isOvernight = end <= start;
-      const durationHours = isOvernight
-        ? (24 - sh) + eh
-        : eh - sh;
+        if (durationMinutes < 60) {
+          throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
+        }
+        if (durationMinutes > 24 * 60) {
+          throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
+        }
 
-      if (durationHours < 1) {
-        throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
-      }
-      if (durationHours > 24) {
-        throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
-      }
-
-      return { workdayId, start, end };
+        return {
+          workdayId,
+          start: normalizedStart,
+          end: normalizedEnd,
+          allDay: Boolean(allDay),
+        };
       });
 
       payload.workdays = workdaysToSend;
@@ -303,10 +435,11 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   return {
     editSection, saving, saveError, loadingCatalogues,
     basicForm, contactForm, adminForm,
+    basicPicturePreview,
     roles, allWorkdays, frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
-    setBasicField, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime,
+    setBasicField, setBasicPicture, setContactField, setAdminField,
+    toggleWorkday, setWorkdayTime, setWorkdayAllDay,
     submitBasic, submitContact, submitAdmin,
   };
 };

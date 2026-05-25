@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export const generateTimes = () => {
+export const generateTimes = (stepMinutes = 15) => {
     const times = [];
 
     for (let h = 0; h < 24; h++) {
-        for (let m = 0; m < 60; m += 15) {
+        for (let m = 0; m < 60; m += stepMinutes) {
             const hour12 = h % 12 === 0 ? 12 : h % 12;
             const ampm = h < 12 ? "AM" : "PM";
 
@@ -18,42 +18,60 @@ export const generateTimes = () => {
     return times;
 };
 
-const ALL_TIMES = generateTimes();
-
 export const useTimeField = ({
     value = "",
     minTime,
     disabled = false,
     onChange,
+    stepMinutes = 15,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownPos, setDropdownPos] = useState({
         top: 0,
         left: 0,
         width: 0,
+        maxHeight: 200,
     });
 
     const containerRef = useRef(null);
     const dropdownRef = useRef(null);
     const listRef = useRef(null);
 
-    const times = ALL_TIMES.filter((time) => {
+    const allTimes = useMemo(() => generateTimes(stepMinutes), [stepMinutes]);
+
+    const times = allTimes.filter((time) => {
         if (minTime && time.value <= minTime) return false;
         return true;
     });
 
     const selectedLabel =
-        ALL_TIMES.find((time) => time.value === value)?.label || "";
+        allTimes.find((time) => time.value === value)?.label || "";
 
     const updateDropdownPosition = () => {
         if (!containerRef.current) return;
 
         const rect = containerRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const desiredHeight = 200;
+        const spaceBelow = viewportHeight - rect.bottom - 12;
+        const spaceAbove = rect.top - 12;
+        const shouldOpenUpward =
+            spaceBelow < desiredHeight && spaceAbove > spaceBelow;
+        const maxHeight = Math.max(
+            120,
+            Math.min(
+                desiredHeight,
+                shouldOpenUpward ? spaceAbove : spaceBelow,
+            ),
+        );
 
         setDropdownPos({
-            top: rect.bottom + 4,
+            top: shouldOpenUpward
+                ? Math.max(8, rect.top - maxHeight - 4)
+                : rect.bottom + 4,
             left: rect.left,
             width: rect.width,
+            maxHeight,
         });
     };
 

@@ -21,23 +21,21 @@ vi.mock("../../services/calendarService", () => ({
     buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
 }));
 
-vi.mock("../../services/vacationService", () => ({
-    deleteVacationRequest: vi.fn(),
-    getRemainingVacations: vi.fn(),
-    updateVacationRequestDates: vi.fn(),
-}));
+const getRelativeDateString = (daysFromToday) => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromToday);
+    return date.toISOString().slice(0, 10);
+};
 
-vi.mock("../../services/vacationRequestService", () => ({
-    approveVacationRequest: vi.fn(),
-    rejectVacationRequest: vi.fn(),
-}));
-
-const buildCalendarClickInfo = () => ({
+const buildCalendarClickInfo = ({
+    startDate = getRelativeDateString(2),
+    endDate = getRelativeDateString(6),
+} = {}) => ({
     event: {
         id: "fc-1",
         title: "Ausencia de Luis Martínez",
-        start: new Date("2026-05-17T00:00:00.000Z"),
-        end: new Date("2026-05-22T00:00:00.000Z"),
+        start: new Date(`${startDate}T00:00:00.000Z`),
+        end: new Date(`${endDate}T00:00:00.000Z`),
         allDay: true,
         backgroundColor: "#EF4444",
         borderColor: "#DC2626",
@@ -52,8 +50,8 @@ const buildCalendarClickInfo = () => ({
             curp: "MALR900205HDFRRS09",
             usedDays: 5,
             link: "",
-            startDate: "2026-05-17",
-            endDate: "2026-05-21",
+            startDate,
+            endDate,
             isDeleted: false,
         },
     },
@@ -117,8 +115,8 @@ describe("useCalendarPage", () => {
         expect(result.current.isAbsenceEditing).toBe(true);
         expect(result.current.absenceForm).toEqual({
             absenceTypeId: "type-1",
-            startDate: "2026-05-17",
-            endDate: "2026-05-21",
+            startDate: getRelativeDateString(2),
+            endDate: getRelativeDateString(6),
             description: "Permiso por paternidad",
         });
     });
@@ -190,6 +188,9 @@ describe("useCalendarPage", () => {
     });
 
     it("actualiza la ausencia, recarga el rango y muestra alerta de éxito", async () => {
+        const nextStartDate = getRelativeDateString(3);
+        const nextEndDate = getRelativeDateString(7);
+
         const reloadCurrentRange = vi.fn().mockResolvedValue([
             {
                 absenceId: "absence-1",
@@ -197,10 +198,10 @@ describe("useCalendarPage", () => {
                 employeeId: "emp-1",
                 name: "Luis Martínez",
                 curp: "MALR900205HDFRRS09",
-                start: "2026-05-18T00:00:00.000Z",
-                end: "2026-05-23T00:00:00.000Z",
-                startDate: "2026-05-18",
-                endDate: "2026-05-22",
+                start: `${nextStartDate}T00:00:00.000Z`,
+                end: `${nextEndDate}T00:00:00.000Z`,
+                startDate: nextStartDate,
+                endDate: nextEndDate,
                 type: "Médica",
                 description: "Descripción actualizada",
                 link: "",
@@ -218,8 +219,8 @@ describe("useCalendarPage", () => {
             name: "Luis Martínez",
             type: "Médica",
             description: "Descripción actualizada",
-            startDate: "2026-05-18",
-            endDate: "2026-05-22",
+            startDate: nextStartDate,
+            endDate: nextEndDate,
             isDeleted: false,
         });
 
@@ -237,8 +238,8 @@ describe("useCalendarPage", () => {
             result.current.handleEventClick(buildCalendarClickInfo());
             result.current.startAbsenceEdit();
             result.current.setAbsenceField("absenceTypeId", "type-2");
-            result.current.setAbsenceField("startDate", "2026-05-18");
-            result.current.setAbsenceField("endDate", "2026-05-22");
+            result.current.setAbsenceField("startDate", nextStartDate);
+            result.current.setAbsenceField("endDate", nextEndDate);
             result.current.setAbsenceField(
                 "description",
                 "Descripción actualizada",
@@ -251,8 +252,8 @@ describe("useCalendarPage", () => {
 
         expect(updateAbsenceService).toHaveBeenCalledWith("absence-1", {
             absenceTypeId: "type-2",
-            startDate: "2026-05-18",
-            endDate: "2026-05-22",
+            startDate: nextStartDate,
+            endDate: nextEndDate,
             description: "Descripción actualizada",
         });
         expect(reloadCurrentRange).toHaveBeenCalledTimes(1);

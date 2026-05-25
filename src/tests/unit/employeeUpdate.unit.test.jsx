@@ -116,6 +116,19 @@ describe("employeeUpdateService", () => {
       expect(JSON.parse(call.body)).toEqual(body);
     });
 
+    it("envía FormData sin Content-Type manual cuando se actualiza foto", async () => {
+      mockFetch(true, { success: true });
+      const formData = new FormData();
+      formData.append("name", "Juan");
+      formData.append("picture", new Blob(["avatar"], { type: "image/jpeg" }), "avatar.jpg");
+
+      await updateBasicInfoService(EMP_ID, formData);
+
+      const call = secureFetch.mock.calls[0][1];
+      expect(call.body).toBe(formData);
+      expect(call.headers["Content-Type"]).toBeUndefined();
+    });
+
     it("retorna los datos si la respuesta es ok", async () => {
       const mockData = { success: true, message: "Actualizado" };
       mockFetch(true, mockData);
@@ -575,7 +588,7 @@ describe("EmployeeAdminCard", () => {
     employee:                mockEmployee,
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
-    employeeFaults:          [],
+    employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
     loadingCatalogues:       false,
@@ -622,9 +635,10 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
     });
 
-    it("muestra 0 faltas", () => {
-      render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("0")).toBeInTheDocument();
+    it("muestra los días hábiles de ausencias", () => {
+      render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
+      expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
+      expect(screen.getByText("5 Días Hábiles")).toBeInTheDocument();
     });
 
     it("muestra 0 solicitudes de vacaciones", () => {
@@ -661,14 +675,14 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
     });
 
-    it("muestra el select de Casa con la opción correcta", () => {
+    it("muestra el select de Frecuencia de pago con la opción por defecto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Casa Test")).toBeInTheDocument();
+      expect(screen.getByText("Sin asignar")).toBeInTheDocument();
     });
 
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Administrador")).toBeInTheDocument();
+      expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
     it("muestra los checkboxes de días de trabajo", () => {
