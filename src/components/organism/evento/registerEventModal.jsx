@@ -1,5 +1,6 @@
 import Alert from "../../atoms/alerts";
 import TextField from "../../atoms/textField";
+import Type from "../../atoms/type";
 import ButtonGroup from "../../molecules/buttonGroup";
 import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
@@ -115,13 +116,12 @@ const RegisterEventModal = ({
                             )}
                         </div>
                     ) : (
-                        <h2
+                        <Type
+                            variant="page-title"
+                            as="h2"
+                            className="mb-0 text-[2rem] leading-none"
                             style={{
                                 margin: 0,
-                                color: "#121212",
-                                fontSize: "28px",
-                                fontWeight: 800,
-                                lineHeight: 1.15,
                             }}
                         >
                             {(() => {
@@ -129,7 +129,7 @@ const RegisterEventModal = ({
                                 const verb = viewerRole === "Coordinador" ? "Registro" : "Solicitud";
                                 return `${verb} de Vacaciones`
                             })()}
-                        </h2>
+                        </Type>
                     )}
 
                     <div style={{ flexShrink: 0 }}>

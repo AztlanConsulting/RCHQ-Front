@@ -42,7 +42,8 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 onClose={onClose}
                 grayBackground
                 placement="center"
-                className="w-full max-w-[560px] rounded-xl p-6"
+                scrollable
+                className="w-full max-w-[560px] max-h-[calc(100vh-2rem)] rounded-xl p-6"
                 backdropClassName="bg-black/40"
             >
                 <div

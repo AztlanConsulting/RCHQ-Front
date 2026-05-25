@@ -285,16 +285,16 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                className={() => {
-                    if (
-                        ["ausencias", "vacaciones"].includes(
-                            selectedEvent?.focus,
-                        )
-                    )
-                        return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
-
-                    return "max-w-[25vw] max-h-[80vh]";
-                }}
+                scrollable={
+                    selectedEvent?.focus === "eventos" ||
+                    selectedEvent?.focus === "ausencias" ||
+                    selectedEvent?.focus === "vacaciones"
+                }
+                className={
+                    ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        : "w-[92vw] max-w-[40rem] max-h-[calc(100vh-2rem)] scrollbar-hide"
+                }
             >
                 {(() => {
                     switch (selectedEvent?.focus) {
