@@ -33,6 +33,9 @@ const EventDetail = ({
 
     const showDelete = canDelete(event.scope, viewerRole);
     const showEdit = canEdit(event.scope, viewerRole);
+    const peopleInsideEvent = Array.isArray(event.peopleInsideEvent)
+        ? event.peopleInsideEvent
+        : [];
 
     const dayText = formatEventDateRange(
         event.date || event.startDate || event.start || event.startStr,
@@ -119,8 +122,7 @@ const EventDetail = ({
                 </div>
             ) : null}
 
-            {Array.isArray(event.peopleInsideEvent) &&
-            event.peopleInsideEvent.length > 0 ? (
+            {peopleInsideEvent.length > 0 ? (
                 <div className="mb-4">
                     <Type
                         variant="metric-label"
@@ -129,7 +131,7 @@ const EventDetail = ({
                         Empleados ligados al evento:
                     </Type>
                     <div className="space-y-1">
-                        {event.peopleInsideEvent.map((person, idx) => (
+                        {peopleInsideEvent.map((person, idx) => (
                             <Type
                                 key={person?.id ?? idx}
                                 variant="body"
