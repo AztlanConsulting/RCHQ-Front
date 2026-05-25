@@ -30,17 +30,13 @@ const EventDetail = ({
     deleteError = "",
     viewerRole = "",
 }) => {
-    const peopleInsideEvent = Array.isArray(event?.peopleInsideEvent)
-        ? event.peopleInsideEvent
-        : [];
-
     const {
         visibleItems: visiblePeople,
         hiddenCount: hiddenPeopleCount,
         isExpanded: isPeopleListExpanded,
         toggleExpanded: togglePeopleList,
     } = useExpandableList(
-        peopleInsideEvent,
+        event?.peopleInsideEvent,
         5,
         event?.eventId ?? event?.houseEventId ?? event?.id ?? "",
     );
@@ -135,7 +131,7 @@ const EventDetail = ({
                 </div>
             ) : null}
 
-            {peopleInsideEvent.length > 0 ? (
+            {visiblePeople.length > 0 ? (
                 <div className="mb-4">
                     <Type
                         variant="metric-label"
