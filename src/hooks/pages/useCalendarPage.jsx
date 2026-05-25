@@ -9,6 +9,10 @@ import {
   updateAbsenceService,
 } from "../../services/calendarService";
 import { deleteVacationRequest } from "../../services/vacationService";
+import {
+  approveVacationRequest,
+  rejectVacationRequest,
+} from "../../services/vacationRequestService";
 import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import { useVacationFormEdit } from "./useVacationFormEdit";
@@ -89,6 +93,12 @@ export const useCalendarPage = ({
   const [isDeleteVacationOpen, setIsDeleteVacationOpen] = useState(false);
   const [isDeletingVacation, setIsDeletingVacation] = useState(false);
   const [deleteVacationError, setDeleteVacationError] = useState("");
+  const [approveVacationRequestModal, setApproveVacationRequestModal] = useState(null);
+  const [rejectVacationRequestModal, setRejectVacationRequestModal] = useState(null);
+  const [isApprovingVacation, setIsApprovingVacation] = useState(false);
+  const [isRejectingVacation, setIsRejectingVacation] = useState(false);
+  const [approveVacationError, setApproveVacationError] = useState("");
+  const [rejectVacationError, setRejectVacationError] = useState("");
   const {
     isVacationEditing,
     vacationForm,
@@ -131,6 +141,10 @@ export const useCalendarPage = ({
     resetVacationEdit();
     setIsDeleteVacationOpen(false);
     setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
   }, [resetAbsenceEvidence, resetVacationEdit]);
 
   const showEventDetail = useCallback((detail) => {
@@ -147,6 +161,10 @@ export const useCalendarPage = ({
     resetVacationEdit();
     setIsDeleteVacationOpen(false);
     setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
   }, [resetVacationEdit]);
 
   const openCalendarItemDetail = useCallback((item) => {
@@ -177,6 +195,10 @@ export const useCalendarPage = ({
     resetVacationEdit();
     setIsDeleteVacationOpen(false);
     setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
   }, [resetVacationEdit]);
 
   const absenceEvidenceLabel = useMemo(
@@ -568,7 +590,30 @@ export const useCalendarPage = ({
     "",
     [],);
 
-  const openDeleteVacation = useCallback(() => {
+  const buildVacationRequestFromEvent = useCallback((event) => {
+    const vacationRequestId = getVacationRequestId(event);
+
+    if (!event || !vacationRequestId) return null;
+
+    return {
+      vacationRequestId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      usedDays: event.usedDays,
+      status: event.status,
+      statusLabel: event.statusLabel,
+      feedback: event.feedback ?? event.vacationFeedback ?? "",
+      employeeId: event.employeeId,
+      employee: {
+        employeeId: event.employeeId,
+        fullName: event.employeeName,
+        curp: event.curp,
+        picture: event.picture,
+      },
+    };
+  }, [getVacationRequestId]);
+  
+    const openDeleteVacation = useCallback(() => {
     const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
     const vacationRequestId = getVacationRequestId(currentSelectedEvent);
 
@@ -626,6 +671,112 @@ export const useCalendarPage = ({
     selectedEvent,
     selectedEventRef,
   ]);
+
+  const openApproveVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const request = buildVacationRequestFromEvent(currentSelectedEvent);
+
+    if (!request) return;
+
+    resetVacationEdit();
+    setApproveVacationError("");
+    setRejectVacationError("");
+    setApproveVacationRequestModal(request);
+  }, [buildVacationRequestFromEvent, resetVacationEdit, selectedEvent]);
+
+  const cancelApproveVacation = useCallback(() => {
+    setApproveVacationRequestModal(null);
+    setApproveVacationError("");
+  }, []);
+
+  const confirmApproveVacation = useCallback(async () => {
+    const vacationRequestId = approveVacationRequestModal?.vacationRequestId;
+
+    if (!vacationRequestId) return;
+
+    setIsApprovingVacation(true);
+    setApproveVacationError("");
+
+    try {
+      await approveVacationRequest(vacationRequestId);
+
+      setApproveVacationRequestModal(null);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras aprobar la solicitud de vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Solicitud de vacaciones aprobada correctamente",
+      });
+    } catch (error) {
+      setApproveVacationError(
+        error?.message || "No se pudo aprobar la solicitud de vacaciones.",
+      );
+    } finally {
+      setIsApprovingVacation(false);
+    }
+  }, [approveVacationRequestModal, closeDetail, reloadCurrentRange]);
+
+  const openRejectVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const request = buildVacationRequestFromEvent(currentSelectedEvent);
+
+    if (!request) return;
+
+    resetVacationEdit();
+    setApproveVacationError("");
+    setRejectVacationError("");
+    setRejectVacationRequestModal(request);
+  }, [buildVacationRequestFromEvent, resetVacationEdit, selectedEvent]);
+
+  const cancelRejectVacation = useCallback(() => {
+    setRejectVacationRequestModal(null);
+    setRejectVacationError("");
+  }, []);
+
+  const confirmRejectVacation = useCallback(async (feedback) => {
+    const vacationRequestId = rejectVacationRequestModal?.vacationRequestId;
+
+    if (!vacationRequestId) return;
+
+    setIsRejectingVacation(true);
+    setRejectVacationError("");
+
+    try {
+      await rejectVacationRequest(vacationRequestId, feedback);
+
+      setRejectVacationRequestModal(null);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras rechazar la solicitud de vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Solicitud de vacaciones rechazada correctamente",
+      });
+    } catch (error) {
+      setRejectVacationError(
+        error?.message || "No se pudo rechazar la solicitud de vacaciones.",
+      );
+    } finally {
+      setIsRejectingVacation(false);
+    }
+  }, [closeDetail, rejectVacationRequestModal, reloadCurrentRange]);
 
   return {
     selectedEvent,
@@ -690,5 +841,17 @@ export const useCalendarPage = ({
     openDeleteVacation,
     cancelDeleteVacation,
     confirmDeleteVacation,
+    approveVacationRequestModal,
+    rejectVacationRequestModal,
+    isApprovingVacation,
+    isRejectingVacation,
+    approveVacationError,
+    rejectVacationError,
+    openApproveVacation,
+    cancelApproveVacation,
+    confirmApproveVacation,
+    openRejectVacation,
+    cancelRejectVacation,
+    confirmRejectVacation,
   };
 };

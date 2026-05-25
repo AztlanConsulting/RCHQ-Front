@@ -93,12 +93,20 @@ const setCalendarHooks = ({
     event = baseVacation,
     isDeleteVacationOpen = false,
     isVacationEditing = false,
+    approveVacationRequestModal = null,
+    rejectVacationRequestModal = null,
 } = {}) => {
     const startVacationEdit = vi.fn();
     const cancelVacationEdit = vi.fn();
     const setVacationField = vi.fn();
     const submitVacationEdit = vi.fn();
     const openDeleteVacation = vi.fn();
+    const openApproveVacation = vi.fn();
+    const openRejectVacation = vi.fn();
+    const cancelApproveVacation = vi.fn();
+    const cancelRejectVacation = vi.fn();
+    const confirmApproveVacation = vi.fn();
+    const confirmRejectVacation = vi.fn();
 
     useBaseCalendar.mockReturnValue({
         employeeHouseName: "",
@@ -216,6 +224,18 @@ const setCalendarHooks = ({
         openDeleteVacation,
         cancelDeleteVacation: vi.fn(),
         confirmDeleteVacation: vi.fn(),
+        approveVacationRequestModal,
+        rejectVacationRequestModal,
+        isApprovingVacation: false,
+        isRejectingVacation: false,
+        approveVacationError: "",
+        rejectVacationError: "",
+        openApproveVacation,
+        cancelApproveVacation,
+        confirmApproveVacation,
+        openRejectVacation,
+        cancelRejectVacation,
+        confirmRejectVacation,
     });
     return {
         startVacationEdit,
@@ -223,6 +243,12 @@ const setCalendarHooks = ({
         setVacationField,
         submitVacationEdit,
         openDeleteVacation,
+        openApproveVacation,
+        openRejectVacation,
+        cancelApproveVacation,
+        cancelRejectVacation,
+        confirmApproveVacation,
+        confirmRejectVacation,
     };
 };
 
@@ -368,6 +394,66 @@ describe("Integración: Calendario - vacaciones", () => {
         );
         expect(
             screen.getByRole("button", { name: /guardar/i }),
+        ).toBeInTheDocument();
+    });
+
+    it("permite abrir aprobación desde el detalle de vacaciones del coordinador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        const { openApproveVacation } = setCalendarHooks({
+            viewerRole: "Coordinador",
+        });
+        renderCalendar();
+
+        fireEvent.click(screen.getByRole("button", { name: /aprobar/i }));
+        expect(openApproveVacation).toHaveBeenCalledTimes(1);
+    });
+
+    it("permite abrir rechazo desde el detalle de vacaciones del coordinador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        const { openRejectVacation } = setCalendarHooks({
+            viewerRole: "Coordinador",
+        });
+        renderCalendar();
+
+        fireEvent.click(screen.getByRole("button", { name: /rechazar/i }));
+        expect(openRejectVacation).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra el modal de aprobación cuando hay solicitud seleccionada para aprobar", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        setCalendarHooks({
+            viewerRole: "Coordinador",
+            approveVacationRequestModal: {
+                vacationRequestId: "vacation-1",
+                employee: {
+                    fullName: "Ana Pendiente",
+                    curp: "US170101HDF00003",
+                },
+            },
+        });
+        renderCalendar();
+
+        expect(
+            screen.getByRole("dialog", { name: /aprobar solicitud/i }),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra el modal de rechazo cuando hay solicitud seleccionada para rechazar", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        setCalendarHooks({
+            viewerRole: "Coordinador",
+            rejectVacationRequestModal: {
+                vacationRequestId: "vacation-1",
+                employee: {
+                    fullName: "Ana Pendiente",
+                    curp: "US170101HDF00003",
+                },
+            },
+        });
+        renderCalendar();
+
+        expect(
+            screen.getByRole("dialog", { name: /rechazar solicitud/i }),
         ).toBeInTheDocument();
     });
 });
