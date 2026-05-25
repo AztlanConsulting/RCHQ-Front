@@ -61,6 +61,7 @@ export const useUpdatePersonalEventForm = ({
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState(null);
+    const [validationAlert, setValidationAlert] = useState(null);
     const [eventTypes, setEventTypes] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -86,6 +87,7 @@ export const useUpdatePersonalEventForm = ({
         setSelectedEmployees(getInitialEmployees(event));
         setErrors({});
         setServerError(null);
+        setValidationAlert(null);
         setOverlapState({
             show: false,
             overlappedEmployees: [],
@@ -190,6 +192,7 @@ export const useUpdatePersonalEventForm = ({
         }
 
         setErrors(fieldErrors);
+        setValidationAlert("Revisa los campos marcados antes de continuar.");
         return null;
     };
 
@@ -271,6 +274,7 @@ export const useUpdatePersonalEventForm = ({
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         employees,
         selectedEmployees,
@@ -279,6 +283,7 @@ export const useUpdatePersonalEventForm = ({
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         searchEmployees,
         handleSelectEmployee,
         handleRemoveEmployee,
