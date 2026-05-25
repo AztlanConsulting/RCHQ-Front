@@ -287,7 +287,8 @@ const Calendario = () => {
                 placement="center"
                 scrollable={
                     selectedEvent?.focus === "eventos" ||
-                    selectedEvent?.focus === "ausencias"
+                    selectedEvent?.focus === "ausencias" ||
+                    selectedEvent?.focus === "vacaciones"
                 }
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
