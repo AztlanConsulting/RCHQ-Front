@@ -36,12 +36,14 @@ export const formatLogMoment = (momentValue) => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   }).format(date);
 
   const timePart = new Intl.DateTimeFormat("es-MX", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
+    timeZone: "UTC",
   })
     .format(date)
     .replace(/\s+/g, " ")
@@ -86,12 +88,11 @@ export const useHouseLogs = () => {
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
 
   const now = useMemo(() => new Date(), []);
-  const [reportMonth, setReportMonth] = useState(now.getMonth() + 1);
   const [reportYear, setReportYear] = useState(now.getFullYear());
 
   const yearOptions = useMemo(() => {
     const currentYear = now.getFullYear();
-    return Array.from({ length: 11 }, (_, index) => currentYear - 5 + index);
+    return Array.from({ length: 11 }, (_, index) => currentYear - index);
   }, [now]);
 
   const filteredActionOptions = useMemo(() => {
@@ -238,7 +239,7 @@ export const useHouseLogs = () => {
 
     try {
       const { blob, fileName } = await downloadHouseLogsReportService({
-        month: reportMonth,
+        currentYear: now.getFullYear(),
         year: reportYear,
       });
       const url = window.URL.createObjectURL(blob);
@@ -278,10 +279,9 @@ export const useHouseLogs = () => {
     isReportModalOpen,
     openReportModal,
     closeReportModal,
-    reportMonth,
-    setReportMonth,
     reportYear,
     setReportYear,
+    currentYear: now.getFullYear(),
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
