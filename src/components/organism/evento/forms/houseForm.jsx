@@ -53,6 +53,7 @@ const CasaForm = (props) => {
                                 onChange={(e) =>
                                     setField("startDate", e.target.value)
                                 }
+                                error={!!errors.startDate}
                             />
                         </div>
 
@@ -97,6 +98,7 @@ const CasaForm = (props) => {
                                 onChange={(e) =>
                                     setField("endDate", e.target.value)
                                 }
+                                error={!!errors.endDate}
                             />
                         </div>
 
@@ -158,6 +160,7 @@ const CasaForm = (props) => {
                 value={form.eventTypeId}
                 setValue={(value) => setField("eventTypeId", value)}
                 options={eventTypes}
+                error={!!errors.eventTypeId}
             />
 
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
@@ -173,7 +176,8 @@ const CasaForm = (props) => {
                     onChange={(e) => setField("description", e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, ""))}
                     maxLength={250}
                     rows={3}
-                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040] text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 outline-none resize-none"
+                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
+                    style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
                 {errors.description && (
