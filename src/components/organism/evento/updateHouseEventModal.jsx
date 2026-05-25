@@ -15,11 +15,13 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         isSubmitting,
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
@@ -35,18 +37,36 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 onClose={onClose}
                 grayBackground
                 placement="center"
-                className="w-full max-w-[560px] rounded-xl p-6"
+                scrollable
+                className="w-full max-w-[560px] max-h-[calc(100vh-2rem)] rounded-xl p-6"
                 backdropClassName="bg-black/40"
             >
-                <div
-                    key={
-                        event?.houseEventId ??
-                        event?.eventId ??
-                        event?.id ??
-                        "update"
-                    }
-                    className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
-                >
+                <div style={{ position: "relative" }}>
+                    {validationAlert && (
+                        <div style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 30,
+                        }}>
+                            <Alert
+                                type="error"
+                                message={validationAlert}
+                                onClose={() => setValidationAlert(null)}
+                            />
+                        </div>
+                    )}
+
+                    <div
+                        key={
+                            event?.houseEventId ??
+                            event?.eventId ??
+                            event?.id ??
+                            "update"
+                        }
+                        className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
+                    >
                     <h2 className="text-2xl font-bold text-[#121212]">
                         Modificar evento de casa
                     </h2>
@@ -231,6 +251,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             activeColor="active:bg-[#0E1B33]"
                             className="px-5 shadow-md"
                         />
+                    </div>
                     </div>
                 </div>
             </Modal>
