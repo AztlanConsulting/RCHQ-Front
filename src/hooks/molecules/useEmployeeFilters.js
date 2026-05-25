@@ -29,7 +29,7 @@ const useEmployeeFilters = ({
   const blacklistFilterOptions = useMemo(() => [
     { value: "", label: "Todos" },
     { value: "true", label: "En lista negra" },
-    { value: "false", label: "No en lista negra" },
+    { value: "false", label: "Fuera de lista negra" },
   ], []);
 
   const statusOptions = useMemo(() => [
