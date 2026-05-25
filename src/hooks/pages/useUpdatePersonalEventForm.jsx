@@ -51,18 +51,6 @@ const getInitialEmployees = (event) => {
     }));
 };
 
-const getTimeContainerStyle = (isVisible) => ({
-    flex: isVisible ? 1 : "0 0 0px",
-    maxWidth: isVisible ? "100%" : "0px",
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible
-        ? "translateX(0) scale(1)"
-        : "translateX(12px) scale(0.96)",
-    pointerEvents: isVisible ? "auto" : "none",
-    overflow: isVisible ? "visible" : "hidden",
-    transition:
-        "max-width 280ms ease, opacity 220ms ease, transform 260ms ease, flex 280ms ease",
-});
 
 export const useUpdatePersonalEventForm = ({
     event,
