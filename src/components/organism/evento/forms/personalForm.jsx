@@ -49,8 +49,8 @@ const PersonalForm = (props) => {
                         value={form.date}
                         placeholder="dd / mm / yyyy"
                         onChange={(e) => setField("date", e.target.value)}
+                        error={!!errors.date}
                     />
-
                     {errors.date && <ErrorText>{errors.date}</ErrorText>}
                 </div>
 
@@ -122,6 +122,7 @@ const PersonalForm = (props) => {
                 value={form.eventTypeId}
                 setValue={(value) => setField("eventTypeId", value)}
                 options={eventTypes}
+                error={!!errors.eventTypeId}
             />
 
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
@@ -157,7 +158,8 @@ const PersonalForm = (props) => {
                     }
                     maxLength={250}
                     rows={3}
-                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040] text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 outline-none resize-none"
+                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
+                    style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
                 {errors.description && (
