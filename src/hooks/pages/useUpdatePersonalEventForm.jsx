@@ -281,6 +281,5 @@ export const useUpdatePersonalEventForm = ({
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     };
 };

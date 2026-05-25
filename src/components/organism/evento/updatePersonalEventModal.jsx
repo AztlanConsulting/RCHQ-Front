@@ -30,7 +30,6 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     } = useUpdatePersonalEventForm({ event, isOpen, onClose, onSuccess });
 
     const showTimeFields = !form.allDay;
@@ -85,9 +84,15 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                 display: "flex",
                                 gap: "8px",
                                 alignItems: "flex-end",
+                                maxHeight: showTimeFields ? "100px" : "0px",
+                                overflow: "hidden",
+                                opacity: showTimeFields ? 1 : 0,
+                                marginTop: showTimeFields ? "0px" : "-8px",
+                                transition:
+                                    "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                             }}
                         >
-                            <div style={getTimeContainerStyle(showTimeFields)}>
+                            <div style={{ flex: 1 }}>
                                 <TimeField
                                     value={form.startTime}
                                     onChange={(value) =>
@@ -100,7 +105,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                     <ErrorText>{errors.startTime}</ErrorText>
                                 )}
                             </div>
-                            <div style={getTimeContainerStyle(showTimeFields)}>
+                            <div style={{ flex: 1 }}>
                                 <TimeField
                                     value={form.endTime}
                                     onChange={(value) =>
