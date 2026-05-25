@@ -77,6 +77,20 @@ const PersonalOverlapModal = ({
                 )}
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
+                    <Button
+                        text="Cancelar"
+                        onClick={onCancel}
+                        disabled={isLoading}
+                        width="w-full sm:w-[146px]"
+                        height="h-[41px]"
+                        textSize="text-sm"
+                        fontWeight="font-bold"
+                        bgColor="bg-white"
+                        textColor="text-[#121212]"
+                        hoverColor="hover:bg-neutral-50"
+                        activeColor="active:bg-neutral-100"
+                        className="border border-[#e5e7eb] px-4 shadow-[0_1px_5px_rgba(0,0,0,0.25)]"
+                    />
                     {isCoordinator && (
                         <Button
                             text={isLoading ? "Registrando..." : "Confirmar"}
@@ -86,27 +100,13 @@ const PersonalOverlapModal = ({
                             height="h-[41px]"
                             textSize="text-sm"
                             fontWeight="font-bold"
-                            bgColor="bg-white"
-                            textColor="text-[#121212]"
-                            hoverColor="hover:bg-neutral-50"
-                            activeColor="active:bg-neutral-100"
-                            className="border border-[#e5e7eb] px-4 shadow-[0_1px_5px_rgba(0,0,0,0.25)]"
+                            bgColor="bg-[#1E3A5F]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#162d4a]"
+                            activeColor="active:bg-[#0f1f33]"
+                            className="px-4 shadow-[0_1px_4px_rgba(0,0,0,0.22)]"
                         />
                     )}
-                    <Button
-                        text="Cancelar"
-                        onClick={onCancel}
-                        disabled={isLoading}
-                        width="w-full sm:w-[146px]"
-                        height="h-[41px]"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        bgColor="bg-[#1E3A5F]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#162d4a]"
-                        activeColor="active:bg-[#0f1f33]"
-                        className="px-4 shadow-[0_1px_4px_rgba(0,0,0,0.22)]"
-                    />
                 </div>
             </div>
         </div>
