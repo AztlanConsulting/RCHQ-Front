@@ -14,6 +14,7 @@ const EmployeeSearchSelect = ({
     placeholder = "Buscar empleado...",
     label = "Empleados",
     selectedPreviewLimit = 4,
+    error = false,
 }) => {
     const {
         query,
@@ -42,7 +43,7 @@ const EmployeeSearchSelect = ({
             <label className="text-sm font-bold text-[#374151]">{label}</label>
 
             <div ref={containerRef} className="relative">
-                <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg shadow-[inset_0px_4px_4px_#00000040]">
+                <div className="h-[50px] flex items-center bg-neutral-50 rounded-lg" style={{ boxShadow: error ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}>
                     <img
                         src={searchIcon}
                         alt=""

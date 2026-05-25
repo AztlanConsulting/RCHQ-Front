@@ -29,7 +29,6 @@ const PersonalForm = (props) => {
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     } = usePersonalForm(props);
 
     const isTimeVisible = !form.allDay;
@@ -50,37 +49,56 @@ const PersonalForm = (props) => {
                         value={form.date}
                         placeholder="dd / mm / yyyy"
                         onChange={(e) => setField("date", e.target.value)}
+                        error={!!errors.date}
                     />
-
                     {errors.date && <ErrorText>{errors.date}</ErrorText>}
                 </div>
 
                 <div
                     style={{
                         display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
+                        flexDirection: "column",
+                        gap: "4px",
+                        maxHeight: isTimeVisible ? "150px" : "0px",
+                        overflow: "hidden",
+                        opacity: isTimeVisible ? 1 : 0,
+                        marginTop: isTimeVisible ? "0px" : "-8px",
+                        transition:
+                            "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                     }}
                 >
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.startTime}
-                            onChange={(value) => setField("startTime", value)}
-                            placeholder="Inicio"
-                            error={errors.startTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                        <div style={{ flex: 1 }}>
+                            <TimeField
+                                value={form.startTime}
+                                onChange={(value) => setField("startTime", value)}
+                                placeholder="Inicio"
+                                error={errors.startTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                            <TimeField
+                                value={form.endTime}
+                                onChange={(value) => setField("endTime", value)}
+                                placeholder="Fin"
+                                minTime={form.startTime}
+                                error={errors.endTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.endTime}
-                            onChange={(value) => setField("endTime", value)}
-                            placeholder="Fin"
-                            minTime={form.startTime}
-                            error={errors.endTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                        </div>
                     </div>
                 </div>
 
@@ -104,20 +122,25 @@ const PersonalForm = (props) => {
                 value={form.eventTypeId}
                 setValue={(value) => setField("eventTypeId", value)}
                 options={eventTypes}
+                error={!!errors.eventTypeId}
             />
 
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
 
             {isCoordinator && (
-                <EmployeeSearchSelect
-                    label="Agregar empleados"
-                    placeholder="Buscar por nombre..."
-                    employees={employees}
-                    selected={selectedEmployees}
-                    onSelect={handleSelectEmployee}
-                    onRemove={handleRemoveEmployee}
-                    onSearch={searchEmployees}
-                />
+                <div>
+                    <EmployeeSearchSelect
+                        label="Agregar empleados"
+                        placeholder="Buscar por nombre..."
+                        employees={employees}
+                        selected={selectedEmployees}
+                        onSelect={handleSelectEmployee}
+                        onRemove={handleRemoveEmployee}
+                        onSearch={searchEmployees}
+                        error={!!errors.employees}
+                    />
+                    {errors.employees && <ErrorText>{errors.employees}</ErrorText>}
+                </div>
             )}
 
             <div className="flex w-full flex-col gap-1.5">
@@ -139,7 +162,8 @@ const PersonalForm = (props) => {
                     }
                     maxLength={250}
                     rows={3}
-                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040] text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 outline-none resize-none"
+                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
+                    style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
                 {errors.description && (
