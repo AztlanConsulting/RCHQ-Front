@@ -16,7 +16,7 @@ const WeekTimeCard = ({ arg }) => {
   }
 
   const startHm = start != null ? getStartHour(start) : "";
-  const showDayLabel = ev.allDay || startHm === "00:00";
+  // const showDayLabel = ev.allDay || startHm === "00:00";
   return (
     <div
       className="fc-weekTimeCard"
@@ -37,9 +37,9 @@ const WeekTimeCard = ({ arg }) => {
         ) : null} */}
       </div>
 
-      {ev.allDay || timeLine ? (
+      {timeLine ? (
         <span className="fc-weekTimeCard-meta block">
-          {showDayLabel ? "Día" : timeLine}
+          {timeLine}
         </span>
       ) : null}
 
