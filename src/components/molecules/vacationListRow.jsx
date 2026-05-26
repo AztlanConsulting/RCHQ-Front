@@ -6,16 +6,21 @@ import {
 } from "../../utils/vacationRequests";
 
 const PENDING_STATUS = 0;
+const APPROVED_STATUS = 1;
 
 const VacationListRow = ({
     request,
     view,
     onViewDetail,
+    onEdit,
+    onDelete,
 }) => {
     const isFutureView = view === "future";
     const isPending = request.status === PENDING_STATUS;
+    const isApproved = request.status === APPROVED_STATUS;
     const canEdit = isFutureView && isPending;
-    const canDelete = isFutureView;
+    const shouldShowEdit = isFutureView;
+    const canDelete = isFutureView || !isApproved;
     const description = getSafeText(request.description ?? request.feedback);
 
     return (
@@ -67,10 +72,11 @@ const VacationListRow = ({
                         />
                     </Button>
 
-                    {canEdit && (
+                    {shouldShowEdit ? (
                         <Button
                             title="Modificar vacación"
-                            onClick={() => {}}
+                            onClick={() => onEdit?.(request)}
+                            disabled={!canEdit}
                             bgColor="bg-transparent"
                             hoverColor="hover:bg-gray-100"
                             activeColor="active:bg-gray-200"
@@ -84,26 +90,25 @@ const VacationListRow = ({
                                 className="h-5 w-5"
                             />
                         </Button>
-                    )}
+                    ) : null}
 
-                    {canDelete && (
-                        <Button
-                            title="Borrar vacación"
-                            onClick={() => {}}
-                            bgColor="bg-transparent"
-                            hoverColor="hover:bg-gray-100"
-                            activeColor="active:bg-gray-200"
-                            width="w-10"
-                            height="h-10"
-                            className="rounded-full"
-                        >
-                            <img
-                                src="/trash.svg"
-                                alt="Borrar vacación"
-                                className="h-5 w-5"
-                            />
-                        </Button>
-                    )}
+                    <Button
+                        title="Borrar vacación"
+                        onClick={() => onDelete?.(request)}
+                        disabled={!canDelete}
+                        bgColor="bg-transparent"
+                        hoverColor="hover:bg-gray-100"
+                        activeColor="active:bg-gray-200"
+                        width="w-10"
+                        height="h-10"
+                        className="rounded-full"
+                    >
+                        <img
+                            src="/trash.svg"
+                            alt="Borrar vacación"
+                            className="h-5 w-5"
+                        />
+                    </Button>
                 </div>
             </td>
         </tr>

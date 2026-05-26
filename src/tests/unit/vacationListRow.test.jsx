@@ -21,6 +21,8 @@ const renderRow = (props = {}) => {
         request: baseRequest,
         view: "future",
         onViewDetail: vi.fn(),
+        onEdit: vi.fn(),
+        onDelete: vi.fn(),
     };
 
     return render(
@@ -46,7 +48,7 @@ describe("VacationListRow", () => {
         expect(screen.getByText("Descanso programado")).toBeInTheDocument();
     });
 
-    it("en vacaciones pasadas solo muestra el botón de ver detalle", () => {
+    it("en vacaciones pasadas aprobadas no muestra edición y deja borrado deshabilitado", () => {
         renderRow({
             view: "past",
             request: {
@@ -57,23 +59,38 @@ describe("VacationListRow", () => {
         });
 
         expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-        expect(screen.queryByAltText("Modificar vacación")).toBeNull();
-        expect(screen.queryByAltText("Borrar vacación")).toBeNull();
+        expect(screen.queryByTitle("Modificar vacación")).toBeNull();
+        expect(screen.getByTitle("Borrar vacación")).toBeDisabled();
     });
 
-    it("en vacaciones futuras pendientes muestra ojo, edición y borrado", () => {
+    it("en vacaciones pasadas pendientes no muestra edición y deja borrado habilitado", () => {
+        renderRow({
+            view: "past",
+            request: {
+                ...baseRequest,
+                status: PENDING_STATUS,
+                statusLabel: "Pendiente",
+            },
+        });
+
+        expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
+        expect(screen.queryByTitle("Modificar vacación")).toBeNull();
+        expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
+    });
+
+    it("en vacaciones futuras pendientes habilita ojo, edición y borrado", () => {
         renderRow();
 
         expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-        expect(screen.getByAltText("Modificar vacación")).toBeInTheDocument();
-        expect(screen.getByAltText("Borrar vacación")).toBeInTheDocument();
+        expect(screen.getByTitle("Modificar vacación")).toBeEnabled();
+        expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
     });
 
     it.each([
         [APPROVED_STATUS, "Aprobada"],
         [REJECTED_STATUS, "Rechazada"],
     ])(
-        "en vacaciones futuras %s muestra ojo y borrado, pero no edición",
+        "en vacaciones futuras %s deja edición deshabilitada y borrado habilitado",
         (status, statusLabel) => {
             renderRow({
                 request: {
@@ -84,8 +101,8 @@ describe("VacationListRow", () => {
             });
 
             expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-            expect(screen.getByAltText("Borrar vacación")).toBeInTheDocument();
-            expect(screen.queryByAltText("Modificar vacación")).toBeNull();
+            expect(screen.getByTitle("Modificar vacación")).toBeDisabled();
+            expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
         },
     );
 
@@ -98,5 +115,18 @@ describe("VacationListRow", () => {
 
         expect(onViewDetail).toHaveBeenCalledTimes(1);
         expect(onViewDetail).toHaveBeenCalledWith(baseRequest);
+    });
+
+    it("llama onEdit y onDelete cuando las acciones están habilitadas", () => {
+        const onEdit = vi.fn();
+        const onDelete = vi.fn();
+
+        renderRow({ onEdit, onDelete });
+
+        fireEvent.click(screen.getByTitle("Modificar vacación"));
+        fireEvent.click(screen.getByTitle("Borrar vacación"));
+
+        expect(onEdit).toHaveBeenCalledWith(baseRequest);
+        expect(onDelete).toHaveBeenCalledWith(baseRequest);
     });
 });

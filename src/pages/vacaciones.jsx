@@ -4,6 +4,10 @@ import VacationListFilters from "../components/molecules/vacationListFilters";
 import VacationListTable from "../components/molecules/vacationListTable";
 import { useVacationList } from "../hooks/pages/useVacationRequests";
 import Alert from "../components/atoms/alerts";
+import Modal from "../components/atoms/modal";
+import VacationEditForm from "../components/organism/evento/forms/vacationEditForm";
+import ConfirmDeleteVacationModal from "../components/molecules/confirmDeleteVacationModal";
+import VacationWorkerDetail from "../components/molecules/calendarCards/vacationWorkerDetail";
 
 const VacationList = () => {
     const {
@@ -21,10 +25,31 @@ const VacationList = () => {
         loading,
         error,
         clearError,
+        alert,
+        clearAlert,
         handleNextPage,
         handlePrevPage,
         clearFilters,
         onViewDetail,
+        selectedVacation,
+        viewingVacation,
+        closeViewingVacation,
+        isVacationEditing,
+        vacationForm,
+        vacationEditError,
+        isSavingVacation,
+        vacationRemainingInfo,
+        isLoadingVacationRemaining,
+        handleEditVacation,
+        cancelVacationEdit,
+        submitVacationEdit,
+        setVacationField,
+        vacationToDelete,
+        isDeletingVacation,
+        deleteVacationError,
+        openDeleteVacation,
+        cancelDeleteVacation,
+        confirmDeleteVacation,
     } = useVacationList();
 
     const isFutureView = view === "future";
@@ -33,9 +58,7 @@ const VacationList = () => {
         <div className="p-8 md:flex md:flex-col md:h-full">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isFutureView
-                        ? "Vacaciones futuras"
-                        : "Vacaciones pasadas"}
+                    {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
                 </h1>
 
                 <Button
@@ -66,10 +89,16 @@ const VacationList = () => {
 
             {error && (
                 <div className="mb-5">
+                    <Alert type="error" message={error} onClose={clearError} />
+                </div>
+            )}
+
+            {alert && (
+                <div className="mb-5">
                     <Alert
-                        type="error"
-                        message={error}
-                        onClose={clearError}
+                        type={alert.type}
+                        message={alert.message}
+                        onClose={clearAlert}
                     />
                 </div>
             )}
@@ -79,6 +108,8 @@ const VacationList = () => {
                 view={view}
                 loading={loading}
                 onViewDetail={onViewDetail}
+                onEdit={handleEditVacation}
+                onDelete={openDeleteVacation}
             />
 
             <Pagination
@@ -90,6 +121,51 @@ const VacationList = () => {
                 loading={loading}
                 hasEmployees={requests.length > 0}
                 itemLabel="vacaciones"
+            />
+
+            <Modal
+                open={isVacationEditing}
+                onClose={cancelVacationEdit}
+                className="max-w-3xl"
+            >
+                <VacationEditForm
+                    title="Modificar vacaciones"
+                    event={selectedVacation ?? {}}
+                    vacationForm={vacationForm}
+                    vacationEditError={vacationEditError}
+                    vacationRemainingInfo={vacationRemainingInfo}
+                    isLoadingVacationRemaining={isLoadingVacationRemaining}
+                    isSaving={isSavingVacation}
+                    onCancelEdit={cancelVacationEdit}
+                    onSubmitEdit={submitVacationEdit}
+                    onVacationFieldChange={setVacationField}
+                    showEmployeeInfo={false}
+                />
+            </Modal>
+
+            <Modal
+                open={viewingVacation != null}
+                onClose={closeViewingVacation}
+                scrollable
+                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
+            >
+                <VacationWorkerDetail
+                    event={viewingVacation ?? {}}
+                    onClose={closeViewingVacation}
+                    onDelete={() => {
+                        openDeleteVacation(viewingVacation);
+                        closeViewingVacation();
+                    }}
+                />
+            </Modal>
+
+            <ConfirmDeleteVacationModal
+                event={vacationToDelete}
+                loading={isDeletingVacation}
+                error={deleteVacationError}
+                showEmployeeInfo={false}
+                onCancel={cancelDeleteVacation}
+                onConfirm={confirmDeleteVacation}
             />
         </div>
     );

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import VacationListTable from "../../components/molecules/vacationListTable";
 
 vi.mock("../../components/molecules/vacationListRow", () => ({
-    default: ({ request, view, onViewDetail }) => (
+    default: ({ request, view, onViewDetail, onEdit, onDelete }) => (
         <tr>
             <td>{request.description}</td>
             <td>{view}</td>
@@ -13,6 +13,18 @@ vi.mock("../../components/molecules/vacationListRow", () => ({
                     onClick={() => onViewDetail(request)}
                 >
                     Ver mock
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onEdit(request)}
+                >
+                    Editar mock
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onDelete(request)}
+                >
+                    Borrar mock
                 </button>
             </td>
         </tr>
@@ -85,8 +97,10 @@ describe("VacationListTable", () => {
         expect(screen.getByText("Acciones")).toBeInTheDocument();
     });
 
-    it("pasa view y onViewDetail al row", () => {
+    it("pasa view y acciones al row", () => {
         const onViewDetail = vi.fn();
+        const onEdit = vi.fn();
+        const onDelete = vi.fn();
 
         render(
             <VacationListTable
@@ -94,6 +108,8 @@ describe("VacationListTable", () => {
                 view="past"
                 loading={false}
                 onViewDetail={onViewDetail}
+                onEdit={onEdit}
+                onDelete={onDelete}
             />,
         );
 
@@ -103,5 +119,11 @@ describe("VacationListTable", () => {
 
         expect(onViewDetail).toHaveBeenCalledTimes(1);
         expect(onViewDetail).toHaveBeenCalledWith(requests[0]);
+
+        fireEvent.click(screen.getByRole("button", { name: "Editar mock" }));
+        fireEvent.click(screen.getByRole("button", { name: "Borrar mock" }));
+
+        expect(onEdit).toHaveBeenCalledWith(requests[0]);
+        expect(onDelete).toHaveBeenCalledWith(requests[0]);
     });
 });
