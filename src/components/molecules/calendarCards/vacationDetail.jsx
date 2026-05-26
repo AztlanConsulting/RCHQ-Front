@@ -3,6 +3,7 @@ import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
+import { getToken } from "../../../utils/authStorage";
 
 const VacationDetail = ({
     event,
@@ -20,6 +21,9 @@ const VacationDetail = ({
     onApprove,
     onReject,
 }) => {
+    const token = getToken();
+    const role = token.role;
+
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
 
@@ -27,9 +31,9 @@ const VacationDetail = ({
     const isApproved = status === 1;
     const isRejected = status === 2;
 
-    const canDelete = Boolean(onDelete) && (!isApproved || !isPast);
-    const canEdit = Boolean(onEdit) && !isPast && !isRejected;
-    const canReview = Boolean(onApprove && onReject) && !isPast && isPending;
+    const canDelete = Boolean(onDelete) && role == "Coordinador" && (!isApproved || !isPast);
+    const canEdit = Boolean(onEdit) && role == "Coordinador" && !isPast && !isRejected;
+    const canReview = Boolean(onApprove && onReject) && role == "Coordinador" && !isPast && isPending;
 
     const title = isPending
         ? "Solicitud de Vacaciones"
