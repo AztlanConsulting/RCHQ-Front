@@ -36,6 +36,10 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
 
     const showTimeFields = !form.allDay;
 
+    const today = new Date();
+    const personalDateMin = today;
+    const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+
     return (
         <>
             <Modal
@@ -92,6 +96,8 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                     setField("date", e.target.value)
                                 }
                                 placeholder="dd / mm / yyyy"
+                                minDate={personalDateMin}
+                                maxDate={personalDateMax}
                                 error={!!errors.date}
                             />
                             {errors.date && (
