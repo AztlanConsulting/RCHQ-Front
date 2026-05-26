@@ -133,14 +133,16 @@ const DetalleEmpleado = () => {
           />
         </div>
 
-        <button
-          type="button"
-          onClick={openModal}
-          className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
+        {canEdit ? (
+          <button
+            type="button"
+            onClick={openModal}
+            className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
             text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
-        >
-          Dar de baja
-        </button>
+          >
+            Dar de baja
+          </button>
+        ) : null}
       </div>
 
       <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
@@ -172,14 +174,16 @@ const DetalleEmpleado = () => {
           </Tabs>
         </div>
 
-        <button
-          type="button"
-          onClick={openModal}
-          className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
+        {canEdit ? (
+          <button
+            type="button"
+            onClick={openModal}
+            className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
             text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
-        >
-          Dar de baja
-        </button>
+          >
+            Dar de baja
+          </button>
+        ) : null}
       </div>
 
       <EmployeeBasicCard
@@ -235,6 +239,7 @@ const DetalleEmpleado = () => {
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
         </div>
       )}
