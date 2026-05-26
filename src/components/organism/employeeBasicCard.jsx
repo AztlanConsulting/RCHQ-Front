@@ -174,6 +174,7 @@ const EmployeeBasicCard = ({
                       name={field}
                       value={basicForm[field]}
                       onChange={(e) => setBasicField(field, e.target.value)}
+                      minDate={new Date("1900-01-01")}
                       maxDate={new Date()}
                     />
                   ) : (
