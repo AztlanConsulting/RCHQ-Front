@@ -30,7 +30,23 @@ export const baseSchema = z.object({
 
     date: z
         .string({ required_error: "La fecha es obligatoria" })
-        .regex(dateRegex, "Fecha inválida"),
+        .regex(dateRegex, "Fecha inválida")
+        .refine(
+            (val) => {
+                const d = new Date();
+                const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                return val >= today;
+            },
+            "La fecha no puede ser anterior al día de hoy",
+        )
+        .refine(
+            (val) => {
+                const d = new Date();
+                const maxStr = `${d.getFullYear() + 2}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                return val <= maxStr;
+            },
+            "La fecha no puede exceder 2 años a partir de hoy",
+        ),
 
     forceOverlap: z.boolean().default(false),
 
