@@ -15,6 +15,8 @@ import UpdateHouseEventModal from "../components/organism/evento/updateHouseEven
 import UpdatePersonalEventModal from "../components/organism/evento/updatePersonalEventModal";
 import WorkerAbsenceDetail from "../components/molecules/calendarCards/workerAbsenceDetail";
 import ConfirmDeleteVacationModal from "../components/molecules/confirmDeleteVacationModal";
+import ConfirmApproveVacationModal from "../components/molecules/confirmApproveVacationModal";
+import ConfirmRejectVacationModal from "../components/molecules/confirmRejectVacationModal";
 import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
@@ -156,6 +158,18 @@ const Calendario = () => {
         openDeleteVacation,
         cancelDeleteVacation,
         confirmDeleteVacation,
+        approveVacationRequestModal,
+        rejectVacationRequestModal,
+        isApprovingVacation,
+        isRejectingVacation,
+        approveVacationError,
+        rejectVacationError,
+        openApproveVacation,
+        cancelApproveVacation,
+        confirmApproveVacation,
+        openRejectVacation,
+        cancelRejectVacation,
+        confirmRejectVacation,
     } = useCalendarPage({
         absenceTypeOptions,
         reloadCurrentRange,
@@ -285,16 +299,16 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                className={() => {
-                    if (
-                        ["ausencias", "vacaciones"].includes(
-                            selectedEvent?.focus,
-                        )
-                    )
-                        return "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]";
-
-                    return "max-w-[25vw] max-h-[80vh]";
-                }}
+                scrollable={
+                    selectedEvent?.focus === "eventos" ||
+                    selectedEvent?.focus === "ausencias" ||
+                    selectedEvent?.focus === "vacaciones"
+                }
+                className={
+                    ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        : "w-[92vw] max-w-[40rem] max-h-[calc(100vh-2rem)] scrollbar-hide"
+                }
             >
                 {(() => {
                     switch (selectedEvent?.focus) {
@@ -356,8 +370,8 @@ const Calendario = () => {
                                     onSubmitEdit={submitVacationEdit}
                                     onVacationFieldChange={setVacationField}
                                     onDelete={openDeleteVacation}
-                                    onApprove={() => { }}
-                                    onReject={() => { }}
+                                    onApprove={openApproveVacation}
+                                    onReject={openRejectVacation}
                                 />
                             ) : (
                                 <VacationWorkerDetail
@@ -427,6 +441,22 @@ const Calendario = () => {
                 showEmployeeInfo={isManagementRole(viewerRole)}
                 onCancel={cancelDeleteVacation}
                 onConfirm={confirmDeleteVacation}
+            />
+
+            <ConfirmApproveVacationModal
+                request={approveVacationRequestModal}
+                loading={isApprovingVacation}
+                error={approveVacationError}
+                onCancel={cancelApproveVacation}
+                onConfirm={confirmApproveVacation}
+            />
+
+            <ConfirmRejectVacationModal
+                request={rejectVacationRequestModal}
+                loading={isRejectingVacation}
+                error={rejectVacationError}
+                onCancel={cancelRejectVacation}
+                onConfirm={confirmRejectVacation}
             />
 
             <UpdateHouseEventModal

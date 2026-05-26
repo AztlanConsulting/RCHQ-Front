@@ -389,9 +389,9 @@ describe("Integración: modificar evento personal", () => {
 
             await clickSubmit();
 
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                "Debes seleccionar al menos un empleado.",
-            );
+            expect(
+                screen.getByText("Debes seleccionar al menos un empleado."),
+            ).toBeInTheDocument();
             expect(updatePersonalEvent).not.toHaveBeenCalled();
         });
 

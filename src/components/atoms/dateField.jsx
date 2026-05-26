@@ -18,6 +18,7 @@ const DateField = ({
     inputWrapperClassName = "",
     inputClassName = "",
     labelClassName = "",
+    error = false,
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
@@ -68,7 +69,7 @@ const DateField = ({
                     {label}
                 </label>
 
-                <div className={`flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${inputWrapperClassName}`}>
+                <div className={`flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 ${inputWrapperClassName}`} style={{ boxShadow: error ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}>
                     <input
                         type="date"
                         name={name}
@@ -111,7 +112,7 @@ const DateField = ({
                     root: {
                         input: {
                             field: {
-                                base: `flex min-h-[50px] w-full cursor-text items-center overflow-hidden rounded-lg bg-neutral-50 shadow-[inset_0px_4px_4px_#00000040] ${inputWrapperClassName}`,
+                                base: `flex min-h-[50px] w-full cursor-text items-center overflow-hidden rounded-lg bg-neutral-50 ${error ? "[box-shadow:inset_0_0_0_2px_#f87171,inset_0px_4px_4px_#00000040]" : "shadow-[inset_0px_4px_4px_#00000040]"} ${inputWrapperClassName}`,
 
                                 input: {
                                     base: `h-full w-full flex-1 border-0 bg-transparent px-4 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] focus:ring-0 sm:text-base ${inputClassName}`,
