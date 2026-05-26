@@ -197,7 +197,6 @@ const Calendario = () => {
         openCalendarItemDetail,
         reloadVisibleRange,
         setCalendarMode,
-        calendarTimeZone,
     });
 
     const calendarFiltersProps = {

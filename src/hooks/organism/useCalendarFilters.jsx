@@ -19,7 +19,10 @@ import {
     getScopeOption,
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator";
-import { dateInTimeZoneToInputValue } from "../../utils/timeZone";
+import {
+    dateInTimeZoneToInputValue,
+    getAllDayRangeInTimeZone,
+} from "../../utils/timeZone";
 
 const calculateTotalDays = (startDate, endDate) => {
     const start = toDateOnly(startDate);
@@ -46,7 +49,7 @@ const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
 
-const expandEventsForList = (events = [], isList) => {
+const expandEventsForList = (events = [], isList, calendarTimeZone) => {
     if (!isList) return events;
 
     const expanded = [];
@@ -54,6 +57,11 @@ const expandEventsForList = (events = [], isList) => {
     events.forEach((event) => {
         const isExpandableRange =
             event.allDay === true &&
+            getAllDayRangeInTimeZone(
+                event.start,
+                event.end,
+                calendarTimeZone,
+            ).isAllDay &&
             (event.focus === "ausencias" ||
                 event.focus === "vacaciones" ||
                 event.isFreeDay === true);
@@ -63,8 +71,13 @@ const expandEventsForList = (events = [], isList) => {
             return;
         }
 
-        const start = toDateOnly(event.startDate);
-        const end = toDateOnly(event.endDate);
+        const allDayRange = getAllDayRangeInTimeZone(
+            event.start,
+            event.end,
+            calendarTimeZone,
+        );
+        const start = toDateOnly(allDayRange.startDate);
+        const end = toDateOnly(allDayRange.displayEndDate);
 
         if (!start || !end || end < start) {
             expanded.push(event);
@@ -117,7 +130,7 @@ const getFilteredEvents = (
             ),
     );
 
-    return expandEventsForList(allEvents, isList)
+    return expandEventsForList(allEvents, isList, calendarTimeZone)
         .filter((e) => focusFilters.includes(e.focus))
         .filter((e) => e.focus !== "eventos" || scopeFilters.includes(e.scope))
         .filter(
@@ -167,11 +180,6 @@ const getFilteredEvents = (
                 absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e)),
         )
         .map((rawEvent, idx) => {
-            const isRangeRecord =
-                rawEvent.focus === "ausencias" ||
-                rawEvent.focus === "vacaciones";
-            const isAllDay = rawEvent.allDay === true;
-            const shouldUseDateOnlyRange = isAllDay;
             const isExpandedListAbsence = Boolean(
                 isList &&
                 (rawEvent.focus === "ausencias" ||
@@ -179,35 +187,39 @@ const getFilteredEvents = (
                 rawEvent.currentDayIndex &&
                 rawEvent.totalDays,
             );
-            const normalizedStartDate = normalizeDateOnly(
-                isExpandedListAbsence
-                    ? rawEvent.start
-                    : (rawEvent.startDate ?? rawEvent.start),
+            const expandedStartDate = normalizeDateOnly(rawEvent.start);
+            const expandedEndDate = addDaysToDateOnly(
+                normalizeDateOnly(rawEvent.end),
+                -1,
             );
-            const normalizedEndDate = normalizeDateOnly(
-                isExpandedListAbsence
-                    ? rawEvent.end
-                    : (rawEvent.endDate ?? rawEvent.end),
-            );
-            const eventStart =
-                isAllDay && shouldUseDateOnlyRange && normalizedStartDate
-                    ? normalizedStartDate
-                    : rawEvent.start;
-            const eventEnd =
-                isAllDay && shouldUseDateOnlyRange && normalizedEndDate
-                    ? isExpandedListAbsence
-                        ? normalizedEndDate
-                        : isRangeRecord
-                          ? addDaysToDateOnly(normalizedEndDate, 1)
-                          : normalizedEndDate === normalizedStartDate
-                            ? addDaysToDateOnly(normalizedEndDate, 1)
-                            : normalizedEndDate
-                    : rawEvent.end;
-            const displayStartDate = shouldUseDateOnlyRange
-                ? normalizedStartDate
+            const allDayRange = isExpandedListAbsence
+                ? {
+                      isAllDay: true,
+                      startDate: expandedStartDate,
+                      displayEndDate: expandedEndDate,
+                      calendarEndDate: normalizeDateOnly(rawEvent.end),
+                  }
+                : getAllDayRangeInTimeZone(
+                      rawEvent.start,
+                      rawEvent.end,
+                      calendarTimeZone,
+                  );
+            const isAllDay = rawEvent.allDay === true && allDayRange.isAllDay;
+            const normalizedStartDate =
+                allDayRange.startDate ||
+                normalizeDateOnly(rawEvent.startDate ?? rawEvent.start);
+            const normalizedEndDate =
+                allDayRange.displayEndDate ||
+                normalizeDateOnly(rawEvent.endDate ?? rawEvent.end);
+            const eventStart = isAllDay ? allDayRange.startDate : rawEvent.start;
+            const eventEnd = isAllDay
+                ? allDayRange.calendarEndDate
+                : rawEvent.end;
+            const displayStartDate = isAllDay
+                ? allDayRange.startDate
                 : dateInTimeZoneToInputValue(rawEvent.start, calendarTimeZone);
-            const displayEndDate = shouldUseDateOnlyRange
-                ? normalizedEndDate
+            const displayEndDate = isAllDay
+                ? allDayRange.displayEndDate
                 : dateInTimeZoneToInputValue(rawEvent.end, calendarTimeZone);
 
             return {

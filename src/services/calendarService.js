@@ -1,12 +1,8 @@
 import { getToken, getStoredUser } from "../utils/authStorage";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
-import { getBrowserTimeZone } from "../utils/timeZone";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-const getTimeZoneQuery = (timeZone = getBrowserTimeZone()) =>
-    `timeZone=${encodeURIComponent(timeZone)}`;
 
 const normalizeCalendarEvent = (event) => {
     const isAbsence = event?.focus === "ausencias" || event?.absenceId;
@@ -158,12 +154,7 @@ export const getHouseEmployees = async () => {
     return response?.data?.employees ?? [];
 };
 
-const getEventsInRange = async (
-    employeeId,
-    startDate,
-    endDate,
-    timeZone,
-) => {
+const getEventsInRange = async (employeeId, startDate, endDate) => {
 
     if (employeeId == "") {
         return [];
@@ -176,7 +167,7 @@ const getEventsInRange = async (
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}?${getTimeZoneQuery(timeZone)}`,
+        `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {
@@ -199,7 +190,7 @@ const getEventsInRange = async (
     return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
-export const getHouseEventsInRange = async (startDate, endDate, timeZone) => {
+export const getHouseEventsInRange = async (startDate, endDate) => {
     const token = getToken();
 
     if (!token) {
@@ -207,7 +198,7 @@ export const getHouseEventsInRange = async (startDate, endDate, timeZone) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/event/house/range/${startDate}/${endDate}?${getTimeZoneQuery(timeZone)}`,
+        `${API_URL}/event/house/range/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {

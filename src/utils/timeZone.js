@@ -87,3 +87,68 @@ export const timeInTimeZoneToInputValue = (
 
     return `${parts.hour}:${parts.minute}`;
 };
+
+const addDaysToDateOnly = (dateValue, days) => {
+    const [year, month, day] = String(dateValue).split("-").map(Number);
+    if ([year, month, day].some(Number.isNaN)) return "";
+
+    const date = new Date(Date.UTC(year, month - 1, day + days, 0, 0, 0, 0));
+
+    return [
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, "0"),
+        String(date.getUTCDate()).padStart(2, "0"),
+    ].join("-");
+};
+
+export const getAllDayRangeInTimeZone = (
+    startValue,
+    endValue,
+    timeZone = getBrowserTimeZone(),
+) => {
+    if (!startValue || !endValue) {
+        return { isAllDay: false };
+    }
+
+    const startDate = startValue instanceof Date
+        ? startValue
+        : new Date(startValue);
+    const endDate = endValue instanceof Date ? endValue : new Date(endValue);
+
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return { isAllDay: false };
+    }
+
+    const startParts = getPartsInTimeZone(startDate, timeZone);
+    const endParts = getPartsInTimeZone(endDate, timeZone);
+    const startsAtMidnight =
+        startParts.hour === "00" &&
+        startParts.minute === "00" &&
+        startParts.second === "00";
+    const endsAtMidnight =
+        endParts.hour === "00" &&
+        endParts.minute === "00" &&
+        endParts.second === "00";
+    const endsAtLastMinute =
+        endParts.hour === "23" && endParts.minute === "59";
+
+    if (!startsAtMidnight || (!endsAtMidnight && !endsAtLastMinute)) {
+        return { isAllDay: false };
+    }
+
+    const startDateOnly = `${startParts.year}-${startParts.month}-${startParts.day}`;
+    const endDateOnly = `${endParts.year}-${endParts.month}-${endParts.day}`;
+    const displayEndDate = endsAtMidnight
+        ? addDaysToDateOnly(endDateOnly, -1)
+        : endDateOnly;
+    const calendarEndDate = endsAtMidnight
+        ? endDateOnly
+        : addDaysToDateOnly(endDateOnly, 1);
+
+    return {
+        isAllDay: true,
+        startDate: startDateOnly,
+        displayEndDate,
+        calendarEndDate,
+    };
+};

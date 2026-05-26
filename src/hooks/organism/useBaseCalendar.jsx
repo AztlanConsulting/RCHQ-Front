@@ -306,13 +306,13 @@ export const useBaseCalendar = () => {
     };
 
     const loadCalendarEvents = useCallback(
-        async (startDate, endDate, employeeId, role, timeZone) => {
+        async (startDate, endDate, employeeId, role) => {
             const personalEventsPromise = employeeId
-                ? getEventsInRange(employeeId, startDate, endDate, timeZone)
+                ? getEventsInRange(employeeId, startDate, endDate)
                 : Promise.resolve([]);
 
             const sameHouseEventsPromise = canViewHouseEvents(role)
-                ? getHouseEventsInRange(startDate, endDate, timeZone)
+                ? getHouseEventsInRange(startDate, endDate)
                 : Promise.resolve([]);
 
             const [personalEvents, houseEvents] = await Promise.all([
@@ -339,17 +339,11 @@ export const useBaseCalendar = () => {
             end.split("T")[0],
             effectiveEmployeeId,
             effectiveViewerRole,
-            calendarTimeZone,
         );
 
         setAllEvents(rawEvents ?? []);
         return rawEvents ?? [];
-    }, [
-        calendarTimeZone,
-        effectiveEmployeeId,
-        effectiveViewerRole,
-        loadCalendarEvents,
-    ]);
+    }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
     const reloadVisibleRange = useCallback(
         async (calendarRef) => {
@@ -373,18 +367,12 @@ export const useBaseCalendar = () => {
                 end.split("T")[0],
                 effectiveEmployeeId,
                 effectiveViewerRole,
-                calendarTimeZone,
             );
 
             setAllEvents(rawEvents ?? []);
             return rawEvents ?? [];
         },
-        [
-            calendarTimeZone,
-            effectiveEmployeeId,
-            effectiveViewerRole,
-            loadCalendarEvents,
-        ],
+        [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents],
     );
 
     useEffect(() => {
@@ -421,7 +409,6 @@ export const useBaseCalendar = () => {
                 endStr.split("T")[0],
                 effectiveEmployeeId,
                 effectiveViewerRole,
-                calendarTimeZone,
             );
             setAllEvents(rawEvents ?? []);
         } catch (err) {

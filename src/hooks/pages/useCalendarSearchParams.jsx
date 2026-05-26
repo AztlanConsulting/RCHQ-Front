@@ -59,7 +59,6 @@ export const useCalendarSearchParams = ({
     openCalendarItemDetail,
     reloadVisibleRange,
     setCalendarMode,
-    calendarTimeZone,
 }) => {
     const [searchParams] = useSearchParams();
     const openedVacationLinkRef = useRef("");
@@ -124,7 +123,6 @@ export const useCalendarSearchParams = ({
                 employeeId,
                 pendingVacationLink.dateParam,
                 endDate,
-                calendarTimeZone,
             );
 
             if (cancelled) return;
@@ -160,7 +158,6 @@ export const useCalendarSearchParams = ({
         };
     }, [
         calendarRef,
-        calendarTimeZone,
         openCalendarItemDetail,
         ownEmployeeId,
         pendingVacationLink,
