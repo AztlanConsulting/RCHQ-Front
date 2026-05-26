@@ -4,6 +4,7 @@ import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import documentIcon from "/document.svg";
 
 const DocumentWhiteIcon = () => (
@@ -97,6 +98,7 @@ const AbsenceDetail = ({
   onConfirmDelete,
   onAbsenceFieldChange,
   onAbsenceEvidenceChange,
+  showMexicoReferenceNotice = false,
 }) => {
   if (!event) return null;
 
@@ -244,6 +246,7 @@ const AbsenceDetail = ({
       <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
         Ausencia
       </Type>
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">

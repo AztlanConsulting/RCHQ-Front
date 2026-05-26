@@ -25,6 +25,10 @@ export const useHouseForm = ({
     onSuccess,
     initialStartDate,
     initialEndDate,
+    initialStartTime,
+    initialEndTime,
+    initialAllDay,
+    calendarTimeZone,
     onNameError,
     onValidationAlert,
 }) => {
@@ -73,14 +77,31 @@ export const useHouseForm = ({
             return;
         }
 
-        if (initialStartDate || initialEndDate) {
+        if (
+            initialStartDate ||
+            initialEndDate ||
+            initialStartTime ||
+            initialEndTime ||
+            initialAllDay != null
+        ) {
             setForm((prev) => ({
                 ...prev,
                 startDate: initialStartDate ?? prev.startDate,
                 endDate: initialEndDate ?? prev.endDate,
+                allDay: initialAllDay ?? prev.allDay,
+                startTime: initialStartTime ?? prev.startTime,
+                endTime: initialEndTime ?? prev.endTime,
             }));
         }
-    }, [isOpen, initialStartDate, initialEndDate, onValidationAlert]);
+    }, [
+        isOpen,
+        initialStartDate,
+        initialEndDate,
+        initialStartTime,
+        initialEndTime,
+        initialAllDay,
+        onValidationAlert,
+    ]);
 
     const setField = useCallback((field, value) => {
         setForm((prev) => ({
@@ -186,6 +207,7 @@ export const useHouseForm = ({
             buildPayload({
                 ...validated,
                 forceOverlap: false,
+                timeZone: calendarTimeZone,
             }),
         );
     };

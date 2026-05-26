@@ -5,6 +5,10 @@ import { getEventTypes, getEmployeesForSelector } from "../../services/eventServ
 import { getCalendarViewerRole } from "../../services/calendarService";
 import { normalizeDateOnly } from "../../utils/calendarEventDetail";
 import {
+    dateInTimeZoneToInputValue,
+    timeInTimeZoneToInputValue,
+} from "../../utils/timeZone";
+import {
     buildPersonalPayload,
     personalEventSchema,
 } from "../../utils/schema/evento/personalEvent.schema";
@@ -21,24 +25,23 @@ const DEFAULT_FORM = {
 
 const TEXT_SANITIZER = /[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g;
 
-const getTimeValue = (value) => {
-    if (!value) return "";
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-    return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-};
-
-const getInitialForm = (event) => {
+const getInitialForm = (event, calendarTimeZone) => {
     if (!event) return DEFAULT_FORM;
-    const date = normalizeDateOnly(event.date ?? event.start);
+    const date =
+        normalizeDateOnly(event.date) ||
+        dateInTimeZoneToInputValue(event.start, calendarTimeZone);
     return {
         name: event.title ?? "",
         eventTypeId: event.eventTypeId ?? "",
         description: event.description ?? "",
         allDay: Boolean(event.allDay),
         date,
-        startTime: event.allDay ? "" : getTimeValue(event.start),
-        endTime: event.allDay ? "" : getTimeValue(event.end),
+        startTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(event.start, calendarTimeZone),
+        endTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(event.end, calendarTimeZone),
     };
 };
 
@@ -57,6 +60,7 @@ export const useUpdatePersonalEventForm = ({
     isOpen,
     onClose,
     onSuccess,
+    calendarTimeZone,
 }) => {
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
@@ -83,7 +87,7 @@ export const useUpdatePersonalEventForm = ({
 
     useEffect(() => {
         if (!isOpen) return;
-        setForm(getInitialForm(event));
+        setForm(getInitialForm(event, calendarTimeZone));
         setSelectedEmployees(getInitialEmployees(event));
         setErrors({});
         setServerError(null);
@@ -94,7 +98,7 @@ export const useUpdatePersonalEventForm = ({
             pendingPayload: null,
             isForcing: false,
         });
-    }, [event, isOpen]);
+    }, [calendarTimeZone, event, isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -230,7 +234,11 @@ export const useUpdatePersonalEventForm = ({
         const validated = validate();
         if (!validated) return;
         await submitPayload(
-            buildPersonalPayload({ ...validated, forceOverlap: false }),
+            buildPersonalPayload({
+                ...validated,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
         );
     };
 

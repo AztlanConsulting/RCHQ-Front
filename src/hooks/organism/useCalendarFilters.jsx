@@ -19,6 +19,7 @@ import {
     getScopeOption,
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator";
+import { dateInTimeZoneToInputValue } from "../../utils/timeZone";
 
 const calculateTotalDays = (startDate, endDate) => {
     const start = toDateOnly(startDate);
@@ -43,18 +44,6 @@ const getAbsenceEvidenceValue = (event) =>
 
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
-};
-
-const normalizeLocalDateOnly = (value) => {
-    if (!value) return "";
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-
-    return [
-        date.getFullYear(),
-        String(date.getMonth() + 1).padStart(2, "0"),
-        String(date.getDate()).padStart(2, "0"),
-    ].join("-");
 };
 
 const expandEventsForList = (events = [], isList) => {
@@ -117,6 +106,7 @@ const getFilteredEvents = (
     absenceEvidenceFilters,
     calendarMode,
     viewerRole,
+    calendarTimeZone,
 ) => {
     const selectedAbsenceTypeNames = new Set(
         absenceTypeOptions
@@ -215,10 +205,10 @@ const getFilteredEvents = (
                     : rawEvent.end;
             const displayStartDate = shouldUseDateOnlyRange
                 ? normalizedStartDate
-                : normalizeLocalDateOnly(rawEvent.start);
+                : dateInTimeZoneToInputValue(rawEvent.start, calendarTimeZone);
             const displayEndDate = shouldUseDateOnlyRange
                 ? normalizedEndDate
-                : normalizeLocalDateOnly(rawEvent.end);
+                : dateInTimeZoneToInputValue(rawEvent.end, calendarTimeZone);
 
             return {
                 id: String(idx),
@@ -296,7 +286,12 @@ const getFilteredEvents = (
 
 export const useCalendarFilters = (
     allEvents = [],
-    { isList = false, viewerRole = "", calendarMode = "personal" } = {},
+    {
+        isList = false,
+        viewerRole = "",
+        calendarMode = "personal",
+        calendarTimeZone,
+    } = {},
 ) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
@@ -551,6 +546,7 @@ export const useCalendarFilters = (
                 absenceEvidenceFilters,
                 calendarMode,
                 viewerRole,
+                calendarTimeZone,
             ),
         [
             allEvents,
@@ -566,6 +562,7 @@ export const useCalendarFilters = (
             absenceEvidenceFilters,
             calendarMode,
             viewerRole,
+            calendarTimeZone,
         ],
     );
 

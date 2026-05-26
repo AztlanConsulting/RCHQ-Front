@@ -3,6 +3,7 @@ import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const VacationWorkerDetail = ({
     event,
@@ -18,6 +19,7 @@ const VacationWorkerDetail = ({
     onSubmitEdit,
     onVacationFieldChange,
     onDelete,
+    showMexicoReferenceNotice = false,
 }) => {
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
@@ -58,6 +60,7 @@ const VacationWorkerDetail = ({
             >
                 {title}
             </Type>
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
                     <Type

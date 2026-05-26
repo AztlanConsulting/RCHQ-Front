@@ -1,6 +1,7 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const DetailLabel = ({ children, className = "" }) => (
   <Type
@@ -43,6 +44,7 @@ const WorkerAbsenceDetail = ({
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
   onClose,
+  showMexicoReferenceNotice = false,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
@@ -57,6 +59,8 @@ const WorkerAbsenceDetail = ({
       >
         Ausencia
       </Type>
+
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
 
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>

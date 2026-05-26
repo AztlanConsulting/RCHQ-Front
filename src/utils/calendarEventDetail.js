@@ -175,7 +175,7 @@ export const formatEventDateTime = (value) => {
     });
 };
 
-export const formatEventTime = (value) => {
+export const formatEventTime = (value, { timeZone } = {}) => {
     if (value == null || value === "") return "—";
     const d = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
@@ -183,6 +183,7 @@ export const formatEventTime = (value) => {
     return d.toLocaleTimeString("es-MX", {
         hour: "numeric",
         minute: "2-digit",
+        ...(timeZone ? { timeZone } : {}),
     });
 };
 

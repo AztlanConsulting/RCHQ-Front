@@ -1,4 +1,8 @@
-export { getBrowserTimeZone } from "../../timeZone";
+export {
+    getBrowserTimeZone,
+    MEXICO_TIME_ZONE,
+    zonedDateTimeToIso,
+} from "../../timeZone";
 
 export const localDateTimeToIso = (date, time = "00:00") =>
     new Date(`${date}T${time}:00`).toISOString();

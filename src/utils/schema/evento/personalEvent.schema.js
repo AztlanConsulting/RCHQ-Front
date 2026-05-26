@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
     addDaysToDateOnly,
     getBrowserTimeZone,
-    localDateTimeToIso,
+    zonedDateTimeToIso,
 } from "./dateTime";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -102,6 +102,7 @@ export function buildPersonalPayload(formData) {
         endTime,
         employeeIds,
         forceOverlap,
+        timeZone = getBrowserTimeZone(),
     } = formData;
 
     const base = {
@@ -109,7 +110,7 @@ export function buildPersonalPayload(formData) {
         eventTypeId,
         date,
         allDay,
-        timeZone: getBrowserTimeZone(),
+        timeZone,
         ...(description?.trim() ? { description: description.trim() } : {}),
         employeeIds: employeeIds ?? [],
         forceOverlap,
@@ -118,14 +119,18 @@ export function buildPersonalPayload(formData) {
     if (allDay) {
         return {
             ...base,
-            start: localDateTimeToIso(date),
-            end: localDateTimeToIso(addDaysToDateOnly(date, 1)),
+            start: zonedDateTimeToIso(date, "00:00", timeZone),
+            end: zonedDateTimeToIso(
+                addDaysToDateOnly(date, 1),
+                "00:00",
+                timeZone,
+            ),
         };
     }
 
     return {
         ...base,
-        start: localDateTimeToIso(date, startTime),
-        end: localDateTimeToIso(date, endTime),
+        start: zonedDateTimeToIso(date, startTime, timeZone),
+        end: zonedDateTimeToIso(date, endTime, timeZone),
     };
 }

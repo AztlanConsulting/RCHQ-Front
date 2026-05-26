@@ -5,8 +5,8 @@ import { getBrowserTimeZone } from "../utils/timeZone";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const getTimeZoneQuery = () =>
-    `timeZone=${encodeURIComponent(getBrowserTimeZone())}`;
+const getTimeZoneQuery = (timeZone = getBrowserTimeZone()) =>
+    `timeZone=${encodeURIComponent(timeZone)}`;
 
 const normalizeCalendarEvent = (event) => {
     const isAbsence = event?.focus === "ausencias" || event?.absenceId;
@@ -158,7 +158,12 @@ export const getHouseEmployees = async () => {
     return response?.data?.employees ?? [];
 };
 
-const getEventsInRange = async (employeeId, startDate, endDate) => {
+const getEventsInRange = async (
+    employeeId,
+    startDate,
+    endDate,
+    timeZone,
+) => {
 
     if (employeeId == "") {
         return [];
@@ -171,7 +176,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}?${getTimeZoneQuery()}`,
+        `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}?${getTimeZoneQuery(timeZone)}`,
         {
             method: "GET",
             headers: {
@@ -194,7 +199,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
     return Array.isArray(rawEvents) ? rawEvents.map(normalizeCalendarEvent) : [];
 };
 
-export const getHouseEventsInRange = async (startDate, endDate) => {
+export const getHouseEventsInRange = async (startDate, endDate, timeZone) => {
     const token = getToken();
 
     if (!token) {
@@ -202,7 +207,7 @@ export const getHouseEventsInRange = async (startDate, endDate) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/event/house/range/${startDate}/${endDate}?${getTimeZoneQuery()}`,
+        `${API_URL}/event/house/range/${startDate}/${endDate}?${getTimeZoneQuery(timeZone)}`,
         {
             method: "GET",
             headers: {

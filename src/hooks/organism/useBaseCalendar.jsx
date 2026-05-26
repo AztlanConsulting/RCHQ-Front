@@ -6,7 +6,12 @@ import {
     getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
-import { dateToInputValue } from "../../utils/dates";
+import {
+    addDaysToInputValue,
+    dateStringToInputValue,
+    timeStringToInputValue,
+} from "../../utils/dates";
+import { getBrowserTimeZone, MEXICO_TIME_ZONE } from "../../utils/timeZone";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -14,6 +19,8 @@ export const useBaseCalendar = () => {
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [viewerRole, setViewerRole] = useState("");
     const [calendarMode, setCalendarMode] = useState("personal");
+    const [calendarTimeZoneMode, setCalendarTimeZoneMode] =
+        useState("local");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
@@ -35,6 +42,24 @@ export const useBaseCalendar = () => {
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseEvents(effectiveViewerRole),
         [effectiveViewerRole],
+    );
+    const browserTimeZone = useMemo(() => getBrowserTimeZone(), []);
+    const canSwitchCalendarTimeZone = browserTimeZone !== MEXICO_TIME_ZONE;
+    const calendarTimeZone = useMemo(
+        () =>
+            calendarTimeZoneMode === "mexico"
+                ? MEXICO_TIME_ZONE
+                : browserTimeZone,
+        [browserTimeZone, calendarTimeZoneMode],
+    );
+    const fullCalendarTimeZone =
+        calendarTimeZoneMode === "mexico" ? MEXICO_TIME_ZONE : "local";
+    const calendarTimeZoneOptions = useMemo(
+        () => [
+            { value: "local", label: "Horario local" },
+            { value: "mexico", label: "Horario central de México" },
+        ],
+        [],
     );
 
     const calendarModeOptions = useMemo(
@@ -281,13 +306,13 @@ export const useBaseCalendar = () => {
     };
 
     const loadCalendarEvents = useCallback(
-        async (startDate, endDate, employeeId, role) => {
+        async (startDate, endDate, employeeId, role, timeZone) => {
             const personalEventsPromise = employeeId
-                ? getEventsInRange(employeeId, startDate, endDate)
+                ? getEventsInRange(employeeId, startDate, endDate, timeZone)
                 : Promise.resolve([]);
 
             const sameHouseEventsPromise = canViewHouseEvents(role)
-                ? getHouseEventsInRange(startDate, endDate)
+                ? getHouseEventsInRange(startDate, endDate, timeZone)
                 : Promise.resolve([]);
 
             const [personalEvents, houseEvents] = await Promise.all([
@@ -314,11 +339,17 @@ export const useBaseCalendar = () => {
             end.split("T")[0],
             effectiveEmployeeId,
             effectiveViewerRole,
+            calendarTimeZone,
         );
 
         setAllEvents(rawEvents ?? []);
         return rawEvents ?? [];
-    }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
+    }, [
+        calendarTimeZone,
+        effectiveEmployeeId,
+        effectiveViewerRole,
+        loadCalendarEvents,
+    ]);
 
     const reloadVisibleRange = useCallback(
         async (calendarRef) => {
@@ -342,12 +373,18 @@ export const useBaseCalendar = () => {
                 end.split("T")[0],
                 effectiveEmployeeId,
                 effectiveViewerRole,
+                calendarTimeZone,
             );
 
             setAllEvents(rawEvents ?? []);
             return rawEvents ?? [];
         },
-        [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents],
+        [
+            calendarTimeZone,
+            effectiveEmployeeId,
+            effectiveViewerRole,
+            loadCalendarEvents,
+        ],
     );
 
     useEffect(() => {
@@ -384,6 +421,7 @@ export const useBaseCalendar = () => {
                 endStr.split("T")[0],
                 effectiveEmployeeId,
                 effectiveViewerRole,
+                calendarTimeZone,
             );
             setAllEvents(rawEvents ?? []);
         } catch (err) {
@@ -413,11 +451,27 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const inclusiveEnd = new Date(info.end.getTime() - 1000);
-        const startDate = dateToInputValue(info.start);
-        const endDate = dateToInputValue(inclusiveEnd);
+        const isAllDaySelection = info.allDay === true;
+        const startDate = dateStringToInputValue(info.startStr, info.start);
+        const rawEndDate = dateStringToInputValue(
+            info.endStr,
+            info.end ?? info.start,
+        );
+        const endDate = isAllDaySelection
+            ? addDaysToInputValue(rawEndDate, -1)
+            : rawEndDate;
 
-        setSelectedDates({ startDate, endDate });
+        setSelectedDates({
+            startDate,
+            endDate,
+            startTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.startStr, info.start),
+            endTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.endStr, info.end),
+            allDay: isAllDaySelection,
+        });
 
         const calendarApi = calendarRef.current.getApi();
         calendarApi.selectable = false;
@@ -443,6 +497,12 @@ export const useBaseCalendar = () => {
         viewerRole,
         calendarMode,
         setCalendarMode,
+        calendarTimeZone,
+        calendarTimeZoneMode,
+        setCalendarTimeZoneMode,
+        calendarTimeZoneOptions,
+        canSwitchCalendarTimeZone,
+        fullCalendarTimeZone,
         calendarModeOptions,
         canSwitchCalendarMode,
         handleDatesSet,

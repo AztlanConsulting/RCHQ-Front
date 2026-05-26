@@ -10,6 +10,10 @@ import {
     buildPayload,
     houseEventSchema,
 } from "../../utils/schema/evento/houseEvent.schema";
+import {
+    dateInTimeZoneToInputValue,
+    timeInTimeZoneToInputValue,
+} from "../../utils/timeZone";
 
 const DEFAULT_FORM = {
     name: "",
@@ -33,24 +37,15 @@ const getEventId = (event) => {
     return /^\d+$/.test(fallbackId) ? "" : fallbackId;
 };
 
-const getTimeValue = (value) => {
-    if (!value) return "";
-
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-
-    return `${String(date.getHours()).padStart(2, "0")}:${String(
-        date.getMinutes(),
-    ).padStart(2, "0")}`;
-};
-
-const getInitialForm = (event) => {
+const getInitialForm = (event, calendarTimeZone) => {
     if (!event) return DEFAULT_FORM;
 
-    const startDate = normalizeDateOnly(event.startDate ?? event.start);
-    const rawEndDate = normalizeDateOnly(
-        event.endDate ?? event.end ?? event.start,
-    );
+    const startDate =
+        normalizeDateOnly(event.startDate) ||
+        dateInTimeZoneToInputValue(event.start, calendarTimeZone);
+    const rawEndDate =
+        normalizeDateOnly(event.endDate) ||
+        dateInTimeZoneToInputValue(event.end ?? event.start, calendarTimeZone);
     const endDate =
         event.allDay && rawEndDate > startDate
             ? addDaysToDateOnly(rawEndDate, -1)
@@ -66,8 +61,16 @@ const getInitialForm = (event) => {
         endDate,
         startTime: event.allDay
             ? ""
-            : getTimeValue(event.start ?? event.startStr),
-        endTime: event.allDay ? "" : getTimeValue(event.end ?? event.endStr),
+            : timeInTimeZoneToInputValue(
+                  event.start ?? event.startStr,
+                  calendarTimeZone,
+              ),
+        endTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(
+                  event.end ?? event.endStr,
+                  calendarTimeZone,
+              ),
     };
 };
 
@@ -89,6 +92,7 @@ export const useUpdateHouseEventForm = ({
     isOpen,
     onClose,
     onSuccess,
+    calendarTimeZone,
 }) => {
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
@@ -108,7 +112,7 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        setForm(getInitialForm(event));
+        setForm(getInitialForm(event, calendarTimeZone));
         setErrors({});
         setServerError(null);
         setValidationAlert(null);
@@ -118,7 +122,7 @@ export const useUpdateHouseEventForm = ({
             pendingPayload: null,
             isForcing: false,
         });
-    }, [event, isOpen]);
+    }, [calendarTimeZone, event, isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -259,7 +263,11 @@ export const useUpdateHouseEventForm = ({
         if (!validated) return;
 
         await submitPayload(
-            buildPayload({ ...validated, forceOverlap: false }),
+            buildPayload({
+                ...validated,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
         );
     };
 

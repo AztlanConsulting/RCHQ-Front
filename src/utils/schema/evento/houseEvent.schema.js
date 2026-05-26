@@ -2,7 +2,8 @@ import { z } from "zod";
 import {
     addDaysToDateOnly,
     getBrowserTimeZone,
-    localDateTimeToIso,
+    MEXICO_TIME_ZONE,
+    zonedDateTimeToIso,
 } from "./dateTime";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -110,6 +111,7 @@ export function buildPayload(formData) {
         forceOverlap,
         startDate,
         endDate,
+        timeZone = getBrowserTimeZone(),
     } = formData;
 
     if (isFreeDay) {
@@ -120,7 +122,7 @@ export function buildPayload(formData) {
             end: endDate,
             allDay: true,
             isFreeDay,
-            timeZone: isFreeDay ? "America/Mexico_City" : getBrowserTimeZone(),
+            timeZone: MEXICO_TIME_ZONE,
             ...(description?.trim() ? { description: description.trim() } : {}),
             forceOverlap,
         };
@@ -130,11 +132,15 @@ export function buildPayload(formData) {
         return {
             eventTypeId,
             name,
-            start: localDateTimeToIso(startDate),
-            end: localDateTimeToIso(addDaysToDateOnly(endDate, 1)),
+            start: zonedDateTimeToIso(startDate, "00:00", timeZone),
+            end: zonedDateTimeToIso(
+                addDaysToDateOnly(endDate, 1),
+                "00:00",
+                timeZone,
+            ),
             allDay: true,
             isFreeDay: false,
-            timeZone: getBrowserTimeZone(),
+            timeZone,
             ...(description?.trim() ? { description: description.trim() } : {}),
             forceOverlap,
         };
@@ -145,11 +151,11 @@ export function buildPayload(formData) {
     return {
         eventTypeId,
         name,
-        start: localDateTimeToIso(startDate, startTime),
-        end: localDateTimeToIso(endDate, endTime),
+        start: zonedDateTimeToIso(startDate, startTime, timeZone),
+        end: zonedDateTimeToIso(endDate, endTime, timeZone),
         allDay: false,
         isFreeDay,
-        timeZone: getBrowserTimeZone(),
+        timeZone,
         ...(description?.trim() ? { description: description.trim() } : {}),
         forceOverlap,
     };

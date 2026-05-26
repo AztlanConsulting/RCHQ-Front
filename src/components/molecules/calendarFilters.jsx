@@ -68,6 +68,10 @@ const CalendarFilters = ({
   onCalendarModeChange,
   calendarModeOptions = [],
   canSwitchCalendarMode = false,
+  calendarTimeZoneMode = "local",
+  onCalendarTimeZoneModeChange,
+  calendarTimeZoneOptions = [],
+  canSwitchCalendarTimeZone = false,
   className = "",
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
@@ -94,6 +98,28 @@ const CalendarFilters = ({
                 key={option.value}
                 type="button"
                 onClick={() => onCalendarModeChange?.(option.value)}
+                className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
+                  isActive
+                    ? "bg-[#1F3664] text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+      {canSwitchCalendarTimeZone ? (
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {calendarTimeZoneOptions.map((option) => {
+            const isActive = option.value === calendarTimeZoneMode;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onCalendarTimeZoneModeChange?.(option.value)}
                 className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
                   isActive
                     ? "bg-[#1F3664] text-white shadow-sm"

@@ -119,9 +119,9 @@ const VacationEditForm = ({
 
             {showMexicoTimeZoneMessage ? (
                 <p className="mx-auto mt-5 mb-1 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
-                    Las vacaciones se guardan con base en horario de México
-                    porque se contabilizan contra días laborales y días libres
-                    mexicanos.
+                    Las vacaciones se guardan con base en horario central de
+                    México porque se contabilizan contra días laborales y días
+                    libres mexicanos.
                 </p>
             ) : null}
 

@@ -55,6 +55,7 @@ const BaseCalendar = ({
     onDateDrag,
     onDateDragging,
     onOpenCalendarFilters,
+    timeZone = "local",
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -138,7 +139,7 @@ const BaseCalendar = ({
             ]}
             locales={[esLocale]}
             locale="es"
-            timeZone="local"
+            timeZone={timeZone}
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}

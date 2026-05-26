@@ -28,6 +28,10 @@ export const usePersonalForm = ({
     onClose,
     onSuccess,
     initialStartDate,
+    initialStartTime,
+    initialEndTime,
+    initialAllDay,
+    calendarTimeZone,
     onNameError,
     onValidationAlert,
 }) => {
@@ -100,10 +104,28 @@ export const usePersonalForm = ({
             return;
         }
 
-        if (initialStartDate) {
-            setForm((prev) => ({ ...prev, date: initialStartDate }));
+        if (
+            initialStartDate ||
+            initialStartTime ||
+            initialEndTime ||
+            initialAllDay != null
+        ) {
+            setForm((prev) => ({
+                ...prev,
+                date: initialStartDate ?? prev.date,
+                allDay: initialAllDay ?? prev.allDay,
+                startTime: initialStartTime ?? prev.startTime,
+                endTime: initialEndTime ?? prev.endTime,
+            }));
         }
-    }, [isOpen, initialStartDate, onValidationAlert]);
+    }, [
+        isOpen,
+        initialStartDate,
+        initialStartTime,
+        initialEndTime,
+        initialAllDay,
+        onValidationAlert,
+    ]);
 
     const setField = useCallback((field, value) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -198,7 +220,11 @@ export const usePersonalForm = ({
         if (!validated) return;
 
         await submitPayload(
-            buildPersonalPayload({ ...validated, forceOverlap: false }),
+            buildPersonalPayload({
+                ...validated,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
         );
     };
 

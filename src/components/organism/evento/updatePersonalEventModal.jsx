@@ -11,7 +11,13 @@ import TimeField from "../../atoms/timeField";
 import OverlapModal from "../overlapModal";
 import { useUpdatePersonalEventForm } from "../../../hooks/pages/useUpdatePersonalEventForm";
 
-const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
+const UpdatePersonalEventModal = ({
+    event,
+    isOpen,
+    onClose,
+    onSuccess,
+    calendarTimeZone,
+}) => {
     const {
         form,
         errors,
@@ -32,7 +38,13 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-    } = useUpdatePersonalEventForm({ event, isOpen, onClose, onSuccess });
+    } = useUpdatePersonalEventForm({
+        event,
+        isOpen,
+        onClose,
+        onSuccess,
+        calendarTimeZone,
+    });
 
     const showTimeFields = !form.allDay;
 
