@@ -52,6 +52,7 @@ const EmployeeAdminCard = ({
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
   const currentRoleOption = roles.find(
     (role) => String(role.roleId) === String(adminForm.originalRoleId),
@@ -90,15 +91,17 @@ const EmployeeAdminCard = ({
             >
               Cancelar
             </button>
-            <button
-              type="button" onClick={onSubmit} disabled={saving || loadingCatalogues}
-              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-            >
-              {saving && <Loader size="sm" />}
-              Guardar
-            </button>
+            {canEdit ? (
+              <button
+                type="button" onClick={onSubmit} disabled={saving || loadingCatalogues}
+                className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
+              >
+                {saving && <Loader size="sm" />}
+                Guardar
+              </button>
+            ) : null}
           </div>
-        ) : (
+        ) : canEdit ? (
           <button
             type="button" aria-label="Editar información administrativa"
             className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -106,10 +109,10 @@ const EmployeeAdminCard = ({
           >
             <img src="/edit.svg" alt="" className="h-5 w-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {saveError && isEditing && (
+      {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
@@ -216,7 +219,7 @@ const EmployeeAdminCard = ({
       )}
 
       {/* Modo edición */}
-      {isEditing && (
+      {isEditing && canEdit && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (

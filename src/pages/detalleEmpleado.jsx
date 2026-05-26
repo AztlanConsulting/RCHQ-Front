@@ -1,3 +1,4 @@
+import { useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Loader from "../components/atoms/loader";
 import Alert from "../components/atoms/alerts";
@@ -14,6 +15,7 @@ import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
 import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
+import { getToken } from "../utils/authStorage";
 
 const tabs = [
   { id: "overview",   label: "Resumen" },
@@ -23,6 +25,10 @@ const tabs = [
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
+  const token = getToken();
+  const role = token?.role || null;
+
+  const canEdit = role == "Coordinador";
 
   const {
     employee, employeeAddress, employeeHouse,
@@ -45,6 +51,47 @@ const DetalleEmpleado = () => {
     setAlert({ type: "success", message: msg });
     getEmployeeDetail();
   });
+
+  useEffect(() => {
+    if (
+      !canEdit &&
+      (editSection === "basic" ||
+        editSection === "contact" ||
+        editSection === "Administrador")
+    ) {
+      closeEdit();
+    }
+  }, [canEdit, editSection, closeEdit]);
+
+  const handleOpenBasicEdit = useCallback(() => {
+    if (!canEdit) return;
+    openBasicEdit(employee);
+  }, [canEdit, employee, openBasicEdit]);
+
+  const handleSubmitBasic = useCallback(() => {
+    if (!canEdit) return;
+    void submitBasic();
+  }, [canEdit, submitBasic]);
+
+  const handleOpenContactEdit = useCallback(() => {
+    if (!canEdit) return;
+    openContactEdit(employee, employeeAddress);
+  }, [canEdit, employee, employeeAddress, openContactEdit]);
+
+  const handleSubmitContact = useCallback(() => {
+    if (!canEdit) return;
+    void submitContact();
+  }, [canEdit, submitContact]);
+
+  const handleOpenAdminEdit = useCallback(() => {
+    if (!canEdit) return;
+    void openAdminEdit(employee, employeeWorkdays);
+  }, [canEdit, employee, employeeWorkdays, openAdminEdit]);
+
+  const handleSubmitAdmin = useCallback(() => {
+    if (!canEdit) return;
+    void submitAdmin();
+  }, [canEdit, submitAdmin]);
 
   const {
     documents, documentTypes, loadingDocs, fetchError, showUploadModal,
@@ -189,9 +236,10 @@ const DetalleEmpleado = () => {
         saving={saving}
         saveError={editSection === "basic" ? saveError : null}
         infoDrawer={infoDrawer}
-        onOpenEdit={() => openBasicEdit(employee)}
-        onSubmit={submitBasic}
+        onOpenEdit={handleOpenBasicEdit}
+        onSubmit={handleSubmitBasic}
         onCancel={closeEdit}
+        canEdit={canEdit}
       />
 
       {currentTab === "overview" && (
@@ -204,9 +252,10 @@ const DetalleEmpleado = () => {
             setContactField={setContactField}
             saving={saving}
             saveError={editSection === "contact" ? saveError : null}
-            onOpenEdit={() => openContactEdit(employee, employeeAddress)}
-            onSubmit={submitContact}
+            onOpenEdit={handleOpenContactEdit}
+            onSubmit={handleSubmitContact}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
 
           <EmployeeAdminCard
@@ -226,9 +275,10 @@ const DetalleEmpleado = () => {
             setWorkdayAllDay={setWorkdayAllDay}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
-            onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
-            onSubmit={submitAdmin}
+            onOpenEdit={handleOpenAdminEdit}
+            onSubmit={handleSubmitAdmin}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
         </div>
       )}
