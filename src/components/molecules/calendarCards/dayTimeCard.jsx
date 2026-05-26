@@ -1,7 +1,6 @@
 import { getStartHour } from "@/utils/dates";
 
 const DayTimeCard = ({ arg }) => {
-  console.log("event; ", arg)
   const ev = arg.event;
   const start = ev.start;
   const end = ev.end;
@@ -16,8 +15,6 @@ const DayTimeCard = ({ arg }) => {
     const b = getStartHour(end);
     if (a && b) timeLine = `${a} – ${b}`;
   }
-  const startHm = start != null ? getStartHour(start) : "";
-  // const showDayLabel = ev.allDay || startHm === "00:00";
 
   return (
     <div

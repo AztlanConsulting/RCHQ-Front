@@ -3,7 +3,7 @@ import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
-import { getToken } from "../../../utils/authStorage";
+import { getStoredUser } from "../../../utils/authStorage";
 
 const VacationDetail = ({
     event,
@@ -22,10 +22,14 @@ const VacationDetail = ({
     onReject,
 }) => {
     console.log("event: ", event)
-    const token = getToken();
-    const role = token.role || null;
-    const userId = token.employeeId || null;
+    const user = getStoredUser()
+    const role = user?.role || null;
+    const userId = user?.employeeId || null;
     const subjectId = event.employeeId || null;
+    console.log("user: ", user)
+    console.log("role: ", role)
+    console.log("userId: ", userId)
+    console.log("subjectId: ", subjectId)
 
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
