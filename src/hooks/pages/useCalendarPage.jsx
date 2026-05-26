@@ -16,6 +16,10 @@ import {
 import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import { useVacationFormEdit } from "./useVacationFormEdit";
+import {
+  buildAbsenceDateLimits,
+  buildAbsenceFormSchema,
+} from "../../utils/schema/evento/absence.schema";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -67,6 +71,7 @@ export const useCalendarPage = ({
   reloadCurrentRange,
   viewerRole = "",
 } = {}) => {
+  const absenceDateLimits = useMemo(() => buildAbsenceDateLimits(), []);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const selectedEventRef = useRef(null);
   const [isAbsenceEditing, setIsAbsenceEditing] = useState(false);
@@ -275,22 +280,30 @@ export const useCalendarPage = ({
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 
-    if (!absenceForm.startDate || !absenceForm.endDate) {
-      setAbsenceEditError("Debes ingresar fecha de inicio y fecha de fin.");
-      return;
-    }
+    const validationResult = buildAbsenceFormSchema(absenceDateLimits).safeParse({
+      employeeId: String(
+        currentSelectedEvent.employeeId ?? currentSelectedEvent.id ?? "employee",
+      ),
+      absenceTypeId: String(absenceForm.absenceTypeId ?? ""),
+      startDate: absenceForm.startDate,
+      endDate: absenceForm.endDate,
+      description: normalizedDescription,
+    });
 
-    if (absenceForm.endDate < absenceForm.startDate) {
+    if (!validationResult.success) {
       setAbsenceEditError(
-        "La fecha de fin no puede ser menor a la fecha de inicio.",
+        validationResult.error.issues[0]?.message ||
+          "Revisa los datos de la ausencia.",
       );
       return;
     }
 
+    const validatedAbsence = validationResult.data;
+
     if (
-      absenceForm.absenceTypeId &&
+      validatedAbsence.absenceTypeId &&
       !absenceTypeOptions.some(
-        (option) => String(option.value) === String(absenceForm.absenceTypeId),
+        (option) => String(option.value) === String(validatedAbsence.absenceTypeId),
       )
     ) {
       setAbsenceEditError("Tipo de ausencia inválido.");
@@ -304,17 +317,17 @@ export const useCalendarPage = ({
 
     const payload = {};
 
-    if (String(absenceForm.absenceTypeId) !== original.absenceTypeId) {
-      payload.absenceTypeId = absenceForm.absenceTypeId;
+    if (String(validatedAbsence.absenceTypeId) !== original.absenceTypeId) {
+      payload.absenceTypeId = validatedAbsence.absenceTypeId;
     }
-    if (absenceForm.startDate !== original.startDate) {
-      payload.startDate = absenceForm.startDate;
+    if (validatedAbsence.startDate !== original.startDate) {
+      payload.startDate = validatedAbsence.startDate;
     }
-    if (absenceForm.endDate !== original.endDate) {
-      payload.endDate = absenceForm.endDate;
+    if (validatedAbsence.endDate !== original.endDate) {
+      payload.endDate = validatedAbsence.endDate;
     }
-    if (normalizedDescription !== original.description) {
-      payload.description = normalizedDescription;
+    if (validatedAbsence.description !== original.description) {
+      payload.description = validatedAbsence.description;
     }
 
     if (absenceEvidenceFile) {
@@ -351,15 +364,15 @@ export const useCalendarPage = ({
               ...currentSelectedEvent,
               absenceId: updatedAbsence?.absenceId ?? currentSelectedEvent.absenceId,
               absenceTypeId:
-                updatedAbsence?.absenceTypeId ?? absenceForm.absenceTypeId,
+                updatedAbsence?.absenceTypeId ?? validatedAbsence.absenceTypeId,
               employeeName: updatedAbsence?.name ?? currentSelectedEvent.employeeName,
               curp: updatedAbsence?.curp ?? currentSelectedEvent.curp,
               eventType: updatedAbsence?.type ?? currentSelectedEvent.eventType,
               description:
-                updatedAbsence?.description ?? normalizedDescription,
+                updatedAbsence?.description ?? validatedAbsence.description,
               link: updatedAbsence?.link ?? currentSelectedEvent.link,
-              startDate: updatedAbsence?.startDate ?? absenceForm.startDate,
-              endDate: updatedAbsence?.endDate ?? absenceForm.endDate,
+              startDate: updatedAbsence?.startDate ?? validatedAbsence.startDate,
+              endDate: updatedAbsence?.endDate ?? validatedAbsence.endDate,
               isDeleted: updatedAbsence?.isDeleted ?? currentSelectedEvent.isDeleted,
             };
 
@@ -382,6 +395,7 @@ export const useCalendarPage = ({
   }, [
     absenceEvidenceError,
     absenceEvidenceFile,
+    absenceDateLimits,
     absenceForm,
     absenceTypeOptions,
     reloadCurrentRange,
@@ -791,6 +805,8 @@ export const useCalendarPage = ({
     setAlert,
     absenceEvidenceFileName,
     absenceEvidenceError,
+    absenceMinStartDate: absenceDateLimits.minStartDate,
+    absenceMaxEndDate: absenceDateLimits.maxEndDate,
     closeDetail,
     showEventDetail,
     handleEventClick,

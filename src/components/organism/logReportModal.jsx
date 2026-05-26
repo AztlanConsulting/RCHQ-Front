@@ -22,7 +22,8 @@ const LogReportModal = ({
       <div className="space-y-6">
         <p className="text-sm text-slate-600">
           Selecciona el año desde el cual quieres incluir registros. El PDF se
-          generará desde {currentYear} hasta el año seleccionado.
+          generará desde el año seleccionado hasta {currentYear}. Solo puedes
+          elegir del año actual a 5 años atrás.
         </p>
 
         <div className="grid gap-4">

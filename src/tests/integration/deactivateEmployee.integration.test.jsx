@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmployee";
 import ReasonCard from "../../components/organism/reasonCard";

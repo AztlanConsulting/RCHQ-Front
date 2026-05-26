@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/landing";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/auth/loginPages";
 import Dashboard from "./pages/dashboard";
 import Casas from "./pages/casas";
@@ -30,7 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Navigate to="/iniciar-sesion" replace />} />
 
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />
