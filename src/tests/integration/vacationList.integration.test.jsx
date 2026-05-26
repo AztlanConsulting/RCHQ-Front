@@ -5,6 +5,7 @@ import {
     screen,
     fireEvent,
     waitFor,
+    within,
 } from "@testing-library/react";
 import {
     MemoryRouter,
@@ -18,11 +19,22 @@ import {
     getFutureVacationRequests,
     getPastVacationRequests,
 } from "../../services/vacationRequestService";
+import {
+    deleteVacationRequest,
+    getRemainingVacations,
+    updateVacationRequestDates,
+} from "../../services/vacationService";
 import { getEventsInRange } from "../../services/calendarService";
 
 vi.mock("../../services/vacationRequestService", () => ({
     getFutureVacationRequests: vi.fn(),
     getPastVacationRequests: vi.fn(),
+}));
+
+vi.mock("../../services/vacationService", () => ({
+    deleteVacationRequest: vi.fn(),
+    getRemainingVacations: vi.fn(),
+    updateVacationRequestDates: vi.fn(),
 }));
 
 vi.mock("../../services/calendarService", () => ({
@@ -32,6 +44,20 @@ vi.mock("../../services/calendarService", () => ({
 }));
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
+    default: ({ label, name, value, onChange }) => (
+        <label>
+            {label}
+            <input
+                aria-label={label}
+                name={name}
+                value={value}
+                onChange={onChange}
+            />
+        </label>
+    ),
+}));
+
+vi.mock("../../components/atoms/dateField", () => ({
     default: ({ label, name, value, onChange }) => (
         <label>
             {label}
@@ -220,6 +246,20 @@ describe("Integración: VacationList", () => {
 
         getFutureVacationRequests.mockResolvedValue(futureResponse);
         getPastVacationRequests.mockResolvedValue(pastResponse);
+        getRemainingVacations.mockResolvedValue({
+            remainingVacations: 10,
+            startDate: "2026-01-01",
+            endDate: "2026-12-31",
+        });
+        updateVacationRequestDates.mockResolvedValue({
+            vacationRequestId: "123e4567-e89b-12d3-a456-426614174000",
+            startDate: "2026-06-16",
+            endDate: "2026-06-17",
+            usedDays: 2,
+        });
+        deleteVacationRequest.mockResolvedValue({
+            vacationRequestId: "123e4567-e89b-12d3-a456-426614174000",
+        });
         getEventsInRange.mockResolvedValue([
             {
                 focus: "vacaciones",
@@ -343,5 +383,72 @@ describe("Integración: VacationList", () => {
             "2026-06-15",
             "2026-06-16",
         );
+    });
+
+    it("abre el detalle en la misma vista si la vacación está rechazada", async () => {
+        renderVacationListWithCalendar();
+
+        expect(await screen.findByText("Futura rechazada 3")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Ver detalle")[2]);
+
+        const dialog = await screen.findByRole("dialog");
+
+        expect(
+            within(dialog).getByText("Vacaciones Rechazadas"),
+        ).toBeInTheDocument();
+        expect(within(dialog).getByText("Rechazado")).toBeInTheDocument();
+        expect(within(dialog).getByText("Futura rechazada 3")).toBeInTheDocument();
+        expect(screen.queryByText("Calendario destino")).toBeNull();
+    });
+
+    it("abre el modal de modificación desde una vacación futura pendiente sin mostrar datos del empleado", async () => {
+        renderVacationList();
+
+        expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Modificar vacación")[0]);
+
+        const dialog = await screen.findByRole("dialog");
+
+        expect(
+            within(dialog).getByText("Modificar vacaciones"),
+        ).toBeInTheDocument();
+        expect(within(dialog).queryByText("Nombre del trabajador")).toBeNull();
+        expect(within(dialog).queryByText("CURP")).toBeNull();
+        expect(within(dialog).getByLabelText("Fecha de inicio")).toHaveValue(
+            "2026-06-15",
+        );
+        expect(within(dialog).getByLabelText("Fecha de fin")).toHaveValue(
+            "2026-06-16",
+        );
+        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+    });
+
+    it("abre el modal de borrado y elimina una vacación futura sin mostrar datos del empleado", async () => {
+        renderVacationList();
+
+        expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Borrar vacación")[0]);
+
+        const dialog = await screen.findByRole("dialog", {
+            name: /eliminar vacaciones/i,
+        });
+
+        expect(
+            within(dialog).getByText(
+                "Está a punto de eliminar la solicitud de vacaciones. Esta acción no se puede deshacer.",
+            ),
+        ).toBeInTheDocument();
+        expect(within(dialog).queryByText(/Futura pendiente 1/)).toBeNull();
+
+        fireEvent.click(within(dialog).getByRole("button", { name: "Eliminar" }));
+
+        await waitFor(() => {
+            expect(deleteVacationRequest).toHaveBeenCalledWith(
+                "123e4567-e89b-12d3-a456-426614174000",
+            );
+        });
     });
 });

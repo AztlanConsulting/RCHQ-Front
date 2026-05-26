@@ -5,6 +5,8 @@ const VacationListTable = ({
     view,
     loading,
     onViewDetail,
+    onEdit,
+    onDelete,
 }) => {
     if (loading && !requests.length) {
         return (
@@ -55,6 +57,8 @@ const VacationListTable = ({
                             request={request}
                             view={view}
                             onViewDetail={onViewDetail}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
                         />
                     ))}
                 </tbody>
