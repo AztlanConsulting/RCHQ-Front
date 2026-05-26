@@ -65,6 +65,9 @@ vi.mock("/vacation-black.svg", () => ({ default: "vacation-black.svg" }));
 vi.mock("/time.svg", () => ({ default: "time.svg" }));
 vi.mock("/chevron-down.svg", () => ({ default: "chevron-down.svg" }));
 
+const _d = new Date();
+const TODAY = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, "0")}-${String(_d.getDate()).padStart(2, "0")}`;
+
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
 const EMP_ID_1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -97,8 +100,8 @@ const renderModal = (props = {}) => {
             isOpen
             onClose={onClose}
             onSuccess={onSuccess}
-            initialStartDate="2026-05-05"
-            initialEndDate="2026-05-05"
+            initialStartDate={TODAY}
+            initialEndDate={TODAY}
             {...props}
         />,
     );
@@ -216,7 +219,7 @@ describe("Integración: agregar evento de personal", () => {
         expect(createPersonalEvent).toHaveBeenCalledWith({
             eventTypeId: EVENT_TYPE_ID,
             name: "Reunión de equipo",
-            date: "2026-05-05",
+            date: TODAY,
             allDay: false,
             start: "09:00:00",
             end: "10:00:00",
@@ -274,7 +277,7 @@ describe("Integración: agregar evento de personal", () => {
         expect(createPersonalEvent).toHaveBeenCalledWith(
             expect.objectContaining({
                 allDay: true,
-                date: "2026-05-05",
+                date: TODAY,
             }),
         );
     });

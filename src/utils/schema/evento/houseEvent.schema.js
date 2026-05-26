@@ -32,15 +32,32 @@ const baseSchema = z.object({
     forceOverlap: z.boolean().default(false),
 });
 
+function getHouseDateMin() {
+    return `${new Date().getFullYear()}-01-01`;
+}
+
+function getHouseDateMax() {
+    return `${new Date().getFullYear() + 2}-12-31`;
+}
+
+const houseDateField = (required_error, invalidMsg) =>
+    z
+        .string({ required_error })
+        .regex(dateRegex, invalidMsg)
+        .refine(
+            (val) => val >= getHouseDateMin(),
+            () => `La fecha no puede ser anterior al 1 de enero de ${new Date().getFullYear()}`,
+        )
+        .refine(
+            (val) => val <= getHouseDateMax(),
+            () => `La fecha no puede ser posterior al 31 de diciembre de ${new Date().getFullYear() + 2}`,
+        );
+
 const allDaySchema = baseSchema
     .extend({
         allDay: z.literal(true),
-        startDate: z
-            .string({ required_error: "La fecha de inicio es obligatoria" })
-            .regex(dateRegex, "Fecha de inicio inválida"),
-        endDate: z
-            .string({ required_error: "La fecha de fin es obligatoria" })
-            .regex(dateRegex, "Fecha de fin inválida"),
+        startDate: houseDateField("La fecha de inicio es obligatoria", "Fecha de inicio inválida"),
+        endDate: houseDateField("La fecha de fin es obligatoria", "Fecha de fin inválida"),
     })
     .refine((d) => d.startDate <= d.endDate, {
         message: "La fecha de fin no puede ser anterior a la de inicio",
@@ -50,16 +67,12 @@ const allDaySchema = baseSchema
 const timedSchema = baseSchema
     .extend({
         allDay: z.literal(false),
-        startDate: z
-            .string({ required_error: "La fecha de inicio es obligatoria" })
-            .regex(dateRegex, "Fecha de inicio inválida"),
+        startDate: houseDateField("La fecha de inicio es obligatoria", "Fecha de inicio inválida"),
         startTime: z
             .string({ required_error: "La hora de inicio es obligatoria" })
             .min(1, "La hora de inicio es obligatoria")
             .regex(timeRegex, "Hora de inicio inválida"),
-        endDate: z
-            .string({ required_error: "La fecha de fin es obligatoria" })
-            .regex(dateRegex, "Fecha de fin inválida"),
+        endDate: houseDateField("La fecha de fin es obligatoria", "Fecha de fin inválida"),
         endTime: z
             .string({ required_error: "La hora de fin es obligatoria" })
             .min(1, "La hora de fin es obligatoria")

@@ -30,6 +30,10 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
 
     const showTimeFields = !form.allDay;
 
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = new Date(currentYear, 0, 1);
+    const houseDateMax = new Date(currentYear + 2, 11, 31);
+
     return (
         <>
             <Modal
@@ -92,6 +96,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("startDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    minDate={houseDateMin}
+                                    maxDate={houseDateMax}
                                     error={!!errors.startDate}
                                 />
                             </div>
@@ -133,6 +139,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("endDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    minDate={houseDateMin}
+                                    maxDate={houseDateMax}
                                     error={!!errors.endDate}
                                 />
                             </div>
