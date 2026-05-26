@@ -1,6 +1,10 @@
 import Button from "../../../atoms/button";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
+import {
+    getVacationDateRange,
+    getVacationEndDateMin,
+} from "../../../../utils/vacationDateRange";
 
 const VacationEditForm = ({
     title,
@@ -15,6 +19,14 @@ const VacationEditForm = ({
     onVacationFieldChange,
     showEmployeeInfo = true,
 }) => {
+    const { minDate: vacationDateMin, maxDate: vacationDateMax } =
+        getVacationDateRange();
+    const vacationEndDateMin = getVacationEndDateMin(
+        vacationForm?.startDate,
+        vacationDateMin,
+        vacationDateMax,
+    );
+
     return (
         <div key="vacation-edit" className="px-2 text-left sm:px-3">
             <Type
@@ -80,6 +92,8 @@ const VacationEditForm = ({
                     label="Fecha de inicio"
                     name="startDate"
                     value={vacationForm?.startDate ?? ""}
+                    minDate={vacationDateMin}
+                    maxDate={vacationDateMax}
                     onChange={(editEvent) =>
                         onVacationFieldChange?.(
                             "startDate",
@@ -102,11 +116,8 @@ const VacationEditForm = ({
                             editEvent.target.value,
                         )
                     }
-                    minDate={
-                        vacationForm?.startDate
-                            ? new Date(`${vacationForm.startDate}T00:00:00`)
-                            : undefined
-                    }
+                    minDate={vacationEndDateMin}
+                    maxDate={vacationDateMax}
                     labelColor="text-[#121212]"
                     popupAlign="right"
                     popupPlacement="top"

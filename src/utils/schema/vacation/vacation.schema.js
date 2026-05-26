@@ -1,16 +1,27 @@
 import { z } from "zod";
+import {
+    DATE_ONLY_REGEX,
+    isDateWithinVacationRange,
+    parseDateOnly,
+} from "../../vacationDateRange";
 
 const DATE_RANGE_ERROR =
     "La fecha de inicio no puede ser posterior a la fecha de término";
 
-const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const VACATION_DATE_LIMIT_ERROR =
+    "La fecha debe estar dentro del rango permitido: 1 mes hacia atrás y 1.5 años hacia adelante";
 
 const requiredDate = (requiredMessage) =>
     z
         .string()
         .trim()
         .min(1, requiredMessage)
-        .regex(DATE_ONLY_REGEX, "Selecciona una fecha válida");
+        .regex(DATE_ONLY_REGEX, "Selecciona una fecha válida")
+        .refine(
+            (value) => parseDateOnly(value) !== null,
+            "Selecciona una fecha válida",
+        )
+        .refine(isDateWithinVacationRange, VACATION_DATE_LIMIT_ERROR);
 
 export const vacationRequestFiltersSchema = z
     .object({
