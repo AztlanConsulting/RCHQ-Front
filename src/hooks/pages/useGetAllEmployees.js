@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEmployees } from "../../services/personalService";
 
-export const useEmployees = () => {
+export const useEmployees = ({ enabled = true } = {}) => {
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -37,9 +37,11 @@ export const useEmployees = () => {
   };
 
   useEffect(() => {
+    if (!enabled) return;
+
     fetchEmployees(1, searchQuery, activeFilter);
     setPage(1);
-  }, [searchQuery, activeFilter]);
+  }, [activeFilter, enabled, searchQuery]);
 
   const handleNextPage = () => {
     if (page < pagination.totalPages) {
@@ -56,6 +58,11 @@ export const useEmployees = () => {
       fetchEmployees(newPage, searchQuery, activeFilter);
     }
   };
+  
+  const refresh = () => {
+    if (!enabled) return;
+    fetchEmployees(page, searchQuery, activeFilter);
+  };
 
   return {
     employees,
@@ -69,5 +76,6 @@ export const useEmployees = () => {
     page,
     handleNextPage,
     handlePrevPage,
+    refresh,
   };
 };

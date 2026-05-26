@@ -2,9 +2,10 @@ import TextField from "../atoms/textField";
 import SelectField from "../atoms/selectField";
 import useSearch from "../../hooks/molecules/useSearch";
 import Button from "../atoms/button";
+import { useMemo } from "react";
 
-const CURP_MAX_LENGTH = 18;
-const CURP_ALLOWED_REGEX = /^[A-ZÑ0-9]{0,18}$/i;
+const BLACKLIST_SEARCH_MAX_LENGTH = 100;
+const BLACKLIST_ALLOWED_REGEX = /^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9\s.-]{0,100}$/;
 
 const EmployeeFilters = ({
   searchQuery,
@@ -20,13 +21,26 @@ const EmployeeFilters = ({
     searchQuery,
     setSearchQuery,
   );
+  const blacklistSearchConfig = useMemo(
+    () => ({
+      sanitize: (value) => {
+        const filteredValue = [...value]
+          .filter((char) => BLACKLIST_ALLOWED_REGEX.test(char))
+          .join("");
+        const compactValue = filteredValue.replace(/\s+/g, " ");
 
-  const handleCurpChange = (val) => {
-    const upper = val.toUpperCase();
-    if (upper.length <= CURP_MAX_LENGTH && CURP_ALLOWED_REGEX.test(upper)) {
-      setSearchQuery(upper);
-    }
-  };
+        return compactValue.slice(0, BLACKLIST_SEARCH_MAX_LENGTH);
+      },
+      getSearchLength: (value) => value.trim().replace(/\s+/g, " ").length,
+      transformSearchValue: (value) => value.toLocaleLowerCase("es-MX"),
+    }),
+    [],
+  );
+  const {
+    inputValue: blacklistSearchInput,
+    handleChange: handleBlacklistSearchChange,
+    handleKeyDown: handleBlacklistKeyDown,
+  } = useSearch(searchQuery, setSearchQuery, blacklistSearchConfig);
 
   const blacklistFilterOptions = [
     { value: "", label: "Todos" },
@@ -52,10 +66,11 @@ const EmployeeFilters = ({
             <>
               <TextField
                 id="search-curp"
-                text="Buscar por CURP"
-                placeholder="Ingresa la CURP"
-                value={searchQuery}
-                setValue={handleCurpChange}
+                text="Buscar por nombre o CURP"
+                placeholder="Ingresa nombre, apellido o CURP"
+                value={blacklistSearchInput}
+                setValue={handleBlacklistSearchChange}
+                onKeyDown={handleBlacklistKeyDown}
                 labelClassName="text-sm font-bold text-[#121212]"
               />
               <SelectField
@@ -107,10 +122,11 @@ const EmployeeFilters = ({
         {isBlacklistMode ? (
           <TextField
             id="search-curp-mobile"
-            text="Buscar por CURP"
-            placeholder="Ingresa la CURP"
-            value={searchQuery}
-            setValue={handleCurpChange}
+            text="Buscar por nombre o CURP"
+            placeholder="Ingresa nombre, apellido o CURP"
+            value={blacklistSearchInput}
+            setValue={handleBlacklistSearchChange}
+            onKeyDown={handleBlacklistKeyDown}
             labelClassName="text-sm font-bold text-[#121212]"
           />
         ) : (

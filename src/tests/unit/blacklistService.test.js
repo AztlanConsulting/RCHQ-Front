@@ -22,7 +22,7 @@ describe("blacklistService", () => {
       await getBlacklist(1, 10, "CURP123", "true");
       
       expect(secureFetch).toHaveBeenCalledWith(
-        expect.stringContaining("page=1&limit=10&curp=CURP123&isBlacklisted=true"),
+        expect.stringContaining("page=1&limit=10&search=CURP123&isBlacklisted=true"),
         expect.objectContaining({ method: "GET" })
       );
     });
