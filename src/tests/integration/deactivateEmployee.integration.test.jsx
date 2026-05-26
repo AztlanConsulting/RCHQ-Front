@@ -176,7 +176,7 @@ describe("Integración: Dar de baja a un empleado", () => {
 
     expect(setAlertMock).toHaveBeenCalledWith({
       type: "error",
-      message: "No se pudo completar la acción porque la razón ingresada es inválida o está incompleta.",
+      message: 'El campo "Razón" es obligatorio.',
     });
   });
 });

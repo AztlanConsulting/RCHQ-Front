@@ -28,4 +28,16 @@ describe("useGetBlacklist", () => {
     expect(result.current.pagination.total).toBe(0);
     expect(result.current.pagination.totalPages).toBe(0);
   });
+
+  it("no hace fetch cuando el hook está deshabilitado", async () => {
+    const { result } = renderHook(() => useGetBlacklist({ enabled: false }));
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(getBlacklist).not.toHaveBeenCalled();
+    expect(result.current.employees).toEqual([]);
+    expect(result.current.pagination.total).toBe(0);
+  });
 });

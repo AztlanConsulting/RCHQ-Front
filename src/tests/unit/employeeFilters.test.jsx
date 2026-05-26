@@ -130,6 +130,8 @@ describe("EmployeeFilters Component", () => {
     const input = screen.getAllByPlaceholderText(/Ingresa nombre, apellido o CURP/i)[0];
 
     fireEvent.change(input, { target: { value: "María José" } });
+    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+
     expect(mockSetSearchQuery).toHaveBeenCalledWith("maría josé");
     expect(input.value).toBe("María José");
   });

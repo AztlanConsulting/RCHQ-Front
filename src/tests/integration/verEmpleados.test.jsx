@@ -113,12 +113,13 @@ describe("Integración: Componente Personal", () => {
       ...mockPersonalData,
       activeLoading: true,
       activeEmployees: [],
+      activePagination: { totalPages: 0, total: 0 },
     });
 
     renderComponent();
 
     expect(screen.getByText(/cargando empleados/i)).toBeInTheDocument();
-    expect(screen.queryByText(/página 1 de 3/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/página/i)).not.toBeInTheDocument();
   });
 
   it("debe llamar a handleToggleBlacklistMode al hacer clic en 'Lista Negra'", () => {
