@@ -189,6 +189,13 @@ const Calendario = () => {
         setCalendarMode,
     });
 
+    const isVacationDetailEditing =
+        selectedEvent?.focus === "vacaciones" && isVacationEditing;
+    const shouldScrollDetailModal =
+        ["eventos", "ausencias", "vacaciones"].includes(
+            selectedEvent?.focus,
+        ) && !isVacationDetailEditing;
+
     const calendarFiltersProps = {
         houseName: employeeHouseName,
         focusFilters,
@@ -301,11 +308,7 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                scrollable={
-                    selectedEvent?.focus === "eventos" ||
-                    selectedEvent?.focus === "ausencias" ||
-                    selectedEvent?.focus === "vacaciones"
-                }
+                scrollable={shouldScrollDetailModal}
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
                         ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
