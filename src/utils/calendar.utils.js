@@ -7,7 +7,7 @@ export const FOCUS_OPTIONS = [
 export const SCOPE_OPTIONS = [
     { value: "global", label: "Global", color: "#B66897" },
     { value: "house", label: "Casa", color: "#307351" },
-    { value: "personal", label: "Personal", color: "#E69941" },
+    { value: "personal", label: "Personal", color: "#D58936" },
 ];
 
 export const STATUS_OPTIONS = [
