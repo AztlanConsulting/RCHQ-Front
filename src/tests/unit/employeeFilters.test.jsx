@@ -90,38 +90,48 @@ describe("EmployeeFilters Component", () => {
   it("muestra los campos de CURP y Filtro cuando está en modo lista negra", () => {
     render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
 
-    expect(screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText(/Ingresa nombre, apellido o CURP/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText("Lista Empleados")[0]).toBeInTheDocument();
   });
 
   it("en lista negra solo busca por CURP cada 3 caracteres", () => {
     render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
 
-    const input = screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0];
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre, apellido o CURP/i)[0];
 
     fireEvent.change(input, { target: { value: "AB" } });
     expect(mockSetSearchQuery).not.toHaveBeenCalled();
 
     fireEvent.change(input, { target: { value: "ABC" } });
-    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABC");
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("abc");
 
     fireEvent.change(input, { target: { value: "ABCD" } });
     expect(mockSetSearchQuery).toHaveBeenCalledTimes(1);
 
     fireEvent.change(input, { target: { value: "ABCDEF" } });
-    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABCDEF");
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("abcdef");
     expect(mockSetSearchQuery).toHaveBeenCalledTimes(2);
   });
 
   it("en lista negra permite buscar con Enter aunque no sean 3 caracteres", () => {
     render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
 
-    const input = screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0];
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre, apellido o CURP/i)[0];
 
     fireEvent.change(input, { target: { value: "ABCD" } });
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
-    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABCD");
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("abcd");
+  });
+
+  it("en lista negra permite buscar por nombre y apellido con acentos", () => {
+    render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
+
+    const input = screen.getAllByPlaceholderText(/Ingresa nombre, apellido o CURP/i)[0];
+
+    fireEvent.change(input, { target: { value: "María José" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("maría josé");
+    expect(input.value).toBe("María José");
   });
 
   it("llama a onToggleBlacklistMode al hacer clic en el botón correspondiente", () => {

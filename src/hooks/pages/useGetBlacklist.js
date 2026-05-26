@@ -15,7 +15,7 @@ const isEmptyBlacklistResponse = (err) => {
   return err?.status === 404 || message.includes("no hay personas en la lista negra");
 };
 
-export const useGetBlacklist = () => {
+export const useGetBlacklist = ({ enabled = true } = {}) => {
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState(EMPTY_PAGINATION);
   const [loading, setLoading] = useState(false);
@@ -61,9 +61,11 @@ export const useGetBlacklist = () => {
   };
 
   useEffect(() => {
+    if (!enabled) return;
+
     fetchBlacklist(1, searchQuery, isBlacklistedFilter);
     setPage(1);
-  }, [searchQuery, isBlacklistedFilter]);
+  }, [enabled, isBlacklistedFilter, searchQuery]);
 
   const handleNextPage = () => {
     if (page < pagination.totalPages) {
@@ -82,6 +84,7 @@ export const useGetBlacklist = () => {
   };
 
   const refresh = () => {
+    if (!enabled) return;
     fetchBlacklist(page, searchQuery, isBlacklistedFilter);
   };
 

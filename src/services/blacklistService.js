@@ -3,9 +3,14 @@ import { buildApiError } from "../utils/apiErrors";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const getBlacklist = async (page = 1, limit = 7, curp = "", isBlacklisted = undefined) => {
+export const getBlacklist = async (
+  page = 1,
+  limit = 7,
+  search = "",
+  isBlacklisted = undefined,
+) => {
   const params = new URLSearchParams({ page, limit });
-  if (curp) params.append("curp", curp);
+  if (search) params.append("search", search);
   if (isBlacklisted !== undefined) params.append("isBlacklisted", isBlacklisted);
 
   const res = await secureFetch(`${API_URL}/blacklist?${params}`, {

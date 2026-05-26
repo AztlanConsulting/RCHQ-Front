@@ -11,8 +11,8 @@ const usePersonal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  const employeesQuery = useEmployees();
-  const blacklistQuery = useGetBlacklist();
+  const employeesQuery = useEmployees({ enabled: !isBlacklistMode });
+  const blacklistQuery = useGetBlacklist({ enabled: isBlacklistMode });
 
   const showAlert = useCallback((type, message) => {
     setAlert({ type, message });
@@ -20,11 +20,8 @@ const usePersonal = () => {
 
   const handleToggleBlacklistMode = useCallback(() => {
     setAlert(null);
-    setIsBlacklistMode((prev) => {
-      if (!prev) blacklistQuery.refresh();
-      return !prev;
-    });
-  }, [blacklistQuery]);
+    setIsBlacklistMode((prev) => !prev);
+  }, []);
 
   const handleAddToBlacklist = useCallback((employee) => {
     setSelectedEmployee(employee);
