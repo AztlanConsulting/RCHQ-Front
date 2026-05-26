@@ -93,7 +93,7 @@ const EmployeeBasicCard = ({
                 { label: "Puesto",              value: employee?.role },
                 { label: "Fecha de Nacimiento", value: employee?.birthDate ? String(employee.birthDate).slice(0, 10) : null },
                 { label: "Fecha de Inicio",     value: employee?.startDate ? String(employee.startDate).slice(0, 10) : "Sin fecha" },
-                { label: "Fecha de Terminación", value: employee?.endDate ?? "N/A" },
+                { label: "Fecha de Terminación", value: employee?.endDate ? String(employee.endDate).slice(0, 10) : "Sin fecha" },
               ].map(({ label, value }) => (
                 <div key={label} className="min-w-0">
                   <Type variant="metric-label" as="p" className="text-[1.05rem] text-slate-500">{label}</Type>
