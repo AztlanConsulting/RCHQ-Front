@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmployee";
 import ReasonCard from "../../components/organism/reasonCard";
@@ -10,32 +10,34 @@ vi.mock("../../services/deactivateEmployeeService", () => ({
 
 const TestIntegrationComponent = ({ employeeId, employeeName, setAlertMock, isActive = true, onSuccessMock }) => {
   const {
-    isModalOpen,
-    openModal,
-    closeModal,
+    isDeactivateModalOpen,
+    openDeactivateModal,
+    closeDeactivateModal,
     reason,
     handleReasonChange,
     addToBlacklist,
     setAddToBlacklist,
     fieldError,
-    isSubmitting,
-    handleSubmit,
+    isSubmittingDeactivate,
+    handleSubmitDeactivate,
   } = useDeactivateEmployee(employeeId, employeeName, setAlertMock, isActive, onSuccessMock);
 
   return (
     <div>
-      <button onClick={openModal}>Abrir Modal</button>
+      <button type="button" onClick={openDeactivateModal}>
+        Abrir Modal
+      </button>
       <ReasonCard
-        isOpen={isModalOpen}
+        isOpen={isDeactivateModalOpen}
         employeeName={employeeName}
         reason={reason}
         onReasonChange={handleReasonChange}
         addToBlacklist={addToBlacklist}
         onBlacklistChange={setAddToBlacklist}
         fieldError={fieldError}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-        onCancel={closeModal}
+        isSubmitting={isSubmittingDeactivate}
+        onSubmit={handleSubmitDeactivate}
+        onCancel={closeDeactivateModal}
       />
     </div>
   );
