@@ -8,6 +8,10 @@ import FormErrorText from "../../../atoms/formErrorText";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useVacationForm } from "../../../../hooks/pages/useVacationForm";
+import {
+    getVacationDateRange,
+    getVacationEndDateMin,
+} from "../../../../utils/vacationDateRange";
 
 const VacationForm = (props) => {
     const {
@@ -27,6 +31,13 @@ const VacationForm = (props) => {
     const [openDropdown, setOpenDropdown] = useState(null);
 
     const viewerRole = getCalendarViewerRole();
+    const { minDate: vacationDateMin, maxDate: vacationDateMax } =
+        getVacationDateRange();
+    const vacationEndDateMin = getVacationEndDateMin(
+        form.startDate,
+        vacationDateMin,
+        vacationDateMax,
+    );
 
     return (
         <>
@@ -100,6 +111,8 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.startDate}
                         placeholder="dd / mm / yyyy"
+                        minDate={vacationDateMin}
+                        maxDate={vacationDateMax}
                         popupSize="compact"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
@@ -115,6 +128,8 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.endDate}
                         placeholder="dd / mm / yyyy"
+                        minDate={vacationEndDateMin}
+                        maxDate={vacationDateMax}
                         popupAlign="right"
                         popupSize="compact"
                         onChange={(e) => setField("endDate", e.target.value)}

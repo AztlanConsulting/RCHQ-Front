@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "../atoms/button";
 import ErrorText from "../atoms/errorText";
 import {
@@ -6,7 +6,7 @@ import {
     getVacationRejectionFeedbackErrors,
 } from "../../utils/schema/vacation/vacation.schema";
 
-const ConfirmRejectVacationModal = ({
+const ConfirmRejectVacationModalContent = ({
     request,
     loading = false,
     error = "",
@@ -16,23 +16,12 @@ const ConfirmRejectVacationModal = ({
     const [feedback, setFeedback] = useState("");
     const [fieldError, setFieldError] = useState("");
 
-    useEffect(() => {
-        if (request) {
-            setFeedback("");
-            setFieldError("");
-        }
-    }, [request]);
-
-    if (!request) return null;
-
     const employee = request.employee || {};
     const employeeName = employee.fullName || "este empleado";
     const curp = employee.curp;
 
     const handleFeedbackChange = (event) => {
-        const value = event.target.value;
-
-        setFeedback(value);
+        setFeedback(event.target.value);
 
         if (fieldError) {
             setFieldError("");
@@ -79,7 +68,7 @@ const ConfirmRejectVacationModal = ({
                         htmlFor="vacation-rejection-feedback"
                         className="mb-1.5 block text-sm font-bold text-[#121212]"
                     >
-                        Retroalimentación
+                        Motivo del rechazo (opcional)
                     </label>
 
                     <textarea
@@ -139,6 +128,18 @@ const ConfirmRejectVacationModal = ({
                 </div>
             </div>
         </div>
+    );
+};
+
+const ConfirmRejectVacationModal = ({ request, ...props }) => {
+    if (!request) return null;
+
+    return (
+        <ConfirmRejectVacationModalContent
+            key={request.vacationRequestId ?? "vacation-request"}
+            request={request}
+            {...props}
+        />
     );
 };
 

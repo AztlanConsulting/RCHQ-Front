@@ -122,7 +122,7 @@ const Personal = () => {
                 onPrevPage={activePrevPage}
                 onNextPage={activeNextPage}
                 loading={activeLoading}
-                hasEmployees={activeEmployees.length > 0}
+                hasItems={activePagination.total > 0}
             />
 
             <BlacklistModal

@@ -1,7 +1,7 @@
 import DateField from "../atoms/dateField";
 import TextField from "../atoms/textField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
-import { sanitizeSearchInput } from "../../utils/searchInput";
+import useLogsSearch from "../../hooks/molecules/useLogsSearch";
 
 const HouseLogsFilters = ({
   responsibleQuery,
@@ -17,14 +17,19 @@ const HouseLogsFilters = ({
   clearActionSelection,
   dateFilter,
   setDateFilter,
+  minDate,
+  maxDate,
 }) => {
-  const handleResponsibleChange = (value) => {
-    setResponsibleQuery(sanitizeSearchInput(value));
-  };
-
-  const handleAffectedChange = (value) => {
-    setAffectedQuery(sanitizeSearchInput(value));
-  };
+  const {
+    inputValue: responsibleInput,
+    handleChange: handleResponsibleChange,
+    handleKeyDown: handleResponsibleKeyDown,
+  } = useLogsSearch(responsibleQuery, setResponsibleQuery);
+  const {
+    inputValue: affectedInput,
+    handleChange: handleAffectedChange,
+    handleKeyDown: handleAffectedKeyDown,
+  } = useLogsSearch(affectedQuery, setAffectedQuery);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-5">
@@ -34,8 +39,9 @@ const HouseLogsFilters = ({
             id="house-logs-responsible"
             text="Buscar por Nombre del responsable"
             placeholder="Ingresa nombre completo o CURP"
-            value={responsibleQuery}
+            value={responsibleInput}
             setValue={handleResponsibleChange}
+            onKeyDown={handleResponsibleKeyDown}
             maxLength={100}
             labelClassName="text-sm font-bold text-[#121212]"
             containerClassName="min-h-[44px] px-3.5"
@@ -48,8 +54,9 @@ const HouseLogsFilters = ({
             id="house-logs-affected"
             text="Buscar por Nombre del afectado"
             placeholder="Ingresa nombre completo o CURP"
-            value={affectedQuery}
+            value={affectedInput}
             setValue={handleAffectedChange}
+            onKeyDown={handleAffectedKeyDown}
             maxLength={100}
             labelClassName="text-sm font-bold text-[#121212]"
             containerClassName="min-h-[44px] px-3.5"
@@ -82,6 +89,8 @@ const HouseLogsFilters = ({
             value={dateFilter}
             onChange={(event) => setDateFilter(event.target.value)}
             labelColor="text-[#121212]"
+            minDate={minDate}
+            maxDate={maxDate}
             inputWrapperClassName="min-h-[44px]"
             inputClassName="text-sm"
             labelClassName="text-sm"

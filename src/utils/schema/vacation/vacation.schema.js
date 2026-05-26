@@ -1,16 +1,27 @@
 import { z } from "zod";
+import {
+    DATE_ONLY_REGEX,
+    isDateWithinVacationRange,
+    parseDateOnly,
+} from "../../vacationDateRange";
 
 const DATE_RANGE_ERROR =
     "La fecha de inicio no puede ser posterior a la fecha de término";
 
-const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const VACATION_DATE_LIMIT_ERROR =
+    "La fecha debe estar dentro del rango permitido: 1 mes hacia atrás y 1.5 años hacia adelante";
 
 const requiredDate = (requiredMessage) =>
     z
         .string()
         .trim()
         .min(1, requiredMessage)
-        .regex(DATE_ONLY_REGEX, "Selecciona una fecha válida");
+        .regex(DATE_ONLY_REGEX, "Selecciona una fecha válida")
+        .refine(
+            (value) => parseDateOnly(value) !== null,
+            "Selecciona una fecha válida",
+        )
+        .refine(isDateWithinVacationRange, VACATION_DATE_LIMIT_ERROR);
 
 export const vacationRequestFiltersSchema = z
     .object({
@@ -160,7 +171,23 @@ export const getVacationEditDatesErrors = (form) => {
     };
 };
 
-export const VACATION_REJECTION_FEEDBACK_MAX_LENGTH = 200;
+export const VACATION_REJECTION_FEEDBACK_MAX_LENGTH = 500;
+const VACATION_REJECTION_FEEDBACK_EMOJI_SEQUENCE_REGEX =
+    "(?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})?(?:\\u200D\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})?)*)";
+const VACATION_REJECTION_FEEDBACK_ALLOWED_CHAR_REGEX =
+    '[\\p{L}\\p{M}\\p{N} \\r\\n.,:;()¿?¡!°&%"=+*/_#~/-]';
+export const VACATION_REJECTION_FEEDBACK_ALLOWED_CHARS_REGEX = new RegExp(
+    `^(?:${VACATION_REJECTION_FEEDBACK_ALLOWED_CHAR_REGEX}|${VACATION_REJECTION_FEEDBACK_EMOJI_SEQUENCE_REGEX})*$`,
+    "u",
+);
+const VACATION_REJECTION_FEEDBACK_ALLOWED_TOKEN_REGEX = new RegExp(
+    `${VACATION_REJECTION_FEEDBACK_EMOJI_SEQUENCE_REGEX}|${VACATION_REJECTION_FEEDBACK_ALLOWED_CHAR_REGEX}`,
+    "gu",
+);
+
+export const sanitizeVacationRejectionFeedback = (value = "") =>
+    String(value).match(VACATION_REJECTION_FEEDBACK_ALLOWED_TOKEN_REGEX)?.join("") ??
+    "";
 
 export const vacationRejectionFeedbackSchema = z.object({
     feedback: z
@@ -169,6 +196,10 @@ export const vacationRejectionFeedbackSchema = z.object({
         .max(
             VACATION_REJECTION_FEEDBACK_MAX_LENGTH,
             `La retroalimentación no puede exceder ${VACATION_REJECTION_FEEDBACK_MAX_LENGTH} caracteres`,
+        )
+        .regex(
+            VACATION_REJECTION_FEEDBACK_ALLOWED_CHARS_REGEX,
+            "La retroalimentación solo puede contener letras, números, emojis, espacios y signos permitidos",
         )
         .optional()
         .default(""),

@@ -60,7 +60,21 @@ const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmittin
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex justify-center gap-3 pt-1">
+          <Button
+            text="Cancelar"
+            onClick={handleCancel}
+            disabled={isSubmitting}
+            bgColor="bg-white"
+            hoverColor="hover:bg-slate-50"
+            activeColor="active:bg-slate-100"
+            textColor="text-slate-600"
+            width="w-auto"
+            height="h-[38px]"
+            textSize="text-sm"
+            fontWeight="font-bold"
+            className="px-5 border border-slate-200 shadow-md"
+          />
           <Button
             text={isSubmitting ? "Procesando..." : "Aceptar"}
             onClick={handleConfirm}
@@ -69,25 +83,11 @@ const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmittin
             hoverColor="hover:bg-[#7a1616]"
             activeColor="active:bg-[#5c1010]"
             textColor="text-white"
-            width="w-full"
-            height="h-auto"
+            width="w-auto"
+            height="h-[38px]"
             textSize="text-sm"
-            fontWeight="font-semibold"
-            className="flex-1 py-2.5"
-          />
-          <Button
-            text="Cancelar"
-            onClick={handleCancel}
-            disabled={isSubmitting}
-            bgColor="bg-white"
-            hoverColor="hover:bg-gray-50"
-            activeColor="active:bg-gray-100"
-            textColor="text-gray-700"
-            width="w-full"
-            height="h-auto"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="flex-1 py-2.5 border border-gray-300"
+            fontWeight="font-bold"
+            className="px-5 shadow-md"
           />
         </div>
       </div>

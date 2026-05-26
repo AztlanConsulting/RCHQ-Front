@@ -12,6 +12,15 @@ import {
   updateAdminInfoService,
 } from "../../services/employeeUpdateService";
 
+const mapZodFieldErrors = (issues = []) =>
+  issues.reduce((fieldErrors, issue) => {
+    const field = issue.path?.[0];
+    if (field && !fieldErrors[field]) {
+      fieldErrors[field] = issue.message;
+    }
+    return fieldErrors;
+  }, {});
+
 export const useEditEmployee = (employeeId, onSuccess) => {
   const revokePreviewUrl = (url) => {
     if (url?.startsWith("blob:")) {
@@ -22,6 +31,9 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
+  const [basicErrors, setBasicErrors] = useState({});
+  const [contactErrors, setContactErrors] = useState({});
+  const [adminErrors, setAdminErrors] = useState({});
   const [loadingCatalogues, setLoadingCatalogues] = useState(false);
 
   const [roles, setRoles]       = useState([]);
@@ -48,6 +60,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
+    setBasicErrors({});
     revokePreviewUrl(basicPicturePreview);
     setBasicPictureFile(null);
     setBasicPicturePreview("");
@@ -65,6 +78,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
+    setContactErrors({});
     setContactFormState({
       email:       employee?.email ?? "",
       phoneNumber: employee?.phoneNumber ?? "",
@@ -79,6 +93,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
+    setAdminErrors({});
     setEditSection("Administrador");
     setLoadingCatalogues(true);
     try {
@@ -138,6 +153,9 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setBasicPicturePreview("");
     setEditSection(null);
     setSaveError(null);
+    setBasicErrors({});
+    setContactErrors({});
+    setAdminErrors({});
   }, [basicPicturePreview]);
 
   const setBasicField = useCallback((field, value) => {
@@ -157,7 +175,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "rfc") {
       finalValue = value
         .replace(/\p{Extended_Pictographic}/gu, "")
-        .replace(/[^A-Za-z0-9Ññ&]/g, "")
+        .replace(/[^A-Za-z0-9Ññ]/g, "")
         .toUpperCase();
     }
     
@@ -171,6 +189,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "nss")  finalValue = finalValue.slice(0, 11);
     if (field === "bankAccount") finalValue = finalValue.slice(0, 18);
 
+    setBasicErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
     setBasicFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
@@ -237,6 +261,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "city") finalValue = finalValue.slice(0, 70);
     if (field === "postalCode") finalValue = finalValue.slice(0, 5);
 
+    setContactErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
     setContactFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
@@ -255,10 +285,22 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         return;
       }
     }
+    setAdminErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
     setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
   }, []);
 
   const toggleWorkday = useCallback((workdayId) => {
+    setAdminErrors((prev) => {
+      if (!prev.workdays) return prev;
+      const next = { ...prev };
+      delete next.workdays;
+      return next;
+    });
     setAdminFormState((prev) => ({
       ...prev,
       selectedWorkdays: prev.selectedWorkdays.map((w) =>
@@ -268,6 +310,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const setWorkdayTime = useCallback((workdayId, timeField, value) => {
+    setAdminErrors((prev) => {
+      if (!prev.workdays) return prev;
+      const next = { ...prev };
+      delete next.workdays;
+      return next;
+    });
     setAdminFormState((prev) => ({
       ...prev,
       selectedWorkdays: prev.selectedWorkdays.map((w) =>
@@ -283,6 +331,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const setWorkdayAllDay = useCallback((workdayId, checked) => {
+    setAdminErrors((prev) => {
+      if (!prev.workdays) return prev;
+      const next = { ...prev };
+      delete next.workdays;
+      return next;
+    });
     setAdminFormState((prev) => ({
       ...prev,
       selectedWorkdays: prev.selectedWorkdays.map((w) =>
@@ -304,11 +358,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitBasic = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setBasicErrors({});
     try {
       const validation = employeeBasicUpdateSchema.safeParse(basicForm);
       if (!validation.success) {
-        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Por favor, llena todos los campos obligatorios correctamente.");
+        const issues = validation.error?.issues || validation.error?.errors || [];
+        const fieldErrors = mapZodFieldErrors(issues);
+        setBasicErrors(fieldErrors);
+        if (Object.keys(fieldErrors).length === 0) {
+          setSaveError(issues[0]?.message || "Por favor, llena todos los campos obligatorios correctamente.");
+        }
+        return;
       }
 
       const formData = new FormData();
@@ -334,11 +394,17 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitContact = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setContactErrors({});
     try {
       const validation = employeeContactUpdateSchema.safeParse(contactForm);
       if (!validation.success) {
-        const firstIssue = validation.error?.issues?.[0] || validation.error?.errors?.[0];
-        throw new Error(firstIssue?.message || "Es necesario completar todos los campos de contacto.");
+        const issues = validation.error?.issues || validation.error?.errors || [];
+        const fieldErrors = mapZodFieldErrors(issues);
+        setContactErrors(fieldErrors);
+        if (Object.keys(fieldErrors).length === 0) {
+          setSaveError(issues[0]?.message || "Es necesario completar todos los campos de contacto.");
+        }
+        return;
       }
 
       await updateContactInfoService(employeeId, validation.data);
@@ -354,17 +420,25 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitAdmin = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setAdminErrors({});
     try {
-      if (!adminForm.roleId || !adminForm.type || adminForm.salary === "") {
-        throw new Error("Debes llenar todos los campos administrativos (Puesto, Tipo y Salario).");
+      const requiredErrors = {};
+      if (!adminForm.roleId) requiredErrors.roleId = "Selecciona un puesto";
+      if (!adminForm.type) requiredErrors.type = "Selecciona un tipo de contrato";
+      if (adminForm.salary === "") requiredErrors.salary = "El salario es obligatorio";
+      if (Object.keys(requiredErrors).length > 0) {
+        setAdminErrors(requiredErrors);
+        return;
       }
 
       const salaryNum = Number(adminForm.salary);
       if (isNaN(salaryNum) || salaryNum < 0) {
-        throw new Error("El salario debe ser un número válido.");
+        setAdminErrors({ salary: "El salario debe ser un número válido." });
+        return;
       }
       if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
-        throw new Error("El salario debe ser mayor a 0 para este tipo de contrato.");
+        setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+        return;
       }
 
       const payload = {
@@ -379,7 +453,8 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
       if (selectedWorkdays.length === 0) {
-        throw new Error("Debes seleccionar al menos un día de trabajo.");
+        setAdminErrors({ workdays: "Debes seleccionar al menos un día de trabajo." });
+        return;
       }
 
       const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end, allDay }) => {
@@ -418,15 +493,24 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
       const validation = employeeAdminUpdateSchema.safeParse(payload);
       if (!validation.success) {
-        const firstIssue = validation.error?.issues?.[0];
-        throw new Error(firstIssue?.message || "Revisa los campos administrativos.");
+        const issues = validation.error?.issues || [];
+        const fieldErrors = mapZodFieldErrors(issues);
+        setAdminErrors(fieldErrors);
+        if (Object.keys(fieldErrors).length === 0) {
+          setSaveError(issues[0]?.message || "Revisa los campos administrativos.");
+        }
+        return;
       }
 
       await updateAdminInfoService(employeeId, validation.data);
       closeEdit();
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {
-      setSaveError(err.message ?? "Error al guardar");
+      if (err.message?.startsWith("Debes asignar") || err.message?.startsWith("El turno")) {
+        setAdminErrors({ workdays: err.message });
+      } else {
+        setSaveError(err.message ?? "Error al guardar");
+      }
     } finally {
       setSaving(false);
     }
@@ -434,6 +518,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   return {
     editSection, saving, saveError, loadingCatalogues,
+    basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
     roles, allWorkdays, frecuentPaymentTypes,

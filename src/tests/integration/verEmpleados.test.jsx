@@ -113,12 +113,13 @@ describe("Integración: Componente Personal", () => {
       ...mockPersonalData,
       activeLoading: true,
       activeEmployees: [],
+      activePagination: { totalPages: 0, total: 0 },
     });
 
     renderComponent();
 
     expect(screen.getByText(/cargando empleados/i)).toBeInTheDocument();
-    expect(screen.queryByText(/página 1 de 3/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/página/i)).not.toBeInTheDocument();
   });
 
   it("debe llamar a handleToggleBlacklistMode al hacer clic en 'Lista Negra'", () => {
@@ -135,5 +136,19 @@ describe("Integración: Componente Personal", () => {
     });
     renderComponent();
     expect(screen.getAllByText(/Estás en modo de lista negra/i)[0]).toBeInTheDocument();
+  });
+
+  it("oculta la paginación cuando la lista negra filtrada no tiene resultados", () => {
+    usePersonal.mockReturnValue({
+      ...mockPersonalData,
+      isBlacklistMode: true,
+      activeEmployees: [],
+      activePagination: { totalPages: 0, total: 0 },
+    });
+
+    renderComponent();
+
+    expect(screen.getByText(/no hay personas en la lista negra/i)).toBeInTheDocument();
+    expect(screen.queryByText(/página/i)).not.toBeInTheDocument();
   });
 });

@@ -33,6 +33,7 @@ const DetalleEmpleado = () => {
 
   const {
     editSection, saving, saveError, loadingCatalogues,
+    basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
     roles,
@@ -188,6 +189,7 @@ const DetalleEmpleado = () => {
         setBasicPicture={setBasicPicture}
         saving={saving}
         saveError={editSection === "basic" ? saveError : null}
+        errors={editSection === "basic" ? basicErrors : {}}
         infoDrawer={infoDrawer}
         onOpenEdit={() => openBasicEdit(employee)}
         onSubmit={submitBasic}
@@ -204,6 +206,7 @@ const DetalleEmpleado = () => {
             setContactField={setContactField}
             saving={saving}
             saveError={editSection === "contact" ? saveError : null}
+            errors={editSection === "contact" ? contactErrors : {}}
             onOpenEdit={() => openContactEdit(employee, employeeAddress)}
             onSubmit={submitContact}
             onCancel={closeEdit}
@@ -226,6 +229,7 @@ const DetalleEmpleado = () => {
             setWorkdayAllDay={setWorkdayAllDay}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
+            errors={editSection === "Administrador" ? adminErrors : {}}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}

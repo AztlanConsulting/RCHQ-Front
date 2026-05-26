@@ -1,6 +1,10 @@
 import Button from "../../../atoms/button";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
+import {
+    getVacationDateRange,
+    getVacationEndDateMin,
+} from "../../../../utils/vacationDateRange";
 
 const VacationEditForm = ({
     title,
@@ -15,6 +19,14 @@ const VacationEditForm = ({
     onVacationFieldChange,
     showEmployeeInfo = true,
 }) => {
+    const { minDate: vacationDateMin, maxDate: vacationDateMax } =
+        getVacationDateRange();
+    const vacationEndDateMin = getVacationEndDateMin(
+        vacationForm?.startDate,
+        vacationDateMin,
+        vacationDateMax,
+    );
+
     return (
         <div key="vacation-edit" className="px-2 text-left sm:px-3">
             <Type
@@ -81,6 +93,8 @@ const VacationEditForm = ({
                         label="Fecha de inicio"
                         name="startDate"
                         value={vacationForm?.startDate ?? ""}
+                        minDate={vacationDateMin}
+                        maxDate={vacationDateMax}
                         onChange={(editEvent) =>
                             onVacationFieldChange?.(
                                 "startDate",
@@ -103,11 +117,8 @@ const VacationEditForm = ({
                                 editEvent.target.value,
                             )
                         }
-                        minDate={
-                            vacationForm?.startDate
-                                ? new Date(`${vacationForm.startDate}T00:00:00`)
-                                : undefined
-                        }
+                        minDate={vacationEndDateMin}
+                        maxDate={vacationDateMax}
                         labelColor="text-[#121212]"
                         popupAlign="right"
                         popupPlacement="top"
@@ -122,32 +133,34 @@ const VacationEditForm = ({
                 </p>
             ) : null}
 
-            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-5">
+            <div className="mt-8 flex justify-center gap-3">
                 <Button
                     type="button"
                     text="Cancelar"
-                    width="w-full sm:w-[10rem]"
-                    height="h-11"
-                    textSize="text-base"
+                    width="w-auto"
+                    height="h-[38px]"
+                    textSize="text-sm"
+                    fontWeight="font-bold"
                     bgColor="bg-white"
                     textColor="text-[#121212]"
                     hoverColor="hover:bg-slate-50"
                     activeColor="active:bg-slate-100"
-                    className="border border-slate-200 shadow-md"
+                    className="px-5 border border-slate-200 shadow-md"
                     onClick={onCancelEdit}
                     disabled={isSaving}
                 />
                 <Button
                     type="button"
                     text="Guardar"
-                    width="w-full sm:w-[10rem]"
-                    height="h-11"
-                    textSize="text-base"
+                    width="w-auto"
+                    height="h-[38px]"
+                    textSize="text-sm"
+                    fontWeight="font-bold"
                     bgColor="bg-[#1F3664]"
                     textColor="text-white"
                     hoverColor="hover:bg-[#15284A]"
                     activeColor="active:bg-[#0E1B33]"
-                    className="shadow-md"
+                    className="px-5 shadow-md"
                     onClick={onSubmitEdit}
                     disabled={isSaving}
                 />

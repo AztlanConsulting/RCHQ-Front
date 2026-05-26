@@ -8,6 +8,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RegisterEventModal from "../../components/organism/evento/registerEventModal";
+import { formatDateOnly } from "../../utils/vacationDateRange";
 import {
     getCalendarViewerRole,
     getOwnEmployeeId,
@@ -452,15 +453,16 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si las vacaciones son en el pasado o el mismo día", async () => {
+        const currentDate = formatDateOnly(new Date());
         const { onClose, onSuccess } = await renderModal({
-            initialStartDate: "2026-01-05",
-            initialEndDate: "2026-01-07",
+            initialStartDate: currentDate,
+            initialEndDate: currentDate,
         });
         const message =
             "No se pueden pedir vacaciones en el pasado ni para el mismo día";
 
         requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
-            if (startDate === "2026-01-05" && endDate === "2026-01-07") {
+            if (startDate === currentDate && endDate === currentDate) {
                 throw new Error(message);
             }
 
@@ -473,8 +475,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         await waitFor(() => {
             expect(requestEmployeeVacation).toHaveBeenCalledWith({
                 employeeId: "own-employee",
-                startDate: "2026-01-05",
-                endDate: "2026-01-07",
+                startDate: currentDate,
+                endDate: currentDate,
             });
         });
         expect(await screen.findByRole("alert")).toHaveTextContent(message);
