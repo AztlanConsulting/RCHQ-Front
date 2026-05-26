@@ -8,8 +8,10 @@ const TimeField = ({
     onChange,
     placeholder = "Hora",
     error,
+    hideErrorText = false,
     disabled = false,
     minTime,
+    stepMinutes = 15,
 }) => {
     const {
         isOpen,
@@ -26,6 +28,7 @@ const TimeField = ({
         minTime,
         disabled,
         onChange,
+        stepMinutes,
     });
 
     return (
@@ -36,7 +39,7 @@ const TimeField = ({
                 onClick={handleOpen}
                 className={`flex min-h-12.5 w-full cursor-pointer items-center gap-3 rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${
                     disabled ? "cursor-not-allowed opacity-50" : ""
-                } ${error ? "ring-2 ring-red-400" : ""}`}
+                }`} style={{ boxShadow: error ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
             >
@@ -65,7 +68,7 @@ const TimeField = ({
                 />
             </button>
 
-            {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+            {error && !hideErrorText && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
             {isOpen &&
                 createPortal(
@@ -88,7 +91,7 @@ const TimeField = ({
                             ref={listRef}
                             role="listbox"
                             style={{
-                                maxHeight: "200px",
+                                maxHeight: `${dropdownPos.maxHeight}px`,
                                 overflowY: "auto",
                                 margin: 0,
                                 padding: "4px 8px",

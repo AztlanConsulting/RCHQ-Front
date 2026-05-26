@@ -81,6 +81,9 @@ vi.mock("../../components/atoms/employeeSearchSelect", () => ({
 vi.mock("/time.svg", () => ({ default: "time.svg" }));
 vi.mock("/chevron-down.svg", () => ({ default: "chevron-down.svg" }));
 
+const _d = new Date();
+const TODAY = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, "0")}-${String(_d.getDate()).padStart(2, "0")}`;
+
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
 const PERSONAL_EVENT_ID = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
@@ -112,9 +115,9 @@ const mockEvent = {
     eventType: "Cita médica",
     description: "Revisión anual.",
     allDay: false,
-    start: new Date("2026-05-05T09:00:00.000Z"),
-    end: new Date("2026-05-05T10:00:00.000Z"),
-    date: "2026-05-05",
+    start: new Date(`${TODAY}T09:00:00.000Z`),
+    end: new Date(`${TODAY}T10:00:00.000Z`),
+    date: TODAY,
     peopleInsideEvent: [{ name: "Juan Pérez", id: EMP_ID_1 }],
 };
 
@@ -191,7 +194,7 @@ describe("Integración: modificar evento personal", () => {
         expect(screen.getByPlaceholderText("Evento personal")).toHaveValue(
             "Cita médica",
         );
-        expect(screen.getByLabelText("Fecha")).toHaveValue("2026-05-05");
+        expect(screen.getByLabelText("Fecha")).toHaveValue(TODAY);
     });
 
     it("muestra placeholder de fecha cuando el evento no tiene fecha", async () => {
@@ -224,7 +227,7 @@ describe("Integración: modificar evento personal", () => {
         expect(updatePersonalEvent).toHaveBeenCalledWith(PERSONAL_EVENT_ID, {
             name: "Cita médica",
             eventTypeId: EVENT_TYPE_ID,
-            date: "2026-05-05",
+            date: TODAY,
             allDay: false,
             start: "09:00:00",
             end: "10:00:00",
@@ -272,7 +275,7 @@ describe("Integración: modificar evento personal", () => {
             PERSONAL_EVENT_ID,
             expect.objectContaining({
                 allDay: true,
-                date: "2026-05-05",
+                date: TODAY,
             }),
         );
     });
@@ -389,9 +392,9 @@ describe("Integración: modificar evento personal", () => {
 
             await clickSubmit();
 
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                "Debes seleccionar al menos un empleado.",
-            );
+            expect(
+                screen.getByText("Debes seleccionar al menos un empleado."),
+            ).toBeInTheDocument();
             expect(updatePersonalEvent).not.toHaveBeenCalled();
         });
 

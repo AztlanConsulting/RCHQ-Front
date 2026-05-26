@@ -240,4 +240,32 @@ describe("VacationDetail", () => {
         expect(screen.getByText("1 de julio de 2026")).toBeInTheDocument();
         expect(screen.getByText("3 de julio de 2026")).toBeInTheDocument();
     });
+
+    it("llama a onApprove al hacer click en aprobar", () => {
+        const onApprove = vi.fn();
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                status: 0,
+            },
+            onApprove,
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /aprobar/i }));
+        expect(onApprove).toHaveBeenCalledTimes(1);
+    });
+
+    it("llama a onReject al hacer click en rechazar", () => {
+        const onReject = vi.fn();
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                status: 0,
+            },
+            onReject,
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /rechazar/i }));
+        expect(onReject).toHaveBeenCalledTimes(1);
+    });
 });

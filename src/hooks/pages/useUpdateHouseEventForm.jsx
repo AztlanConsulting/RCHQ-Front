@@ -93,6 +93,7 @@ export const useUpdateHouseEventForm = ({
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState(null);
+    const [validationAlert, setValidationAlert] = useState(null);
     const [eventTypes, setEventTypes] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [overlapState, setOverlapState] = useState({
@@ -110,6 +111,7 @@ export const useUpdateHouseEventForm = ({
         setForm(getInitialForm(event));
         setErrors({});
         setServerError(null);
+        setValidationAlert(null);
         setOverlapState({
             show: false,
             collisions: [],
@@ -202,6 +204,7 @@ export const useUpdateHouseEventForm = ({
         });
 
         setErrors(fieldErrors);
+        setValidationAlert("Revisa los campos marcados antes de continuar.");
         return null;
     };
 
@@ -283,11 +286,13 @@ export const useUpdateHouseEventForm = ({
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         isSubmitting,
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,

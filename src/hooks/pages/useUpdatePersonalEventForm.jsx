@@ -51,18 +51,6 @@ const getInitialEmployees = (event) => {
     }));
 };
 
-const getTimeContainerStyle = (isVisible) => ({
-    flex: isVisible ? 1 : "0 0 0px",
-    maxWidth: isVisible ? "100%" : "0px",
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible
-        ? "translateX(0) scale(1)"
-        : "translateX(12px) scale(0.96)",
-    pointerEvents: isVisible ? "auto" : "none",
-    overflow: isVisible ? "visible" : "hidden",
-    transition:
-        "max-width 280ms ease, opacity 220ms ease, transform 260ms ease, flex 280ms ease",
-});
 
 export const useUpdatePersonalEventForm = ({
     event,
@@ -73,6 +61,7 @@ export const useUpdatePersonalEventForm = ({
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState(null);
+    const [validationAlert, setValidationAlert] = useState(null);
     const [eventTypes, setEventTypes] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -98,6 +87,7 @@ export const useUpdatePersonalEventForm = ({
         setSelectedEmployees(getInitialEmployees(event));
         setErrors({});
         setServerError(null);
+        setValidationAlert(null);
         setOverlapState({
             show: false,
             overlappedEmployees: [],
@@ -159,6 +149,7 @@ export const useUpdatePersonalEventForm = ({
 
     const handleSelectEmployee = useCallback((emp) => {
         setSelectedEmployees((prev) => [...prev, emp]);
+        setErrors((prev) => ({ ...prev, employees: undefined }));
     }, []);
 
     const handleRemoveEmployee = useCallback((employeeId) => {
@@ -173,11 +164,6 @@ export const useUpdatePersonalEventForm = ({
             return null;
         }
 
-        if (isCoordinator && selectedEmployees.length === 0) {
-            setServerError("Debes seleccionar al menos un empleado.");
-            return null;
-        }
-
         const input = {
             ...form,
             categoryKey: "personal",
@@ -187,17 +173,26 @@ export const useUpdatePersonalEventForm = ({
 
         const result = personalEventSchema.safeParse(input);
 
-        if (result.success) {
+        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
             setErrors({});
             return result.data;
         }
 
         const fieldErrors = {};
-        result.error.issues.forEach((issue) => {
-            const key = issue.path[issue.path.length - 1];
-            if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-        });
+
+        if (!result.success) {
+            result.error.issues.forEach((issue) => {
+                const key = issue.path[issue.path.length - 1];
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+            });
+        }
+
+        if (isCoordinator && selectedEmployees.length === 0) {
+            fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
         setErrors(fieldErrors);
+        setValidationAlert("Revisa los campos marcados antes de continuar.");
         return null;
     };
 
@@ -279,6 +274,7 @@ export const useUpdatePersonalEventForm = ({
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         employees,
         selectedEmployees,
@@ -287,12 +283,12 @@ export const useUpdatePersonalEventForm = ({
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         searchEmployees,
         handleSelectEmployee,
         handleRemoveEmployee,
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     };
 };

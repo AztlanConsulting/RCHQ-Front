@@ -15,6 +15,22 @@ vi.mock("/personal-black.svg", () => ({ default: "personal-black.svg" }));
 vi.mock("/vacation-black.svg", () => ({ default: "vacation-black.svg" }));
 vi.mock("/time.svg", () => ({ default: "time.svg" }));
 vi.mock("/chevron-down.svg", () => ({ default: "chevron-down.svg" }));
+vi.mock("/add.svg", () => ({ default: "add.svg" }));
+vi.mock("/edit.svg", () => ({ default: "edit.svg" }));
+vi.mock("/close.svg", () => ({ default: "close.svg" }));
+
+// Mock de localStorage para evitar errores y advertencias de jsdom
+const localStorageMock = (function () {
+  let store = {};
+  return {
+    getItem: function (key) { return store[key] || null; },
+    setItem: function (key, value) { store[key] = value.toString(); },
+    removeItem: function (key) { delete store[key]; },
+    clear: function () { store = {}; },
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 afterEach(() => {
   cleanup();

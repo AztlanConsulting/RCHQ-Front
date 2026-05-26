@@ -8,7 +8,7 @@ import Modal from "../../atoms/modal";
 import SelectField from "../../atoms/selectField";
 import TextField from "../../atoms/textField";
 import TimeField from "../../atoms/timeField";
-import PersonalOverlapModal from "../personalOverlapModal";
+import OverlapModal from "../overlapModal";
 import { useUpdatePersonalEventForm } from "../../../hooks/pages/useUpdatePersonalEventForm";
 
 const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
@@ -16,6 +16,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         employees,
         selectedEmployees,
@@ -24,16 +25,20 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         searchEmployees,
         handleSelectEmployee,
         handleRemoveEmployee,
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     } = useUpdatePersonalEventForm({ event, isOpen, onClose, onSuccess });
 
     const showTimeFields = !form.allDay;
+
+    const today = new Date();
+    const personalDateMin = today;
+    const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
 
     return (
         <>
@@ -46,10 +51,27 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 className="w-full max-w-[560px] max-h-[calc(100vh-2rem)] rounded-xl p-6"
                 backdropClassName="bg-black/40"
             >
-                <div
-                    key={event?.eventId ?? event?.id ?? "update-personal"}
-                    className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
-                >
+                <div style={{ position: "relative" }}>
+                    {validationAlert && (
+                        <div style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 30,
+                        }}>
+                            <Alert
+                                type="error"
+                                message={validationAlert}
+                                onClose={() => setValidationAlert(null)}
+                            />
+                        </div>
+                    )}
+
+                    <div
+                        key={event?.eventId ?? event?.id ?? "update-personal"}
+                        className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
+                    >
                     <h2 className="text-2xl font-bold text-[#121212]">
                         Modificar evento personal
                     </h2>
@@ -74,6 +96,9 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                     setField("date", e.target.value)
                                 }
                                 placeholder="dd / mm / yyyy"
+                                minDate={personalDateMin}
+                                maxDate={personalDateMax}
+                                error={!!errors.date}
                             />
                             {errors.date && (
                                 <ErrorText>{errors.date}</ErrorText>
@@ -83,36 +108,50 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         <div
                             style={{
                                 display: "flex",
-                                gap: "8px",
-                                alignItems: "flex-end",
+                                flexDirection: "column",
+                                gap: "4px",
+                                maxHeight: showTimeFields ? "150px" : "0px",
+                                overflow: "hidden",
+                                opacity: showTimeFields ? 1 : 0,
+                                marginTop: showTimeFields ? "0px" : "-8px",
+                                transition:
+                                    "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                             }}
                         >
-                            <div style={getTimeContainerStyle(showTimeFields)}>
-                                <TimeField
-                                    value={form.startTime}
-                                    onChange={(value) =>
-                                        setField("startTime", value)
-                                    }
-                                    placeholder="Inicio"
-                                    disabled={form.allDay}
-                                />
-                                {showTimeFields && errors.startTime && (
-                                    <ErrorText>{errors.startTime}</ErrorText>
-                                )}
+                            <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                                <div style={{ flex: 1 }}>
+                                    <TimeField
+                                        value={form.startTime}
+                                        onChange={(value) =>
+                                            setField("startTime", value)
+                                        }
+                                        placeholder="Inicio"
+                                        error={errors.startTime}
+                                        hideErrorText
+                                        disabled={form.allDay}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <TimeField
+                                        value={form.endTime}
+                                        onChange={(value) =>
+                                            setField("endTime", value)
+                                        }
+                                        minTime={form.startTime}
+                                        placeholder="Fin"
+                                        error={errors.endTime}
+                                        hideErrorText
+                                        disabled={form.allDay}
+                                    />
+                                </div>
                             </div>
-                            <div style={getTimeContainerStyle(showTimeFields)}>
-                                <TimeField
-                                    value={form.endTime}
-                                    onChange={(value) =>
-                                        setField("endTime", value)
-                                    }
-                                    minTime={form.startTime}
-                                    placeholder="Fin"
-                                    disabled={form.allDay}
-                                />
-                                {showTimeFields && errors.endTime && (
-                                    <ErrorText>{errors.endTime}</ErrorText>
-                                )}
+                            <div style={{ display: "flex", gap: "8px" }}>
+                                <div style={{ flex: 1 }}>
+                                    {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,21 +170,26 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         setValue={(value) => setField("eventTypeId", value)}
                         options={eventTypes}
                         placeholder="General"
+                        error={!!errors.eventTypeId}
                     />
                     {errors.eventTypeId && (
                         <ErrorText>{errors.eventTypeId}</ErrorText>
                     )}
 
                     {isCoordinator && (
-                        <EmployeeSearchSelect
-                            label="Agregar empleados"
-                            placeholder="Buscar por nombre..."
-                            employees={employees}
-                            selected={selectedEmployees}
-                            onSelect={handleSelectEmployee}
-                            onRemove={handleRemoveEmployee}
-                            onSearch={searchEmployees}
-                        />
+                        <div>
+                            <EmployeeSearchSelect
+                                label="Agregar empleados"
+                                placeholder="Buscar por nombre..."
+                                employees={employees}
+                                selected={selectedEmployees}
+                                onSelect={handleSelectEmployee}
+                                onRemove={handleRemoveEmployee}
+                                onSearch={searchEmployees}
+                                error={!!errors.employees}
+                            />
+                            {errors.employees && <ErrorText>{errors.employees}</ErrorText>}
+                        </div>
                     )}
 
                     <div className="flex w-full flex-col gap-1.5">
@@ -160,7 +204,8 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             }
                             maxLength={250}
                             rows={4}
-                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
+                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
+                            style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                         />
                         {errors.description && (
                             <ErrorText>{errors.description}</ErrorText>
@@ -205,10 +250,11 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             className="px-5 shadow-md"
                         />
                     </div>
+                    </div>
                 </div>
             </Modal>
 
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen={overlapState.show}
                 overlappedEmployees={overlapState.overlappedEmployees}
                 onConfirm={handleForceOverlap}

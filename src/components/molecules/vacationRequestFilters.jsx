@@ -3,6 +3,12 @@ import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import Button from "../atoms/button";
 import { sanitizeSearchInput } from "../../utils/searchInput";
+import {
+    getEarlierDate,
+    getLaterDate,
+    getYearRangeDates,
+    toFilterDate,
+} from "../../utils/dateRange";
 
 const VacationRequestFilters = ({
     view,
@@ -27,6 +33,11 @@ const VacationRequestFilters = ({
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
     };
+
+    const { minDate: minFilterDate, maxDate: maxFilterDate } =
+        getYearRangeDates();
+    const selectedStartDate = toFilterDate(startDate);
+    const selectedEndDate = toFilterDate(endDate, true);
 
     const gridColumns =
         view === "reviewed"
@@ -67,7 +78,8 @@ const VacationRequestFilters = ({
                     name="startDate"
                     value={startDate}
                     onChange={handleStartDateChange}
-                    maxDate={endDate ? new Date(`${endDate}T12:00:00`) : undefined}
+                    minDate={minFilterDate}
+                    maxDate={getEarlierDate(selectedEndDate, maxFilterDate)}
                 />
 
                 <VacationDateField
@@ -75,10 +87,9 @@ const VacationRequestFilters = ({
                     name="endDate"
                     value={endDate}
                     onChange={handleEndDateChange}
-                    minDate={startDate ? new Date(`${startDate}T12:00:00`) : undefined}
-                    calendarStartDate={
-                        startDate ? new Date(`${startDate}T12:00:00`) : undefined
-                    }
+                    minDate={getLaterDate(selectedStartDate, minFilterDate)}
+                    maxDate={maxFilterDate}
+                    calendarStartDate={selectedStartDate}
                 />
 
                 <div className="flex flex-col justify-end">

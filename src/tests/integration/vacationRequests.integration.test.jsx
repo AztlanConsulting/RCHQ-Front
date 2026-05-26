@@ -41,13 +41,6 @@ const wait = (ms) =>
         setTimeout(resolve, ms);
     });
 
-const renderVacationRequests = () =>
-    render(
-        <MemoryRouter>
-            <VacationRequests />
-        </MemoryRouter>,
-    );
-
 const pendingRequests = [
     {
         vacationRequestId: "vac-001",
@@ -123,6 +116,16 @@ const singlePendingResponse = {
     },
 };
 
+const renderComponent = async () => {
+    await act(async () => {
+        render(
+            <MemoryRouter>
+                <VacationRequests />
+            </MemoryRouter>,
+        );
+    });
+};
+
 describe("Integración: VacationRequests", () => {
     beforeEach(() => {
         vi.resetAllMocks();
@@ -147,7 +150,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("carga y muestra solicitudes pendientes al entrar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(
             screen.getByText("Solicitudes de vacaciones pendientes"),
@@ -183,7 +186,7 @@ describe("Integración: VacationRequests", () => {
                     }),
             );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -212,7 +215,7 @@ describe("Integración: VacationRequests", () => {
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce(singlePendingResponse);
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -235,7 +238,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("limpia la búsqueda si el usuario borra de us9 a us y usa el último valor", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -267,7 +270,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("cambia a vista revisadas y carga solicitudes revisadas", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -292,7 +295,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("manda status approved al servicio cuando se filtra revisadas por aprobadas", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -317,7 +320,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("muestra error local si la fecha de inicio es posterior a la fecha de término", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -341,7 +344,7 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudieron cargar las solicitudes"),
         );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(
             await screen.findByText("No se pudieron cargar las solicitudes"),
@@ -353,7 +356,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("limpia filtros al presionar Limpiar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -385,7 +388,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("abre modal de confirmación al presionar aprobar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -403,7 +406,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("cierra modal de aprobación al presionar cancelar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -433,7 +436,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -465,7 +468,7 @@ describe("Integración: VacationRequests", () => {
             new Error("La solicitud ya fue revisada"),
         );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -487,7 +490,7 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudo aprobar la solicitud"),
         );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -518,7 +521,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -533,7 +536,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("abre modal de confirmación al presionar rechazar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -553,7 +556,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("cierra modal de rechazo al presionar cancelar", async () => {
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -583,7 +586,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -630,7 +633,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -652,7 +655,7 @@ describe("Integración: VacationRequests", () => {
             new Error("La solicitud ya fue revisada"),
         );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -685,7 +688,7 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudo rechazar la solicitud"),
         );
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -728,7 +731,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        renderVacationRequests();
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 

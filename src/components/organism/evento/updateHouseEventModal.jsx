@@ -15,11 +15,13 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         form,
         errors,
         serverError,
+        validationAlert,
         eventTypes,
         isSubmitting,
         overlapState,
         setField,
         setServerError,
+        setValidationAlert,
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
@@ -28,6 +30,10 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
 
     const showTimeFields = !form.allDay;
 
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = new Date(currentYear, 0, 1);
+    const houseDateMax = new Date(currentYear + 2, 11, 31);
+
     return (
         <>
             <Modal
@@ -35,18 +41,36 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                 onClose={onClose}
                 grayBackground
                 placement="center"
-                className="w-full max-w-[560px] rounded-xl p-6"
+                scrollable
+                className="w-full max-w-[560px] max-h-[calc(100vh-2rem)] rounded-xl p-6"
                 backdropClassName="bg-black/40"
             >
-                <div
-                    key={
-                        event?.houseEventId ??
-                        event?.eventId ??
-                        event?.id ??
-                        "update"
-                    }
-                    className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
-                >
+                <div style={{ position: "relative" }}>
+                    {validationAlert && (
+                        <div style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 30,
+                        }}>
+                            <Alert
+                                type="error"
+                                message={validationAlert}
+                                onClose={() => setValidationAlert(null)}
+                            />
+                        </div>
+                    )}
+
+                    <div
+                        key={
+                            event?.houseEventId ??
+                            event?.eventId ??
+                            event?.id ??
+                            "update"
+                        }
+                        className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
+                    >
                     <h2 className="text-2xl font-bold text-[#121212]">
                         Modificar evento de casa
                     </h2>
@@ -72,6 +96,9 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("startDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    minDate={houseDateMin}
+                                    maxDate={houseDateMax}
+                                    error={!!errors.startDate}
                                 />
                             </div>
                             <div style={getTimeContainerStyle(showTimeFields)}>
@@ -81,6 +108,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("startTime", value)
                                     }
                                     placeholder="-- : --"
+                                    error={errors.startTime}
+                                    hideErrorText
                                     disabled={form.allDay}
                                 />
                             </div>
@@ -110,6 +139,9 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                         setField("endDate", e.target.value)
                                     }
                                     placeholder="dd / mm / yyyy"
+                                    minDate={houseDateMin}
+                                    maxDate={houseDateMax}
+                                    error={!!errors.endDate}
                                 />
                             </div>
                             <div style={getTimeContainerStyle(showTimeFields)}>
@@ -124,6 +156,8 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                                             : undefined
                                     }
                                     placeholder="-- : --"
+                                    error={errors.endTime}
+                                    hideErrorText
                                     disabled={form.allDay}
                                 />
                             </div>
@@ -162,24 +196,31 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         setValue={(value) => setField("eventTypeId", value)}
                         options={eventTypes}
                         placeholder="General"
+                        error={!!errors.eventTypeId}
                     />
                     {errors.eventTypeId && (
                         <ErrorText>{errors.eventTypeId}</ErrorText>
                     )}
 
-                    <textarea
-                        placeholder="Este es un evento de casa"
-                        value={form.description}
-                        onChange={(e) =>
-                            setField("description", e.target.value)
-                        }
-                        maxLength={250}
-                        rows={4}
-                        className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] outline-none placeholder-[#aaaaaa]"
-                    />
-                    {errors.description && (
-                        <ErrorText>{errors.description}</ErrorText>
-                    )}
+                    <div className="flex w-full flex-col gap-1.5">
+                        <label className="text-sm font-bold text-[#374151]">
+                            Descripción
+                        </label>
+                        <textarea
+                            placeholder="Este es un evento de casa"
+                            value={form.description}
+                            onChange={(e) =>
+                                setField("description", e.target.value)
+                            }
+                            maxLength={250}
+                            rows={4}
+                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
+                            style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
+                        />
+                        {errors.description && (
+                            <ErrorText>{errors.description}</ErrorText>
+                        )}
+                    </div>
 
                     {serverError && (
                         <Alert
@@ -218,6 +259,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             activeColor="active:bg-[#0E1B33]"
                             className="px-5 shadow-md"
                         />
+                    </div>
                     </div>
                 </div>
             </Modal>

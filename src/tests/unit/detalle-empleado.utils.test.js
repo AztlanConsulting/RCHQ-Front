@@ -100,4 +100,56 @@ describe("countWorkdaysHours", () => {
   it("retorna 0 para un array vacío", () => {
     expect(countWorkdaysHours([])).toBe(0);
   });
+
+  it("suma correctamente horas con minutos", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T06:00:00.000Z",
+          end: "1970-01-01T23:30:00.000Z",
+        },
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T17:00:00.000Z",
+        },
+      ]),
+    ).toBe(34.5);
+  });
+
+  it("conserva enteros cuando no hay fracciones", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T08:00:00.000Z",
+          end: "1970-01-01T17:00:00.000Z",
+        },
+      ]),
+    ).toBe(9);
+  });
+
+  it("cuenta 24 horas cuando inicio y fin son la misma hora", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T00:00:00.000Z",
+        },
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T00:00:00.000Z",
+        },
+      ]),
+    ).toBe(48);
+  });
+
+  it("cuenta correctamente turnos que cruzan medianoche", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T22:00:00.000Z",
+          end: "1970-01-01T06:00:00.000Z",
+        },
+      ]),
+    ).toBe(8);
+  });
 });

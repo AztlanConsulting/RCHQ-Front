@@ -112,6 +112,7 @@ export const usePersonalForm = ({
 
     const handleSelectEmployee = useCallback((emp) => {
         setSelectedEmployees((prev) => [...prev, emp]);
+        setErrors((prev) => ({ ...prev, employees: undefined }));
     }, []);
 
     const handleRemoveEmployee = useCallback((employeeId) => {
@@ -131,12 +132,7 @@ export const usePersonalForm = ({
 
         const result = personalEventSchema.safeParse(input);
 
-        const extraMessages = [];
-        if (isCoordinator && selectedEmployees.length === 0) {
-            extraMessages.push("Debes seleccionar al menos un empleado");
-        }
-
-        if (result.success && extraMessages.length === 0) {
+        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
             setErrors({});
             return result.data;
         }
@@ -152,14 +148,14 @@ export const usePersonalForm = ({
             });
         }
 
+        if (isCoordinator && selectedEmployees.length === 0) {
+            fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
         setErrors(fieldErrors);
         onNameError?.(fieldErrors.name ?? "");
 
-        const schemaMessages = result.success
-            ? []
-            : [...new Set(result.error.issues.map((i) => i.message))];
-
-        onValidationAlert?.([...schemaMessages, ...extraMessages].join("\n"));
+        onValidationAlert?.("Revisa los campos marcados antes de continuar.");
 
         return null;
     };
@@ -237,19 +233,6 @@ export const usePersonalForm = ({
         });
     };
 
-    const getTimeContainerStyle = (isVisible) => ({
-        flex: isVisible ? 1 : "0 0 0px",
-        maxWidth: isVisible ? "100%" : "0px",
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible
-            ? "translateX(0) scale(1)"
-            : "translateX(12px) scale(0.96)",
-        pointerEvents: isVisible ? "auto" : "none",
-        overflow: isVisible ? "visible" : "hidden",
-        transition:
-            "max-width 280ms ease, opacity 220ms ease, transform 260ms ease, flex 280ms ease",
-    });
-
     return {
         form,
         errors,
@@ -268,6 +251,5 @@ export const usePersonalForm = ({
         handleSubmit,
         handleForceOverlap,
         handleCancelOverlap,
-        getTimeContainerStyle,
     };
 };

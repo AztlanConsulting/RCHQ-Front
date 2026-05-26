@@ -18,13 +18,14 @@ export const getUpdateFormService = async () => {
 export const updateBasicInfoService = async (employeeId, body) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
+  const isFormData = body instanceof FormData;
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/basic-info`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
     },
-    body: JSON.stringify(body),
+    body: isFormData ? body : JSON.stringify(body),
   });
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al actualizar información básica");

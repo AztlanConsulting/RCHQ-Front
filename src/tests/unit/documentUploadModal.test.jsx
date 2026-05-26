@@ -18,7 +18,7 @@ vi.mock("../../services/documentService", () => ({
 // ── Mock token con rol administrador ────────────────────────────
 beforeEach(() => {
   vi.clearAllMocks();
-  const payload = btoa(JSON.stringify({ role: "admin", id: "1" }));
+  const payload = btoa(JSON.stringify({ role: "Administrador", id: "1" }));
   localStorage.setItem("token", `header.${payload}.sig`);
 });
 

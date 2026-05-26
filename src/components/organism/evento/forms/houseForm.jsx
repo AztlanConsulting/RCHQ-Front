@@ -27,6 +27,10 @@ const CasaForm = (props) => {
 
     const isTimeVisible = !form.allDay;
 
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = new Date(currentYear, 0, 1);
+    const houseDateMax = new Date(currentYear + 2, 11, 31);
+
     return (
         <>
             <div
@@ -36,76 +40,102 @@ const CasaForm = (props) => {
                     gap: "8px",
                 }}
             >
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
-                    }}
-                >
-                    <div style={{ flex: 1 }}>
-                        <DateField
-                            label="Fecha de inicio"
-                            labelColor="text-[#374151]"
-                            value={form.startDate}
-                            placeholder="dd / mm / yyyy"
-                            onChange={(e) =>
-                                setField("startDate", e.target.value)
-                            }
-                        />
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "flex-end",
+                        }}
+                    >
+                        <div style={{ flex: 1 }}>
+                            <DateField
+                                label="Fecha de inicio"
+                                labelColor="text-[#374151]"
+                                value={form.startDate}
+                                placeholder="dd / mm / yyyy"
+                                onChange={(e) =>
+                                    setField("startDate", e.target.value)
+                                }
+                                minDate={houseDateMin}
+                                maxDate={houseDateMax}
+                                error={!!errors.startDate}
+                            />
+                        </div>
 
-                        {errors.startDate && (
-                            <ErrorText>{errors.startDate}</ErrorText>
-                        )}
+                        <div style={getTimeContainerStyle(isTimeVisible)}>
+                            <TimeField
+                                value={form.startTime}
+                                onChange={(value) => setField("startTime", value)}
+                                placeholder="-- : --"
+                                error={errors.startTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.startTime}
-                            onChange={(value) => setField("startTime", value)}
-                            placeholder="-- : --"
-                            error={errors.startTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.startDate && <ErrorText>{errors.startDate}</ErrorText>}
+                        </div>
+                        {isTimeVisible && (
+                            <div style={{ flex: 1 }}>
+                                {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "flex-end",
-                    }}
-                >
-                    <div style={{ flex: 1 }}>
-                        <DateField
-                            label="Fecha de fin"
-                            labelColor="text-[#374151]"
-                            value={form.endDate}
-                            placeholder="dd / mm / yyyy"
-                            onChange={(e) =>
-                                setField("endDate", e.target.value)
-                            }
-                        />
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "flex-end",
+                        }}
+                    >
+                        <div style={{ flex: 1 }}>
+                            <DateField
+                                label="Fecha de fin"
+                                labelColor="text-[#374151]"
+                                value={form.endDate}
+                                placeholder="dd / mm / yyyy"
+                                onChange={(e) =>
+                                    setField("endDate", e.target.value)
+                                }
+                                minDate={houseDateMin}
+                                maxDate={houseDateMax}
+                                error={!!errors.endDate}
+                            />
+                        </div>
 
-                        {errors.endDate && (
-                            <ErrorText>{errors.endDate}</ErrorText>
-                        )}
+                        <div style={getTimeContainerStyle(isTimeVisible)}>
+                            <TimeField
+                                value={form.endTime}
+                                onChange={(value) => setField("endTime", value)}
+                                placeholder="-- : --"
+                                minTime={
+                                    form.startDate === form.endDate
+                                        ? form.startTime
+                                        : undefined
+                                }
+                                error={errors.endTime}
+                                hideErrorText
+                                disabled={form.allDay}
+                            />
+                        </div>
                     </div>
 
-                    <div style={getTimeContainerStyle(isTimeVisible)}>
-                        <TimeField
-                            value={form.endTime}
-                            onChange={(value) => setField("endTime", value)}
-                            placeholder="-- : --"
-                            minTime={
-                                form.startDate === form.endDate
-                                    ? form.startTime
-                                    : undefined
-                            }
-                            error={errors.endTime}
-                            disabled={form.allDay}
-                        />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ flex: 1 }}>
+                            {errors.endDate && <ErrorText>{errors.endDate}</ErrorText>}
+                        </div>
+                        {isTimeVisible && (
+                            <div style={{ flex: 1 }}>
+                                {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -138,6 +168,7 @@ const CasaForm = (props) => {
                 value={form.eventTypeId}
                 setValue={(value) => setField("eventTypeId", value)}
                 options={eventTypes}
+                error={!!errors.eventTypeId}
             />
 
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
@@ -153,7 +184,8 @@ const CasaForm = (props) => {
                     onChange={(e) => setField("description", e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, ""))}
                     maxLength={250}
                     rows={3}
-                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040] text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 outline-none resize-none"
+                    className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
+                    style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
                 {errors.description && (

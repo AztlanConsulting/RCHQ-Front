@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import PersonalOverlapModal from "../../components/organism/personalOverlapModal";
+import OverlapModal from "../../components/organism/overlapModal";
 
 vi.mock("../../components/atoms/button", () => ({
     default: ({ text, onClick, disabled }) => (
@@ -10,7 +10,7 @@ vi.mock("../../components/atoms/button", () => ({
     ),
 }));
 
-describe("PersonalOverlapModal", () => {
+describe("OverlapModal (personal)", () => {
     const overlappedEmployees = [
         {
             employeeId: "emp-1",
@@ -43,7 +43,7 @@ describe("PersonalOverlapModal", () => {
 
     it("no renderiza nada cuando isOpen es false", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen={false}
                 overlappedEmployees={overlappedEmployees}
                 onConfirm={onConfirm}
@@ -56,7 +56,7 @@ describe("PersonalOverlapModal", () => {
 
     it("renderiza el modal cuando isOpen es true", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={overlappedEmployees}
                 onConfirm={onConfirm}
@@ -69,7 +69,7 @@ describe("PersonalOverlapModal", () => {
 
     it("muestra mensaje singular cuando solo hay un empleado con empalme", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={[overlappedEmployees[0]]}
                 onConfirm={onConfirm}
@@ -86,7 +86,7 @@ describe("PersonalOverlapModal", () => {
 
     it("muestra mensaje plural cuando hay varios empleados con empalme", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={overlappedEmployees}
                 onConfirm={onConfirm}
@@ -101,7 +101,7 @@ describe("PersonalOverlapModal", () => {
 
     it("muestra la información de los empleados y eventos empalmados", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={overlappedEmployees}
                 onConfirm={onConfirm}
@@ -122,7 +122,7 @@ describe("PersonalOverlapModal", () => {
 
     it("no muestra botón Confirmar si no es coordinador", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 isCoordinator={false}
                 overlappedEmployees={overlappedEmployees}
@@ -142,7 +142,7 @@ describe("PersonalOverlapModal", () => {
 
     it("muestra botón Confirmar y mensaje si es coordinador", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 isCoordinator
                 overlappedEmployees={overlappedEmployees}
@@ -162,7 +162,7 @@ describe("PersonalOverlapModal", () => {
 
     it("llama a onConfirm al presionar Confirmar", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 isCoordinator
                 overlappedEmployees={overlappedEmployees}
@@ -178,7 +178,7 @@ describe("PersonalOverlapModal", () => {
 
     it("llama a onCancel al presionar Cancelar", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={overlappedEmployees}
                 onConfirm={onConfirm}
@@ -193,7 +193,7 @@ describe("PersonalOverlapModal", () => {
 
     it("deshabilita botones cuando isLoading es true", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 isCoordinator
                 isLoading
@@ -212,7 +212,7 @@ describe("PersonalOverlapModal", () => {
 
     it("usa texto por defecto si el empleado no tiene nombre", () => {
         render(
-            <PersonalOverlapModal
+            <OverlapModal
                 isOpen
                 overlappedEmployees={[
                     {

@@ -122,11 +122,7 @@ export const useHouseForm = ({
         setErrors(fieldErrors);
         onNameError?.(fieldErrors.name ?? "");
 
-        const messages = [
-            ...new Set(result.error.issues.map((error) => error.message)),
-        ].join("\n");
-
-        onValidationAlert?.(messages);
+        onValidationAlert?.("Revisa los campos marcados antes de continuar.");
 
         return null;
     };

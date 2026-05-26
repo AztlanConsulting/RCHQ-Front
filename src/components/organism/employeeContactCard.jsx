@@ -68,7 +68,13 @@ const EmployeeContactCard = ({
             <div key={label} className="min-w-0 w-full">
               <Type variant="metric-label" as="p" className="mb-1.5">{label}</Type>
               <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
-                <Type variant="metric-value" as="p">{value ?? EMPTY_LABEL}</Type>
+                <Type
+                  variant="metric-value"
+                  as="p"
+                  className="min-w-0 w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+                >
+                  {value ?? EMPTY_LABEL}
+                </Type>
               </div>
             </div>
           ))}

@@ -78,22 +78,24 @@ const employees = [
     },
 ];
 
-const renderModal = (props = {}) => {
+const renderModal = async (props = {}) => {
     const onClose = vi.fn();
     const onSuccess = vi.fn();
     const onFeedback = vi.fn();
 
-    render(
-        <RegisterEventModal
-            isOpen
-            onClose={onClose}
-            onSuccess={onSuccess}
-            onFeedback={onFeedback}
-            initialStartDate="2026-05-05"
-            initialEndDate="2026-05-07"
-            {...props}
-        />,
-    );
+    await act(async () => {
+        render(
+            <RegisterEventModal
+                isOpen
+                onClose={onClose}
+                onSuccess={onSuccess}
+                onFeedback={onFeedback}
+                initialStartDate="2026-05-05"
+                initialEndDate="2026-05-07"
+                {...props}
+            />,
+        );
+    });
 
     return { onClose, onSuccess, onFeedback };
 };
@@ -157,8 +159,8 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         });
     });
 
-    it("muestra la opción de vacaciones para el coordinador", () => {
-        renderModal();
+    it("muestra la opción de vacaciones para el coordinador", async () => {
+        await renderModal();
 
         expect(
             screen.getByRole("radio", { name: "Vacaciones" }),
@@ -166,7 +168,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("carga empleados elegibles al abrir el formulario de vacaciones", async () => {
-        renderModal();
+        await renderModal();
 
         await openVacationForm();
 
@@ -184,7 +186,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("consulta días disponibles al seleccionar empleado", async () => {
-        renderModal();
+        await renderModal();
 
         await openVacationForm();
         await selectEmployee();
@@ -199,7 +201,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("registra vacaciones con los datos del formulario", async () => {
-        const { onClose, onSuccess, onFeedback } = renderModal();
+        const { onClose, onSuccess, onFeedback } = await renderModal();
 
         await openVacationForm();
         await selectEmployee();
@@ -225,7 +227,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("muestra errores y no envía si faltan campos obligatorios", async () => {
-        renderModal({
+        await renderModal({
             initialStartDate: "",
             initialEndDate: "",
         });
@@ -243,7 +245,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("muestra error y no envía si la fecha de inicio es posterior a la fecha de fin", async () => {
-        renderModal({
+        await renderModal({
             initialStartDate: "2026-05-10",
             initialEndDate: "2026-05-07",
         });
@@ -262,7 +264,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
     });
 
     it("muestra error del backend si falla el registro", async () => {
-        const { onClose, onSuccess } = renderModal();
+        const { onClose, onSuccess } = await renderModal();
 
         registerEmployeeVacation.mockRejectedValueOnce(
             new Error("No hay días suficientes"),
@@ -303,8 +305,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         });
     });
 
-    it("muestra la opción de vacaciones para el trabajador", () => {
-        renderModal();
+    it("muestra la opción de vacaciones para el trabajador", async () => {
+        await renderModal();
 
         expect(
             screen.getByRole("radio", { name: "Vacaciones" }),
@@ -312,7 +314,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("consulta días disponibles del empleado de la sesión al abrir vacaciones", async () => {
-        renderModal();
+        await renderModal();
 
         await openWorkerVacationForm();
 
@@ -324,7 +326,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("solicita vacaciones con los datos del formulario", async () => {
-        const { onClose, onSuccess, onFeedback } = renderModal();
+        const { onClose, onSuccess, onFeedback } = await renderModal();
 
         await openWorkerVacationForm();
 
@@ -356,7 +358,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra validación local si la fecha de inicio es posterior a la fecha de fin", async () => {
-        renderModal({
+        await renderModal({
             initialStartDate: "2026-05-10",
             initialEndDate: "2026-05-07",
         });
@@ -374,7 +376,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra validación local si las fechas tienen formato inválido", async () => {
-        renderModal({
+        await renderModal({
             initialStartDate: "2026-6-1",
             initialEndDate: "2026-06-03",
         });
@@ -388,7 +390,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
     it("muestra error del backend si el empleado no tiene días de trabajo registrados", async () => {
         getOwnEmployeeId.mockReturnValue("worker-without-workdays");
-        const { onClose, onSuccess } = renderModal();
+        const { onClose, onSuccess } = await renderModal();
         const message = "Se necesitan tener registrados los días de trabajo";
 
         requestEmployeeVacation.mockImplementation(async ({ employeeId }) => {
@@ -418,7 +420,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si las vacaciones están fuera del periodo laboral", async () => {
-        const { onClose, onSuccess } = renderModal({
+        const { onClose, onSuccess } = await renderModal({
             initialStartDate: "2027-01-05",
             initialEndDate: "2027-01-07",
         });
@@ -450,7 +452,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si las vacaciones son en el pasado o el mismo día", async () => {
-        const { onClose, onSuccess } = renderModal({
+        const { onClose, onSuccess } = await renderModal({
             initialStartDate: "2026-01-05",
             initialEndDate: "2026-01-07",
         });
@@ -482,7 +484,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si el rango no contiene días hábiles de vacaciones", async () => {
-        const { onClose, onSuccess } = renderModal({
+        const { onClose, onSuccess } = await renderModal({
             initialStartDate: "2026-06-06",
             initialEndDate: "2026-06-07",
         });
@@ -514,7 +516,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si no hay suficientes días disponibles", async () => {
-        const { onClose, onSuccess } = renderModal({
+        const { onClose, onSuccess } = await renderModal({
             initialStartDate: "2026-06-01",
             initialEndDate: "2026-06-30",
         });
@@ -546,7 +548,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si ya hay una solicitud cubriendo los días", async () => {
-        const { onClose, onSuccess } = renderModal({
+        const { onClose, onSuccess } = await renderModal({
             initialStartDate: "2026-07-01",
             initialEndDate: "2026-07-03",
         });
