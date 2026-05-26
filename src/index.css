@@ -395,6 +395,13 @@ svg {
     color: #fff;
 }
 
+.fc .fc-custom-week-card,
+.fc .fc-custom-week-card *,
+.fc .fc-custom-day-card,
+.fc .fc-custom-day-card * {
+    color: #fff;
+}
+
 .fc .fc-daygrid-more-link .fc-dayGridOverflowCard {
     display: block;
     box-sizing: border-box;

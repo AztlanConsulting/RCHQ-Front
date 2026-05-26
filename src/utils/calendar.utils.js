@@ -5,14 +5,14 @@ export const FOCUS_OPTIONS = [
 ];
 
 export const SCOPE_OPTIONS = [
-    { value: "global",   label: "Global",   color: "#C524FF" },
-    { value: "house",    label: "Casa",     color: "#7FD447" },
-    { value: "personal", label: "Personal", color: "#EFBF22" },
+    { value: "global", label: "Global", color: "#B66897" },
+    { value: "house", label: "Casa", color: "#307351" },
+    { value: "personal", label: "Personal", color: "#D58936" },
 ];
 
 export const STATUS_OPTIONS = [
-    { value: "aprobadas",  label: "Aprobadas", color: "#1439BA" },
-    { value: "en_espera",  label: "En espera", color: "#5673DB" },
+    { value: "aprobadas", label: "Aprobadas", color: "#203766" },
+    { value: "en_espera", label: "En espera", color: "#6298C7" },
 ];
 
 export const ABSENCE_STATUS_OPTIONS = [
