@@ -7,7 +7,7 @@ const Alert = ({ icon = "", type = "success", message, onClose }) => {
 
     const styles = {
         success: {
-            container: "bg-[#307351] text-black",
+            container: "bg-[#7FD447] text-black",
             icon: check,
         },
         error: {
