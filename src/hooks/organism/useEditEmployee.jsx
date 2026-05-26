@@ -175,7 +175,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     if (field === "rfc") {
       finalValue = value
         .replace(/\p{Extended_Pictographic}/gu, "")
-        .replace(/[^A-Za-z0-9Ññ&]/g, "")
+        .replace(/[^A-Za-z0-9Ññ]/g, "")
         .toUpperCase();
     }
     
