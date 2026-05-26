@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const CURP_REGEX         = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
-const RFC_REGEX          = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+const RFC_REGEX          = /^[A-ZÑ]{3,4}\d{6}[A-Z0-9]{3}$/;
 const ONLY_NUMBERS_REGEX = /^\d+$/;
 const NAMES_REGEX        = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
 const EMAIL_SAFE_REGEX   = /^[A-Za-z0-9._@-]+$/;
@@ -57,7 +57,7 @@ export const employeeBasicUpdateSchema = z
 
     rfc: z.string().trim().transform(emptyToNull).nullable()
       .refine((val) => val === null || RFC_ALLOWED_REGEX.test(val), {
-        message: "El RFC solo puede contener letras, números y &",
+        message: "El RFC solo puede contener letras, números",
       })
       .refine((val) => val === null || val.length === 13, { message: "El RFC debe tener exactamente 13 dígitos" })
       .refine((val) => val === null || RFC_REGEX.test(val), { message: "Formato del RFC inválido" })
