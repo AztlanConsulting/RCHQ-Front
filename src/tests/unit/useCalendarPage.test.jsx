@@ -25,7 +25,7 @@ const buildCalendarClickInfo = () => ({
         start: new Date("2026-05-17T00:00:00.000Z"),
         end: new Date("2026-05-22T00:00:00.000Z"),
         allDay: true,
-        backgroundColor: "#EF4444",
+        backgroundColor: "#A8201A",
         borderColor: "#DC2626",
         extendedProps: {
             absenceId: "absence-1",
