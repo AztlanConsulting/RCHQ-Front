@@ -32,9 +32,10 @@ export const getYearRangeDates = (
 export const toFilterDate = (value, endOfDay = false) => {
     if (!value) return undefined;
 
-    const time = endOfDay ? "23:59:59.999" : "00:00:00";
-    const date = new Date(`${value}T${time}`);
-    return Number.isNaN(date.getTime()) ? undefined : date;
+    const date = new Date(`${value}T12:00:00`);
+    if (Number.isNaN(date.getTime())) return undefined;
+
+    return createDateAtDayBoundary(date, endOfDay);
 };
 
 export const getEarlierDate = (date, fallbackDate) =>
