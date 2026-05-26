@@ -28,7 +28,6 @@ export const isPastDate = (date) => {
     return now > date;
 };
 
-/** HH:mm in UTC (matches FullCalendar timeZone="UTC" in baseCalendar). */
 export const getStartHour = (timestamp) => {
     if (timestamp == null) return "";
     const base =

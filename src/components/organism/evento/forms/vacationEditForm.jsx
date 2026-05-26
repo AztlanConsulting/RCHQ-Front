@@ -76,7 +76,6 @@ const VacationEditForm = ({
                     )}
                 </div>
 
-                {/* Extra top offset so picker popups aren’t clipped by scrollable modal */}
                 <div className="col-span-1 mt-8 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-10">
                     <DateField
                         label="Fecha de inicio"

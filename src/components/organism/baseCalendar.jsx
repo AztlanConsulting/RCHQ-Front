@@ -13,7 +13,6 @@ import ListEventCard from "../molecules/calendarCards/listEventCard";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
-/** 12-hour axis labels with lowercase am/pm (not locale "a. m."); matches `timeZone="UTC"`. */
 function formatUtcSlotLabel12h(date) {
     if (!date || !(date instanceof Date) || Number.isNaN(date.getTime()))
         return "";

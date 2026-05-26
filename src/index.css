@@ -359,7 +359,6 @@ svg {
     vertical-align: middle;
 }
 
-/* Week/day all-day lanes: tighter text so stacks match measured seg heights */
 .fc-timeGridWeek-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-title,
 .fc-timeGridDay-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-title {
     -webkit-line-clamp: 1;
@@ -370,7 +369,6 @@ svg {
     -webkit-line-clamp: 1;
 }
 
-/* Time grid (week + day): 30m slot rows; hide minor-slot divider hairline */
 .fc-timeGridWeek-view .fc-timegrid-slot-minor,
 .fc-timeGridDay-view .fc-timegrid-slot-minor {
     border-top-color: transparent !important;
@@ -460,7 +458,6 @@ svg {
     white-space: normal;
 }
 
-/* Keep timed events inside FullCalendar slot height (week/day); clip custom HTML overflow */
 .fc-timeGridWeek-view .fc-timegrid-event,
 .fc-timeGridDay-view .fc-timegrid-event {
     overflow: hidden;
