@@ -13,6 +13,18 @@ import ListEventCard from "../molecules/calendarCards/listEventCard";
 
 const MONTH_DAY_EVENT_CAP = 3;
 
+/** 12-hour axis labels with lowercase am/pm (not locale "a. m."); matches `timeZone="UTC"`. */
+function formatUtcSlotLabel12h(date) {
+    if (!date || !(date instanceof Date) || Number.isNaN(date.getTime()))
+        return "";
+    const h = date.getUTCHours();
+    const m = date.getUTCMinutes();
+    const isPm = h >= 12;
+    const hour12 = h % 12 || 12;
+    const minutePart = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+    return `${hour12}${minutePart} ${isPm ? "pm" : "am"}`;
+}
+
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
 
@@ -146,9 +158,13 @@ const BaseCalendar = ({
             views={{
                 timeGridDay: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
