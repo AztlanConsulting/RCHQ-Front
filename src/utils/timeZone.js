@@ -138,30 +138,20 @@ export const getAllDayRangeInTimeZone = (
         startParts.hour === "00" &&
         startParts.minute === "00" &&
         startParts.second === "00";
-    const endsAtMidnight =
-        endParts.hour === "00" &&
-        endParts.minute === "00" &&
-        endParts.second === "00";
     const endsAtLastMinute =
         endParts.hour === "23" && endParts.minute === "59";
 
-    if (!startsAtMidnight || (!endsAtMidnight && !endsAtLastMinute)) {
+    if (!startsAtMidnight || !endsAtLastMinute) {
         return { isAllDay: false };
     }
 
     const startDateOnly = `${startParts.year}-${startParts.month}-${startParts.day}`;
     const endDateOnly = `${endParts.year}-${endParts.month}-${endParts.day}`;
-    const displayEndDate = endsAtMidnight
-        ? addDaysToDateOnly(endDateOnly, -1)
-        : endDateOnly;
-    const calendarEndDate = endsAtMidnight
-        ? endDateOnly
-        : addDaysToDateOnly(endDateOnly, 1);
 
     return {
         isAllDay: true,
         startDate: startDateOnly,
-        displayEndDate,
-        calendarEndDate,
+        displayEndDate: endDateOnly,
+        calendarEndDate: addDaysToDateOnly(endDateOnly, 1),
     };
 };
