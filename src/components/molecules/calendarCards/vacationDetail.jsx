@@ -21,15 +21,10 @@ const VacationDetail = ({
     onApprove,
     onReject,
 }) => {
-    console.log("event: ", event)
     const user = getStoredUser()
     const role = user?.role || null;
     const userId = user?.employeeId || null;
     const subjectId = event.employeeId || null;
-    console.log("user: ", user)
-    console.log("role: ", role)
-    console.log("userId: ", userId)
-    console.log("subjectId: ", subjectId)
 
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
