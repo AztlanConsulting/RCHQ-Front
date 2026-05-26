@@ -79,7 +79,7 @@ const ConfirmRejectVacationModal = ({
                         htmlFor="vacation-rejection-feedback"
                         className="mb-1.5 block text-sm font-bold text-[#121212]"
                     >
-                        Retroalimentación
+                        Motivo del rechazo (opcional)
                     </label>
 
                     <textarea
