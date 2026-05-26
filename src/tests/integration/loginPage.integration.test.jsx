@@ -1,6 +1,6 @@
 // tests/integration/LoginPage.integration.test.jsx
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import LoginPage from "../../pages/auth/loginPages";
 
@@ -40,7 +40,9 @@ const fillAndSubmit = async (email, password) => {
   fireEvent.change(document.querySelector("input[type='password']"), {
     target: { value: password },
   });
-  fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
+  });
 };
 
 beforeEach(() => {

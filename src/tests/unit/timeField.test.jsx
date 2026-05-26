@@ -152,6 +152,7 @@ describe("TimeField", () => {
             value: "09:00",
             minTime: "08:00",
             disabled: false,
+            stepMinutes: 15,
             onChange,
         });
     });

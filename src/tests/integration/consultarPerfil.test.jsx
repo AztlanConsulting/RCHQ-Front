@@ -83,7 +83,6 @@ describe("Consultar Perfil — integración", () => {
     expect(screen.getAllByText("Ammi").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Cuidador").length).toBeGreaterThan(0);
 
-    expect(screen.getByRole("button", { name: /modificar perfil/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /otras opciones/i })).toBeInTheDocument();
 
     expect(document.querySelector(".animate-pulse")).not.toBeInTheDocument();

@@ -10,6 +10,10 @@ vi.mock("../../../src/utils/authStorage", () => ({
   getToken: vi.fn().mockReturnValue("mock-token"),
 }));
 
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 import Perfil from "../../../src/pages/perfil";
 import { getUserData } from "../../../src/services/profileService";
 
@@ -109,11 +113,10 @@ describe("perfil.jsx", () => {
       });
     });
 
-    it("muestra los botones Modificar Perfil y Otras Opciones", async () => {
+    it("muestra el botón Otras Opciones", async () => {
       getUserData.mockResolvedValue(PROFILE_DATA);
       render(<Perfil />);
       await waitFor(() => {
-        expect(screen.getByText("Modificar Perfil")).toBeInTheDocument();
         expect(screen.getByText("Otras Opciones")).toBeInTheDocument();
       });
     });

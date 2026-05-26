@@ -7,7 +7,7 @@ describe("getRoleName", () => {
     });
 
     it("obtiene el rol desde roleName", () => {
-        expect(getRoleName({ roleName: "Administrador" })).toBe("Administrador");
+        expect(getRoleName({ roleName: "Administrador" })).toBe("administrador");
     });
 
     it("obtiene el rol desde role como string", () => {

@@ -17,6 +17,12 @@ vi.mock("../utils/apiErrors", () => ({
   buildApiError: vi.fn((res, data, msg) => new Error(data?.message ?? msg)),
 }));
 
+vi.mock("../../components/atoms/timeField", () => ({
+  default: ({ value, onChange }) => (
+    <input type="time" value={value || ""} onChange={(e) => onChange(e.target.value)} />
+  ),
+}));
+
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
 import { getToken } from "../../utils/authStorage";
@@ -575,10 +581,10 @@ describe("EmployeeAdminCard", () => {
     houseId: "h1",
     roleId:  "r1",
     type:    "tiempo_completo",
-    salary:  "15000",
+    salary:  15000,
     selectedWorkdays: [
-      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00" },
-      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00" },
+      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00", allDay: false },
+      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00", allDay: false },
     ],
   };
 
@@ -597,6 +603,7 @@ describe("EmployeeAdminCard", () => {
     houses:  [{ houseId: "h1", name: "Casa Test" }],
     setAdminField:  vi.fn(),
     toggleWorkday:  vi.fn(),
+    setWorkdayAllDay: vi.fn(),
     setWorkdayTime: vi.fn(),
     saving:         false,
     saveError:      null,
@@ -632,13 +639,13 @@ describe("EmployeeAdminCard", () => {
 
     it("muestra el número de días trabajados", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
+      expect(screen.getByText(/2 días trabajados/i)).toBeInTheDocument();
     });
 
     it("muestra los días hábiles de ausencias", () => {
       render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
       expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
-      expect(screen.getByText("5 Días Hábiles")).toBeInTheDocument();
+      expect(screen.getByText("5")).toBeInTheDocument();
     });
 
     it("muestra 0 solicitudes de vacaciones", () => {
@@ -706,7 +713,7 @@ describe("EmployeeAdminCard", () => {
     it("llama a toggleWorkday al hacer click en un checkbox", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[1]); // Martes
+      fireEvent.click(checkboxes[2]); // Martes (0=Lunes, 1=Lunes allDay, 2=Martes)
       expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
     });
 

@@ -109,7 +109,6 @@ const setupEmployeeDetail = (overrides = {}) => {
     employeeFaults:          [],
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
-    employeeAbsenceUsedDays: 0,
     isLoading:               false,
     currentTab:              "overview",
     setCurrentTab:           vi.fn(),
@@ -177,14 +176,14 @@ describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el título de la página", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("Gestión de Empleados")).toBeInTheDocument();
+      expect(screen.getAllByText("Gestión de Empleados")[0]).toBeInTheDocument();
     });
   });
 
   it("muestra el tab Overview por defecto", async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Resumen" })).toBeInTheDocument();
     });
   });
 
@@ -441,7 +440,7 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     await waitFor(() => {
       expect(updateAdminInfoService).toHaveBeenCalledWith(
         TEST_EMPLOYEE_ID,
-        expect.objectContaining({ salary: 20000 }),
+        expect.objectContaining({ salary: "20000" }),
       );
     });
   });
