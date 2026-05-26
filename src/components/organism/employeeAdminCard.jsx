@@ -5,6 +5,7 @@ import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import TimeField from "../atoms/timeField";
 import CheckboxField from "../atoms/checkboxField";
+import ErrorText from "../atoms/errorText";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -49,6 +50,7 @@ const EmployeeAdminCard = ({
   setWorkdayAllDay,
   saving,
   saveError,
+  errors = {},
   onOpenEdit,
   onSubmit,
   onCancel,
@@ -222,22 +224,34 @@ const EmployeeAdminCard = ({
         ) : (
           <div className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Puesto" id="roleId"
-                value={adminForm.roleId}
-                onChange={(e) => setAdminField("roleId", e.target.value)}
-                options={roleOptions}
-                placeholder="Selecciona un puesto"
-                labelColor="text-slate-500"
-              />
-              <SelectField
-                label="Tipo de contrato" id="type"
-                value={adminForm.type}
-                onChange={(e) => setAdminField("type", e.target.value)}
-                options={TIPOS}
-                placeholder="Selecciona tipo"
-                labelColor="text-slate-500"
-              />
+              <div className="flex flex-col gap-1">
+                <SelectField
+                  label="Puesto" id="roleId"
+                  value={adminForm.roleId}
+                  onChange={(e) => setAdminField("roleId", e.target.value)}
+                  options={roleOptions}
+                  placeholder="Selecciona un puesto"
+                  labelColor="text-slate-500"
+                  error={!!errors.roleId}
+                />
+                <div className="min-h-5">
+                  {errors.roleId && <ErrorText>{errors.roleId}</ErrorText>}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <SelectField
+                  label="Tipo de contrato" id="type"
+                  value={adminForm.type}
+                  onChange={(e) => setAdminField("type", e.target.value)}
+                  options={TIPOS}
+                  placeholder="Selecciona tipo"
+                  labelColor="text-slate-500"
+                  error={!!errors.type}
+                />
+                <div className="min-h-5">
+                  {errors.type && <ErrorText>{errors.type}</ErrorText>}
+                </div>
+              </div>
               <div className="flex flex-col gap-1">
                 <Type variant="metric-label" as="p">Salario (MXN)</Type>
                 <TextField
@@ -247,6 +261,9 @@ const EmployeeAdminCard = ({
                   placeholder="Ej: 15000"
                   labelClassName="hidden" text=""
                 />
+                <div className="min-h-5">
+                  {errors.salary && <ErrorText>{errors.salary}</ErrorText>}
+                </div>
               </div>
               <div className="flex flex-col gap-1">
                 <SelectField
@@ -262,7 +279,13 @@ const EmployeeAdminCard = ({
                   ]}
                   placeholder="Selecciona frecuencia"
                   labelColor="text-slate-500"
+                  error={!!errors.frequencyOfPaymentId}
                 />
+                <div className="min-h-5">
+                  {errors.frequencyOfPaymentId && (
+                    <ErrorText>{errors.frequencyOfPaymentId}</ErrorText>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -324,6 +347,9 @@ const EmployeeAdminCard = ({
                       )}
                     </div>
                   ))}
+                </div>
+                <div className="min-h-5">
+                  {errors.workdays && <ErrorText>{errors.workdays}</ErrorText>}
                 </div>
               </div>
             )}
