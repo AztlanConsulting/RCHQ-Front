@@ -7,6 +7,38 @@ const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const DESCRIPTION_REGEX = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 const DESCRIPTION_TEST_REGEX = /[^\p{L}\p{N}\s¿?¡!]/u;
 
+const toDateInputValue = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+export const buildAbsenceDateLimits = () => {
+    const today = new Date();
+    const minStartDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate(),
+    );
+    const maxEndDate = new Date(
+        today.getFullYear() + 1,
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    minStartDate.setHours(0, 0, 0, 0);
+    maxEndDate.setHours(23, 59, 59, 999);
+
+    return {
+        minStartDate,
+        maxEndDate,
+        minStartDateValue: toDateInputValue(minStartDate),
+        maxEndDateValue: toDateInputValue(maxEndDate),
+    };
+};
+
 export const sanitizeAbsenceDescription = (value, fallback = "") => {
     const nextValue = String(value ?? "");
 
