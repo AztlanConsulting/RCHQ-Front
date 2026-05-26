@@ -5,13 +5,13 @@ import {
 } from "@/services/deactivateEmployeeService";
 
 export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActive = true, onSuccess) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [addToBlacklist, setAddToBlacklist] = useState(false);
   const [fieldError, setFieldError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingDeactivate, setIsSubmittingDeactivate] = useState(false);
 
-  const openModal = () => {
+  const openDeactivateModal = () => {
     if (!isActive) {
       setAlert({
         type: "error",
@@ -22,12 +22,12 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
     setReason("");
     setAddToBlacklist(false);
     setFieldError(null);
-    setIsModalOpen(true);
+    setIsDeactivateModalOpen(true);
   };
 
-  const closeModal = () => {
-    if (isSubmitting) return;
-    setIsModalOpen(false);
+  const closeDeactivateModal = () => {
+    if (isSubmittingDeactivate) return;
+    setIsDeactivateModalOpen(false);
   };
 
   const handleReasonChange = (value) => {
@@ -43,7 +43,7 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitDeactivate = async () => {
     const parsed = deactivateEmployeeSchema.safeParse({ reason, addToBlacklist });
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0].message);
@@ -55,12 +55,12 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSubmittingDeactivate(true);
     setFieldError(null);
 
     try {
       await deactivateEmployeeService(employeeId, reason, addToBlacklist);
-      setIsModalOpen(false);
+      setIsDeactivateModalOpen(false);
       setAlert({
         type: "success",
         message: `"${employeeName}" ha sido dado de baja${addToBlacklist ? " y agregado a la lista negra." : "."}`,
@@ -69,25 +69,25 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
         onSuccess();
       }
     } catch (err) {
-      setIsModalOpen(false);
+      setIsDeactivateModalOpen(false);
       setAlert({
         type: "error",
         message: err?.message ?? `Hubo un error al dar de baja a "${employeeName}".`,
       });
     }
-    setIsSubmitting(false);
+    setIsSubmittingDeactivate(false);
   };
 
   return {
-    isModalOpen,
-    openModal,
-    closeModal,
+    isDeactivateModalOpen,
+    openDeactivateModal,
+    closeDeactivateModal,
     reason,
     handleReasonChange,
     addToBlacklist,
     setAddToBlacklist,
     fieldError,
-    isSubmitting,
-    handleSubmit,
+    isSubmittingDeactivate,
+    handleSubmitDeactivate,
   };
 };

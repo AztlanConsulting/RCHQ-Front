@@ -15,6 +15,7 @@ import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
 import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
+import { useReactivateEmployee } from "../hooks/organism/useReactivateEmployee";
 
 const tabs = [
   { id: "overview",   label: "Resumen" },
@@ -72,7 +73,7 @@ const DetalleEmpleado = () => {
     handleReasonChange,
     addToBlacklist,
     setAddToBlacklist,
-    deactivateFieldError,
+    fieldError,
     isSubmittingDeactivate,
     handleSubmitDeactivate,
   } = useDeactivateEmployee(
@@ -87,11 +88,14 @@ const DetalleEmpleado = () => {
     isReactivateModalOpen,
     openReactivateModal,
     closeReactivateModal,
-    reactivateFieldError,
     isSubmittingReactivate,
     handleSubmitReactivate,
-  } = useReactivateModal(
-    
+  } = useReactivateEmployee(
+    employeeId,
+    employeeFullName,
+    setAlert,
+    employee?.isActive !== false,
+
   )
 
   if (isLoading) return <Loader />;
@@ -112,7 +116,7 @@ const DetalleEmpleado = () => {
         onReasonChange={handleReasonChange}
         addToBlacklist={addToBlacklist}
         onBlacklistChange={setAddToBlacklist}
-        fieldError={deactivateFieldError}
+        fieldError={fieldError}
         isSubmitting={isSubmittingDeactivate}
         onSubmit={handleSubmitDeactivate}
         onCancel={closeDeactivateModal}
@@ -121,7 +125,6 @@ const DetalleEmpleado = () => {
       <ReactivateCard 
         isOpen={isReactivateModalOpen}
         employee={employee}
-        fieldError={reactivateFieldError}
         isSubmitting={isSubmittingReactivate}
         onSubmit={handleSubmitReactivate}
         onCancel={closeReactivateModal}
@@ -163,8 +166,8 @@ const DetalleEmpleado = () => {
           <button
             type="button"
             onClick={openReactivateModal}
-            className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
-              text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+            className="shrink-0 rounded-lg bg-[#7FD447] px-3 py-2 text-xs font-semibold
+              text-white hover:bg-[#7a1616] active:bg-[#7FD447] transition-colors"
           >
             Reactivar
           </button>
@@ -200,14 +203,26 @@ const DetalleEmpleado = () => {
           </Tabs>
         </div>
 
-        <button
-          type="button"
-          onClick={openDeactivateModal}
-          className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
-            text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
-        >
-          Dar de baja
-        </button>
+        {employee?.isActive ? (
+          <button
+            type="button"
+            onClick={openDeactivateModal}
+            className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
+              text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
+          >
+            Dar de baja
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={openReactivateModal}
+            className="ml-auto mr-2 shrink-0 rounded-xl bg-[#7FD447] px-5 py-2.5 text-sm font-semibold
+              text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#7FD447] transition-colors"
+          >
+            Reactivar
+          </button>
+        )}
+
       </div>
 
       <EmployeeBasicCard
