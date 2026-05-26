@@ -20,7 +20,7 @@ describe("Alert — renderizado base", () => {
         const { container } = render(<Alert type="success" message="OK" />);
 
         // Assert
-        expect(container.firstChild).toHaveClass("bg-[#7FD447]");
+        expect(container.firstChild).toHaveClass("bg-[#307351]");
     });
 
     it("aplica la clase de fondo rojo para el tipo error", () => {
