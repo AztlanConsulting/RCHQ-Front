@@ -33,6 +33,10 @@ const PersonalForm = (props) => {
 
     const isTimeVisible = !form.allDay;
 
+    const today = new Date();
+    const personalDateMin = today;
+    const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+
     return (
         <>
             <div
@@ -49,6 +53,8 @@ const PersonalForm = (props) => {
                         value={form.date}
                         placeholder="dd / mm / yyyy"
                         onChange={(e) => setField("date", e.target.value)}
+                        minDate={personalDateMin}
+                        maxDate={personalDateMax}
                         error={!!errors.date}
                     />
                     {errors.date && <ErrorText>{errors.date}</ErrorText>}
