@@ -1,22 +1,49 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import VacationRequestFilters from "../../components/molecules/vacationRequestFilters";
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
-    default: ({ label, name, value, onChange }) => (
-        <label>
-            {label}
-            <input
-                aria-label={label}
-                name={name}
-                value={value}
-                onChange={onChange}
-            />
-        </label>
-    ),
+    default: ({
+        label,
+        name,
+        value,
+        onChange,
+        minDate,
+        maxDate,
+        calendarStartDate,
+    }) => {
+        const formatDate = (date) => {
+            if (!date) return "";
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+
+            return `${year}-${month}-${day}`;
+        };
+
+        return (
+            <label>
+                {label}
+                <input
+                    aria-label={label}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    data-min-date={formatDate(minDate)}
+                    data-max-date={formatDate(maxDate)}
+                    data-calendar-start-date={formatDate(calendarStartDate)}
+                />
+            </label>
+        );
+    },
 }));
 
 describe("VacationRequestFilters", () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     const defaultProps = {
         view: "pending",
         searchQuery: "",
@@ -109,6 +136,31 @@ describe("VacationRequestFilters", () => {
 
         expect(setStartDate).toHaveBeenCalledWith("2026-05-01");
         expect(setEndDate).toHaveBeenCalledWith("2026-05-15");
+    });
+
+    it("limita las fechas a 5 años al pasado y 5 años al futuro", () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2026-05-25T12:00:00"));
+
+        render(
+            <VacationRequestFilters
+                {...defaultProps}
+                startDate="2026-06-10"
+                endDate="2026-06-15"
+            />,
+        );
+
+        const startDateInput = screen.getByLabelText("Fecha de inicio");
+        const endDateInput = screen.getByLabelText("Fecha de término");
+
+        expect(startDateInput).toHaveAttribute("data-min-date", "2021-05-25");
+        expect(startDateInput).toHaveAttribute("data-max-date", "2026-06-15");
+        expect(endDateInput).toHaveAttribute("data-min-date", "2026-06-10");
+        expect(endDateInput).toHaveAttribute("data-max-date", "2031-05-25");
+        expect(endDateInput).toHaveAttribute(
+            "data-calendar-start-date",
+            "2026-06-10",
+        );
     });
 
     it("llama clearFilters al presionar Limpiar", () => {

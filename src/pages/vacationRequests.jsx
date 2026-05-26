@@ -164,16 +164,18 @@ const VacationRequests = () => {
                 </div>
             )}
 
-            <VacationRequestTable
-                requests={requests}
-                view={view}
-                loading={loading}
-                approvingRequestId={approvingRequestId}
-                rejectingRequestId={rejectingRequestId}
-                onViewDetail={onViewDetail}
-                onOpenApproveModal={handleOpenApproveModal}
-                onOpenRejectModal={handleOpenRejectModal}
-            />
+            <div className="md:flex-1 md:min-h-0 md:overflow-y-auto">
+                <VacationRequestTable
+                    requests={requests}
+                    view={view}
+                    loading={loading}
+                    approvingRequestId={approvingRequestId}
+                    rejectingRequestId={rejectingRequestId}
+                    onViewDetail={onViewDetail}
+                    onOpenApproveModal={handleOpenApproveModal}
+                    onOpenRejectModal={handleOpenRejectModal}
+                />
+            </div>
 
             <Pagination
                 page={page}
@@ -182,7 +184,7 @@ const VacationRequests = () => {
                 onPrevPage={handlePrevPage}
                 onNextPage={handleNextPage}
                 loading={loading}
-                hasEmployees={requests.length > 0}
+                hasItems={requests.length > 0}
                 itemLabel="solicitudes"
             />
 
