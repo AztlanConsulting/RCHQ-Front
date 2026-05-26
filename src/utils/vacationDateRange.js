@@ -1,4 +1,5 @@
-export const VACATION_DATE_RANGE_YEARS = 3;
+export const VACATION_PAST_LIMIT_MONTHS = 1;
+export const VACATION_FUTURE_LIMIT_MONTHS = 18;
 
 export const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -27,14 +28,30 @@ export const formatDateOnly = (date) => {
     return `${year}-${month}-${day}`;
 };
 
-export const getVacationDateRange = (baseDate = new Date()) => {
-    const year = baseDate.getFullYear();
-    const month = baseDate.getMonth();
-    const day = baseDate.getDate();
+const addMonthsClamped = (baseDate, monthsToAdd) => {
+    const targetFirstDay = new Date(
+        baseDate.getFullYear(),
+        baseDate.getMonth() + monthsToAdd,
+        1,
+    );
+    const lastDayOfTargetMonth = new Date(
+        targetFirstDay.getFullYear(),
+        targetFirstDay.getMonth() + 1,
+        0,
+    ).getDate();
+    const day = Math.min(baseDate.getDate(), lastDayOfTargetMonth);
 
+    return new Date(
+        targetFirstDay.getFullYear(),
+        targetFirstDay.getMonth(),
+        day,
+    );
+};
+
+export const getVacationDateRange = (baseDate = new Date()) => {
     return {
-        minDate: new Date(year - VACATION_DATE_RANGE_YEARS, month, day),
-        maxDate: new Date(year + VACATION_DATE_RANGE_YEARS, month, day),
+        minDate: addMonthsClamped(baseDate, -VACATION_PAST_LIMIT_MONTHS),
+        maxDate: addMonthsClamped(baseDate, VACATION_FUTURE_LIMIT_MONTHS),
     };
 };
 

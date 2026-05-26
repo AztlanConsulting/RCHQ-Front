@@ -9,7 +9,7 @@ const DATE_RANGE_ERROR =
     "La fecha de inicio no puede ser posterior a la fecha de término";
 
 const VACATION_DATE_LIMIT_ERROR =
-    "La fecha debe estar dentro del rango permitido de 3 años hacia atrás o adelante";
+    "La fecha debe estar dentro del rango permitido: 1 mes hacia atrás y 1.5 años hacia adelante";
 
 const requiredDate = (requiredMessage) =>
     z
