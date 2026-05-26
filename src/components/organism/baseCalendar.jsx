@@ -138,7 +138,7 @@ const BaseCalendar = ({
             ]}
             locales={[esLocale]}
             locale="es"
-            timeZone="UTC"
+            timeZone="local"
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}

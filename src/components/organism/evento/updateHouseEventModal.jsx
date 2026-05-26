@@ -191,6 +191,14 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         />
                     </div>
 
+                    {form.isFreeDay ? (
+                        <p className="rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                            Los días libres se guardan a las 00:00 en horario de
+                            México porque afectan el cálculo de vacaciones y
+                            ausencias.
+                        </p>
+                    ) : null}
+
                     <SelectField
                         value={form.eventTypeId}
                         setValue={(value) => setField("eventTypeId", value)}

@@ -21,7 +21,6 @@ const OverlapModal = ({
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
-                timeZone: "UTC",
             });
         } catch {
             return iso;
@@ -30,6 +29,12 @@ const OverlapModal = ({
 
     const formatTime = (timeStr) => {
         if (!timeStr) return "";
+        if (String(timeStr).includes("T")) {
+            return new Date(timeStr).toLocaleTimeString("es-MX", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        }
         return timeStr.slice(0, 5);
     };
 

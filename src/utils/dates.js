@@ -1,26 +1,11 @@
-export const normalToUTCWithOffset = (
-    date,
-    {
-        days = 0,
-        months = 0,
-        years = 0,
-        hours = 0,
-        minutes = 0,
-        seconds = 0,
-    } = {},
-) => {
-    const newDate = new Date(
-        Date.UTC(
-            date.getUTCFullYear() + years,
-            date.getUTCMonth() + months,
-            date.getUTCDate() + days,
-            date.getUTCHours() + hours,
-            date.getUTCMinutes() + minutes,
-            date.getUTCSeconds() + seconds,
-        ),
-    );
+export const dateToInputValue = (date) => {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
 
-    return newDate;
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0"),
+    ].join("-");
 };
 
 export const isPastDate = (date) => {

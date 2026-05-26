@@ -5,8 +5,8 @@ const getStartHour = (timestamp) => {
             ? new Date(timestamp.getTime())
             : new Date(timestamp);
     if (Number.isNaN(base.getTime())) return "";
-    const h = base.getUTCHours();
-    const m = base.getUTCMinutes();
+    const h = base.getHours();
+    const m = base.getMinutes();
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 

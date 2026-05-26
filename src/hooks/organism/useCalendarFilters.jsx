@@ -45,6 +45,18 @@ const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
 
+const normalizeLocalDateOnly = (value) => {
+    if (!value) return "";
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+};
+
 const expandEventsForList = (events = [], isList) => {
     if (!isList) return events;
 
@@ -163,6 +175,8 @@ const getFilteredEvents = (
                 rawEvent.focus === "ausencias" ||
                 rawEvent.focus === "vacaciones";
             const isAllDay = isRangeRecord || rawEvent.allDay === true;
+            const shouldUseDateOnlyRange =
+                isRangeRecord || rawEvent.isFreeDay === true;
             const isExpandedListAbsence = Boolean(
                 isList &&
                 (rawEvent.focus === "ausencias" ||
@@ -181,11 +195,11 @@ const getFilteredEvents = (
                     : (rawEvent.endDate ?? rawEvent.end),
             );
             const eventStart =
-                isAllDay && normalizedStartDate
+                isAllDay && shouldUseDateOnlyRange && normalizedStartDate
                     ? normalizedStartDate
                     : rawEvent.start;
             const eventEnd =
-                isAllDay && normalizedEndDate
+                isAllDay && shouldUseDateOnlyRange && normalizedEndDate
                     ? isExpandedListAbsence
                         ? normalizedEndDate
                         : isRangeRecord
@@ -194,6 +208,12 @@ const getFilteredEvents = (
                             ? addDaysToDateOnly(normalizedEndDate, 1)
                             : normalizedEndDate
                     : rawEvent.end;
+            const displayStartDate = shouldUseDateOnlyRange
+                ? normalizedStartDate
+                : normalizeLocalDateOnly(rawEvent.startDate ?? rawEvent.start);
+            const displayEndDate = shouldUseDateOnlyRange
+                ? normalizedEndDate
+                : normalizeLocalDateOnly(rawEvent.endDate ?? rawEvent.end);
 
             return {
                 id: String(idx),
@@ -243,12 +263,12 @@ const getFilteredEvents = (
                             ? (rawEvent.link ?? "")
                             : "",
                     startDate:
-                        normalizedStartDate ||
+                        displayStartDate ||
                         rawEvent.startDate ||
                         rawEvent.start ||
                         eventStart,
                     endDate:
-                        normalizedEndDate ||
+                        displayEndDate ||
                         rawEvent.endDate ||
                         rawEvent.end ||
                         eventStart,
@@ -261,8 +281,8 @@ const getFilteredEvents = (
                                 ? calculateTotalDays(normalizedStartDate, normalizedEndDate)
                                 : ""
                         ),
-                    startReadableDate: normalizedStartDate || rawEvent.startDate || rawEvent.start || "",
-                    endReadableDate: normalizedEndDate || rawEvent.endDate || rawEvent.end || "",
+                    startReadableDate: displayStartDate || rawEvent.startDate || rawEvent.start || "",
+                    endReadableDate: displayEndDate || rawEvent.endDate || rawEvent.end || "",
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
                 },
             };

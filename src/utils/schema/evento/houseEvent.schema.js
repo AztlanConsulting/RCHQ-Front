@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+    addDaysToDateOnly,
+    getBrowserTimeZone,
+    localDateTimeToIso,
+} from "./dateTime";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -95,8 +100,6 @@ export const houseEventSchema = z.discriminatedUnion("allDay", [
     timedSchema,
 ]);
 
-const TIMEZONE_OFFSET = "-06:00";
-
 export function buildPayload(formData) {
     const {
         name,
@@ -109,7 +112,7 @@ export function buildPayload(formData) {
         endDate,
     } = formData;
 
-    if (allDay) {
+    if (isFreeDay) {
         return {
             eventTypeId,
             name,
@@ -117,6 +120,21 @@ export function buildPayload(formData) {
             end: endDate,
             allDay: true,
             isFreeDay,
+            timeZone: isFreeDay ? "America/Mexico_City" : getBrowserTimeZone(),
+            ...(description?.trim() ? { description: description.trim() } : {}),
+            forceOverlap,
+        };
+    }
+
+    if (allDay) {
+        return {
+            eventTypeId,
+            name,
+            start: localDateTimeToIso(startDate),
+            end: localDateTimeToIso(addDaysToDateOnly(endDate, 1)),
+            allDay: true,
+            isFreeDay: false,
+            timeZone: getBrowserTimeZone(),
             ...(description?.trim() ? { description: description.trim() } : {}),
             forceOverlap,
         };
@@ -127,10 +145,11 @@ export function buildPayload(formData) {
     return {
         eventTypeId,
         name,
-        start: `${startDate}T${startTime}:00.000${TIMEZONE_OFFSET}`,
-        end: `${endDate}T${endTime}:00.000${TIMEZONE_OFFSET}`,
+        start: localDateTimeToIso(startDate, startTime),
+        end: localDateTimeToIso(endDate, endTime),
         allDay: false,
         isFreeDay,
+        timeZone: getBrowserTimeZone(),
         ...(description?.trim() ? { description: description.trim() } : {}),
         forceOverlap,
     };

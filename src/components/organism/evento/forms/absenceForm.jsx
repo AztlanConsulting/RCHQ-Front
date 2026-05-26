@@ -130,6 +130,11 @@ const AusenciaForm = (props) => {
                 </div>
             </div>
 
+            <p className="rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                Las ausencias se guardan con base en horario de México porque
+                se contabilizan contra días laborales y días libres mexicanos.
+            </p>
+
             <div className="flex w-full flex-col gap-1.5">
                 <label className="text-sm font-bold text-[#374151]">
                     Descripción

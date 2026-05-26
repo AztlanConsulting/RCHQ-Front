@@ -85,12 +85,30 @@ export const useHouseForm = ({
     const setField = useCallback((field, value) => {
         setForm((prev) => ({
             ...prev,
+            ...(field === "isFreeDay" && value
+                ? {
+                      allDay: true,
+                      startTime: "",
+                      endTime: "",
+                  }
+                : {}),
+            ...(field === "allDay" && value === false
+                ? {
+                      isFreeDay: false,
+                  }
+                : {}),
             [field]: value,
         }));
 
         setErrors((prev) => ({
             ...prev,
             [field]: undefined,
+            ...(field === "isFreeDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
         }));
     }, []);
 

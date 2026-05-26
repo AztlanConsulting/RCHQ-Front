@@ -6,7 +6,7 @@ import {
     getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
-import { normalToUTCWithOffset } from "../../utils/dates";
+import { dateToInputValue } from "../../utils/dates";
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -270,7 +270,7 @@ export const useBaseCalendar = () => {
         const weekDay = validateShortenedSize(hasNumber)
             ? shortenedDays[weekDayIndex]
             : fullDays[weekDayIndex];
-        const dayNumber = hasNumber ? ` ${currentDay.date.getUTCDate()}` : "";
+        const dayNumber = hasNumber ? ` ${currentDay.date.getDate()}` : "";
         const viewableString = `${weekDay}${dayNumber}`;
         return viewableString;
     };
@@ -413,8 +413,9 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const startDate = normalToUTCWithOffset(info.start);
-        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+        const inclusiveEnd = new Date(info.end.getTime() - 1000);
+        const startDate = dateToInputValue(info.start);
+        const endDate = dateToInputValue(inclusiveEnd);
 
         setSelectedDates({ startDate, endDate });
 

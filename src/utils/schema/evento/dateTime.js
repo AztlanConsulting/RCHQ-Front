@@ -1,0 +1,17 @@
+export const getBrowserTimeZone = () =>
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+
+export const localDateTimeToIso = (date, time = "00:00") =>
+    new Date(`${date}T${time}:00`).toISOString();
+
+export const addDaysToDateOnly = (date, days) => {
+    const [year, month, day] = date.split("-").map(Number);
+    const nextDate = new Date(year, month - 1, day);
+    nextDate.setDate(nextDate.getDate() + days);
+
+    return [
+        nextDate.getFullYear(),
+        String(nextDate.getMonth() + 1).padStart(2, "0"),
+        String(nextDate.getDate()).padStart(2, "0"),
+    ].join("-");
+};

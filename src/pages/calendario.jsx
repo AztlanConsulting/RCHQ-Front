@@ -485,12 +485,8 @@ const Calendario = () => {
                     });
                 }}
                 onFeedback={showCalendarAlert}
-                initialStartDate={
-                    selectedDates?.startDate?.toISOString().split("T")[0]
-                }
-                initialEndDate={
-                    selectedDates?.endDate?.toISOString().split("T")[0]
-                }
+                initialStartDate={selectedDates?.startDate}
+                initialEndDate={selectedDates?.endDate}
             />
         </div>
     );

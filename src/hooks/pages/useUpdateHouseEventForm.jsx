@@ -39,8 +39,8 @@ const getTimeValue = (value) => {
     const date = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(date.getTime())) return "";
 
-    return `${String(date.getUTCHours()).padStart(2, "0")}:${String(
-        date.getUTCMinutes(),
+    return `${String(date.getHours()).padStart(2, "0")}:${String(
+        date.getMinutes(),
     ).padStart(2, "0")}`;
 };
 
@@ -161,6 +161,18 @@ export const useUpdateHouseEventForm = ({
                       endTime: "",
                   }
                 : {}),
+            ...(field === "isFreeDay" && value
+                ? {
+                      allDay: true,
+                      startTime: "",
+                      endTime: "",
+                  }
+                : {}),
+            ...(field === "allDay" && value === false
+                ? {
+                      isFreeDay: false,
+                  }
+                : {}),
             [field]:
                 field === "name" || field === "description"
                     ? String(value).replace(TEXT_SANITIZER, "")
@@ -171,6 +183,12 @@ export const useUpdateHouseEventForm = ({
             ...prev,
             [field]: undefined,
             ...(field === "allDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
+            ...(field === "isFreeDay" && value
                 ? {
                       startTime: undefined,
                       endTime: undefined,

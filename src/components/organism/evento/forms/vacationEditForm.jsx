@@ -114,6 +114,11 @@ const VacationEditForm = ({
                 />
             </div>
 
+            <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                Las vacaciones se guardan con base en horario de México porque
+                se contabilizan contra días laborales y días libres mexicanos.
+            </p>
+
             {vacationEditError ? (
                 <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
                     {vacationEditError}

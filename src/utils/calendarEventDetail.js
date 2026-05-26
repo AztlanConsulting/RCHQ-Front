@@ -172,7 +172,6 @@ export const formatEventDateTime = (value) => {
     return d.toLocaleString("es-MX", {
         dateStyle: "medium",
         timeStyle: "short",
-        timeZone: "UTC",
     });
 };
 
@@ -184,7 +183,6 @@ export const formatEventTime = (value) => {
     return d.toLocaleTimeString("es-MX", {
         hour: "numeric",
         minute: "2-digit",
-        timeZone: "UTC",
     });
 };
 
@@ -263,6 +261,5 @@ export const formatEventDate = (value) => {
 
     return parsedDate.toLocaleDateString("es-MX", {
         dateStyle: "long",
-        timeZone: "UTC",
     });
 };
