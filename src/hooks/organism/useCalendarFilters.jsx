@@ -63,7 +63,13 @@ const expandEventsForList = (events = [], isList) => {
     const expanded = [];
 
     events.forEach((event) => {
-        if (!event.startDate || !event.endDate) {
+        const isExpandableRange =
+            event.allDay === true &&
+            (event.focus === "ausencias" ||
+                event.focus === "vacaciones" ||
+                event.isFreeDay === true);
+
+        if (!isExpandableRange || !event.startDate || !event.endDate) {
             expanded.push(event);
             return;
         }
@@ -174,9 +180,8 @@ const getFilteredEvents = (
             const isRangeRecord =
                 rawEvent.focus === "ausencias" ||
                 rawEvent.focus === "vacaciones";
-            const isAllDay = isRangeRecord || rawEvent.allDay === true;
-            const shouldUseDateOnlyRange =
-                isRangeRecord || rawEvent.isFreeDay === true;
+            const isAllDay = rawEvent.allDay === true;
+            const shouldUseDateOnlyRange = isAllDay;
             const isExpandedListAbsence = Boolean(
                 isList &&
                 (rawEvent.focus === "ausencias" ||
@@ -210,10 +215,10 @@ const getFilteredEvents = (
                     : rawEvent.end;
             const displayStartDate = shouldUseDateOnlyRange
                 ? normalizedStartDate
-                : normalizeLocalDateOnly(rawEvent.startDate ?? rawEvent.start);
+                : normalizeLocalDateOnly(rawEvent.start);
             const displayEndDate = shouldUseDateOnlyRange
                 ? normalizedEndDate
-                : normalizeLocalDateOnly(rawEvent.endDate ?? rawEvent.end);
+                : normalizeLocalDateOnly(rawEvent.end);
 
             return {
                 id: String(idx),

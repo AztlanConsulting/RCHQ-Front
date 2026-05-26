@@ -1,5 +1,4 @@
-export const getBrowserTimeZone = () =>
-    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+export { getBrowserTimeZone } from "../../timeZone";
 
 export const localDateTimeToIso = (date, time = "00:00") =>
     new Date(`${date}T${time}:00`).toISOString();

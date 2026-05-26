@@ -8,6 +8,7 @@ import TimeField from "../../../atoms/timeField";
 import OverlapModal from "../../overlapModal";
 
 import { useHouseForm } from "../../../../hooks/pages/useHouseForm";
+import { isMexicoTimeZone } from "../../../../utils/timeZone";
 
 const CasaForm = (props) => {
     const {
@@ -26,6 +27,7 @@ const CasaForm = (props) => {
     } = useHouseForm(props);
 
     const isTimeVisible = !form.allDay;
+    const showMexicoTimeZoneMessage = form.isFreeDay && !isMexicoTimeZone();
 
     const currentYear = new Date().getFullYear();
     const houseDateMin = new Date(currentYear, 0, 1);
@@ -162,8 +164,8 @@ const CasaForm = (props) => {
                     />
                 </div>
 
-                {form.isFreeDay ? (
-                    <p className="rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                {showMexicoTimeZoneMessage ? (
+                    <p className="mx-auto mt-1 mb-3 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
                         Los días libres se guardan a las 00:00 en horario de
                         México porque afectan el cálculo de vacaciones y
                         ausencias.

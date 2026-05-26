@@ -1,6 +1,7 @@
 import Button from "../../../atoms/button";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
+import { isMexicoTimeZone } from "../../../../utils/timeZone";
 
 const VacationEditForm = ({
     title,
@@ -15,6 +16,8 @@ const VacationEditForm = ({
     onVacationFieldChange,
     showEmployeeInfo = true,
 }) => {
+    const showMexicoTimeZoneMessage = !isMexicoTimeZone();
+
     return (
         <div key="vacation-edit" className="px-2 text-left sm:px-3">
             <Type
@@ -114,10 +117,13 @@ const VacationEditForm = ({
                 />
             </div>
 
-            <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-                Las vacaciones se guardan con base en horario de México porque
-                se contabilizan contra días laborales y días libres mexicanos.
-            </p>
+            {showMexicoTimeZoneMessage ? (
+                <p className="mx-auto mt-5 mb-1 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
+                    Las vacaciones se guardan con base en horario de México
+                    porque se contabilizan contra días laborales y días libres
+                    mexicanos.
+                </p>
+            ) : null}
 
             {vacationEditError ? (
                 <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">
