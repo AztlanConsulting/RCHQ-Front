@@ -110,6 +110,9 @@ export const employeeContactUpdateSchema = z
 
     street: z.string().trim()
       .max(70, "La calle y número no pueden exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 10, {
+        message: "La calle y número deben tener al menos 10 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "La calle y número contienen caracteres no permitidos",
       })
@@ -118,6 +121,9 @@ export const employeeContactUpdateSchema = z
       .optional(),
     municipio: z.string().trim()
       .max(70, "El municipio no puede exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 4, {
+        message: "El municipio debe tener al menos 4 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "El municipio contiene caracteres no permitidos",
       })
@@ -126,6 +132,9 @@ export const employeeContactUpdateSchema = z
       .optional(),
     city: z.string().trim()
       .max(70, "La ciudad no puede exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 4, {
+        message: "La ciudad debe tener al menos 4 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "La ciudad contiene caracteres no permitidos",
       })
@@ -133,7 +142,9 @@ export const employeeContactUpdateSchema = z
       .nullable()
       .optional(),
     postalCode: z.string().trim()
-      .max(5, "El código postal no puede exceder 5 dígitos")
+      .refine(val => val === "" || val.length === 5, {
+        message: "El código postal debe tener exactamente 5 caracteres"
+      })
       .transform(emptyToNull)
       .nullable()
       .optional(),
