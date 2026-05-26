@@ -51,8 +51,8 @@ export const calculateDateRangeDays = (startDate, endDate) => {
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
-    const start = ev.start;
-    const end = ev.end;
+    const start = x.utcStart ? new Date(x.utcStart) : ev.start;
+    const end = x.utcEnd ? new Date(x.utcEnd) : ev.end;
     return {
         id: ev.id,
         houseEventId: x.houseEventId,
@@ -175,12 +175,30 @@ export const formatEventDateTime = (value) => {
     });
 };
 
-export const formatEventTime = (value, { timeZone } = {}) => {
+export const formatEventTime = (value, { timeZone, roundUpLastMinute = false } = {}) => {
     if (value == null || value === "") return "—";
     const d = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
+    const displayMinute = timeZone
+        ? Number(
+              new Intl.DateTimeFormat("en-US", {
+                  timeZone,
+                  minute: "2-digit",
+              })
+                  .formatToParts(d)
+                  .find((part) => part.type === "minute")?.value,
+          )
+        : d.getMinutes();
+    const displayDate =
+        roundUpLastMinute && displayMinute === 59
+            ? new Date(
+                  d.getTime() +
+                      (60 - d.getSeconds()) * 1000 -
+                      d.getMilliseconds(),
+              )
+            : d;
 
-    return d.toLocaleTimeString("es-MX", {
+    return displayDate.toLocaleTimeString("es-MX", {
         hour: "numeric",
         minute: "2-digit",
         ...(timeZone ? { timeZone } : {}),

@@ -283,7 +283,7 @@ const Calendario = () => {
                 ) : null}
 
                 <BaseCalendar
-                    key={`${viewType}-${isList}-${fullCalendarTimeZone}`}
+                    key={`${viewType}-${isList}-${calendarTimeZoneMode}`}
                     initialView={currentCalendarView}
                     initialDate={currentCalendarDate}
                     timeZone={fullCalendarTimeZone}
@@ -359,6 +359,7 @@ const Calendario = () => {
                                     showMexicoReferenceNotice={
                                         showMexicoReferenceNotice
                                     }
+                                    calendarTimeZone={calendarTimeZone}
                                     onOpenEvidence={openAbsenceEvidence}
                                     onStartEdit={startAbsenceEdit}
                                     onCancelEdit={cancelAbsenceEdit}
@@ -378,6 +379,7 @@ const Calendario = () => {
                                     showMexicoReferenceNotice={
                                         showMexicoReferenceNotice
                                     }
+                                    calendarTimeZone={calendarTimeZone}
                                     onOpenEvidence={openAbsenceEvidence}
                                     onClose={closeDetail}
                                 />
@@ -403,6 +405,7 @@ const Calendario = () => {
                                     showMexicoReferenceNotice={
                                         showMexicoReferenceNotice
                                     }
+                                    calendarTimeZone={calendarTimeZone}
                                 />
                             ) : (
                                 <VacationWorkerDetail
@@ -422,6 +425,7 @@ const Calendario = () => {
                                     showMexicoReferenceNotice={
                                         showMexicoReferenceNotice
                                     }
+                                    calendarTimeZone={calendarTimeZone}
                                 />
                             );
 

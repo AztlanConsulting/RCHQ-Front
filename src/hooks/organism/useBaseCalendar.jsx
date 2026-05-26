@@ -52,8 +52,7 @@ export const useBaseCalendar = () => {
                 : browserTimeZone,
         [browserTimeZone, calendarTimeZoneMode],
     );
-    const fullCalendarTimeZone =
-        calendarTimeZoneMode === "mexico" ? MEXICO_TIME_ZONE : "local";
+    const fullCalendarTimeZone = "local";
     const calendarTimeZoneOptions = useMemo(
         () => [
             { value: "local", label: "Horario local" },

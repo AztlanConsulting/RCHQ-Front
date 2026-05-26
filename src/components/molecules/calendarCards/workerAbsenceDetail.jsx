@@ -1,6 +1,9 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+  formatEventDate,
+  formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const DetailLabel = ({ children, className = "" }) => (
@@ -45,6 +48,7 @@ const WorkerAbsenceDetail = ({
   onOpenEvidence,
   onClose,
   showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
@@ -78,10 +82,36 @@ const WorkerAbsenceDetail = ({
           <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
-        <div>
-          <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <DetailLabel>Hora de inicio:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.start, { timeZone: calendarTimeZone })}
+              </DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Fecha de término:</DetailLabel>
+              <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Hora de término:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.end, {
+                  timeZone: calendarTimeZone,
+                  roundUpLastMinute: true,
+                })}
+              </DetailValue>
+            </div>
+          </>
+        ) : (
+          <div>
+            <DetailLabel>Fecha de término:</DetailLabel>
+            <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+          </div>
+        )}
 
         <div className="sm:col-span-2">
           <DetailLabel>Descripción:</DetailLabel>

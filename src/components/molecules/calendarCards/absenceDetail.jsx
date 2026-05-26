@@ -3,7 +3,10 @@ import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+  formatEventDate,
+  formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import documentIcon from "/document.svg";
 
@@ -99,6 +102,7 @@ const AbsenceDetail = ({
   onAbsenceFieldChange,
   onAbsenceEvidenceChange,
   showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   if (!event) return null;
 
@@ -290,14 +294,46 @@ const AbsenceDetail = ({
             )}
           </Type>
         </div>
-        <div>
-          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Fecha de fin:
-          </Type>
-          <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
-          </Type>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de inicio:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.start, { timeZone: calendarTimeZone })}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Fecha de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.end, {
+                  timeZone: calendarTimeZone,
+                  roundUpLastMinute: true,
+                })}
+              </Type>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+              Fecha de término:
+            </Type>
+            <Type variant="body" className="text-[1.05rem] leading-snug">
+              {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+            </Type>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Descripción:

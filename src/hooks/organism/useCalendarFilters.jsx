@@ -20,6 +20,7 @@ import {
 } from "../../utils/calendar.utils";
 import { getPersonalEventTitle } from "../../utils/titleGenerator";
 import {
+    dateTimeInTimeZoneToCalendarValue,
     dateInTimeZoneToInputValue,
     getAllDayRangeInTimeZone,
 } from "../../utils/timeZone";
@@ -211,10 +212,18 @@ const getFilteredEvents = (
             const normalizedEndDate =
                 allDayRange.displayEndDate ||
                 normalizeDateOnly(rawEvent.endDate ?? rawEvent.end);
-            const eventStart = isAllDay ? allDayRange.startDate : rawEvent.start;
+            const eventStart = isAllDay
+                ? allDayRange.startDate
+                : dateTimeInTimeZoneToCalendarValue(
+                      rawEvent.start,
+                      calendarTimeZone,
+                  );
             const eventEnd = isAllDay
                 ? allDayRange.calendarEndDate
-                : rawEvent.end;
+                : dateTimeInTimeZoneToCalendarValue(
+                      rawEvent.end,
+                      calendarTimeZone,
+                  );
             const displayStartDate = isAllDay
                 ? allDayRange.startDate
                 : dateInTimeZoneToInputValue(rawEvent.start, calendarTimeZone);
@@ -250,6 +259,8 @@ const getFilteredEvents = (
                     vacationFeedback: rawEvent.feedback,
                     employeeId: rawEvent.employeeId,
                     employeeName: rawEvent.name,
+                    utcStart: rawEvent.start,
+                    utcEnd: rawEvent.end,
                     subtitle: rawEvent.subtitle ?? "",
                     description: rawEvent.description ?? "",
                     focus: rawEvent.focus,

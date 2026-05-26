@@ -1,6 +1,9 @@
 import Button from "../../atoms/button";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+    formatEventDate,
+    formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
 import MexicoReferenceNotice from "./mexicoReferenceNotice";
@@ -21,6 +24,7 @@ const VacationDetail = ({
     onApprove,
     onReject,
     showMexicoReferenceNotice = false,
+    calendarTimeZone,
 }) => {
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
@@ -127,12 +131,31 @@ const VacationDetail = ({
                     </Type>
                 </div>
 
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de inicio:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.start, {
+                                timeZone: calendarTimeZone,
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
+
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de fin:
+                        Fecha de término:
                     </Type>
                     <Type
                         variant="body"
@@ -143,6 +166,26 @@ const VacationDetail = ({
                         )}
                     </Type>
                 </div>
+
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de término:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.end, {
+                                timeZone: calendarTimeZone,
+                                roundUpLastMinute: true,
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
 
                 <div>
                     <Type

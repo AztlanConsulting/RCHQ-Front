@@ -88,6 +88,19 @@ export const timeInTimeZoneToInputValue = (
     return `${parts.hour}:${parts.minute}`;
 };
 
+export const dateTimeInTimeZoneToCalendarValue = (
+    value,
+    timeZone = getBrowserTimeZone(),
+) => {
+    if (!value) return "";
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const parts = getPartsInTimeZone(date, timeZone);
+
+    return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
+};
+
 const addDaysToDateOnly = (dateValue, days) => {
     const [year, month, day] = String(dateValue).split("-").map(Number);
     if ([year, month, day].some(Number.isNaN)) return "";
