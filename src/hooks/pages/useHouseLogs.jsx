@@ -88,12 +88,14 @@ export const useHouseLogs = () => {
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
 
   const now = useMemo(() => new Date(), []);
+  const currentYear = now.getFullYear();
+  const minLogsDate = useMemo(() => new Date(currentYear - 5, 0, 1), [currentYear]);
+  const maxLogsDate = useMemo(() => new Date(currentYear, 11, 31), [currentYear]);
   const [reportYear, setReportYear] = useState(now.getFullYear());
 
   const yearOptions = useMemo(() => {
-    const currentYear = now.getFullYear();
-    return Array.from({ length: 11 }, (_, index) => currentYear - index);
-  }, [now]);
+    return Array.from({ length: 6 }, (_, index) => currentYear - index);
+  }, [currentYear]);
 
   const filteredActionOptions = useMemo(() => {
     const normalizedSearch = actionSearch.trim().toLowerCase();
@@ -187,7 +189,9 @@ export const useHouseLogs = () => {
 
   useEffect(() => {
     fetchLogs(page);
-  }, [page, limit, responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
+  }, [page, limit, responsibleSearch, 
+    affectedSearch, selectedActionIds, 
+    effectiveStartDate, effectiveEndDate]);
 
   useEffect(() => {
     setPage(1);
@@ -282,6 +286,8 @@ export const useHouseLogs = () => {
     reportYear,
     setReportYear,
     currentYear: now.getFullYear(),
+    minLogsDate,
+    maxLogsDate,
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,

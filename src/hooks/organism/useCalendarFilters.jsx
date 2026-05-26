@@ -295,7 +295,7 @@ const getFilteredEvents = (
                 start: eventStart,
                 end: eventEnd,
                 backgroundColor:
-                    rawEvent.focus === "ausencias" ? "#EF4444" : rawEvent.color,
+                    rawEvent.focus === "ausencias" ? "#A8201A" : rawEvent.color,
                 borderColor:
                     rawEvent.focus === "ausencias"
                         ? "#DC2626"

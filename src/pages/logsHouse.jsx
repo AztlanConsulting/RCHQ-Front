@@ -26,6 +26,8 @@ const LogsHouse = () => {
     clearActionSelection,
     dateFilter,
     setDateFilter,
+    minLogsDate,
+    maxLogsDate,
     isReportModalOpen,
     openReportModal,
     closeReportModal,
@@ -75,6 +77,8 @@ const LogsHouse = () => {
           clearActionSelection={clearActionSelection}
           dateFilter={dateFilter}
           setDateFilter={setDateFilter}
+          minDate={minLogsDate}
+          maxDate={maxLogsDate}
         />
       </div>
 

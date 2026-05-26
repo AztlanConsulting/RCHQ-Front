@@ -122,6 +122,8 @@ const Calendario = () => {
         setAlert,
         absenceEvidenceFileName,
         absenceEvidenceError,
+        absenceMinStartDate,
+        absenceMaxEndDate,
         closeDetail,
         handleEventClick,
         absenceEvidenceLabel,
@@ -350,6 +352,8 @@ const Calendario = () => {
                                         absenceEvidenceFileName
                                     }
                                     absenceEvidenceError={absenceEvidenceError}
+                                    absenceMinStartDate={absenceMinStartDate}
+                                    absenceMaxEndDate={absenceMaxEndDate}
                                     isSaving={isSavingAbsence}
                                     isDeleteOpen={isDeleteAbsenceOpen}
                                     isLoadingWhileDeleting={
