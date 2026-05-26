@@ -21,8 +21,11 @@ const VacationDetail = ({
     onApprove,
     onReject,
 }) => {
+    console.log("event: ", event)
     const token = getToken();
-    const role = token.role;
+    const role = token.role || null;
+    const userId = token.employeeId || null;
+    const subjectId = event.employeeId || null;
 
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
@@ -32,7 +35,7 @@ const VacationDetail = ({
     const isRejected = status === 2;
 
     const canDelete = Boolean(onDelete) && role == "Coordinador" && (!isApproved || !isPast);
-    const canEdit = Boolean(onEdit) && role == "Coordinador" && !isPast && !isRejected;
+    const canEdit = Boolean(onEdit) && (role == "Coordinador" || userId === subjectId ) && !isPast && !isRejected;
     const canReview = Boolean(onApprove && onReject) && role == "Coordinador" && !isPast && isPending;
 
     const title = isPending
