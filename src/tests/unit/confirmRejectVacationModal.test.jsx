@@ -40,8 +40,10 @@ describe("ConfirmRejectVacationModal", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
-        expect(screen.getByLabelText("Retroalimentación")).toBeInTheDocument();
-        expect(screen.getByText("0/200")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("0/500")).toBeInTheDocument();
     });
 
     it("llama onCancel al presionar Cancelar", () => {
@@ -88,7 +90,7 @@ describe("ConfirmRejectVacationModal", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "No hay disponibilidad para esas fechas" },
         });
 
@@ -109,11 +111,37 @@ describe("ConfirmRejectVacationModal", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "Motivo" },
         });
 
-        expect(screen.getByText("6/200")).toBeInTheDocument();
+        expect(screen.getByText("6/500")).toBeInTheDocument();
+    });
+
+    it("remueve caracteres no permitidos y conserva emojis en la retroalimentación", () => {
+        const onConfirm = vi.fn();
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No procede @#$ por fechas ¿ok? 🙂👩🏽‍💻🇲🇽" },
+        });
+
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toHaveValue("No procede  por fechas ¿ok? 🙂👩🏽‍💻🇲🇽");
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).toHaveBeenCalledWith(
+            "No procede  por fechas ¿ok? 🙂👩🏽‍💻🇲🇽",
+        );
     });
 
     it("muestra estado loading y deshabilita botones y textarea", () => {
@@ -128,7 +156,9 @@ describe("ConfirmRejectVacationModal", () => {
 
         expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
         expect(screen.getByRole("button", { name: "Rechazando..." })).toBeDisabled();
-        expect(screen.getByLabelText("Retroalimentación")).toBeDisabled();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeDisabled();
     });
 
     it("muestra error si se recibe error", () => {

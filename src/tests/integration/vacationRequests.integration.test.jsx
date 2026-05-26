@@ -546,8 +546,10 @@ describe("Integración: VacationRequests", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
-        expect(screen.getByLabelText("Retroalimentación")).toBeInTheDocument();
-        expect(screen.getByText("0/200")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("0/500")).toBeInTheDocument();
 
         expect(rejectVacationRequest).not.toHaveBeenCalled();
     });
@@ -593,7 +595,7 @@ describe("Integración: VacationRequests", () => {
             screen.getByRole("dialog", { name: "Rechazar solicitud" }),
         ).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "No hay disponibilidad para esas fechas" },
         });
 
@@ -658,7 +660,7 @@ describe("Integración: VacationRequests", () => {
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "No procede por empalme de fechas" },
         });
 
@@ -691,7 +693,7 @@ describe("Integración: VacationRequests", () => {
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "No se puede aprobar en estas fechas" },
         });
 
@@ -734,7 +736,7 @@ describe("Integración: VacationRequests", () => {
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
 
-        fireEvent.change(screen.getByLabelText("Retroalimentación"), {
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
             target: { value: "No hay disponibilidad para esas fechas" },
         });
 
