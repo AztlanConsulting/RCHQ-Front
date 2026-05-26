@@ -44,7 +44,7 @@ const ReactivateCard = ({
             type="button"
             onClick={onSubmit}
             disabled={isSubmitting}
-            className="flex-1 rounded-lg bg-[#7FD447] py-2.5 text-sm font-semibold text-gray-900 transition-colors hover:bg-[#6bc238] active:bg-[#5aad2f] disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex-1 rounded-lg bg-emerald-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#7FD447] hover:text-black active:bg-[#7FD447] active:text-black disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Procesando..." : "Reactivar"}
           </button>

@@ -166,8 +166,8 @@ const DetalleEmpleado = () => {
           <button
             type="button"
             onClick={openReactivateModal}
-            className="shrink-0 rounded-lg bg-[#7FD447] px-3 py-2 text-xs font-semibold
-              text-white hover:bg-[#7a1616] active:bg-[#7FD447] transition-colors"
+            className="shrink-0 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-semibold
+              text-white transition-colors hover:bg-[#7FD447] hover:text-black active:bg-[#7FD447] active:text-black"
           >
             Reactivar
           </button>
@@ -216,8 +216,8 @@ const DetalleEmpleado = () => {
           <button
             type="button"
             onClick={openReactivateModal}
-            className="ml-auto mr-2 shrink-0 rounded-xl bg-[#7FD447] px-5 py-2.5 text-sm font-semibold
-              text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#7FD447] transition-colors"
+            className="ml-auto mr-2 shrink-0 rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold
+              text-white shadow-sm transition-colors hover:bg-[#7FD447] hover:text-black active:bg-[#7FD447] active:text-black"
           >
             Reactivar
           </button>
