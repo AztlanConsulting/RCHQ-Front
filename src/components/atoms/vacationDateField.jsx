@@ -18,6 +18,9 @@ const VacationDateField = ({
     const initialCalendarDate = dateValue || calendarStartDate || null;
 
     const handleDateChange = (date) => {
+        if (date && minDate && date < minDate) return;
+        if (date && maxDate && date > maxDate) return;
+
         onChange({
             target: {
                 name,
