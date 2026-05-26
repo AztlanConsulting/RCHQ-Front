@@ -34,12 +34,14 @@ export function normalizeEmployeeContractType(val) {
 export const employeeBasicUpdateSchema = z
   .object({
     name: z.string().trim()
+      .min(1, "El nombre es obligatorio")
       .max(50, "El nombre es demasiado largo")
       .refine((val) => val === "" || val.length >= 2, { message: "El nombre debe tener al menos 2 caracteres" })
       .refine((val) => val === "" || NAMES_REGEX.test(val), { message: "No se permiten caracteres especiales en el nombre" })
       .optional(),
 
     surname: z.string().trim()
+      .min(1, "El apellido es obligatorio")
       .max(50, "El apellido es demasiado largo")
       .refine((val) => val === "" || val.length >= 2, { message: "El apellido debe tener al menos 2 caracteres" })
       .refine((val) => val === "" || NAMES_REGEX.test(val), { message: "No se permiten caracteres especiales en el apellido" })
@@ -47,6 +49,7 @@ export const employeeBasicUpdateSchema = z
 
     curp: z.string().trim()
       .toUpperCase()
+      .min(1, "El CURP es obligatorio")
       .refine((val) => val === "" || val.length === 18, { message: "El CURP debe tener exactamente 18 caracteres" })
       .refine((val) => val === "" || CURP_ALLOWED_REGEX.test(val), { message: "El CURP solo puede contener letras y números" })
       .refine((val) => val === "" || CURP_REGEX.test(val), { message: "Formato del CURP inválido" })
