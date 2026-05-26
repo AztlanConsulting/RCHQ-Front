@@ -2,6 +2,7 @@ import TextField from "../atoms/textField";
 import SelectField from "../atoms/selectField";
 import useSearch from "../../hooks/molecules/useSearch";
 import Button from "../atoms/button";
+import { useEffect, useRef, useState } from "react";
 
 const CURP_MAX_LENGTH = 18;
 const CURP_ALLOWED_REGEX = /^[A-ZÑ0-9]{0,18}$/i;
@@ -20,11 +21,40 @@ const EmployeeFilters = ({
     searchQuery,
     setSearchQuery,
   );
+  const [blacklistCurpInput, setBlacklistCurpInput] = useState(searchQuery);
+  const lastBlacklistSearch = useRef(searchQuery);
+
+  useEffect(() => {
+    setBlacklistCurpInput(searchQuery);
+    lastBlacklistSearch.current = searchQuery;
+  }, [searchQuery]);
+
+  const searchBlacklist = (value) => {
+    if (lastBlacklistSearch.current === value) return;
+
+    lastBlacklistSearch.current = value;
+    setSearchQuery(value);
+  };
 
   const handleCurpChange = (val) => {
     const upper = val.toUpperCase();
     if (upper.length <= CURP_MAX_LENGTH && CURP_ALLOWED_REGEX.test(upper)) {
-      setSearchQuery(upper);
+      setBlacklistCurpInput(upper);
+
+      if (upper.length === 0) {
+        searchBlacklist("");
+        return;
+      }
+
+      if (upper.length % 3 === 0) {
+        searchBlacklist(upper);
+      }
+    }
+  };
+
+  const handleBlacklistKeyDown = (event) => {
+    if (event.key === "Enter") {
+      searchBlacklist(blacklistCurpInput);
     }
   };
 
@@ -54,8 +84,9 @@ const EmployeeFilters = ({
                 id="search-curp"
                 text="Buscar por CURP"
                 placeholder="Ingresa la CURP"
-                value={searchQuery}
+                value={blacklistCurpInput}
                 setValue={handleCurpChange}
+                onKeyDown={handleBlacklistKeyDown}
                 labelClassName="text-sm font-bold text-[#121212]"
               />
               <SelectField
@@ -109,8 +140,9 @@ const EmployeeFilters = ({
             id="search-curp-mobile"
             text="Buscar por CURP"
             placeholder="Ingresa la CURP"
-            value={searchQuery}
+            value={blacklistCurpInput}
             setValue={handleCurpChange}
+            onKeyDown={handleBlacklistKeyDown}
             labelClassName="text-sm font-bold text-[#121212]"
           />
         ) : (

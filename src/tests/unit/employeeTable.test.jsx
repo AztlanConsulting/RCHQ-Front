@@ -45,6 +45,16 @@ describe("EmployeeTable Component", () => {
     ).toBeInTheDocument();
   });
 
+  it('debe mostrar mensaje en gris de lista negra vacía cuando está en modo lista negra', () => {
+    renderWithRouter(
+      <EmployeeTable employees={[]} loading={false} isBlacklistMode={true} />,
+    );
+
+    const message = screen.getByText(/no hay personas en la lista negra/i);
+    expect(message).toBeInTheDocument();
+    expect(message).toHaveClass("text-gray-500");
+  });
+
   it("debe renderizar los encabezados de la tabla correctamente", () => {
     renderWithRouter(
       <EmployeeTable employees={mockEmployees} loading={false} />,

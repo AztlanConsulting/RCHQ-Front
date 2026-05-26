@@ -136,4 +136,18 @@ describe("Integración: Componente Personal", () => {
     renderComponent();
     expect(screen.getAllByText(/Estás en modo de lista negra/i)[0]).toBeInTheDocument();
   });
+
+  it("oculta la paginación cuando la lista negra filtrada no tiene resultados", () => {
+    usePersonal.mockReturnValue({
+      ...mockPersonalData,
+      isBlacklistMode: true,
+      activeEmployees: [],
+      activePagination: { totalPages: 0, total: 0 },
+    });
+
+    renderComponent();
+
+    expect(screen.getByText(/no hay personas en la lista negra/i)).toBeInTheDocument();
+    expect(screen.queryByText(/página/i)).not.toBeInTheDocument();
+  });
 });

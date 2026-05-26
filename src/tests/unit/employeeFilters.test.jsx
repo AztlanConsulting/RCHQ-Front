@@ -94,6 +94,36 @@ describe("EmployeeFilters Component", () => {
     expect(screen.getAllByText("Lista Empleados")[0]).toBeInTheDocument();
   });
 
+  it("en lista negra solo busca por CURP cada 3 caracteres", () => {
+    render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
+
+    const input = screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0];
+
+    fireEvent.change(input, { target: { value: "AB" } });
+    expect(mockSetSearchQuery).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: "ABC" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABC");
+
+    fireEvent.change(input, { target: { value: "ABCD" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(input, { target: { value: "ABCDEF" } });
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABCDEF");
+    expect(mockSetSearchQuery).toHaveBeenCalledTimes(2);
+  });
+
+  it("en lista negra permite buscar con Enter aunque no sean 3 caracteres", () => {
+    render(<EmployeeFilters {...defaultProps} isBlacklistMode={true} />);
+
+    const input = screen.getAllByPlaceholderText(/Ingresa la CURP/i)[0];
+
+    fireEvent.change(input, { target: { value: "ABCD" } });
+    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+
+    expect(mockSetSearchQuery).toHaveBeenCalledWith("ABCD");
+  });
+
   it("llama a onToggleBlacklistMode al hacer clic en el botón correspondiente", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
