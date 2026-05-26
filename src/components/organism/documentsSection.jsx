@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, matchPath } from "react-router-dom";
 import Alert from "../atoms/alerts";
 import Button from "../atoms/button";
 import DocumentCard from "../molecules/documentCard";
@@ -44,21 +44,27 @@ const DocumentsSection = ({
   handleConflictConfirm,
   handleConflictCancel,
 }) => {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const showDocumentsPageBack =
+    matchPath({ path: "/app/:employeeId/documentos", end: true }, pathname) != null;
 
   return (
     <div className="p-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate("/app/opciones")}
-            className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
-          >
-            <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+          {showDocumentsPageBack ? (
+            <button
+              type="button"
+              onClick={() => navigate("/app/opciones")}
+              className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
+            >
+              <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          ) : null}
           <h1 className="text-2xl font-bold text-slate-900">Documentos</h1>
         </div>
         {canModify && (
