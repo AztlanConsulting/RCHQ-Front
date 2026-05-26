@@ -53,6 +53,9 @@ const WorkerAbsenceDetail = ({
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
   const descriptionPreview = getDescriptionPreview(fullDescription);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
 
   return (
     <div className="px-1 text-left sm:px-2">
@@ -73,7 +76,12 @@ const WorkerAbsenceDetail = ({
         </div>
 
         <div>
-          <DetailLabel>Días hábiles:</DetailLabel>
+          <DetailLabel>Días totales{mexicoDaysSuffix}:</DetailLabel>
+          <DetailValue>{event?.totalDays}</DetailValue>
+        </div>
+
+        <div>
+          <DetailLabel>Días hábiles{mexicoDaysSuffix}:</DetailLabel>
           <DetailValue>{event?.usedDays}</DetailValue>
         </div>
 
@@ -100,8 +108,7 @@ const WorkerAbsenceDetail = ({
               <DetailLabel>Hora de término:</DetailLabel>
               <DetailValue>
                 {formatEventTime(event?.end, {
-                  timeZone: calendarTimeZone,
-                  roundUpLastMinute: true,
+                  timeZone: calendarTimeZone
                 })}
               </DetailValue>
             </div>

@@ -74,7 +74,7 @@ export const eventApiToDetail = (ev) => {
         readableEnd: x.endReadableDate,
         startStr: start != null ? (start.toISOString?.() ?? String(start)) : "",
         endStr: end != null ? (end.toISOString?.() ?? String(end)) : "",
-        allDay: ev.allDay,
+        allDay: x.detailAllDay ?? ev.allDay,
         backgroundColor: ev.backgroundColor || ev.color,
         borderColor: ev.borderColor || ev.backgroundColor || ev.color,
         subtitle: x.subtitle,
@@ -175,30 +175,12 @@ export const formatEventDateTime = (value) => {
     });
 };
 
-export const formatEventTime = (value, { timeZone, roundUpLastMinute = false } = {}) => {
+export const formatEventTime = (value, { timeZone } = {}) => {
     if (value == null || value === "") return "—";
     const d = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
-    const displayMinute = timeZone
-        ? Number(
-              new Intl.DateTimeFormat("en-US", {
-                  timeZone,
-                  minute: "2-digit",
-              })
-                  .formatToParts(d)
-                  .find((part) => part.type === "minute")?.value,
-          )
-        : d.getMinutes();
-    const displayDate =
-        roundUpLastMinute && displayMinute === 59
-            ? new Date(
-                  d.getTime() +
-                      (60 - d.getSeconds()) * 1000 -
-                      d.getMilliseconds(),
-              )
-            : d;
 
-    return displayDate.toLocaleTimeString("es-MX", {
+    return d.toLocaleTimeString("es-MX", {
         hour: "numeric",
         minute: "2-digit",
         ...(timeZone ? { timeZone } : {}),

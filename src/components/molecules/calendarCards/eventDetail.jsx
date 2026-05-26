@@ -116,10 +116,7 @@ const EventDetail = ({
                         </Type>
                         <p className="text-sm">
                             {formatEventTime(event.end ?? event.endStr, {
-                                timeZone: calendarTimeZone,
-                                roundUpLastMinute:
-                                    showMexicoReferenceNotice ||
-                                    event.isFreeDay === true,
+                                timeZone: calendarTimeZone
                             })}
                         </p>
                     </div>

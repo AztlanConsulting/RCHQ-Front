@@ -11,7 +11,21 @@ import {
     dateStringToInputValue,
     timeStringToInputValue,
 } from "../../utils/dates";
-import { getBrowserTimeZone, MEXICO_TIME_ZONE } from "../../utils/timeZone";
+import {
+    getBrowserTimeZone,
+    getCalendarNowValue,
+    MEXICO_TIME_ZONE,
+} from "../../utils/timeZone";
+
+const getPaddedFetchRange = (startValue, endValue) => {
+    const startDate = String(startValue ?? "").split("T")[0];
+    const endDate = String(endValue ?? "").split("T")[0];
+
+    return {
+        startDate: addDaysToInputValue(startDate, -1) || startDate,
+        endDate: addDaysToInputValue(endDate, 1) || endDate,
+    };
+};
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -25,6 +39,7 @@ export const useBaseCalendar = () => {
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
     const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+    const [calendarClock, setCalendarClock] = useState(() => new Date());
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -51,6 +66,10 @@ export const useBaseCalendar = () => {
                 ? MEXICO_TIME_ZONE
                 : browserTimeZone,
         [browserTimeZone, calendarTimeZoneMode],
+    );
+    const calendarNow = useMemo(
+        () => getCalendarNowValue(calendarTimeZone, calendarClock),
+        [calendarTimeZone, calendarClock],
     );
     const fullCalendarTimeZone = "local";
     const calendarTimeZoneOptions = useMemo(
@@ -333,9 +352,10 @@ export const useBaseCalendar = () => {
             return [];
 
         const { start, end } = lastFetchedRange.current;
+        const fetchRange = getPaddedFetchRange(start, end);
         const rawEvents = await loadCalendarEvents(
-            start.split("T")[0],
-            end.split("T")[0],
+            fetchRange.startDate,
+            fetchRange.endDate,
             effectiveEmployeeId,
             effectiveViewerRole,
         );
@@ -360,10 +380,11 @@ export const useBaseCalendar = () => {
             const end = currentView.activeEnd.toISOString();
 
             lastFetchedRange.current = { start, end };
+            const fetchRange = getPaddedFetchRange(start, end);
 
             const rawEvents = await loadCalendarEvents(
-                start.split("T")[0],
-                end.split("T")[0],
+                fetchRange.startDate,
+                fetchRange.endDate,
                 effectiveEmployeeId,
                 effectiveViewerRole,
             );
@@ -379,6 +400,14 @@ export const useBaseCalendar = () => {
             console.error(err);
         });
     }, [reloadCurrentRange]);
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            setCalendarClock(new Date());
+        }, 60000);
+
+        return () => window.clearInterval(intervalId);
+    }, []);
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
@@ -403,9 +432,10 @@ export const useBaseCalendar = () => {
             return;
 
         try {
+            const fetchRange = getPaddedFetchRange(startStr, endStr);
             const rawEvents = await loadCalendarEvents(
-                startStr.split("T")[0],
-                endStr.split("T")[0],
+                fetchRange.startDate,
+                fetchRange.endDate,
                 effectiveEmployeeId,
                 effectiveViewerRole,
             );
@@ -484,6 +514,7 @@ export const useBaseCalendar = () => {
         calendarMode,
         setCalendarMode,
         calendarTimeZone,
+        calendarNow,
         calendarTimeZoneMode,
         setCalendarTimeZoneMode,
         calendarTimeZoneOptions,

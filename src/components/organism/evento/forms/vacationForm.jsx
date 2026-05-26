@@ -5,10 +5,10 @@ import Alert from "../../../atoms/alerts";
 import Button from "../../../atoms/button";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useVacationForm } from "../../../../hooks/pages/useVacationForm";
-import { isMexicoTimeZone } from "../../../../utils/timeZone";
 
 const VacationForm = (props) => {
     const {
@@ -28,7 +28,9 @@ const VacationForm = (props) => {
     const [openDropdown, setOpenDropdown] = useState(null);
 
     const viewerRole = getCalendarViewerRole();
-    const showMexicoTimeZoneMessage = !isMexicoTimeZone();
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? "Las vacaciones se guardan con base en horario central de México porque se contabilizan contra días laborales y días libres mexicanos."
+        : "";
 
     return (
         <>
@@ -128,13 +130,7 @@ const VacationForm = (props) => {
                 </div>
             </div>
 
-            {showMexicoTimeZoneMessage ? (
-                <p className="mx-auto mt-1 mb-4 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
-                    Las vacaciones se guardan con base en horario central de
-                    México porque se contabilizan contra días laborales y días
-                    libres mexicanos.
-                </p>
-            ) : null}
+            <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
             {viewerRole === "Coordinador" ? (
                 <p className="mb-5 text-xs text-slate-400">

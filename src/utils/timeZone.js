@@ -6,9 +6,6 @@ export const getBrowserTimeZone = () =>
 export const isMexicoTimeZone = () =>
     getBrowserTimeZone() === MEXICO_TIME_ZONE;
 
-export const isMexicoCalendarTimeZone = (timeZone) =>
-    (timeZone || getBrowserTimeZone()) === MEXICO_TIME_ZONE;
-
 const getPartsInTimeZone = (date, timeZone) => {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone,
@@ -101,6 +98,11 @@ export const dateTimeInTimeZoneToCalendarValue = (
     return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
 };
 
+export const getCalendarNowValue = (
+    timeZone = getBrowserTimeZone(),
+    now = new Date(),
+) => dateTimeInTimeZoneToCalendarValue(now, timeZone);
+
 const addDaysToDateOnly = (dateValue, days) => {
     const [year, month, day] = String(dateValue).split("-").map(Number);
     if ([year, month, day].some(Number.isNaN)) return "";
@@ -140,18 +142,31 @@ export const getAllDayRangeInTimeZone = (
         startParts.second === "00";
     const endsAtLastMinute =
         endParts.hour === "23" && endParts.minute === "59";
+    const endsOnNextMidnight =
+        endParts.hour === "00" &&
+        endParts.minute === "00" &&
+        endParts.second === "00";
 
-    if (!startsAtMidnight || !endsAtLastMinute) {
+    if (!startsAtMidnight || (!endsAtLastMinute && !endsOnNextMidnight)) {
         return { isAllDay: false };
     }
 
     const startDateOnly = `${startParts.year}-${startParts.month}-${startParts.day}`;
     const endDateOnly = `${endParts.year}-${endParts.month}-${endParts.day}`;
+    const displayEndDate = endsOnNextMidnight
+        ? addDaysToDateOnly(endDateOnly, -1)
+        : endDateOnly;
+
+    if (displayEndDate < startDateOnly) {
+        return { isAllDay: false };
+    }
 
     return {
         isAllDay: true,
         startDate: startDateOnly,
-        displayEndDate: endDateOnly,
-        calendarEndDate: addDaysToDateOnly(endDateOnly, 1),
+        displayEndDate,
+        calendarEndDate: endsOnNextMidnight
+            ? endDateOnly
+            : addDaysToDateOnly(endDateOnly, 1),
     };
 };

@@ -4,9 +4,6 @@ export {
     zonedDateTimeToIso,
 } from "../../timeZone";
 
-export const localDateTimeToIso = (date, time = "00:00") =>
-    new Date(`${date}T${time}:00`).toISOString();
-
 export const addDaysToDateOnly = (date, days) => {
     const [year, month, day] = date.split("-").map(Number);
     const nextDate = new Date(year, month - 1, day);

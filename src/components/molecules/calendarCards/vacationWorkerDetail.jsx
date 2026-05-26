@@ -36,6 +36,9 @@ const VacationWorkerDetail = ({
         isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
     const statusLabel =
         isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+    const mexicoDaysSuffix = showMexicoReferenceNotice
+        ? " (horario cdmx)"
+        : "";
 
     if (isEditing) {
         return (
@@ -125,8 +128,7 @@ const VacationWorkerDetail = ({
                                 className="text-[1.05rem] leading-snug"
                             >
                                 {formatEventTime(event.end, {
-                                    timeZone: calendarTimeZone,
-                                    roundUpLastMinute: true,
+                                    timeZone: calendarTimeZone
                                 })}
                             </Type>
                         </div>
@@ -152,7 +154,7 @@ const VacationWorkerDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días totales:
+                        Días totales{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -166,7 +168,7 @@ const VacationWorkerDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días hábiles:
+                        Días hábiles{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"

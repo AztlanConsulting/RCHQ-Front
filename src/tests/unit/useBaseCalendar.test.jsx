@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
+import { getEventsInRange } from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
     getCalendarViewerRole: vi.fn(() => "Empleado"),
@@ -79,5 +80,27 @@ describe("useBaseCalendar", () => {
             endTime: "",
             allDay: true,
         });
+    });
+
+    it("consulta un día extra antes y después del rango visible para eventos con desfase horario", async () => {
+        const { result } = renderHook(() => useBaseCalendar());
+
+        await act(async () => {
+            await result.current.handleDatesSet({
+                startStr: "2026-05-06T00:00:00-05:00",
+                endStr: "2026-05-07T00:00:00-05:00",
+                view: {
+                    calendar: {
+                        getDate: () => new Date(2026, 4, 6),
+                    },
+                },
+            });
+        });
+
+        expect(getEventsInRange).toHaveBeenCalledWith(
+            "employee-1",
+            "2026-05-05",
+            "2026-05-08",
+        );
     });
 });

@@ -27,6 +27,8 @@ const RegisterEventModal = ({
     initialEndTime,
     initialAllDay,
     calendarTimeZone,
+    calendarTimeZoneMode,
+    canSwitchCalendarTimeZone,
 }) => {
     const {
         name,
@@ -172,6 +174,10 @@ const RegisterEventModal = ({
                                     initialEndTime={initialEndTime}
                                     initialAllDay={initialAllDay}
                                     calendarTimeZone={calendarTimeZone}
+                                    calendarTimeZoneMode={calendarTimeZoneMode}
+                                    canSwitchCalendarTimeZone={
+                                        canSwitchCalendarTimeZone
+                                    }
                                     onNameError={setNameError}
                                     onValidationAlert={setValidationAlert}
                                 />

@@ -12,6 +12,7 @@ import {
     createPersonalEvent,
     getEventTypes,
 } from "../../services/eventService";
+import { getBrowserTimeZone, zonedDateTimeToIso } from "../../utils/timeZone";
 
 vi.mock("../../services/eventService", () => ({
     createPersonalEvent: vi.fn(),
@@ -102,6 +103,8 @@ const renderModal = (props = {}) => {
             onSuccess={onSuccess}
             initialStartDate={TODAY}
             initialEndDate={TODAY}
+            calendarTimeZoneMode="local"
+            canSwitchCalendarTimeZone
             {...props}
         />,
     );
@@ -221,8 +224,13 @@ describe("Integración: agregar evento de personal", () => {
             name: "Reunión de equipo",
             date: TODAY,
             allDay: false,
-            start: "09:00:00",
-            end: "10:00:00",
+            start: zonedDateTimeToIso(
+                TODAY,
+                "09:00",
+                getBrowserTimeZone(),
+            ),
+            end: zonedDateTimeToIso(TODAY, "10:00", getBrowserTimeZone()),
+            timeZone: getBrowserTimeZone(),
             description: "Discutir avances del proyecto.",
             employeeIds: [],
             forceOverlap: false,
@@ -234,6 +242,30 @@ describe("Integración: agregar evento de personal", () => {
         });
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra la leyenda de horario local en modo local", async () => {
+        renderModal();
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(
+            screen.getByText(/este evento se guardará con base en tu horario local/i),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra la leyenda de horario central de México en modo México", async () => {
+        renderModal({ calendarTimeZoneMode: "mexico" });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(
+            screen.getByText(/este evento se guardará con base en horario central de méxico/i),
+        ).toBeInTheDocument();
     });
 
     it("muestra error si se intenta confirmar sin nombre", async () => {

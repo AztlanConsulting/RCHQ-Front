@@ -12,6 +12,12 @@ import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 
 const MONTH_DAY_EVENT_CAP = 3;
+const LIST_EVENT_TIME_FORMAT = {
+    hour: "numeric",
+    minute: "2-digit",
+    meridiem: "short",
+    hour12: true,
+};
 
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
@@ -56,6 +62,7 @@ const BaseCalendar = ({
     onDateDragging,
     onOpenCalendarFilters,
     timeZone = "local",
+    now,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -140,6 +147,7 @@ const BaseCalendar = ({
             locales={[esLocale]}
             locale="es"
             timeZone={timeZone}
+            now={now}
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}
@@ -154,6 +162,15 @@ const BaseCalendar = ({
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
                     dayMaxEvents: MONTH_DAY_EVENT_CAP,
+                },
+                listDay: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listWeek: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listMonth: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}

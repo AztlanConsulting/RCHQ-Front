@@ -56,7 +56,7 @@ describe("VacationWorkerDetail", () => {
         expect(screen.getByText("Solicitud de Vacaciones")).toBeInTheDocument();
         expect(screen.getByText("Fecha de inicio:")).toBeInTheDocument();
         expect(screen.getByText("5 de junio de 2026")).toBeInTheDocument();
-        expect(screen.getByText("Fecha de fin:")).toBeInTheDocument();
+        expect(screen.getByText("Fecha de término:")).toBeInTheDocument();
         expect(screen.getByText("10 de junio de 2026")).toBeInTheDocument();
         expect(screen.getByText("5")).toBeInTheDocument();
         expect(screen.getByText("4")).toBeInTheDocument();
@@ -198,5 +198,25 @@ describe("VacationWorkerDetail", () => {
         expect(screen.getByRole("button", { name: /cancelar/i })).toBeInTheDocument();
         expect(screen.getByRole("button", { name: /guardar/i })).toBeInTheDocument();
     });
-});
 
+    it("marca los días como horario cdmx cuando se consulta en horario foráneo", () => {
+        renderVacationWorkerDetail({
+            event: {
+                ...baseVacation,
+                start: "2026-06-05T06:00:00.000Z",
+                end: "2026-06-10T05:59:59.999Z",
+            },
+            showMexicoReferenceNotice: true,
+            calendarTimeZone: "America/Matamoros",
+        });
+
+        expect(
+            screen.getByText("Días totales (horario cdmx):"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Días hábiles (horario cdmx):"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Hora de inicio:")).toBeInTheDocument();
+        expect(screen.getByText("Hora de término:")).toBeInTheDocument();
+    });
+});

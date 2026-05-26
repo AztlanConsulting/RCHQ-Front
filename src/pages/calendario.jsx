@@ -42,6 +42,7 @@ const Calendario = () => {
         calendarMode,
         setCalendarMode,
         calendarTimeZone,
+        calendarNow,
         calendarTimeZoneMode,
         setCalendarTimeZoneMode,
         calendarTimeZoneOptions,
@@ -287,6 +288,7 @@ const Calendario = () => {
                     initialView={currentCalendarView}
                     initialDate={currentCalendarDate}
                     timeZone={fullCalendarTimeZone}
+                    now={calendarNow}
                     loadButtonsAtStart={loadButtonsAtStart}
                     calendarRef={calendarRef}
                     toggleList={toggleList}
@@ -535,6 +537,8 @@ const Calendario = () => {
                 initialEndTime={selectedDates?.endTime}
                 initialAllDay={selectedDates?.allDay}
                 calendarTimeZone={calendarTimeZone}
+                calendarTimeZoneMode={calendarTimeZoneMode}
+                canSwitchCalendarTimeZone={canSwitchCalendarTimeZone}
             />
         </div>
     );

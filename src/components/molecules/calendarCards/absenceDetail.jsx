@@ -108,6 +108,9 @@ const AbsenceDetail = ({
 
   const canModifyAbsence = canManageAbsence && !event.isDeleted;
   const hasEvidence = Boolean(event.link);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
 
   if (isEditing) {
     return (
@@ -278,7 +281,15 @@ const AbsenceDetail = ({
         </div>
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Días hábiles:
+            Días totales{mexicoDaysSuffix}:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.totalDays ?? "—"}
+          </Type>
+        </div>
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Días hábiles{mexicoDaysSuffix}:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
             {event.usedDays ?? "—"}
@@ -318,8 +329,7 @@ const AbsenceDetail = ({
               </Type>
               <Type variant="body" className="text-[1.05rem] leading-snug">
                 {formatEventTime(event.end, {
-                  timeZone: calendarTimeZone,
-                  roundUpLastMinute: true,
+                  timeZone: calendarTimeZone
                 })}
               </Type>
             </div>

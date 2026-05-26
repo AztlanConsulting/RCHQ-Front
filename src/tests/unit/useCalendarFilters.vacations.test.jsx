@@ -20,11 +20,11 @@ const buildVacation = (overrides = {}) => ({
     name: "Ana Pendiente",
     curp: "US170101HDF00003",
     type: "Vacaciones",
-    start: "2026-06-05T00:00:00.000Z",
-    end: "2026-06-11T00:00:00.000Z",
+    start: "2026-06-05T06:00:00.000Z",
+    end: "2026-06-11T05:59:59.999Z",
     startDate: "2026-06-05",
     endDate: "2026-06-10",
-    lastsAllDay: true,
+    allDay: true,
     status: 0,
     feedback: "",
     usedDays: 4,
@@ -74,6 +74,7 @@ describe("useCalendarFilters - vacaciones", () => {
                 isList: false,
                 viewerRole: "Coordinador",
                 calendarMode: "personal",
+                calendarTimeZone: "America/Mexico_City",
             }),
         );
 
@@ -115,6 +116,7 @@ describe("useCalendarFilters - vacaciones", () => {
                 isList: false,
                 viewerRole: "Coordinador",
                 calendarMode: "house",
+                calendarTimeZone: "America/Mexico_City",
             }),
         );
 
@@ -152,6 +154,7 @@ describe("useCalendarFilters - vacaciones", () => {
                     isList: false,
                     viewerRole: "Coordinador",
                     calendarMode,
+                    calendarTimeZone: "America/Mexico_City",
                 }),
             {
                 initialProps: {
@@ -200,6 +203,7 @@ describe("useCalendarFilters - vacaciones", () => {
                 isList: false,
                 viewerRole: "Coordinador",
                 calendarMode: "personal",
+                calendarTimeZone: "America/Mexico_City",
             }),
         );
 
@@ -214,6 +218,53 @@ describe("useCalendarFilters - vacaciones", () => {
             startDate: "2026-06-05",
             endDate: "2026-06-10",
             focus: "vacaciones",
+        });
+    });
+
+    it("adapta vacaciones all-day entre horario central de México y horario foráneo", async () => {
+        const vacation = buildVacation({
+            vacationId: "timezone-vacation",
+            start: "2026-06-05T06:00:00.000Z",
+            end: "2026-06-06T05:59:59.999Z",
+            startDate: "2026-06-05",
+            endDate: "2026-06-05",
+            totalDays: 1,
+        });
+
+        const { result, rerender } = renderHook(
+            ({ calendarTimeZone }) =>
+                useCalendarFilters([vacation], {
+                    isList: false,
+                    viewerRole: "Coordinador",
+                    calendarMode: "personal",
+                    calendarTimeZone,
+                }),
+            {
+                initialProps: {
+                    calendarTimeZone: "America/Mexico_City",
+                },
+            },
+        );
+
+        await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-06-05",
+            end: "2026-06-06",
+            allDay: true,
+        });
+
+        rerender({ calendarTimeZone: "America/Matamoros" });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-06-05T01:00:00",
+            end: "2026-06-06T00:59:59",
+            allDay: false,
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            startDate: "2026-06-05",
+            endDate: "2026-06-06",
+            totalDays: 1,
         });
     });
 
@@ -234,6 +285,7 @@ describe("useCalendarFilters - vacaciones", () => {
                 isList: false,
                 viewerRole: "Coordinador",
                 calendarMode: "personal",
+                calendarTimeZone: "America/Mexico_City",
             }),
         );
 

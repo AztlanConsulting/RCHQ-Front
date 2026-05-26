@@ -51,6 +51,9 @@ const VacationDetail = ({
 
     const feedback = event.feedback || event.vacationFeedback || "";
     const shouldShowFeedback = Boolean(feedback);
+    const mexicoDaysSuffix = showMexicoReferenceNotice
+        ? " (horario cdmx)"
+        : "";
 
     if (isEditing) {
         return (
@@ -180,8 +183,7 @@ const VacationDetail = ({
                             className="text-[1.05rem] leading-snug"
                         >
                             {formatEventTime(event.end, {
-                                timeZone: calendarTimeZone,
-                                roundUpLastMinute: true,
+                                timeZone: calendarTimeZone
                             })}
                         </Type>
                     </div>
@@ -192,7 +194,7 @@ const VacationDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días totales:
+                        Días totales{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -209,7 +211,7 @@ const VacationDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días hábiles:
+                        Días hábiles{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"

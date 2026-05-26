@@ -14,6 +14,7 @@ import {
     getEmployeesForSelector,
 } from "../../services/eventService";
 import { getCalendarViewerRole } from "../../services/calendarService";
+import { getBrowserTimeZone } from "../../utils/timeZone";
 
 vi.mock("../../services/updateEventService", () => ({
     updatePersonalEvent: vi.fn(),
@@ -229,8 +230,9 @@ describe("Integración: modificar evento personal", () => {
             eventTypeId: EVENT_TYPE_ID,
             date: TODAY,
             allDay: false,
-            start: "09:00:00",
-            end: "10:00:00",
+            start: mockEvent.start.toISOString(),
+            end: mockEvent.end.toISOString(),
+            timeZone: getBrowserTimeZone(),
             description: "Revisión anual.",
             employeeIds: [EMP_ID_1],
             forceOverlap: false,

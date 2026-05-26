@@ -12,6 +12,7 @@ const absence = {
   endDate: "2026-05-09",
   description: "Reposo médico",
   link: "",
+  totalDays: 5,
   usedDays: 3,
 };
 
@@ -27,8 +28,27 @@ describe("AbsenceDetail", () => {
 
     expect(screen.getByText("Nombre del trabajador")).toBeInTheDocument();
     expect(screen.getByText("CURP")).toBeInTheDocument();
+    expect(screen.getByText("Días totales:")).toBeInTheDocument();
     expect(screen.getByText("Días hábiles:")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /editar/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /eliminar/i })).toBeInTheDocument();
+  });
+
+  it("marca los días como horario cdmx cuando se consulta en horario foráneo", () => {
+    render(
+      <AbsenceDetail
+        event={absence}
+        showMexicoReferenceNotice
+        calendarTimeZone="America/Matamoros"
+        onStartEdit={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText("Días totales (horario cdmx):"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Días hábiles (horario cdmx):"),
+    ).toBeInTheDocument();
   });
 });

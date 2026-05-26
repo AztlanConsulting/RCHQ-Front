@@ -6,6 +6,7 @@ import EmployeeSearchSelect from "../../../atoms/employeeSearchSelect";
 import ErrorText from "../../../atoms/errorText";
 import SelectField from "../../../atoms/selectField";
 import TimeField from "../../../atoms/timeField";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import OverlapModal from "../../overlapModal";
 
 import { usePersonalForm } from "../../../../hooks/pages/usePersonalForm";
@@ -32,6 +33,11 @@ const PersonalForm = (props) => {
     } = usePersonalForm(props);
 
     const isTimeVisible = !form.allDay;
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? props.calendarTimeZoneMode === "mexico"
+            ? "Este evento se guardará con base en horario central de México."
+            : "Este evento se guardará con base en tu horario local."
+        : "";
 
     const today = new Date();
     const personalDateMin = today;
@@ -121,6 +127,8 @@ const PersonalForm = (props) => {
                         onChange={(value) => setField("allDay", value)}
                     />
                 </div>
+
+                <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
             </div>
 
             <SelectField
