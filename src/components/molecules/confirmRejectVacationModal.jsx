@@ -4,7 +4,6 @@ import ErrorText from "../atoms/errorText";
 import {
     VACATION_REJECTION_FEEDBACK_MAX_LENGTH,
     getVacationRejectionFeedbackErrors,
-    sanitizeVacationRejectionFeedback,
 } from "../../utils/schema/vacation/vacation.schema";
 
 const ConfirmRejectVacationModalContent = ({
@@ -22,9 +21,7 @@ const ConfirmRejectVacationModalContent = ({
     const curp = employee.curp;
 
     const handleFeedbackChange = (event) => {
-        const value = sanitizeVacationRejectionFeedback(event.target.value);
-
-        setFeedback(value);
+        setFeedback(event.target.value);
 
         if (fieldError) {
             setFieldError("");

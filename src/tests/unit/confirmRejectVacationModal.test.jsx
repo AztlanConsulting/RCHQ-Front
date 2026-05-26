@@ -118,7 +118,33 @@ describe("ConfirmRejectVacationModal", () => {
         expect(screen.getByText("6/500")).toBeInTheDocument();
     });
 
-    it("remueve caracteres no permitidos y conserva emojis en la retroalimentación", () => {
+    it("permite escribir acentos, signos permitidos y emojis en la retroalimentación", () => {
+        const onConfirm = vi.fn();
+        const feedback =
+            'No procede por días: razón #1 ¿ok? 50% + ajuste_2 ~= "sí" ° 🙂👩🏽‍💻🇲🇽';
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: feedback },
+        });
+
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toHaveValue(feedback);
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).toHaveBeenCalledWith(feedback);
+    });
+
+    it("muestra error al confirmar si la retroalimentación tiene caracteres no permitidos", () => {
         const onConfirm = vi.fn();
 
         render(
@@ -130,18 +156,21 @@ describe("ConfirmRejectVacationModal", () => {
         );
 
         fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
-            target: { value: "No procede @#$ por fechas ¿ok? 🙂👩🏽‍💻🇲🇽" },
+            target: { value: "No procede @ por fechas" },
         });
 
         expect(
             screen.getByLabelText("Motivo del rechazo (opcional)"),
-        ).toHaveValue("No procede  por fechas ¿ok? 🙂👩🏽‍💻🇲🇽");
+        ).toHaveValue("No procede @ por fechas");
 
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
-        expect(onConfirm).toHaveBeenCalledWith(
-            "No procede  por fechas ¿ok? 🙂👩🏽‍💻🇲🇽",
-        );
+        expect(onConfirm).not.toHaveBeenCalled();
+        expect(
+            screen.getByText(
+                "La retroalimentación solo puede contener letras, números, emojis, espacios y signos permitidos",
+            ),
+        ).toBeInTheDocument();
     });
 
     it("muestra estado loading y deshabilita botones y textarea", () => {

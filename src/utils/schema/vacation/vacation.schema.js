@@ -164,7 +164,7 @@ export const VACATION_REJECTION_FEEDBACK_MAX_LENGTH = 500;
 const VACATION_REJECTION_FEEDBACK_EMOJI_SEQUENCE_REGEX =
     "(?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})?(?:\\u200D\\p{Extended_Pictographic}(?:\\uFE0F|\\p{Emoji_Modifier})?)*)";
 const VACATION_REJECTION_FEEDBACK_ALLOWED_CHAR_REGEX =
-    "[\\p{L}\\p{M}\\p{N} \\r\\n.,:;()¿?¡!/-]";
+    '[\\p{L}\\p{M}\\p{N} \\r\\n.,:;()¿?¡!°&%"=+*/_#~/-]';
 export const VACATION_REJECTION_FEEDBACK_ALLOWED_CHARS_REGEX = new RegExp(
     `^(?:${VACATION_REJECTION_FEEDBACK_ALLOWED_CHAR_REGEX}|${VACATION_REJECTION_FEEDBACK_EMOJI_SEQUENCE_REGEX})*$`,
     "u",
@@ -188,7 +188,7 @@ export const vacationRejectionFeedbackSchema = z.object({
         )
         .regex(
             VACATION_REJECTION_FEEDBACK_ALLOWED_CHARS_REGEX,
-            "La retroalimentación solo puede contener letras, números, espacios y signos básicos",
+            "La retroalimentación solo puede contener letras, números, emojis, espacios y signos permitidos",
         )
         .optional()
         .default(""),
