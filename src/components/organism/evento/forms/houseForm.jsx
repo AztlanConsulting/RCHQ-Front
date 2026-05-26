@@ -27,6 +27,10 @@ const CasaForm = (props) => {
 
     const isTimeVisible = !form.allDay;
 
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = new Date(currentYear, 0, 1);
+    const houseDateMax = new Date(currentYear + 2, 11, 31);
+
     return (
         <>
             <div
@@ -53,6 +57,8 @@ const CasaForm = (props) => {
                                 onChange={(e) =>
                                     setField("startDate", e.target.value)
                                 }
+                                minDate={houseDateMin}
+                                maxDate={houseDateMax}
                                 error={!!errors.startDate}
                             />
                         </div>
@@ -98,6 +104,8 @@ const CasaForm = (props) => {
                                 onChange={(e) =>
                                     setField("endDate", e.target.value)
                                 }
+                                minDate={houseDateMin}
+                                maxDate={houseDateMax}
                                 error={!!errors.endDate}
                             />
                         </div>
