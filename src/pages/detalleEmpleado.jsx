@@ -94,8 +94,8 @@ const DetalleEmpleado = () => {
     employeeId,
     employeeFullName,
     setAlert,
-    employee?.isActive !== false,
-
+    employee?.isActive,
+    getEmployeeDetail
   )
 
   if (isLoading) return <Loader />;

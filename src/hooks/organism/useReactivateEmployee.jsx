@@ -12,7 +12,7 @@ export const useReactivateEmployee = (employeeId, employeeName, setAlert, isActi
   const [isSubmittingReactivate, setIsSubmittingReactivate] = useState(false);
 
   const openReactivateModal = () => {
-    if (!isActive) {
+    if (isActive) {
       setAlert({
         type: "error",
         message: "El empleado ya ha sido reactivado previamente.",

@@ -2,7 +2,7 @@
 
 // const MAX_CHARS = 250;
 
-const ReasonCard = ({
+const ReactivateCard = ({
   isOpen,
   employee,
 //   fieldError,
@@ -111,4 +111,4 @@ const ReasonCard = ({
   );
 };
 
-export default ReasonCard;
+export default ReactivateCard;
