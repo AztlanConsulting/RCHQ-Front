@@ -4,6 +4,7 @@ const ConfirmDeleteVacationModal = ({
     event,
     loading = false,
     error = "",
+    showEmployeeInfo = true,
     onCancel,
     onConfirm,
 }) => {
@@ -28,11 +29,17 @@ const ConfirmDeleteVacationModal = ({
                 </h3>
 
                 <div className="text-sm text-slate-500">
-                    Está a punto de eliminar la solicitud de vacaciones de{" "}
-                    <span className="font-semibold text-slate-700">
-                        {employeeName}
-                    </span>
-                    {curp ? ` - ${curp}` : ""}. Esta acción no se puede deshacer.
+                    {showEmployeeInfo ? (
+                        <>
+                            Está a punto de eliminar la solicitud de vacaciones de{" "}
+                            <span className="font-semibold text-slate-700">
+                                {employeeName}
+                            </span>
+                            {curp ? ` - ${curp}` : ""}. Esta acción no se puede deshacer.
+                        </>
+                    ) : (
+                        "Está a punto de eliminar la solicitud de vacaciones. Esta acción no se puede deshacer."
+                    )}
 
                     {error ? (
                         <span className="mt-3 block rounded-md bg-red-50 px-3 py-2 text-red-600">

@@ -62,6 +62,7 @@ const setCalendarHooks = ({
     const cancelVacationEdit = vi.fn();
     const setVacationField = vi.fn();
     const submitVacationEdit = vi.fn();
+    const openDeleteVacation = vi.fn();
 
     useBaseCalendar.mockReturnValue({
         employeeHouseName: "",
@@ -167,12 +168,19 @@ const setCalendarHooks = ({
         cancelVacationEdit,
         setVacationField,
         submitVacationEdit,
+        isDeleteVacationOpen: false,
+        isDeletingVacation: false,
+        deleteVacationError: "",
+        openDeleteVacation,
+        cancelDeleteVacation: vi.fn(),
+        confirmDeleteVacation: vi.fn(),
     });
     return {
         startVacationEdit,
         cancelVacationEdit,
         setVacationField,
         submitVacationEdit,
+        openDeleteVacation,
     };
 };
 
@@ -239,5 +247,18 @@ describe("Integración: Calendario - vacaciones", () => {
         render(<Calendario />);
         fireEvent.click(screen.getByRole("button", { name: /editar/i }));
         expect(startVacationEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it("permite abrir eliminación desde el detalle de vacaciones del trabajador", () => {
+        vi.setSystemTime(new Date(2026, 5, 1, 12));
+        const { openDeleteVacation } = setCalendarHooks({
+            viewerRole: "Cocinero",
+        });
+
+        render(<Calendario />);
+
+        fireEvent.click(screen.getByRole("button", { name: /eliminar/i }));
+
+        expect(openDeleteVacation).toHaveBeenCalledTimes(1);
     });
 });
