@@ -4,6 +4,7 @@ import TextField from "../atoms/textField";
 import DateField from "../atoms/dateField";
 import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
+import ErrorText from "../atoms/errorText";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -18,6 +19,7 @@ const EmployeeBasicCard = ({
   setBasicPicture,
   saving,
   saveError,
+  errors = {},
   infoDrawer,
   onOpenEdit,
   onSubmit,
@@ -187,6 +189,9 @@ const EmployeeBasicCard = ({
                       />
                     </>
                   )}
+                  <div className="min-h-5">
+                    {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+                  </div>
                 </div>
               ))}
             </div>

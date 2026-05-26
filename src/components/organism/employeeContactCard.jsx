@@ -1,6 +1,7 @@
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
+import ErrorText from "../atoms/errorText";
 
 const EmployeeContactCard = ({
   employee,
@@ -10,6 +11,7 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
+  errors = {},
   onOpenEdit,
   onSubmit,
   onCancel,
@@ -100,6 +102,9 @@ const EmployeeContactCard = ({
                 labelClassName="hidden"
                 text=""
               />
+              <div className="min-h-5">
+                {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+              </div>
             </div>
           ))}
         </div>
