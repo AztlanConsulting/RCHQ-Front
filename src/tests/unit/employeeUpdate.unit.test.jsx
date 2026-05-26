@@ -17,6 +17,12 @@ vi.mock("../utils/apiErrors", () => ({
   buildApiError: vi.fn((res, data, msg) => new Error(data?.message ?? msg)),
 }));
 
+vi.mock("../../components/atoms/timeField", () => ({
+  default: ({ value, onChange }) => (
+    <input type="time" value={value || ""} onChange={(e) => onChange(e.target.value)} />
+  ),
+}));
+
 // ── Imports después de los mocks ───────────────────────────────────────────────
 
 import { getToken } from "../../utils/authStorage";
@@ -114,6 +120,19 @@ describe("employeeUpdateService", () => {
       await updateBasicInfoService(EMP_ID, body);
       const call = secureFetch.mock.calls[0][1];
       expect(JSON.parse(call.body)).toEqual(body);
+    });
+
+    it("envía FormData sin Content-Type manual cuando se actualiza foto", async () => {
+      mockFetch(true, { success: true });
+      const formData = new FormData();
+      formData.append("name", "Juan");
+      formData.append("picture", new Blob(["avatar"], { type: "image/jpeg" }), "avatar.jpg");
+
+      await updateBasicInfoService(EMP_ID, formData);
+
+      const call = secureFetch.mock.calls[0][1];
+      expect(call.body).toBe(formData);
+      expect(call.headers["Content-Type"]).toBeUndefined();
     });
 
     it("retorna los datos si la respuesta es ok", async () => {
@@ -562,10 +581,10 @@ describe("EmployeeAdminCard", () => {
     houseId: "h1",
     roleId:  "r1",
     type:    "tiempo_completo",
-    salary:  "15000",
+    salary:  15000,
     selectedWorkdays: [
-      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00" },
-      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00" },
+      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00", allDay: false },
+      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00", allDay: false },
     ],
   };
 
@@ -575,7 +594,7 @@ describe("EmployeeAdminCard", () => {
     employee:                mockEmployee,
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
-    employeeFaults:          [],
+    employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
     loadingCatalogues:       false,
@@ -584,6 +603,7 @@ describe("EmployeeAdminCard", () => {
     houses:  [{ houseId: "h1", name: "Casa Test" }],
     setAdminField:  vi.fn(),
     toggleWorkday:  vi.fn(),
+    setWorkdayAllDay: vi.fn(),
     setWorkdayTime: vi.fn(),
     saving:         false,
     saveError:      null,
@@ -619,12 +639,13 @@ describe("EmployeeAdminCard", () => {
 
     it("muestra el número de días trabajados", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
+      expect(screen.getByText(/2 días trabajados/i)).toBeInTheDocument();
     });
 
-    it("muestra 0 faltas", () => {
-      render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("0")).toBeInTheDocument();
+    it("muestra los días hábiles de ausencias", () => {
+      render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
+      expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
+      expect(screen.getByText("5")).toBeInTheDocument();
     });
 
     it("muestra 0 solicitudes de vacaciones", () => {
@@ -661,6 +682,11 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
     });
 
+    it("muestra el select de Frecuencia de pago con la opción por defecto", () => {
+      render(<EmployeeAdminCard {...editingProps} />);
+      expect(screen.getByText("Sin asignar")).toBeInTheDocument();
+    });
+
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       expect(screen.getByText("Admin")).toBeInTheDocument();
@@ -687,7 +713,7 @@ describe("EmployeeAdminCard", () => {
     it("llama a toggleWorkday al hacer click en un checkbox", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[1]); // Martes
+      fireEvent.click(checkboxes[2]); // Martes (0=Lunes, 1=Lunes allDay, 2=Martes)
       expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
     });
 

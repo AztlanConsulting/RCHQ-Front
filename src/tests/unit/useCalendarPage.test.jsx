@@ -1,19 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useCalendarPage } from "../../hooks/pages/useCalendarPage";
-import {
-    deleteAbsenceService,
-    updateAbsenceService,
-} from "../../services/calendarService";
-import {
-    deleteVacationRequest,
-    getRemainingVacations,
-    updateVacationRequestDates,
-} from "../../services/vacationService";
-import {
-    approveVacationRequest,
-    rejectVacationRequest,
-} from "../../services/vacationRequestService";
+import { deleteAbsenceService, updateAbsenceService } from "../../services/calendarService";
+import { deleteVacationRequest, getRemainingVacations, updateVacationRequestDates } from "../../services/vacationService";
+import { approveVacationRequest, rejectVacationRequest } from "../../services/vacationRequestService";
 
 vi.mock("../../services/calendarService", () => ({
     deleteAbsenceService: vi.fn(),
@@ -21,11 +11,7 @@ vi.mock("../../services/calendarService", () => ({
     buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
 }));
 
-vi.mock("../../services/vacationService", () => ({
-    deleteVacationRequest: vi.fn(),
-    getRemainingVacations: vi.fn(),
-    updateVacationRequestDates: vi.fn(),
-}));
+vi.mock("../../services/vacationService");
 
 vi.mock("../../services/vacationRequestService", () => ({
     approveVacationRequest: vi.fn(),
@@ -91,7 +77,7 @@ describe("useCalendarPage", () => {
         vi.clearAllMocks();
         vi.stubGlobal("open", vi.fn());
 
-        getRemainingVacations.mockResolvedValue({
+        vi.mocked(getRemainingVacations).mockResolvedValue({
             remainingVacations: 8,
             startDate: "2026-01-01",
             endDate: "2026-12-31",
@@ -418,7 +404,7 @@ describe("useCalendarPage", () => {
     it("actualiza la vacación, recarga el rango y muestra alerta de éxito", async () => {
         const reloadCurrentRange = vi.fn().mockResolvedValue([]);
 
-        updateVacationRequestDates.mockResolvedValue({
+        vi.mocked(updateVacationRequestDates).mockResolvedValue({
             vacationRequestId: "vacation-1",
             startDate: "2026-06-06",
             endDate: "2026-06-12",
@@ -442,7 +428,7 @@ describe("useCalendarPage", () => {
             await result.current.submitVacationEdit();
         });
 
-        expect(updateVacationRequestDates).toHaveBeenCalledWith({
+        expect(vi.mocked(updateVacationRequestDates)).toHaveBeenCalledWith({
             vacationRequestId: "vacation-1",
             startDate: "2026-06-06",
             endDate: "2026-06-12",
@@ -473,7 +459,7 @@ describe("useCalendarPage", () => {
     });
 
     it("muestra error si falla la actualización de vacaciones", async () => {
-        updateVacationRequestDates.mockRejectedValue(
+        vi.mocked(updateVacationRequestDates).mockRejectedValue(
             new Error("No se pudo actualizar vacaciones"),
         );
 
@@ -501,7 +487,7 @@ describe("useCalendarPage", () => {
 
     it("elimina la vacación, recarga el rango y cierra el detalle", async () => {
         const reloadCurrentRange = vi.fn().mockResolvedValue([]);
-        deleteVacationRequest.mockResolvedValue({
+        vi.mocked(deleteVacationRequest).mockResolvedValue({
             vacationRequestId: "vacation-1",
         });
 
@@ -525,7 +511,7 @@ describe("useCalendarPage", () => {
             await result.current.confirmDeleteVacation();
         });
 
-        expect(deleteVacationRequest).toHaveBeenCalledWith("vacation-1");
+        expect(vi.mocked(deleteVacationRequest)).toHaveBeenCalledWith("vacation-1");
         expect(reloadCurrentRange).toHaveBeenCalledTimes(1);
         expect(result.current.selectedEvent).toBe(null);
         expect(result.current.alert).toEqual({
@@ -535,7 +521,7 @@ describe("useCalendarPage", () => {
     });
 
     it("muestra error si falla la eliminación de vacaciones", async () => {
-        deleteVacationRequest.mockRejectedValue(
+        vi.mocked(deleteVacationRequest).mockRejectedValue(
             new Error("No se pudo eliminar vacaciones"),
         );
 
@@ -561,7 +547,7 @@ describe("useCalendarPage", () => {
     });
 
     it("muestra error de permisos si el back rechaza la eliminación de vacaciones", async () => {
-        deleteVacationRequest.mockRejectedValue(
+        vi.mocked(deleteVacationRequest).mockRejectedValue(
             new Error("No puede acceder a este recurso"),
         );
 
