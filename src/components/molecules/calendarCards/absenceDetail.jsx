@@ -86,6 +86,8 @@ const AbsenceDetail = ({
   absenceDeleteError = "",
   absenceEvidenceFileName = "",
   absenceEvidenceError = "",
+  absenceMinStartDate,
+  absenceMaxEndDate,
   isSaving = false,
   isDeleteOpen = false,
   isLoadingWhileDeleting = false,
@@ -112,6 +114,13 @@ const AbsenceDetail = ({
   const evidencePlaceholder = hasEvidence
     ? "Selecciona un nuevo archivo para reemplazar la evidencia"
     : "Selecciona un archivo de evidencia";
+  const selectedStartDate = absenceForm?.startDate
+    ? new Date(`${absenceForm.startDate}T00:00:00`)
+    : null;
+  const absenceEndMinDate =
+    selectedStartDate && absenceMinStartDate && selectedStartDate < absenceMinStartDate
+      ? absenceMinStartDate
+      : selectedStartDate ?? absenceMinStartDate;
 
   if (isEditing) {
     return (
@@ -146,6 +155,8 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("startDate", editEvent.target.value)
             }
+            minDate={absenceMinStartDate}
+            maxDate={absenceMaxEndDate}
             labelColor="text-[#121212]"
             popupAlign="left"
             popupSize="compact"
@@ -157,11 +168,8 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("endDate", editEvent.target.value)
             }
-            minDate={
-              absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T00:00:00`)
-                : undefined
-            }
+            minDate={absenceEndMinDate}
+            maxDate={absenceMaxEndDate}
             labelColor="text-[#121212]"
             popupAlign="right"
             popupSize="compact"

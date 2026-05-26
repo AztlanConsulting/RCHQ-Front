@@ -5,6 +5,7 @@ import {
     getAbsenceAddData,
 } from "../../services/calendarService";
 import {
+    buildAbsenceDateLimits,
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,
 } from "../../utils/schema/evento/absence.schema";
@@ -20,38 +21,6 @@ const DEFAULT_FORM = {
 
 const normalizeInitialDate = (value) =>
     value ? String(value).slice(0, 10) : "";
-
-const toDateInputValue = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-};
-
-const buildAbsenceDateLimits = () => {
-    const today = new Date();
-    const minStartDate = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        today.getDate(),
-    );
-    const maxEndDate = new Date(
-        today.getFullYear() + 1,
-        today.getMonth(),
-        today.getDate(),
-    );
-
-    minStartDate.setHours(0, 0, 0, 0);
-    maxEndDate.setHours(23, 59, 59, 999);
-
-    return {
-        minStartDate,
-        maxEndDate,
-        minStartDateValue: toDateInputValue(minStartDate),
-        maxEndDateValue: toDateInputValue(maxEndDate),
-    };
-};
 
 const getSubmitErrorMessage = (error) => {
     const detailedErrors = Array.isArray(error?.errors)
