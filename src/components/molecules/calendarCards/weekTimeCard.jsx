@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import { getStartHour } from "@/utils/dates";
 
 const WeekTimeCard = ({ arg }) => {
@@ -5,8 +6,8 @@ const WeekTimeCard = ({ arg }) => {
   const start = ev.start;
   const end = ev.end;
   const x = ev.extendedProps ?? {};
-  const icon = x.icon;
   const subtitle = String(x.subtitle ?? "").trim();
+  const description = String(x.description ?? "").trim();
 
   let timeLine = "";
   if (!ev.allDay && start != null && end != null) {
@@ -15,36 +16,97 @@ const WeekTimeCard = ({ arg }) => {
     if (a && b) timeLine = `${a} – ${b}`;
   }
 
-  const startHm = start != null ? getStartHour(start) : "";
-  // const showDayLabel = ev.allDay || startHm === "00:00";
+  const cardRef = useRef(null);
+  const fixedRef = useRef(null);
+  const measureRef = useRef(null);
+  const [showDescription, setShowDescription] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!description || ev.allDay) {
+      setShowDescription(false);
+      return;
+    }
+
+    const card = cardRef.current;
+    const fixed = fixedRef.current;
+    const measureEl = measureRef.current;
+    if (!card || !fixed || !measureEl) return;
+
+    const compute = () => {
+      const cs = getComputedStyle(card);
+      const padX =
+        parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      const innerW = Math.max(0, card.clientWidth - padX);
+
+      measureEl.style.width = `${innerW}px`;
+
+      const descH = measureEl.offsetHeight;
+
+      const gapParsed = parseFloat(cs.rowGap || cs.gap || "0");
+      const gap = Number.isFinite(gapParsed) ? gapParsed : 0;
+
+      const available = card.clientHeight - fixed.offsetHeight - gap;
+
+      setShowDescription(innerW > 0 && available + 0.5 >= descH);
+    };
+
+    compute();
+
+    const ro = new ResizeObserver(compute);
+    ro.observe(card);
+    ro.observe(fixed);
+
+    return () => ro.disconnect();
+  }, [description, subtitle, ev.title, timeLine, ev.allDay]);
+
+  const titleClass =
+    ev.allDay
+      ? "fc-weekTimeCard-title font-medium text-xs"
+      : "fc-weekTimeCard-title font-medium text-sm";
+
   return (
     <div
-      className="fc-weekTimeCard"
+      ref={cardRef}
+      className={`fc-weekTimeCard${ev.allDay ? " fc-weekTimeCard--allday" : ""}`}
       style={{
         backgroundColor: ev.backgroundColor,
         borderColor: ev.borderColor ?? ev.backgroundColor,
       }}
     >
-      <div className="fc-weekTimeCard-titleRow">
-        <span className="fc-weekTimeCard-title font-medium">{ev.title}</span>
-        {/* {icon ? (
-          <img
-            src={`/${icon}.svg`}
-            alt=""
-            className="h-3.5 w-3.5 shrink-0 object-contain brightness-0 invert"
-            loading="lazy"
-          />
-        ) : null} */}
+      <div ref={fixedRef} className="fc-weekTimeCard-fixed">
+        <div className="fc-weekTimeCard-titleRow">
+          <span className={titleClass}>{ev.title}</span>
+        </div>
+
+        {timeLine ? (
+          <span className="fc-weekTimeCard-meta block">{timeLine}</span>
+        ) : null}
+
+        {subtitle ? (
+          <span className="fc-weekTimeCard-subtitle block">{subtitle}</span>
+        ) : null}
       </div>
 
-      {timeLine ? (
-        <span className="fc-weekTimeCard-meta block">
-          {timeLine}
-        </span>
+      {!ev.allDay && description && showDescription ? (
+        <div className="fc-weekTimeCard-description mt-3">{description}</div>
       ) : null}
 
-      {subtitle ? (
-        <span className="fc-weekTimeCard-subtitle block">{subtitle}</span>
+      {!ev.allDay && description ? (
+        <div
+          aria-hidden
+          className="fc-weekTimeCard-measure-host"
+          style={{
+            position: "absolute",
+            left: -99999,
+            top: 0,
+            visibility: "hidden",
+            pointerEvents: "none",
+          }}
+        >
+          <div ref={measureRef} className="fc-weekTimeCard-description">
+            {description}
+          </div>
+        </div>
       ) : null}
     </div>
   );

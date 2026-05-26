@@ -1,6 +1,7 @@
 import { getStartHour } from "@/utils/dates";
 
 const DayTimeCard = ({ arg }) => {
+  console.log("event; ", arg)
   const ev = arg.event;
   const start = ev.start;
   const end = ev.end;
@@ -16,7 +17,7 @@ const DayTimeCard = ({ arg }) => {
     if (a && b) timeLine = `${a} – ${b}`;
   }
   const startHm = start != null ? getStartHour(start) : "";
-  const showDayLabel = ev.allDay || startHm === "00:00";
+  // const showDayLabel = ev.allDay || startHm === "00:00";
 
   return (
     <div
@@ -27,7 +28,7 @@ const DayTimeCard = ({ arg }) => {
       }}
     >
       <div className="fc-dayTimeCard-titleRow">
-        <span className="fc-dayTimeCard-title font-medium">{ev.title}</span>
+        <span className="fc-dayTimeCard-title font-medium text-base">{ev.title}</span>
         {icon ? (
           <img
             src={`/${icon}.svg`}
@@ -38,9 +39,9 @@ const DayTimeCard = ({ arg }) => {
         ) : null}
       </div>
 
-      {ev.allDay || timeLine ? (
+      {timeLine ? (
         <span className="fc-dayTimeCard-meta block">
-          {showDayLabel ? "Día" : timeLine}
+          {timeLine}
         </span>
       ) : null}
 

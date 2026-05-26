@@ -54,11 +54,11 @@ const EventDetail = ({
 
     return (
         <div className="relative text-left">
-            <Type variant="page-title" className="mb-2" as="h2">
+            <Type variant="page-title" as="h2">
                 {event.title ?? "—"}
             </Type>
 
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2">
                 <span
                     className="inline-block size-3 rounded-full shrink-0"
                     style={{
@@ -82,7 +82,7 @@ const EventDetail = ({
             </div>
 
             {event.subtitle ? (
-                <Type variant="body" className="mb-4 block">
+                <Type variant="body" className="mb-6 block">
                     {event.subtitle}
                 </Type>
             ) : null}
@@ -115,7 +115,7 @@ const EventDetail = ({
             ) : null}
 
             {event.description ? (
-                <div className="mb-4">
+                <div className="mb-6">
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
