@@ -8,8 +8,13 @@ import Modal from "../../atoms/modal";
 import SelectField from "../../atoms/selectField";
 import TextField from "../../atoms/textField";
 import TimeField from "../../atoms/timeField";
+import TimeZoneSaveNotice from "../../atoms/timeZoneSaveNotice";
 import OverlapModal from "../overlapModal";
 import { useUpdatePersonalEventForm } from "../../../hooks/pages/useUpdatePersonalEventForm";
+import {
+    getPersonalEndTimeMinTime,
+    getPersonalTimeZoneSaveNotice,
+} from "../../../utils/schema/evento/personalEventRules";
 
 const UpdatePersonalEventModal = ({
     event,
@@ -17,6 +22,8 @@ const UpdatePersonalEventModal = ({
     onClose,
     onSuccess,
     calendarTimeZone,
+    calendarTimeZoneMode,
+    canSwitchCalendarTimeZone,
 }) => {
     const {
         form,
@@ -29,6 +36,7 @@ const UpdatePersonalEventModal = ({
         isSubmitting,
         isCoordinator,
         overlapState,
+        showEndDateField,
         setField,
         setServerError,
         setValidationAlert,
@@ -44,9 +52,16 @@ const UpdatePersonalEventModal = ({
         onClose,
         onSuccess,
         calendarTimeZone,
+        calendarTimeZoneMode,
+        canSwitchCalendarTimeZone,
     });
 
     const showTimeFields = !form.allDay;
+    const timeZoneSaveNotice = getPersonalTimeZoneSaveNotice({
+        allDay: form.allDay,
+        calendarTimeZoneMode,
+        canSwitchCalendarTimeZone,
+    });
 
     const today = new Date();
     const personalDateMin = today;
@@ -99,21 +114,53 @@ const UpdatePersonalEventModal = ({
                     {errors.name && <ErrorText>{errors.name}</ErrorText>}
 
                     <div className="flex flex-col gap-2">
-                        <div>
-                            <DateField
-                                label="Fecha"
-                                labelColor="text-[#374151]"
-                                value={form.date}
-                                onChange={(e) =>
-                                    setField("date", e.target.value)
-                                }
-                                placeholder="dd / mm / yyyy"
-                                minDate={personalDateMin}
-                                maxDate={personalDateMax}
-                                error={!!errors.date}
-                            />
-                            {errors.date && (
-                                <ErrorText>{errors.date}</ErrorText>
+                        <div
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: showEndDateField
+                                    ? "minmax(0, 1fr) minmax(0, 1fr)"
+                                    : "minmax(0, 1fr)",
+                                gap: "8px",
+                            }}
+                        >
+                            <div style={{ minWidth: 0 }}>
+                                <DateField
+                                    label="Fecha"
+                                    labelColor="text-[#374151]"
+                                    value={form.date}
+                                    onChange={(e) =>
+                                        setField("date", e.target.value)
+                                    }
+                                    placeholder="dd / mm / yyyy"
+                                    minDate={personalDateMin}
+                                    maxDate={personalDateMax}
+                                    error={!!errors.date}
+                                />
+                                {errors.date && (
+                                    <ErrorText>{errors.date}</ErrorText>
+                                )}
+                            </div>
+
+                            {showEndDateField && (
+                                <div style={{ minWidth: 0 }}>
+                                    <DateField
+                                        label="Fecha final"
+                                        labelColor="text-[#374151]"
+                                        value={form.endDate}
+                                        onChange={(e) =>
+                                            setField("endDate", e.target.value)
+                                        }
+                                        placeholder="dd / mm / yyyy"
+                                        minDate={form.date ? new Date(`${form.date}T12:00:00`) : personalDateMin}
+                                        maxDate={personalDateMax}
+                                        error={!!errors.endDate}
+                                    />
+                                    {errors.endDate && (
+                                        <ErrorText>
+                                            {errors.endDate}
+                                        </ErrorText>
+                                    )}
+                                </div>
                             )}
                         </div>
 
@@ -149,7 +196,7 @@ const UpdatePersonalEventModal = ({
                                         onChange={(value) =>
                                             setField("endTime", value)
                                         }
-                                        minTime={form.startTime}
+                                        minTime={getPersonalEndTimeMinTime(form)}
                                         placeholder="Fin"
                                         error={errors.endTime}
                                         hideErrorText
@@ -176,6 +223,8 @@ const UpdatePersonalEventModal = ({
                             onChange={(value) => setField("allDay", value)}
                         />
                     </div>
+
+                    <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
                     <SelectField
                         value={form.eventTypeId}

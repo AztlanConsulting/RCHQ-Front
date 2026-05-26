@@ -22,7 +22,7 @@ const buildAbsence = (overrides = {}) => ({
     type: "Médica",
     description: "Reposo indicado",
     start: "2026-05-05T06:00:00.000Z",
-    end: "2026-05-10T05:59:59.999Z",
+    end: "2026-05-10T06:00:00.000Z",
     startDate: "2026-05-05",
     endDate: "2026-05-09",
     allDay: true,
@@ -162,7 +162,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         const absence = buildAbsence({
             absenceId: "timezone-absence",
             start: "2026-05-05T06:00:00.000Z",
-            end: "2026-05-06T05:59:59.999Z",
+            end: "2026-05-06T06:00:00.000Z",
             startDate: "2026-05-05",
             endDate: "2026-05-05",
             totalDays: 1,
@@ -195,7 +195,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
 
         expect(result.current.visibleEvents[0]).toMatchObject({
             start: "2026-05-05T01:00:00",
-            end: "2026-05-06T00:59:59",
+            end: "2026-05-06T01:00:00",
             allDay: false,
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
@@ -305,7 +305,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             scope: "global",
             type: "General",
             start: "2026-05-05T06:00:00.000Z",
-            end: "2026-05-06T05:59:59.999Z",
+            end: "2026-05-06T06:00:00.000Z",
             allDay: true,
             isFreeDay: true,
         };
@@ -337,7 +337,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             },
             {
                 start: "2026-05-06T00:00:00",
-                end: "2026-05-06T00:59:59",
+                end: "2026-05-06T01:00:00",
                 currentDayIndex: 2,
                 totalDays: 2,
             },
@@ -420,7 +420,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             scope: "global",
             type: "General",
             start: "2026-05-05T06:00:00.000Z",
-            end: "2026-05-06T05:59:59.999Z",
+            end: "2026-05-06T06:00:00.000Z",
             allDay: true,
             isFreeDay: true,
         };
@@ -454,7 +454,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
 
         expect(result.current.visibleEvents[0]).toMatchObject({
             start: "2026-05-05T01:00:00",
-            end: "2026-05-06T00:59:59",
+            end: "2026-05-06T01:00:00",
             allDay: false,
         });
         expect(result.current.visibleEvents[0].extendedProps.isFreeDay).toBe(

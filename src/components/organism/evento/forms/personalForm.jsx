@@ -10,6 +10,10 @@ import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import OverlapModal from "../../overlapModal";
 
 import { usePersonalForm } from "../../../../hooks/pages/usePersonalForm";
+import {
+    getPersonalEndTimeMinTime,
+    getPersonalTimeZoneSaveNotice,
+} from "../../../../utils/schema/evento/personalEventRules";
 
 const PersonalForm = (props) => {
     const {
@@ -22,6 +26,7 @@ const PersonalForm = (props) => {
         isSubmitting,
         isCoordinator,
         overlapState,
+        showEndDateField,
         setField,
         setServerError,
         searchEmployees,
@@ -33,11 +38,11 @@ const PersonalForm = (props) => {
     } = usePersonalForm(props);
 
     const isTimeVisible = !form.allDay;
-    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
-        ? props.calendarTimeZoneMode === "mexico"
-            ? "Este evento se guardará con base en horario central de México."
-            : "Este evento se guardará con base en tu horario local."
-        : "";
+    const timeZoneSaveNotice = getPersonalTimeZoneSaveNotice({
+        allDay: form.allDay,
+        calendarTimeZoneMode: props.calendarTimeZoneMode,
+        canSwitchCalendarTimeZone: props.canSwitchCalendarTimeZone,
+    });
 
     const today = new Date();
     const personalDateMin = today;
@@ -52,18 +57,48 @@ const PersonalForm = (props) => {
                     gap: "8px",
                 }}
             >
-                <div style={{ flex: 1 }}>
-                    <DateField
-                        label="Fecha"
-                        labelColor="text-[#374151]"
-                        value={form.date}
-                        placeholder="dd / mm / yyyy"
-                        onChange={(e) => setField("date", e.target.value)}
-                        minDate={personalDateMin}
-                        maxDate={personalDateMax}
-                        error={!!errors.date}
-                    />
-                    {errors.date && <ErrorText>{errors.date}</ErrorText>}
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: showEndDateField
+                            ? "minmax(0, 1fr) minmax(0, 1fr)"
+                            : "minmax(0, 1fr)",
+                        gap: "8px",
+                    }}
+                >
+                    <div style={{ minWidth: 0 }}>
+                        <DateField
+                            label="Fecha"
+                            labelColor="text-[#374151]"
+                            value={form.date}
+                            placeholder="dd / mm / yyyy"
+                            onChange={(e) => setField("date", e.target.value)}
+                            minDate={personalDateMin}
+                            maxDate={personalDateMax}
+                            error={!!errors.date}
+                        />
+                        {errors.date && <ErrorText>{errors.date}</ErrorText>}
+                    </div>
+
+                    {showEndDateField && (
+                        <div style={{ minWidth: 0 }}>
+                            <DateField
+                                label="Fecha final"
+                                labelColor="text-[#374151]"
+                                value={form.endDate}
+                                placeholder="dd / mm / yyyy"
+                                onChange={(e) =>
+                                    setField("endDate", e.target.value)
+                                }
+                                minDate={form.date ? new Date(`${form.date}T12:00:00`) : personalDateMin}
+                                maxDate={personalDateMax}
+                                error={!!errors.endDate}
+                            />
+                            {errors.endDate && (
+                                <ErrorText>{errors.endDate}</ErrorText>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div
@@ -96,7 +131,7 @@ const PersonalForm = (props) => {
                                 value={form.endTime}
                                 onChange={(value) => setField("endTime", value)}
                                 placeholder="Fin"
-                                minTime={form.startTime}
+                                minTime={getPersonalEndTimeMinTime(form)}
                                 error={errors.endTime}
                                 hideErrorText
                                 disabled={form.allDay}

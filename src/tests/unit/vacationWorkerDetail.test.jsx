@@ -204,7 +204,7 @@ describe("VacationWorkerDetail", () => {
             event: {
                 ...baseVacation,
                 start: "2026-06-05T06:00:00.000Z",
-                end: "2026-06-10T05:59:59.999Z",
+                end: "2026-06-10T06:00:00.000Z",
             },
             showMexicoReferenceNotice: true,
             calendarTimeZone: "America/Matamoros",

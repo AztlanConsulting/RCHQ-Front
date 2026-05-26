@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import {
     createPersonalEvent,
@@ -12,15 +12,29 @@ import {
     personalEventSchema,
     buildPersonalPayload,
 } from "../../utils/schema/evento/personalEvent.schema";
+import {
+    getPersonalEventMexicoRangeError,
+    getPersonalMexicoRangeErrorKey,
+    shouldShowPersonalEndDateField,
+} from "../../utils/schema/evento/personalEventRules";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
     description: "",
     allDay: false,
     date: "",
+    endDate: "",
     startTime: "",
     endTime: "",
 };
+
+const getSelectionEndDate = (initialStartDate, initialEndDate, formDate) =>
+    initialStartDate &&
+    initialStartDate === formDate &&
+    initialEndDate &&
+    initialEndDate !== formDate
+        ? initialEndDate
+        : undefined;
 
 export const usePersonalForm = ({
     name,
@@ -28,10 +42,13 @@ export const usePersonalForm = ({
     onClose,
     onSuccess,
     initialStartDate,
+    initialEndDate,
     initialStartTime,
     initialEndTime,
     initialAllDay,
     calendarTimeZone,
+    calendarTimeZoneMode,
+    canSwitchCalendarTimeZone,
     onNameError,
     onValidationAlert,
 }) => {
@@ -106,6 +123,7 @@ export const usePersonalForm = ({
 
         if (
             initialStartDate ||
+            initialEndDate ||
             initialStartTime ||
             initialEndTime ||
             initialAllDay != null
@@ -113,6 +131,10 @@ export const usePersonalForm = ({
             setForm((prev) => ({
                 ...prev,
                 date: initialStartDate ?? prev.date,
+                endDate:
+                    initialEndDate ??
+                    initialStartDate ??
+                    prev.endDate,
                 allDay: initialAllDay ?? prev.allDay,
                 startTime: initialStartTime ?? prev.startTime,
                 endTime: initialEndTime ?? prev.endTime,
@@ -121,14 +143,86 @@ export const usePersonalForm = ({
     }, [
         isOpen,
         initialStartDate,
+        initialEndDate,
         initialStartTime,
         initialEndTime,
         initialAllDay,
         onValidationAlert,
     ]);
 
+    const showEndDateField = shouldShowPersonalEndDateField({
+        allDay: form.allDay,
+        calendarTimeZoneMode,
+        canSwitchCalendarTimeZone,
+    });
+
+    const effectiveEndDate = useMemo(
+        () =>
+            showEndDateField
+                ? form.endDate || form.date
+                : getSelectionEndDate(
+                      initialStartDate,
+                      initialEndDate,
+                      form.date,
+                  ),
+        [
+            form.date,
+            form.endDate,
+            initialEndDate,
+            initialStartDate,
+            showEndDateField,
+        ],
+    );
+
+    const selectionMexicoRangeError = useMemo(() => {
+        if (!isOpen) return "";
+
+        return getPersonalEventMexicoRangeError({
+            startDate: form.date,
+            endDate: effectiveEndDate ?? form.date,
+            startTime: form.startTime,
+            endTime: form.endTime,
+            allDay: form.allDay,
+            calendarTimeZone,
+        });
+    }, [
+        calendarTimeZone,
+        effectiveEndDate,
+        form.allDay,
+        form.date,
+        form.endTime,
+        form.startTime,
+        isOpen,
+    ]);
+
+    const displayErrors = useMemo(
+        () => {
+            if (!selectionMexicoRangeError) return errors;
+
+            const errorKey = getPersonalMexicoRangeErrorKey(form.allDay);
+
+            return {
+                ...errors,
+                [errorKey]: errors[errorKey] ?? selectionMexicoRangeError,
+            };
+        },
+        [errors, form.allDay, selectionMexicoRangeError],
+    );
+
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
+        setForm((prev) => {
+            const next = { ...prev, [field]: value };
+
+            if (field === "date" && (!prev.endDate || prev.endDate < value)) {
+                next.endDate = value;
+            }
+
+            if (field === "allDay" && value) {
+                next.endDate = next.date;
+            }
+
+            return next;
+        });
         setErrors((prev) => ({ ...prev, [field]: undefined }));
     }, []);
 
@@ -144,17 +238,31 @@ export const usePersonalForm = ({
     }, []);
 
     const validate = () => {
+        const mexicoRangeError = getPersonalEventMexicoRangeError({
+            startDate: form.date,
+            endDate: effectiveEndDate ?? form.date,
+            startTime: form.startTime,
+            endTime: form.endTime,
+            allDay: form.allDay,
+            calendarTimeZone,
+        });
+
         const input = {
             ...form,
             name: name?.trim() ?? "",
             categoryKey: "personal",
+            endDate: effectiveEndDate,
             forceOverlap: false,
             employeeIds: selectedEmployees.map((e) => e.employeeId),
         };
 
         const result = personalEventSchema.safeParse(input);
 
-        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
+        if (
+            result.success &&
+            !mexicoRangeError &&
+            !(isCoordinator && selectedEmployees.length === 0)
+        ) {
             setErrors({});
             return result.data;
         }
@@ -172,6 +280,11 @@ export const usePersonalForm = ({
 
         if (isCoordinator && selectedEmployees.length === 0) {
             fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
+        if (mexicoRangeError) {
+            fieldErrors[getPersonalMexicoRangeErrorKey(form.allDay)] =
+                mexicoRangeError;
         }
 
         setErrors(fieldErrors);
@@ -222,6 +335,7 @@ export const usePersonalForm = ({
         await submitPayload(
             buildPersonalPayload({
                 ...validated,
+                endDate: effectiveEndDate,
                 forceOverlap: false,
                 timeZone: calendarTimeZone,
             }),
@@ -261,7 +375,7 @@ export const usePersonalForm = ({
 
     return {
         form,
-        errors,
+        errors: displayErrors,
         serverError,
         eventTypes,
         employees,
@@ -269,6 +383,7 @@ export const usePersonalForm = ({
         isSubmitting,
         isCoordinator,
         overlapState,
+        showEndDateField,
         setField,
         setServerError,
         searchEmployees,

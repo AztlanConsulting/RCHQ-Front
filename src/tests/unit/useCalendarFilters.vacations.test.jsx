@@ -21,7 +21,7 @@ const buildVacation = (overrides = {}) => ({
     curp: "US170101HDF00003",
     type: "Vacaciones",
     start: "2026-06-05T06:00:00.000Z",
-    end: "2026-06-11T05:59:59.999Z",
+    end: "2026-06-11T06:00:00.000Z",
     startDate: "2026-06-05",
     endDate: "2026-06-10",
     allDay: true,
@@ -225,7 +225,7 @@ describe("useCalendarFilters - vacaciones", () => {
         const vacation = buildVacation({
             vacationId: "timezone-vacation",
             start: "2026-06-05T06:00:00.000Z",
-            end: "2026-06-06T05:59:59.999Z",
+            end: "2026-06-06T06:00:00.000Z",
             startDate: "2026-06-05",
             endDate: "2026-06-05",
             totalDays: 1,
@@ -258,7 +258,7 @@ describe("useCalendarFilters - vacaciones", () => {
 
         expect(result.current.visibleEvents[0]).toMatchObject({
             start: "2026-06-05T01:00:00",
-            end: "2026-06-06T00:59:59",
+            end: "2026-06-06T01:00:00",
             allDay: false,
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({

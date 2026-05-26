@@ -73,7 +73,7 @@ describe("WorkerAbsenceDetail", () => {
         event={{
           ...baseAbsence,
           start: "2026-05-05T06:00:00.000Z",
-          end: "2026-05-10T05:59:59.999Z",
+          end: "2026-05-10T06:00:00.000Z",
         }}
         showMexicoReferenceNotice
         calendarTimeZone="America/Matamoros"
@@ -89,8 +89,7 @@ describe("WorkerAbsenceDetail", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Hora de inicio:")).toBeInTheDocument();
     expect(screen.getByText("Hora de término:")).toBeInTheDocument();
-    expect(screen.getByText("1:00 a.m.")).toBeInTheDocument();
-    expect(screen.getByText("12:59 a.m.")).toBeInTheDocument();
+    expect(screen.getAllByText("1:00 a.m.")).toHaveLength(2);
   });
 
   it("limita la descripción a 200 caracteres y conserva el texto completo en hover", () => {

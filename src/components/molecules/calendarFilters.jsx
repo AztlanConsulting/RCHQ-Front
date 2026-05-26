@@ -30,21 +30,22 @@ const vacationTrailing = (opt) =>
     />
   ) : null;
 
+const FilterSeparator = ({ emphasis = false, className = "" }) => (
+  <div
+    className={`border border-b ${
+      emphasis ? "border-[#1F3664]" : "border-[#EAEAEA]"
+    } ${className}`}
+  />
+);
+
 const CalendarSwitchGroup = ({
   label,
   options,
   value,
   onChange,
-  withDivider = false,
 }) => (
-  <div
-    className={`mt-2 ${withDivider ? "border-t border-slate-200 pt-3" : ""}`}
-  >
-    <Type
-      variant="metric-label"
-      className="mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.08em] text-slate-500"
-      as="p"
-    >
+  <div className="mt-2">
+    <Type variant="metric-label" className="text-sm" as="p">
       {label}
     </Type>
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -56,10 +57,10 @@ const CalendarSwitchGroup = ({
             key={option.value}
             type="button"
             onClick={() => onChange?.(option.value)}
-            className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
+            className={`flex min-h-11 w-full items-center justify-center rounded-md border px-2.5 py-2 text-center text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
               isActive
-                ? "bg-[#1F3664] text-white shadow-sm"
-                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                ? "border-transparent bg-[#1F3664] text-white shadow-sm"
+                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             }`}
           >
             {option.label}
@@ -130,20 +131,24 @@ const CalendarFilters = ({
       )}
       {canSwitchCalendarMode ? (
         <CalendarSwitchGroup
-          label="Calendario"
+          label="CALENDARIO"
           options={calendarModeOptions}
           value={calendarMode}
           onChange={onCalendarModeChange}
         />
       ) : null}
       {canSwitchCalendarTimeZone ? (
-        <CalendarSwitchGroup
-          label="Horario"
-          options={calendarTimeZoneOptions}
-          value={calendarTimeZoneMode}
-          onChange={onCalendarTimeZoneModeChange}
-          withDivider={canSwitchCalendarMode}
-        />
+        <>
+          {canSwitchCalendarMode ? (
+            <FilterSeparator className="my-2" />
+          ) : null}
+          <CalendarSwitchGroup
+            label="HORARIO"
+            options={calendarTimeZoneOptions}
+            value={calendarTimeZoneMode}
+            onChange={onCalendarTimeZoneModeChange}
+          />
+        </>
       ) : null}
       <div className={`flex flex-col gap-4 mt-4`}>
         <FilterGroup
@@ -154,7 +159,7 @@ const CalendarFilters = ({
           setValues={setFocusFilters}
           renderTrailing={focusTrailing}
         />
-        <div className="border border-b  border-[#1F3664]"></div>
+        <FilterSeparator emphasis />
         {viewerRole === "Coordinador" && calendarMode === "house" ? (
           <>
             <SearchableCheckboxDropdown
@@ -168,7 +173,7 @@ const CalendarFilters = ({
               onToggleValue={toggleEmployeeValue}
               onClearSelection={clearEmployeeSelection}
             />
-            <div className="border border-b border-[#EAEAEA]"></div>
+            <FilterSeparator />
           </>
         ) : null}
         <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
@@ -180,7 +185,7 @@ const CalendarFilters = ({
             setValues={setScopeFilters}
             renderTrailing={scopeTrailing}
           />
-          <div className="border border-b border-[#EAEAEA]"></div>
+          <FilterSeparator />
           {showEventFilters && (
             <>
               <FilterGroup
@@ -190,7 +195,7 @@ const CalendarFilters = ({
                 values={eventTypeFilters}
                 setValues={setEventTypeFilters}
               />
-              <div className="border border-b border-[#EAEAEA]"></div>
+              <FilterSeparator />
             </>
           )}
           {showVacationFilters && (
@@ -203,7 +208,7 @@ const CalendarFilters = ({
                 setValues={setVacationStatusFilters}
                 renderTrailing={vacationTrailing}
               />
-              <div className="border border-b border-[#EAEAEA]"></div>
+              <FilterSeparator />
             </>
           )}
           {showAbscenceFilters && (

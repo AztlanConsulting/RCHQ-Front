@@ -149,12 +149,12 @@ describe("calendarEventDetail", () => {
     ).toBe("3:30 p.m.");
   });
 
-  it("formatEventTime conserva el último minuto real del registro", () => {
+  it("formatEventTime conserva el minuto real del registro", () => {
     expect(
-      formatEventTime("2026-05-06T05:59:59.999Z", {
+      formatEventTime("2026-05-06T06:00:00.000Z", {
         timeZone: "America/Matamoros",
       }),
-    ).toBe("12:59 a.m.");
+    ).toBe("1:00 a.m.");
   });
 
   it("formatEventTime regresa guion si no hay valor", () => {

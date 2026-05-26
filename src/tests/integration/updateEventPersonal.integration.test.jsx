@@ -14,7 +14,11 @@ import {
     getEmployeesForSelector,
 } from "../../services/eventService";
 import { getCalendarViewerRole } from "../../services/calendarService";
-import { getBrowserTimeZone } from "../../utils/timeZone";
+import {
+    getBrowserTimeZone,
+    MEXICO_TIME_ZONE,
+    zonedDateTimeToIso,
+} from "../../utils/timeZone";
 
 vi.mock("../../services/updateEventService", () => ({
     updatePersonalEvent: vi.fn(),
@@ -262,10 +266,18 @@ describe("Integración: modificar evento personal", () => {
     });
 
     it("modifica un evento de todo el día", async () => {
-        await renderModal();
+        await renderModal({
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+            canSwitchCalendarTimeZone: true,
+        });
         await waitForForm();
 
         fireEvent.click(screen.getByLabelText(/todo el día/i));
+
+        expect(
+            screen.getByText(/los eventos personales de todo el día se guardan con base en horario central de méxico/i),
+        ).toBeInTheDocument();
 
         await clickSubmit();
 
@@ -278,6 +290,90 @@ describe("Integración: modificar evento personal", () => {
             expect.objectContaining({
                 allDay: true,
                 date: TODAY,
+                start: zonedDateTimeToIso(TODAY, "00:00", MEXICO_TIME_ZONE),
+                timeZone: MEXICO_TIME_ZONE,
+            }),
+        );
+    });
+
+    it("bloquea la modificación manual si el evento cruza de día en México central", async () => {
+        await renderModal({
+            event: {
+                ...mockEvent,
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "06:30",
+                    "Europe/London",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "08:00",
+                    "Europe/London",
+                ),
+            },
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+            canSwitchCalendarTimeZone: true,
+        });
+        await waitForForm();
+
+        expect(screen.getByLabelText("Fecha final")).toHaveValue("2026-06-05");
+
+        await clickSubmit();
+
+        expect(
+            screen.getByText(/no se puede crear un evento personal que abarque más de 1 día/i),
+        ).toBeInTheDocument();
+        expect(updatePersonalEvent).not.toHaveBeenCalled();
+    });
+
+    it("modifica un evento local foráneo usando fecha final cuando equivale a un día de México central", async () => {
+        await renderModal({
+            event: {
+                ...mockEvent,
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "07:00",
+                    "Europe/London",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-06",
+                    "07:00",
+                    "Europe/London",
+                ),
+            },
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+            canSwitchCalendarTimeZone: true,
+        });
+        await waitForForm();
+
+        expect(screen.getByLabelText("Fecha")).toHaveValue("2026-06-05");
+        expect(screen.getByLabelText("Fecha final")).toHaveValue("2026-06-06");
+
+        await clickSubmit();
+
+        await waitFor(() => {
+            expect(updatePersonalEvent).toHaveBeenCalledTimes(1);
+        });
+
+        expect(updatePersonalEvent).toHaveBeenCalledWith(
+            PERSONAL_EVENT_ID,
+            expect.objectContaining({
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "07:00",
+                    "Europe/London",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-06",
+                    "07:00",
+                    "Europe/London",
+                ),
+                timeZone: "Europe/London",
             }),
         );
     });

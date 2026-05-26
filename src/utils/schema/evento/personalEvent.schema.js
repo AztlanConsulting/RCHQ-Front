@@ -2,12 +2,18 @@ import { z } from "zod";
 import {
     addDaysToDateOnly,
     getBrowserTimeZone,
+    MEXICO_TIME_ZONE,
     zonedDateTimeToIso,
 } from "./dateTime";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const TEXT_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]+$/;
+
+const resolveTimedEndDate = (date, endTime) =>
+    String(endTime).slice(0, 5) === "00:00"
+        ? addDaysToDateOnly(date, 1)
+        : date;
 
 export const baseSchema = z.object({
     name: z
@@ -53,6 +59,8 @@ export const baseSchema = z.object({
             "La fecha no puede exceder 2 años a partir de hoy",
         ),
 
+    endDate: z.string().regex(dateRegex, "Fecha final inválida").optional(),
+
     forceOverlap: z.boolean().default(false),
 
     employeeIds: z.array(z.string().uuid()).optional(),
@@ -77,7 +85,9 @@ export const timedSchema = baseSchema
     .refine(
         (d) => {
             const start = new Date(`${d.date}T${d.startTime}:00`);
-            const end = new Date(`${d.date}T${d.endTime}:00`);
+            const end = new Date(
+                `${d.endDate ?? resolveTimedEndDate(d.date, d.endTime)}T${d.endTime}:00`,
+            );
             return end > start;
         },
         {
@@ -98,6 +108,7 @@ export function buildPersonalPayload(formData) {
         description,
         allDay,
         date,
+        endDate,
         startTime,
         endTime,
         employeeIds,
@@ -117,20 +128,21 @@ export function buildPersonalPayload(formData) {
     };
 
     if (allDay) {
+        const mexicoEndDate = addDaysToDateOnly(date, 1);
+
         return {
             ...base,
-            start: zonedDateTimeToIso(date, "00:00", timeZone),
-            end: zonedDateTimeToIso(
-                addDaysToDateOnly(date, 1),
-                "00:00",
-                timeZone,
-            ),
+            timeZone: MEXICO_TIME_ZONE,
+            start: zonedDateTimeToIso(date, "00:00", MEXICO_TIME_ZONE),
+            end: zonedDateTimeToIso(mexicoEndDate, "00:00", MEXICO_TIME_ZONE),
         };
     }
+
+    const resolvedEndDate = endDate ?? resolveTimedEndDate(date, endTime);
 
     return {
         ...base,
         start: zonedDateTimeToIso(date, startTime, timeZone),
-        end: zonedDateTimeToIso(date, endTime, timeZone),
+        end: zonedDateTimeToIso(resolvedEndDate, endTime, timeZone),
     };
 }

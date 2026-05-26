@@ -517,6 +517,8 @@ const Calendario = () => {
                 onClose={() => setEditingPersonalEvent(null)}
                 onSuccess={onPersonalEventEditSuccess}
                 calendarTimeZone={calendarTimeZone}
+                calendarTimeZoneMode={calendarTimeZoneMode}
+                canSwitchCalendarTimeZone={canSwitchCalendarTimeZone}
             />
 
             <RegisterEventModal
