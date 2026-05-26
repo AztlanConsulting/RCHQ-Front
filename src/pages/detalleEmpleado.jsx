@@ -9,6 +9,7 @@ import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
 import DocumentsSection from "../components/organism/documentsSection";
 import ReasonCard from "../components/organism/reasonCard";
+import ReactivateCard from "../components/organism/reactivateCard";
 import { useDrawer } from "@/hooks/atoms/useDrawer";
 import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
@@ -64,16 +65,16 @@ const DetalleEmpleado = () => {
     : "";
 
   const {
-    isModalOpen,
-    openModal,
-    closeModal,
+    isDeactivateModalOpen,
+    openDeactivateModal,
+    closeDeactivateModal,
     reason,
     handleReasonChange,
     addToBlacklist,
     setAddToBlacklist,
-    fieldError,
-    isSubmitting,
-    handleSubmit,
+    deactivateFieldError,
+    isSubmittingDeactivate,
+    handleSubmitDeactivate,
   } = useDeactivateEmployee(
     employeeId,
     employeeFullName,
@@ -81,6 +82,17 @@ const DetalleEmpleado = () => {
     employee?.isActive !== false,
     getEmployeeDetail
   );
+
+  const {
+    isReactivateModalOpen,
+    openReactivateModal,
+    closeReactivateModal,
+    reactivateFieldError,
+    isSubmittingReactivate,
+    handleSubmitReactivate,
+  } = useReactivateModal(
+    
+  )
 
   if (isLoading) return <Loader />;
 
@@ -94,16 +106,25 @@ const DetalleEmpleado = () => {
       )}
 
       <ReasonCard
-        isOpen={isModalOpen}
+        isOpen={isDeactivateModalOpen}
         employeeName={employeeFullName}
         reason={reason}
         onReasonChange={handleReasonChange}
         addToBlacklist={addToBlacklist}
         onBlacklistChange={setAddToBlacklist}
-        fieldError={fieldError}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-        onCancel={closeModal}
+        fieldError={deactivateFieldError}
+        isSubmitting={isSubmittingDeactivate}
+        onSubmit={handleSubmitDeactivate}
+        onCancel={closeDeactivateModal}
+      />
+
+      <ReactivateCard 
+        isOpen={isReactivateModalOpen}
+        employee={employee}
+        fieldError={reactivateFieldError}
+        isSubmitting={isSubmittingReactivate}
+        onSubmit={handleSubmitReactivate}
+        onCancel={closeReactivateModal}
       />
 
       <div className="flex items-center gap-2 md:hidden">
@@ -129,14 +150,25 @@ const DetalleEmpleado = () => {
           />
         </div>
 
-        <button
-          type="button"
-          onClick={openModal}
-          className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
-            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
-        >
-          Dar de baja
-        </button>
+        {employee?.isActive ? (
+          <button
+            type="button"
+            onClick={openDeactivateModal}
+            className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
+              text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+          >
+            Dar de baja
+          </button>
+        ): (
+          <button
+            type="button"
+            onClick={openReactivateModal}
+            className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
+              text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+          >
+            Reactivar
+          </button>
+        )}
       </div>
 
       <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
@@ -170,7 +202,7 @@ const DetalleEmpleado = () => {
 
         <button
           type="button"
-          onClick={openModal}
+          onClick={openDeactivateModal}
           className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
             text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
         >
