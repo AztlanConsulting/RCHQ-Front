@@ -30,7 +30,7 @@ describe("StatusBadge Component", () => {
     const badge = screen.getByText(/activo/i);
 
     expect(badge).toHaveClass("shadow-lg");
-    expect(badge).toHaveClass("rounded-full"); // Clase base
+    expect(badge).toHaveClass("rounded-full");
   });
 
   it("debe renderizarse como Inactivo por defecto si no se pasa isActive (undefined)", () => {

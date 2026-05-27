@@ -1,6 +1,6 @@
 import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 
 const VacationListFilters = ({
     startDate,
@@ -57,17 +57,10 @@ const VacationListFilters = ({
                 />
 
                 <div className="flex flex-col justify-end">
-                    <Button
+                    <BigButton
                         text="Limpiar"
                         onClick={clearFilters}
-                        bgColor="bg-[#24375e]"
-                        hoverColor="hover:bg-[#162d4a]"
-                        activeColor="active:bg-[#0f2035]"
-                        textColor="text-white"
-                        width="w-full lg:w-28"
-                        height="h-[50px]"
-                        textSize="text-sm"
-                        className="px-4"
+                        className="w-full min-w-0 px-4 lg:w-28"
                     />
                 </div>
             </div>

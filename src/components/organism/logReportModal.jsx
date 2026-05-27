@@ -1,4 +1,4 @@
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 import Modal from "../atoms/modal";
 import NativeSelect from "../atoms/nativeSelect";
 
@@ -43,27 +43,19 @@ const LogReportModal = ({
         </div>
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
-          <Button
+          <SmallButton
             text="Cancelar"
             onClick={onClose}
-            bgColor="bg-slate-100"
-            hoverColor="hover:bg-slate-200"
-            activeColor="active:bg-slate-300"
-            textColor="text-slate-700"
-            width="w-full sm:w-36"
-            textSize="text-base"
+            cancel
+            hasAdjustableWidth
+            className="sm:w-36"
           />
-          <Button
+          <SmallButton
             text={loading ? "Generando..." : "Descargar PDF"}
             onClick={onConfirm}
             disabled={loading}
-            bgColor="bg-[#24375e]"
-            hoverColor="hover:bg-[#162d4a]"
-            activeColor="active:bg-[#0f2035]"
-            textColor="text-white"
-            width="w-full sm:w-44"
-            textSize="text-base"
-            className="disabled:cursor-not-allowed disabled:opacity-60"
+            hasAdjustableWidth
+            className="sm:w-44"
           />
         </div>
       </div>

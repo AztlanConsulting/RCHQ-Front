@@ -1,4 +1,3 @@
-// tests/integration/AltaEmpleado.test.jsx
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
     render,
@@ -13,13 +12,11 @@ import AltaPersonal from "../../pages/personal/altaPersonal";
 const mockNavigate = vi.fn();
 const mockOnSuccess = vi.fn();
 
-// Mock Router
 vi.mock("react-router-dom", async (importOriginal) => {
     const actual = await importOriginal();
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
-// Mock Services
 vi.mock("../../services/personalService", () => ({
     getEmployeeFormData: vi.fn(),
     createEmployee: vi.fn(),
@@ -49,7 +46,6 @@ const validFormData = {
     roleId: "a0000002-0000-4000-8000-000000000002",
 };
 
-// Mock roles
 const mockRoles = [
     {
         id: validFormData.roleId,
@@ -119,13 +115,11 @@ afterEach(() => {
 
 describe("AltaPersonal — integración de formulario y servicios", () => {
     it("carga los roles iniciales y quita el estado de carga", async () => {
-        // Arrange
+        
         getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
 
-        // Act
         renderPage();
 
-        // Assert
         expect(screen.getByText(/cargando datos/i)).toBeInTheDocument();
 
         await waitFor(() => {
@@ -137,7 +131,6 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
     });
 
     it("muestra un error de Zod si el formulario está vacío", async () => {
-        // Arrange
         getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
         renderPage();
         await waitFor(() =>
@@ -146,7 +139,6 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
             ).not.toBeInTheDocument(),
         );
 
-        // Act
         const submitBtn = screen.getByRole("button", {
             name: /guardar|crear|registrar|alta/i,
         });
@@ -154,7 +146,6 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
             fireEvent.click(submitBtn);
         });
 
-        // Assert
         await waitFor(() => {
             expect(createEmployee).not.toHaveBeenCalled();
             expect(
@@ -167,7 +158,6 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
     });
 
     it("crea el empleado exitosamente", async () => {
-        // Arrange
         getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
         createEmployee.mockResolvedValue({ success: true });
         renderPage();
@@ -177,10 +167,8 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
             ).not.toBeInTheDocument(),
         );
 
-        // Act
         await fillAndSubmit(validFormData);
 
-        // Assert
         await waitFor(() => {
             expect(createEmployee).toHaveBeenCalledTimes(1);
         });
@@ -188,7 +176,6 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
     });
 
     it("muestra error si el backend falla", async () => {
-        // Arrange
         getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
         createEmployee.mockRejectedValue(
             new Error("El correo electrónico ya está registrado"),
@@ -200,10 +187,8 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
             ).not.toBeInTheDocument(),
         );
 
-        // Act
         await fillAndSubmit(validFormData);
 
-        // Assert
         await waitFor(() => {
             expect(createEmployee).toHaveBeenCalledTimes(1);
         });

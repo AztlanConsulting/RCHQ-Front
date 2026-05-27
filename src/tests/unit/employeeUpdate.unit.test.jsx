@@ -1,9 +1,5 @@
-// src/tests/unit/employeeUpdate.unit.test.jsx
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-
-// ── Mocks globales ─────────────────────────────────────────────────────────────
 
 vi.mock("../../utils/authStorage", () => ({
   getToken: vi.fn(() => "mock-token"),
@@ -23,8 +19,6 @@ vi.mock("../../components/atoms/timeField", () => ({
   ),
 }));
 
-// ── Imports después de los mocks ───────────────────────────────────────────────
-
 import { getToken } from "../../utils/authStorage";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 import {
@@ -38,8 +32,6 @@ import EmployeeContactCard from "../../components/organism/employeeContactCard";
 import EmployeeBasicCard   from "../../components/organism/employeeBasicCard";
 import EmployeeAdminCard   from "../../components/organism/employeeAdminCard";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const mockFetch = (ok, data, status = 200) => {
   secureFetch.mockResolvedValue({
     ok,
@@ -48,10 +40,6 @@ const mockFetch = (ok, data, status = 200) => {
   });
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// SERVICE: employeeUpdateService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("employeeUpdateService", () => {
 
   beforeEach(() => {
@@ -59,24 +47,11 @@ describe("employeeUpdateService", () => {
     getToken.mockReturnValue("mock-token");
   });
 
-  // ── getUpdateFormService ───────────────────────────────────────────────────
-
   describe("getUpdateFormService", () => {
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(getUpdateFormService()).rejects.toThrow("No se encontró token de sesión");
-      expect(secureFetch).not.toHaveBeenCalled();
-    });
-
-    it("llama al endpoint correcto con el token", async () => {
+    it("llama al endpoint correcto", async () => {
       mockFetch(true, { roles: [], houses: [], workdays: [] });
       await getUpdateFormService();
-      expect(secureFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/employee/update-form"),
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: "Bearer mock-token" }),
-        }),
-      );
+      expect(secureFetch).toHaveBeenCalledWith(expect.stringContaining("/employee/update-form"));
     });
 
     it("retorna los datos cuando la respuesta es ok", async () => {
@@ -92,16 +67,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateBasicInfoService ─────────────────────────────────────────────────
-
   describe("updateBasicInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { name: "Juan", surname: "Pérez" };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT correcto", async () => {
       mockFetch(true, { success: true });
@@ -158,16 +126,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateContactInfoService ───────────────────────────────────────────────
-
   describe("updateContactInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { email: "juan@mail.com", phoneNumber: "4421234567" };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT de contact-info", async () => {
       mockFetch(true, { success: true });
@@ -191,16 +152,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateAdminInfoService ─────────────────────────────────────────────────
-
   describe("updateAdminInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { type: "tiempo_completo", salary: 15000 };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT de admin-info", async () => {
       mockFetch(true, { success: true });
@@ -231,10 +185,6 @@ describe("employeeUpdateService", () => {
     });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeContactCard
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("EmployeeContactCard", () => {
 
@@ -271,8 +221,6 @@ describe("EmployeeContactCard", () => {
   };
 
   beforeEach(() => vi.clearAllMocks());
-
-  // ── Modo lectura ───────────────────────────────────────────────────────────
 
   describe("Modo lectura (isEditing=false)", () => {
     it("muestra el título 'Contacto'", () => {
@@ -338,8 +286,6 @@ describe("EmployeeContactCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición (isEditing=true)", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -404,15 +350,10 @@ describe("EmployeeContactCard", () => {
 
     it("no muestra los valores de lectura en modo edición", () => {
       render(<EmployeeContactCard {...editingProps} />);
-      // Los labels de lectura sí están, pero los valores en divs inset no
       expect(screen.queryByText("N/A")).toBeNull();
     });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeBasicCard
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("EmployeeBasicCard", () => {
 
@@ -453,8 +394,6 @@ describe("EmployeeBasicCard", () => {
   };
 
   beforeEach(() => vi.clearAllMocks());
-
-  // ── Modo lectura ───────────────────────────────────────────────────────────
 
   describe("Modo lectura", () => {
     it("muestra el nombre completo del empleado", () => {
@@ -510,8 +449,6 @@ describe("EmployeeBasicCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -564,10 +501,6 @@ describe("EmployeeBasicCard", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeAdminCard
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("EmployeeAdminCard", () => {
 
   const mockEmployee = { type: "tiempo_completo", salary: "15000", houseId: "h1", roleId: "r1" };
@@ -613,8 +546,6 @@ describe("EmployeeAdminCard", () => {
   };
 
   beforeEach(() => vi.clearAllMocks());
-
-  // ── Modo lectura ───────────────────────────────────────────────────────────
 
   describe("Modo lectura", () => {
     it("muestra el título", () => {
@@ -671,8 +602,6 @@ describe("EmployeeAdminCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -701,19 +630,19 @@ describe("EmployeeAdminCard", () => {
     it("el checkbox de Lunes está marcado (selected=true)", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[0]).toBeChecked(); // Lunes
+      expect(checkboxes[0]).toBeChecked();
     });
 
     it("el checkbox de Martes NO está marcado (selected=false)", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[1]).not.toBeChecked(); // Martes
+      expect(checkboxes[1]).not.toBeChecked();
     });
 
     it("llama a toggleWorkday al hacer click en un checkbox", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[2]); // Martes (0=Lunes, 1=Lunes allDay, 2=Martes)
+      fireEvent.click(checkboxes[2]);
       expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
     });
 

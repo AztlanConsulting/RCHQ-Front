@@ -1,3 +1,5 @@
+import { secureFetch } from "../utils/secureFetchWrapper";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const buildApiError = (response, data, fallbackMessage) => {
@@ -7,23 +9,15 @@ const buildApiError = (response, data, fallbackMessage) => {
   return errorMessage;
 };
 
-const getToken = () => localStorage.getItem("token");
-
 export const getDocumentTypesService = async () => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/employee/document-types`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await secureFetch(`/employee/document-types`);
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al obtener tipos de documento");
   return data.data.map((d) => ({ value: d.document_id, label: d.name }));
 };
 
 export const getDocumentsService = async (employeeId) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/employee/${employeeId}/documents`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await secureFetch(`/employee/${employeeId}/documents`);
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al obtener los documentos");
   return {
@@ -36,10 +30,8 @@ export const getDocumentsService = async (employeeId) => {
   };
 
 export const uploadDocumentService = async (employeeId, formData) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/employee/${employeeId}/documents`, {
+  const response = await secureFetch(`/employee/${employeeId}/documents`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
   const data = await response.json();
@@ -48,10 +40,8 @@ export const uploadDocumentService = async (employeeId, formData) => {
 };
 
 export const updateDocumentService = async (employeeId, documentId, formData) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/employee/${employeeId}/documents/${documentId}`, {
+  const response = await secureFetch(`/employee/${employeeId}/documents/${documentId}`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
   const data = await response.json();
@@ -60,10 +50,8 @@ export const updateDocumentService = async (employeeId, documentId, formData) =>
 };
 
 export const deleteDocumentService = async (employeeId, documentId) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/employee/${employeeId}/documents/${documentId}`, {
+  const response = await secureFetch(`/employee/${employeeId}/documents/${documentId}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al eliminar el documento");

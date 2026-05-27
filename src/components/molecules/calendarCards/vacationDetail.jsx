@@ -1,4 +1,4 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
@@ -214,43 +214,24 @@ const VacationDetail = ({
             </div>
 
             {canDelete || canEdit ? (
-                <div className="mt-6 flex flex-row items-center gap-3 sm:justify-center sm:gap-8">
+                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
                     {canDelete ? (
-                        <Button
+                        <SmallButton
                             type="button"
                             text="Eliminar"
-                            width={
-                                canEdit
-                                    ? "w-1/2 sm:w-[7.2rem]"
-                                    : "w-full sm:w-[7.2rem]"
-                            }
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#A20000]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#870000]"
-                            activeColor="active:bg-[#6B0000]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+                            hasNoRollback
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
                             onClick={onDelete}
                         />
                     ) : null}
 
                     {canEdit ? (
-                        <Button
+                        <SmallButton
                             type="button"
                             text="Editar"
-                            width={
-                                canDelete
-                                    ? "w-1/2 sm:w-[7.2rem]"
-                                    : "w-full sm:w-[7.2rem]"
-                            }
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
                             onClick={onEdit}
                         />
                     ) : null}
@@ -261,31 +242,20 @@ const VacationDetail = ({
                 <div>
                     <div className="mt-4 border border-b border-[#EAEAEA]"></div>
 
-                    <div className="mt-4 flex flex-row items-center gap-3 sm:justify-center sm:gap-8">
-                        <Button
+                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                        <SmallButton
                             type="button"
                             text="Aprobar"
-                            width="w-1/2 sm:w-[7.2rem]"
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
                             onClick={onApprove}
                         />
-                        <Button
+                        <SmallButton
                             type="button"
                             text="Rechazar"
-                            width="w-1/2 sm:w-[7.2rem]"
-                            height="h-8"
-                            textSize="text-[0.95rem]"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                            hasNoRollback
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
                             onClick={onReject}
                         />
                     </div>

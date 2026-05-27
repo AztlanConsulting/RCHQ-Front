@@ -4,7 +4,7 @@ import DateField from "../atoms/dateField";
 import ErrorText from "../atoms/errorText";
 import PhotoUploader from "../atoms/photoUploader";
 import SelectField from "../atoms/selectField";
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 
 const UserIcon = () => (
     <svg
@@ -217,26 +217,17 @@ const UserInfoSection = ({
             )}
 
             <div className="flex justify-end gap-4 mt-4">
-                <Button
+                <SmallButton
                     text="Cancelar"
                     onClick={onCancel}
                     disabled={isLoading}
-                    bgColor="bg-[#9b1c1c]"
-                    hoverColor="hover:bg-[#7f1d1d]"
-                    activeColor="active:bg-[#6b1a1a]"
-                    textColor="text-white"
-                    height="h-[45px]"
+                    cancel
                 />
 
-                <Button
+                <SmallButton
                     text={isLoading ? "Registrando..." : "Registrar"}
                     onClick={onSubmit}
                     disabled={isLoading}
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    height="h-[45px]"
                 />
             </div>
         </section>

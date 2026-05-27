@@ -1,7 +1,7 @@
 import TextField from "../atoms/textField";
 import SelectField from "../atoms/selectField";
 import useSearch from "../../hooks/molecules/useSearch";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 import { useMemo } from "react";
 
 const BLACKLIST_SEARCH_MAX_LENGTH = 100;
@@ -105,16 +105,10 @@ const EmployeeFilters = ({
           )}
         </div>
 
-        <Button
+        <BigButton
           text={isBlacklistMode ? "Lista Empleados" : "Lista Negra"}
           onClick={onToggleBlacklistMode}
-          bgColor="bg-[#24375e]"
-          hoverColor="hover:bg-[#162d4a]"
-          activeColor="active:bg-[#0f2035]"
-          textColor="text-white"
-          width="w-auto"
-          height="h-[50px]"
-          className="px-6 shrink-0"
+          className="min-w-0 shrink-0 px-6"
         />
       </div>
 
@@ -161,16 +155,10 @@ const EmployeeFilters = ({
           />
         )}
 
-        <Button
+        <BigButton
           text={isBlacklistMode ? "Lista Empleados" : "Lista Negra"}
           onClick={onToggleBlacklistMode}
-          bgColor="bg-[#24375e]"
-          hoverColor="hover:bg-[#162d4a]"
-          activeColor="active:bg-[#0f2035]"
-          textColor="text-white"
-          width="w-full"
-          height="h-[50px]"
-          className="mt-1"
+          className="mt-1 w-full min-w-0"
         />
       </div>
     </div>

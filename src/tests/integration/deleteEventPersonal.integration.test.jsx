@@ -16,7 +16,6 @@ vi.mock("../../services/deleteEventService", () => ({
     deletePersonalEvent: vi.fn(),
 }));
 
-// ─── Datos de prueba ────────────────────────────────────────────────────────
 
 const PERSONAL_EVENT = {
     eventId: "personal-evt-001",
@@ -51,7 +50,6 @@ const GLOBAL_EVENT = {
     scopeLabel: "Global",
 };
 
-// ─── Wrapper con estado (replica la lógica de useCalendarPage) ───────────────
 
 const EventDetailWithDelete = ({ event, viewerRole, onSuccess = vi.fn() }) => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -94,7 +92,6 @@ const EventDetailWithDelete = ({ event, viewerRole, onSuccess = vi.fn() }) => {
     );
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const renderDetail = async (
     event = PERSONAL_EVENT,
@@ -119,7 +116,6 @@ const clickEliminar = async () => {
     });
 };
 
-// Cuando el modal está abierto hay dos botones "Eliminar"; el último es el de confirmación.
 const clickConfirmEliminar = async () => {
     const buttons = screen.getAllByRole("button", { name: /^eliminar$/i });
     await act(async () => {
@@ -133,7 +129,6 @@ const clickCancelar = async () => {
     });
 };
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("Integración: eliminar evento de personal", () => {
     beforeEach(() => {
@@ -143,7 +138,6 @@ describe("Integración: eliminar evento de personal", () => {
         deletePersonalEvent.mockResolvedValue({ success: true });
     });
 
-    // ── Visibilidad de botones por rol ────────────────────────────────────────
 
     describe("visibilidad de botones según rol", () => {
         it("muestra Eliminar y Editar al Coordinador en evento personal", async () => {
@@ -236,7 +230,6 @@ describe("Integración: eliminar evento de personal", () => {
         });
     });
 
-    // ── Flujo de confirmación ─────────────────────────────────────────────────
 
     describe("flujo de confirmación de eliminación", () => {
         it("muestra el modal de confirmación con el nombre del evento al hacer clic en Eliminar", async () => {
@@ -272,7 +265,6 @@ describe("Integración: eliminar evento de personal", () => {
         });
     });
 
-    // ── Llamada al servicio ───────────────────────────────────────────────────
 
     describe("llamada al servicio deletePersonalEvent", () => {
         it("llama a deletePersonalEvent con el eventId correcto al confirmar", async () => {
@@ -328,7 +320,6 @@ describe("Integración: eliminar evento de personal", () => {
         });
     });
 
-    // ── Manejo de errores ─────────────────────────────────────────────────────
 
     describe("manejo de errores", () => {
         it("muestra el mensaje de error si deletePersonalEvent falla", async () => {

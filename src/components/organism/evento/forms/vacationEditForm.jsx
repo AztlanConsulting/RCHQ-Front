@@ -1,4 +1,4 @@
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
 import {
@@ -134,33 +134,16 @@ const VacationEditForm = ({
             ) : null}
 
             <div className="mt-8 flex justify-center gap-3">
-                <Button
+                <SmallButton
                     type="button"
                     text="Cancelar"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-bold"
-                    bgColor="bg-white"
-                    textColor="text-[#121212]"
-                    hoverColor="hover:bg-slate-50"
-                    activeColor="active:bg-slate-100"
-                    className="px-5 border border-slate-200 shadow-md"
                     onClick={onCancelEdit}
                     disabled={isSaving}
+                    cancel
                 />
-                <Button
+                <SmallButton
                     type="button"
                     text="Guardar"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-bold"
-                    bgColor="bg-[#1F3664]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#15284A]"
-                    activeColor="active:bg-[#0E1B33]"
-                    className="px-5 shadow-md"
                     onClick={onSubmitEdit}
                     disabled={isSaving}
                 />
