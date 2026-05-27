@@ -103,6 +103,14 @@ const RegisterEventModal = ({
 
                     {shouldShowNameField ? (
                         <div className="min-w-0">
+                            <Type
+                                variant="page-title"
+                                as="h2"
+                                className="mb-3 min-w-0 text-[2rem] leading-none"
+                            >
+                                Registro de Evento
+                            </Type>
+
                             <TextField
                                 id="event-name"
                                 placeholder="Agregar título"
