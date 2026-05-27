@@ -65,7 +65,7 @@ const Modal = ({
                     w-full max-w-2xl
                     rounded-xl bg-white shadow-xl
                     p-[30px] md:p-8
-                    max-h-[90vh]
+                    max-h-[min(96vh,60rem)]
                     ${scrollable ? "overflow-y-auto" : "overflow-y-visible"}
                     mx-4
                     ${className}

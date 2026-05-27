@@ -91,43 +91,45 @@ const VacationEditForm = ({
                     )}
                 </div>
 
-                <DateField
-                    label="Fecha de inicio"
-                    name="startDate"
-                    value={vacationForm?.startDate ?? ""}
-                    minDate={vacationDateMin}
-                    maxDate={vacationDateMax}
-                    onChange={(editEvent) =>
-                        onVacationFieldChange?.(
-                            "startDate",
-                            editEvent.target.value,
-                        )
-                    }
-                    labelColor="text-[#121212]"
-                    popupAlign="left"
-                    popupPlacement="bottom"
-                    popupSize="compact"
-                    popupStrategy="fixed"
-                />
+                <div className="col-span-1 mt-8 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-10">
+                    <DateField
+                        label="Fecha de inicio"
+                        name="startDate"
+                        value={vacationForm?.startDate ?? ""}
+                        minDate={vacationDateMin}
+                        maxDate={vacationDateMax}
+                        onChange={(editEvent) =>
+                            onVacationFieldChange?.(
+                                "startDate",
+                                editEvent.target.value,
+                            )
+                        }
+                        labelColor="text-[#121212]"
+                        popupAlign="left"
+                        popupPlacement="bottom"
+                        popupSize="compact"
+                        popupStrategy="fixed"
+                    />
 
-                <DateField
-                    label="Fecha de fin"
-                    name="endDate"
-                    value={vacationForm?.endDate ?? ""}
-                    onChange={(editEvent) =>
-                        onVacationFieldChange?.(
-                            "endDate",
-                            editEvent.target.value,
-                        )
-                    }
-                    minDate={vacationEndDateMin}
-                    maxDate={vacationDateMax}
-                    labelColor="text-[#121212]"
-                    popupAlign="right"
-                    popupPlacement="bottom"
-                    popupSize="compact"
-                    popupStrategy="fixed"
-                />
+                    <DateField
+                        label="Fecha de fin"
+                        name="endDate"
+                        value={vacationForm?.endDate ?? ""}
+                        onChange={(editEvent) =>
+                            onVacationFieldChange?.(
+                                "endDate",
+                                editEvent.target.value,
+                            )
+                        }
+                        minDate={vacationEndDateMin}
+                        maxDate={vacationDateMax}
+                        labelColor="text-[#121212]"
+                        popupAlign="right"
+                        popupPlacement="bottom"
+                        popupSize="compact"
+                        popupStrategy="fixed"
+                    />
+                </div>
             </div>
 
             {vacationEditError ? (
