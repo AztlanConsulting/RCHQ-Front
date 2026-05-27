@@ -29,6 +29,7 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
     } = useUpdateHouseEventForm({ event, isOpen, onClose, onSuccess });
 
     const showTimeFields = !form.allDay;
+    const descriptionLength = String(form.description ?? "").length;
 
     const currentYear = new Date().getFullYear();
     const houseDateMin = new Date(currentYear, 0, 1);
@@ -217,6 +218,9 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
                             style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                         />
+                        <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                            {`${descriptionLength}/250`}
+                        </div>
                         {errors.description && (
                             <ErrorText>{errors.description}</ErrorText>
                         )}

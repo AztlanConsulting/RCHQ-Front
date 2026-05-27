@@ -32,6 +32,7 @@ const PersonalForm = (props) => {
     } = usePersonalForm(props);
 
     const isTimeVisible = !form.allDay;
+    const descriptionLength = String(form.description ?? "").length;
 
     const today = new Date();
     const personalDateMin = today;
@@ -171,6 +172,10 @@ const PersonalForm = (props) => {
                     className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
                     style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
+
+                <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                    {`${descriptionLength}/250`}
+                </div>
 
                 {errors.description && (
                     <ErrorText>{errors.description}</ErrorText>
