@@ -3,9 +3,22 @@ import {
   changePasswordFirstLoginService,
   changePasswordService,
 } from "../../services/passwordService";
+import { secureFetch } from "../../utils/secureFetchWrapper";
+
+vi.mock("../../utils/secureFetchWrapper", () => ({
+  secureFetch: vi.fn(),
+}));
 
 const mockFetch = (body, ok = true, status = 200) => {
   globalThis.fetch = vi.fn().mockResolvedValue({
+    ok,
+    status,
+    json: vi.fn().mockResolvedValue(body),
+  });
+};
+
+const mockSecureFetch = (body, ok = true, status = 200) => {
+  secureFetch.mockResolvedValue({
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),
@@ -46,6 +59,7 @@ describe("changePasswordFirstLoginService", () => {
       expect.stringContaining("/auth/first-login/change-password"),
       expect.objectContaining({
         method: "POST",
+        credentials: "include",
         headers: expect.objectContaining({
           "Content-Type": "application/json",
           Authorization: "Bearer first-token-123",
@@ -120,16 +134,10 @@ describe("changePasswordFirstLoginService", () => {
 });
 
 describe("changePasswordService", () => {
-  it("lanza error cuando no hay token de sesión", async () => {
-    await expect(
-      changePasswordService("Actual123", "Nueva123", "Nueva123"),
-    ).rejects.toThrow("No se encontró token de sesión");
-  });
-
   it("envía currentPassword, newPassword y confirmPassword al endpoint correcto", async () => {
     seedLocalStorage({ token: "session-token-123" });
 
-    mockFetch({
+    mockSecureFetch({
       success: true,
       message: "Contraseña cambiada exitosamente",
       data: { employeeId: "EMP001" },
@@ -137,13 +145,12 @@ describe("changePasswordService", () => {
 
     await changePasswordService("Actual123", "Nueva123", "Nueva123");
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
+    expect(secureFetch).toHaveBeenCalledWith(
       expect.stringContaining("/auth/change-password"),
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
           "Content-Type": "application/json",
-          Authorization: "Bearer session-token-123",
         }),
         body: JSON.stringify({
           currentPassword: "Actual123",
@@ -157,7 +164,7 @@ describe("changePasswordService", () => {
   it("retorna la respuesta cuando el cambio es exitoso", async () => {
     seedLocalStorage({ token: "session-token-123" });
 
-    mockFetch({
+    mockSecureFetch({
       success: true,
       message: "Contraseña cambiada exitosamente",
       data: { employeeId: "EMP001" },
@@ -179,7 +186,7 @@ describe("changePasswordService", () => {
   it("lanza error cuando la contraseña actual es incorrecta", async () => {
     seedLocalStorage({ token: "session-token-123" });
 
-    mockFetch(
+    mockSecureFetch(
       {
         success: false,
         message: "Credenciales inválidas",

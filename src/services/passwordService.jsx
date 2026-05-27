@@ -27,6 +27,7 @@ const changePasswordFirstLoginService = async (
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ newPassword, confirmPassword }),
   });
 

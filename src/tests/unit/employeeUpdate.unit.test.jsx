@@ -48,21 +48,10 @@ describe("employeeUpdateService", () => {
   });
 
   describe("getUpdateFormService", () => {
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(getUpdateFormService()).rejects.toThrow("No se encontró token de sesión");
-      expect(secureFetch).not.toHaveBeenCalled();
-    });
-
-    it("llama al endpoint correcto con el token", async () => {
+    it("llama al endpoint correcto", async () => {
       mockFetch(true, { roles: [], houses: [], workdays: [] });
       await getUpdateFormService();
-      expect(secureFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/employee/update-form"),
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: "Bearer mock-token" }),
-        }),
-      );
+      expect(secureFetch).toHaveBeenCalledWith(expect.stringContaining("/employee/update-form"));
     });
 
     it("retorna los datos cuando la respuesta es ok", async () => {
@@ -81,11 +70,6 @@ describe("employeeUpdateService", () => {
   describe("updateBasicInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { name: "Juan", surname: "Pérez" };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT correcto", async () => {
       mockFetch(true, { success: true });
@@ -146,11 +130,6 @@ describe("employeeUpdateService", () => {
     const EMP_ID = "emp-001";
     const body   = { email: "juan@mail.com", phoneNumber: "4421234567" };
 
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
-
     it("llama al endpoint PUT de contact-info", async () => {
       mockFetch(true, { success: true });
       await updateContactInfoService(EMP_ID, body);
@@ -176,11 +155,6 @@ describe("employeeUpdateService", () => {
   describe("updateAdminInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { type: "tiempo_completo", salary: 15000 };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT de admin-info", async () => {
       mockFetch(true, { success: true });
