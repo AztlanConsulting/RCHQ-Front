@@ -16,7 +16,6 @@ vi.mock("../../services/deleteEventService", () => ({
     deleteHouseEvent: vi.fn(),
 }));
 
-// ─── Datos de prueba ────────────────────────────────────────────────────────
 
 const HOUSE_EVENT = {
     houseEventId: "house-evt-001",
@@ -51,7 +50,6 @@ const GLOBAL_EVENT = {
     scopeLabel: "Global",
 };
 
-// ─── Wrapper con estado (replica la lógica de useCalendarPage) ───────────────
 
 const EventDetailWithDelete = ({ event, viewerRole, onSuccess = vi.fn() }) => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -94,7 +92,6 @@ const EventDetailWithDelete = ({ event, viewerRole, onSuccess = vi.fn() }) => {
     );
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const renderDetail = async (
     event = HOUSE_EVENT,
@@ -113,17 +110,12 @@ const renderDetail = async (
     return { onSuccess };
 };
 
-// Abre el modal de confirmación haciendo clic en el botón Eliminar del detalle.
-// Cuando la confirmación no está abierta solo hay un botón "Eliminar".
 const clickEliminar = async () => {
     await act(async () => {
         fireEvent.click(screen.getByRole("button", { name: /^eliminar$/i }));
     });
 };
 
-// Confirma la eliminación haciendo clic en el botón Eliminar dentro del modal
-// de confirmación. Cuando el modal está abierto hay dos botones "Eliminar" en
-// el DOM; el último corresponde al de confirmación.
 const clickConfirmEliminar = async () => {
     const buttons = screen.getAllByRole("button", { name: /^eliminar$/i });
     await act(async () => {
@@ -137,7 +129,6 @@ const clickCancelar = async () => {
     });
 };
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("Integración: eliminar evento de casa", () => {
     beforeEach(() => {
@@ -147,7 +138,6 @@ describe("Integración: eliminar evento de casa", () => {
         deleteHouseEvent.mockResolvedValue({ success: true });
     });
 
-    // ── Visibilidad de botones por rol ────────────────────────────────────────
 
     describe("visibilidad de botones según rol", () => {
         it("muestra Eliminar y Editar al Coordinador en evento de casa", async () => {
@@ -217,7 +207,6 @@ describe("Integración: eliminar evento de casa", () => {
         });
     });
 
-    // ── Flujo de confirmación ─────────────────────────────────────────────────
 
     describe("flujo de confirmación de eliminación", () => {
         it("muestra el modal de confirmación con el nombre del evento al hacer clic en Eliminar", async () => {
@@ -253,7 +242,6 @@ describe("Integración: eliminar evento de casa", () => {
         });
     });
 
-    // ── Llamada al servicio ───────────────────────────────────────────────────
 
     describe("llamada al servicio deleteHouseEvent", () => {
         it("llama a deleteHouseEvent con el ID correcto al confirmar", async () => {
@@ -308,7 +296,6 @@ describe("Integración: eliminar evento de casa", () => {
         });
     });
 
-    // ── Manejo de errores ─────────────────────────────────────────────────────
 
     describe("manejo de errores", () => {
         it("muestra el mensaje de error si deleteHouseEvent falla", async () => {

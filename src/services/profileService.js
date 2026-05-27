@@ -20,12 +20,11 @@ const getReadableErrors = (err) => {
   return ["Ocurrió un error inesperado"];
 };
 
-const getUserData = async (token) => {
+const getUserData = async () => {
   const response = await secureFetch(`${API_URL}/user/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 

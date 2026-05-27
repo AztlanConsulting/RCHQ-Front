@@ -113,11 +113,9 @@ const EmployeeAdminCard = ({
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
-      {/* Modo lectura */}
       {!isEditing && (
         <div className="mt-6 w-full flex flex-col gap-7">
 
-          {/* Fila 1: Tipo | Salario */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Tipo</Type>
@@ -133,7 +131,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Fila 2: Frecuencia de Pago */}
           <div className="min-w-0">
             <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Frecuencia de pago</Type>
             <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
@@ -141,7 +138,6 @@ const EmployeeAdminCard = ({
             </Type>
           </div>
 
-          {/* Fila 3: Resumen de horario */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Horario</Type>
@@ -164,7 +160,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Drawer días */}
           {workdaysDrawer.isOpen && (
             <div className="-mt-3">
               <Drawer isOpen={workdaysDrawer.isOpen}>
@@ -182,7 +177,6 @@ const EmployeeAdminCard = ({
             </div>
           )}
 
-          {/* Fila 4: Ausencias justificadas | número */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Ausencias justificadas</Type>
@@ -197,7 +191,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Fila 5: Vacaciones | Días usados */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Vacaciones</Type>

@@ -3,7 +3,6 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import AppLayout from "../../components/appLayout";
 
-// ─── Mocks ────────────────────────────────────────────────────────────────────
 vi.mock("../../components/organism/sideBar", () => ({
   default: () => <div data-testid="sidebar" />,
 }));
@@ -50,7 +49,6 @@ describe("AppLayout", () => {
     renderAppLayout();
     const main = screen.getByRole("main");
     expect(main.className).toContain("md:pl-[104px]");
-    // No debe tener paddingLeft inline
     expect(main.style.paddingLeft).toBe("");
   });
 

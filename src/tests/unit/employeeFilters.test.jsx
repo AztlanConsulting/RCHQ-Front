@@ -79,10 +79,9 @@ describe("EmployeeFilters Component", () => {
     render(<EmployeeFilters {...defaultProps} />);
 
     const select = screen.getAllByRole("combobox")[0];
-    // Buscamos las opciones solo dentro de ese select e incluimos el placeholder oculto
     const options = within(select).getAllByRole("option", { hidden: true });
 
-    expect(options).toHaveLength(3); // (1 placeholder + 2 opciones)
+    expect(options).toHaveLength(3);
     expect(options[1]).toHaveTextContent("Activos");
     expect(options[2]).toHaveTextContent("Inactivos");
   });

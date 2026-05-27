@@ -90,7 +90,6 @@ const mockOverlappedEmployees = [
     },
 ];
 
-// Role "Empleado" makes "personal" the default visible category
 const renderModal = (props = {}) => {
     const onClose = vi.fn();
     const onSuccess = vi.fn();

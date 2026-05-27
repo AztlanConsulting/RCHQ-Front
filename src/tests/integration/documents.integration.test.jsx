@@ -10,7 +10,6 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Documents from "../../pages/documents";
 
-// ─── Mocks ────────────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
   getDocumentsService:     vi.fn(),
   uploadDocumentService:   vi.fn(),
@@ -53,7 +52,6 @@ const renderPage = (role = "Coordinador") => {
   );
 };
 
-// ─── Respuestas mock ──────────────────────────────────────
 const mockDocumentsResponse = {
   success: true,
   data: [
@@ -85,9 +83,6 @@ beforeEach(() => {
   ]);
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Carga inicial
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — carga inicial", () => {
   it("muestra los documentos del empleado cuando la carga es exitosa", async () => {
@@ -116,9 +111,6 @@ describe("Documents — carga inicial", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Permisos por rol
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — permisos por rol", () => {
   it("no muestra el botón Subir cuando el rol es Administrador (canModify Coordinador sólo)", async () => {
@@ -152,9 +144,6 @@ describe("Documents — permisos por rol", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Subir documento
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — subir documento", () => {
   it("abre el modal al hacer click en 'Subir documento'", async () => {
@@ -236,9 +225,6 @@ describe("Documents — subir documento", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Editar documento
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — editar documento", () => {
   it("abre el modal en modo edición al hacer click en el botón editar", async () => {
@@ -284,9 +270,6 @@ describe("Documents — editar documento", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Eliminar documento
-// ══════════════════════════════════════════════════════════════════════════════
 describe("Documents — eliminar documento", () => {
   const getConfirmButton = () => {
     const modal = screen.getByRole("dialog", { name: /eliminar documento/i });
@@ -335,7 +318,6 @@ describe("Documents — eliminar documento", () => {
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    // Un solo documento → getByTitle no falla
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument(),
