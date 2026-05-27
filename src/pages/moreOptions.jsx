@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import OptionCard from "../components/molecules/optionCard";
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import TextField from "../components/atoms/textField";
 import Alert from "../components/atoms/alerts";
 import TwoFactorAuth from "./auth/twoFactorAuth";
@@ -57,16 +57,10 @@ const MoreOptions = () => {
 
       <div className="min-h-96 rounded-2xl border border-slate-200 bg-transparent p-4 sm:p-6 md:min-h-[30rem] md:p-8">
         <div className="flex justify-center md:justify-start">
-          <Button
+          <BigButton
             text="Regresar a mi perfil"
             onClick={() => navigate("/app/perfil")}
-            bgColor="bg-[#1e2b4d]"
-            hoverColor="hover:bg-[#15203b]"
-            activeColor="active:bg-[#0f172a]"
-            textColor="text-white"
-            width="w-full max-w-[18rem] sm:w-[11rem] md:w-[10rem]"
-            height="h-[48px] md:h-[40px]"
-            textSize="text-lg sm:text-base md:text-sm"
+            className="w-full max-w-[18rem] md:w-auto"
           />
         </div>
 

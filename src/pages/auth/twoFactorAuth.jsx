@@ -1,4 +1,5 @@
-import Button from "../../components/atoms/button";
+import BigButton from "../../components/atoms/bigButton";
+import SmallButton from "../../components/atoms/smallButton";
 import Alert from "../../components/atoms/alerts";
 import TwoFactorCode from "../../components/organism/twoFactorCode";
 import { useTwoFactorAuth } from "../../hooks/organism/useTwoFactorAuth";
@@ -49,17 +50,11 @@ const TwoFactorAuth = ({ onClose }) => {
             ) : null}
 
             <div className="mt-5 sm:mt-6">
-              <Button
+              <BigButton
                 text="Continuar"
                 onClick={handleGoToCode}
                 disabled={isGenerating || !qr}
-                bgColor="bg-[#1a2f5e]"
-                hoverColor="hover:opacity-85"
-                activeColor="active:opacity-70"
-                textColor="text-white"
-                width="w-full min-w-[14rem] sm:w-56"
-                textSize="text-lg sm:text-xl"
-                className="px-4 shadow-sm"
+                className="w-full min-w-[14rem] px-4 shadow-sm sm:w-56"
               />
             </div>
           </div>
@@ -107,18 +102,11 @@ const TwoFactorAuth = ({ onClose }) => {
             loading={isVerifying}
           />
 
-          <Button
+          <SmallButton
             text="Volver al QR"
             onClick={handleGoToQr}
-            bgColor="bg-transparent"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-slate-500 hover:text-slate-700"
-            width="w-auto"
-            height="h-auto"
-            textSize="text-sm"
-            fontWeight="font-medium"
-            className="mt-1 px-4 py-2 sm:mt-2"
+            cancel
+            className="mt-1 shadow-none sm:mt-2"
           />
         </div>
       )}

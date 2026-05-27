@@ -1,4 +1,4 @@
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 
 const ConfirmApproveVacationModal = ({
     request,
@@ -44,34 +44,17 @@ const ConfirmApproveVacationModal = ({
                 </div>
 
                 <div className="flex justify-center gap-3 pt-1">
-                    <Button
+                    <SmallButton
                         text="Cancelar"
                         onClick={onCancel}
                         disabled={loading}
-                        width="w-auto"
-                        height="h-[38px]"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        bgColor="bg-white"
-                        textColor="text-[#121212]"
-                        hoverColor="hover:bg-slate-50"
-                        activeColor="active:bg-slate-100"
-                        className="px-5 border border-slate-200 shadow-md"
+                        cancel
                     />
 
-                    <Button
+                    <SmallButton
                         text={loading ? "Aprobando..." : "Aprobar"}
                         onClick={onConfirm}
                         disabled={loading}
-                        width="w-auto"
-                        height="h-[38px]"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        bgColor="bg-[#1F3664]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        className="px-5 shadow-md"
                     />
                 </div>
             </div>

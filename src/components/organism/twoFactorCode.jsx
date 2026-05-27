@@ -1,5 +1,5 @@
 import TextField from "../atoms/textField";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 
 const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   const handleChange = (value) => {
@@ -23,16 +23,11 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
         wrapperClassName="w-full max-w-[19rem] sm:max-w-sm"
         containerClassName="min-h-[52px] px-4 sm:min-h-[50px]"
       />
-      <Button
+      <BigButton
         text={loading ? "Verificando..." : "Verificar"}
         onClick={onSubmit}
         disabled={loading || disabled}
-        bgColor="bg-[#1a2f5e]"
-        hoverColor="hover:opacity-85"
-        activeColor="active:opacity-70"
-        textColor="text-white"
-        width="w-full max-w-[19rem] sm:w-[206px]"
-        textSize="text-lg sm:text-xl"
+        className="w-full max-w-[19rem] sm:w-[206px]"
       />
     </div>
   );

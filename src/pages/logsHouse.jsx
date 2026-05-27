@@ -1,4 +1,4 @@
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import HouseLogsFilters from "../components/molecules/houseLogsFilters";
 import HouseLogsTable from "../components/molecules/houseLogsTable";
@@ -50,15 +50,10 @@ const LogsHouse = () => {
           </h1>
         </div>
 
-        <Button
+        <BigButton
           text="Generar reporte"
           onClick={openReportModal}
-          bgColor="bg-[#24375e]"
-          hoverColor="hover:bg-[#162d4a]"
-          activeColor="active:bg-[#0f2035]"
-          textColor="text-white"
-          width="w-full md:w-56"
-          className="px-6"
+          className="w-full md:w-56"
         />
       </div>
 

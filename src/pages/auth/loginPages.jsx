@@ -45,6 +45,7 @@ const LoginPage = () => {
       text: loading ? "Cargando..." : "Ingresar",
       type: "submit",
       disabled: loading,
+      white: true,
     },
   ];
 

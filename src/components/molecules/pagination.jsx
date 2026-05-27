@@ -1,4 +1,4 @@
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 
 const Pagination = ({
   page,
@@ -21,16 +21,11 @@ const Pagination = ({
 
   return (
     <div className="mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <Button
+      <BigButton
         text="Anterior"
         onClick={onPrevPage}
         disabled={loading || page === 1}
-        bgColor="bg-[#24375e]"
-        hoverColor="hover:bg-[#162d4a]"
-        activeColor="active:bg-[#0f2035]"
-        textColor="text-white"
-        width="w-full sm:w-32"
-        className="disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-w-0 sm:w-32"
       />
 
       <div className="flex items-center justify-center px-2 text-center">
@@ -40,16 +35,11 @@ const Pagination = ({
         </span>
       </div>
 
-      <Button
+      <BigButton
         text="Siguiente"
         onClick={onNextPage}
         disabled={loading || page === totalPages}
-        bgColor="bg-[#24375e]"
-        hoverColor="hover:bg-[#162d4a]"
-        activeColor="active:bg-[#0f2035]"
-        textColor="text-white"
-        width="w-full sm:w-32"
-        className="disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-w-0 sm:w-32"
       />
     </div>
   );

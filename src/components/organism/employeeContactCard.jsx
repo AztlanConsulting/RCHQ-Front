@@ -2,6 +2,7 @@ import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
 import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 
 const EmployeeContactCard = ({
   employee,
@@ -25,19 +26,13 @@ const EmployeeContactCard = ({
 
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
-            <button
-              type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button" onClick={onSubmit} disabled={saving}
-              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-            >
-              {saving && <Loader size="sm" />}
-              Guardar
-            </button>
+            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            <SmallButton
+              text="Guardar"
+              onClick={onSubmit}
+              disabled={saving}
+              leadingIcon={saving ? <Loader size="sm" /> : null}
+            />
           </div>
         ) : (
           <button
