@@ -309,7 +309,7 @@ const Calendario = () => {
                 scrollable={shouldScrollDetailModal}
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
-                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[min(96vh,56rem)]"
                         : "w-[92vw] max-w-[40rem] max-h-[calc(100vh-2rem)] scrollbar-hide"
                 }
             >

@@ -1,6 +1,19 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../../utils/authStorage", () => ({
+    getStoredUser: vi.fn(),
+}));
+
 import VacationDetail from "../../components/molecules/calendarCards/vacationDetail";
+import { getStoredUser } from "../../utils/authStorage";
+
+/** Coincide con vacationDetail.jsx: canDelete / canEdit / canReview usan role === "Coordinador". */
+const mockCoordinador = () =>
+    vi.mocked(getStoredUser).mockReturnValue({
+        role: "Coordinador",
+        employeeId: "coord-test",
+    });
 
 const baseVacation = {
     employeeName: "",
@@ -34,6 +47,7 @@ describe("VacationDetail", () => {
     beforeEach(() => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date(2026, 5, 1, 12));
+        mockCoordinador();
     });
 
     afterEach(() => {
