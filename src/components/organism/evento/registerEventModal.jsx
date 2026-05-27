@@ -1,4 +1,5 @@
 import Alert from "../../atoms/alerts";
+import ModalCloseButton from "../../atoms/modalCloseButton";
 import TextField from "../../atoms/textField";
 import Type from "../../atoms/type";
 import ButtonGroup from "../../molecules/buttonGroup";
@@ -93,8 +94,15 @@ const RegisterEventModal = ({
                         gap: "16px",
                     }}
                 >
+                    <div className="flex justify-end">
+                        <ModalCloseButton
+                            onClick={onClose}
+                            className="shrink-0"
+                        />
+                    </div>
+
                     {shouldShowNameField ? (
-                        <div>
+                        <div className="min-w-0">
                             <TextField
                                 id="event-name"
                                 placeholder="Agregar título"
@@ -119,7 +127,7 @@ const RegisterEventModal = ({
                         <Type
                             variant="page-title"
                             as="h2"
-                            className="mb-0 text-[2rem] leading-none"
+                            className="mb-0 min-w-0 text-[2rem] leading-none"
                             style={{
                                 margin: 0,
                             }}
