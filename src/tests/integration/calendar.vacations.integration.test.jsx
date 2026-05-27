@@ -18,6 +18,10 @@ vi.mock("../../hooks/pages/useCalendarPage", () => ({
     useCalendarPage: vi.fn(),
 }));
 
+vi.mock("../../utils/authStorage", () => ({
+    getStoredUser: vi.fn(),
+}));
+
 vi.mock("../../hooks/pages/useCalendarSearchParams", () => ({
     useCalendarSearchParams: vi.fn(),
 }));
@@ -65,6 +69,8 @@ vi.mock("../../components/atoms/dateField", () => ({
     ),
 }));
 
+import { getStoredUser } from "../../utils/authStorage";
+
 const setOwnCalendar = vi.fn();
 
 const renderCalendar = () =>
@@ -107,6 +113,12 @@ const setCalendarHooks = ({
     const cancelRejectVacation = vi.fn();
     const confirmApproveVacation = vi.fn();
     const confirmRejectVacation = vi.fn();
+
+    vi.mocked(getStoredUser).mockReturnValue({
+        role: viewerRole,
+        employeeId:
+            viewerRole === "Coordinador" ? "coord-integration" : "worker-integration",
+    });
 
     useBaseCalendar.mockReturnValue({
         employeeHouseName: "",
