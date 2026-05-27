@@ -95,7 +95,7 @@ export const getUpdateFormService = async () => {
 ### localStorage (authStorage.js)
 El acceso al `localStorage` debe estar centralizado para evitar vulnerabilidades XSS directas o errores de typos:
 - `getToken()` / `setToken(token)` → Manejo del JWT Principal (*Access Token*, corta duración: 1h).
-- **Nota:** La sesión de larga duración (7 días) está gestionada por un *Refresh Token* almacenado en una Cookie `HttpOnly`, inaccesible vía JavaScript.
+- **Nota:** La sesión de larga duración (configurada desde el backend) está gestionada por un *Refresh Token* almacenado en una Cookie `HttpOnly`, inaccesible vía JavaScript.
 - `getFirstLoginToken()` → Token para el flujo de cambio obligatorio de contraseña.
 - `getPreTwoFactorAuthToken()` → Token temporal si el usuario tiene 2FA activado.
 
