@@ -6,6 +6,7 @@ import {
     houseEventSchema,
     buildPayload,
 } from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -83,10 +84,7 @@ export const useHouseForm = ({
     }, [isOpen, initialStartDate, initialEndDate, onValidationAlert]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+        setForm((prev) => shiftDateTimeRange(prev, field, value));
 
         setErrors((prev) => ({
             ...prev,

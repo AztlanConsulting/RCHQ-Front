@@ -7,6 +7,7 @@ import {
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { getVacationEditDatesErrors } from "../../utils/schema/vacation/vacation.schema";
 
 const getVacationRequestId = (event) =>
@@ -95,10 +96,16 @@ export const useVacationFormEdit = ({
     }, [resetVacationEdit]);
 
     const setVacationField = useCallback((field, value) => {
-        setVacationForm((prev) => ({
-            ...prev,
-            [field]: String(value ?? "").slice(0, 80),
-        }));
+        const nextValue = String(value ?? "").slice(0, 80);
+
+        setVacationForm((prev) =>
+            field === "startDate"
+                ? shiftDateOnlyRange(prev, nextValue)
+                : {
+                    ...prev,
+                    [field]: nextValue,
+                },
+        );
 
         setVacationEditError("");
     }, []);
