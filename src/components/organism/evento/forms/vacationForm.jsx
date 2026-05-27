@@ -142,7 +142,7 @@ const VacationForm = (props) => {
             </div>
 
             {viewerRole === "Coordinador" ? (
-                <p className="mb-5 text-xs text-slate-400">
+                <p className="mb-10 mt-2 text-xs text-slate-400">
                     Las vacaciones registradas por coordinación quedarán
                     aprobadas automáticamente.
                 </p>
