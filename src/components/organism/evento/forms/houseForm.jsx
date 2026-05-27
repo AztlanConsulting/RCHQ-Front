@@ -1,5 +1,5 @@
 import Alert from "../../../atoms/alerts";
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import CheckboxField from "../../../atoms/checkboxField";
 import DateField from "../../../atoms/dateField";
 import ErrorText from "../../../atoms/errorText";
@@ -26,6 +26,7 @@ const CasaForm = (props) => {
     } = useHouseForm(props);
 
     const isTimeVisible = !form.allDay;
+    const descriptionLength = String(form.description ?? "").length;
 
     const currentYear = new Date().getFullYear();
     const houseDateMin = new Date(currentYear, 0, 1);
@@ -188,6 +189,10 @@ const CasaForm = (props) => {
                     style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
+                <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                    {`${descriptionLength}/250`}
+                </div>
+
                 {errors.description && (
                     <ErrorText>{errors.description}</ErrorText>
                 )}
@@ -202,19 +207,10 @@ const CasaForm = (props) => {
             )}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
+                <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    bgColor="bg-[#1E3A5F]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f1f33]"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-semibold"
-                    className="px-5"
                 />
             </div>
 

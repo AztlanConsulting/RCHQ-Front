@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import ModalCloseButton from "./modalCloseButton";
 
 const placements = {
     "center": "fixed inset-0 z-50 flex items-center justify-center",
@@ -82,14 +83,7 @@ const Modal = ({
                             </h2>
                         )}
 
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="cursor-pointer text-[1.75rem] leading-none"
-                            aria-label="Close modal"
-                        >
-                            ×
-                        </button>
+                        <ModalCloseButton onClick={onClose} />
                     </div>
                 )}
 

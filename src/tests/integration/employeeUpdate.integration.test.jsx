@@ -98,6 +98,7 @@ const setupEmployeeDetail = (overrides = {}) => {
     employeeFaults:          [],
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
+    employeeAbsenceUsedDays: 0,
     isLoading:               false,
     currentTab:              "overview",
     setCurrentTab:           vi.fn(),
@@ -116,8 +117,12 @@ const makeToken = (role = "Administrador") => {
   return `header.${payload}.signature`;
 };
 
+/** Detalle usa getStoredUser(); canEdit sólo Coordinador */
+const coordinatorsStoredUserJson = JSON.stringify({ role: "Coordinador" });
+
 const renderPage = () => {
   localStorage.setItem("token", makeToken("Administrador"));
+  localStorage.setItem("user", coordinatorsStoredUserJson);
   
   return render(
     <MemoryRouter initialEntries={[`/app/personal/${TEST_EMPLOYEE_ID}`]}>

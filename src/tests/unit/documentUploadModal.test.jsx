@@ -15,7 +15,7 @@ vi.mock("../../services/documentService", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  const payload = btoa(JSON.stringify({ role: "Administrador", id: "1" }));
+  const payload = btoa(JSON.stringify({ role: "Coordinador", id: "1" }));
   localStorage.setItem("token", `header.${payload}.sig`);
 });
 

@@ -6,6 +6,7 @@ import TextField from "../atoms/textField";
 import TimeField from "../atoms/timeField";
 import CheckboxField from "../atoms/checkboxField";
 import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -54,6 +55,7 @@ const EmployeeAdminCard = ({
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
   const currentRoleOption = roles.find(
     (role) => String(role.roleId) === String(adminForm.originalRoleId),
@@ -86,21 +88,17 @@ const EmployeeAdminCard = ({
 
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
-            <button
-              type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button" onClick={onSubmit} disabled={saving || loadingCatalogues}
-              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-            >
-              {saving && <Loader size="sm" />}
-              Guardar
-            </button>
+            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            {canEdit ? (
+              <SmallButton
+                text="Guardar"
+                onClick={onSubmit}
+                disabled={saving || loadingCatalogues}
+                leadingIcon={saving ? <Loader size="sm" /> : null}
+              />
+            ) : null}
           </div>
-        ) : (
+        ) : canEdit ? (
           <button
             type="button" aria-label="Editar información administrativa"
             className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -108,10 +106,10 @@ const EmployeeAdminCard = ({
           >
             <img src="/edit.svg" alt="" className="h-5 w-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {saveError && isEditing && (
+      {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
@@ -210,7 +208,8 @@ const EmployeeAdminCard = ({
         </div>
       )}
 
-      {isEditing && (
+      {/* Modo edición */}
+      {isEditing && canEdit && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (

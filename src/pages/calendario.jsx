@@ -189,12 +189,10 @@ const Calendario = () => {
         setCalendarMode,
     });
 
-    const isVacationDetailEditing =
-        selectedEvent?.focus === "vacaciones" && isVacationEditing;
     const shouldScrollDetailModal =
         ["eventos", "ausencias", "vacaciones"].includes(
             selectedEvent?.focus,
-        ) && !isVacationDetailEditing;
+        );
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -358,7 +356,6 @@ const Calendario = () => {
                                     event={selectedEvent}
                                     evidenceLabel={absenceEvidenceLabel}
                                     onOpenEvidence={openAbsenceEvidence}
-                                    onClose={closeDetail}
                                 />
                             );
 
@@ -389,7 +386,6 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
-                                    onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}

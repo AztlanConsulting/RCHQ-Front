@@ -1,3 +1,5 @@
+import ModalCloseButton from "../atoms/modalCloseButton";
+
 const ModalShell = ({
   isOpen,
   onClose,
@@ -29,14 +31,11 @@ const ModalShell = ({
           onClick={handleContentClick}
         >
           {showCloseButton && typeof onClose === "function" && (
-            <button
-              type="button"
+            <ModalCloseButton
               onClick={onClose}
-              className="absolute right-8 top-8 z-10 text-xl font-bold text-slate-400 hover:text-slate-600"
-              aria-label="Cerrar"
-            >
-              ✕
-            </button>
+              className="absolute right-8 top-8 z-10"
+              ariaLabel="Cerrar"
+            />
           )}
 
           <div className="max-h-[90vh] overflow-y-auto p-8">{children}</div>

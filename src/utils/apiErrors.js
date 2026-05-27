@@ -1,4 +1,11 @@
 export const buildApiError = (response, data, fallbackMessage) => {
+  if (response?.status === 429) {
+    const resetSeconds = response.headers?.get?.("RateLimit-Reset");
+    window.dispatchEvent(
+      new CustomEvent("api:rate-limit", { detail: { resetSeconds } })
+    );
+  }
+
   const errorMessage = new Error(data?.message || fallbackMessage);
   errorMessage.status = response.status;
   errorMessage.code = data?.code;
