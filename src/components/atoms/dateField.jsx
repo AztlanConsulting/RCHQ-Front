@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Datepicker } from "flowbite-react";
 import { useDateField } from "../../hooks/atoms/useDateField";
 
@@ -14,6 +15,7 @@ const DateField = ({
     popupAlign = "left",
     popupSize = "default",
     popupPlacement = "bottom",
+    popupStrategy = "absolute",
     wrapperClassName = "",
     inputWrapperClassName = "",
     inputClassName = "",
@@ -22,6 +24,8 @@ const DateField = ({
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
+    const wrapperRef = useRef(null);
+    const shouldUseFixedPopup = popupStrategy === "fixed";
 
     useDateField(!native);
 
@@ -49,6 +53,43 @@ const DateField = ({
                 value: `${year}-${month}-${day}`,
             },
         });
+    };
+
+    const updateFixedPopupPosition = () => {
+        if (!shouldUseFixedPopup || !wrapperRef.current) return;
+
+        const rect = wrapperRef.current.getBoundingClientRect();
+        const gap = 12;
+        const viewportPadding = 24;
+        const popupWidth = isCompactPopup ? 248 : 280;
+        const popupHeight = isCompactPopup ? 300 : 340;
+
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - popupWidth - viewportPadding;
+
+        const preferredLeft =
+            popupAlign === "right"
+                ? rect.right - popupWidth
+                : rect.left;
+
+        const left = Math.min(Math.max(preferredLeft, minLeft), maxLeft);
+
+        const hasEnoughBottomSpace =
+            window.innerHeight - rect.bottom >= popupHeight + gap;
+
+        const preferredBottomTop = rect.bottom + gap;
+        const preferredTopTop = rect.top - popupHeight - gap;
+
+        const top =
+            popupPlacement === "top" && rect.top >= popupHeight + gap
+                ? preferredTopTop
+                : Math.min(
+                    preferredBottomTop,
+                    window.innerHeight - popupHeight - viewportPadding,
+                );
+
+        wrapperRef.current.style.setProperty("--datepicker-fixed-left", `${left}px`);
+        wrapperRef.current.style.setProperty("--datepicker-fixed-top", `${top}px`);
     };
 
     if (native) {
@@ -92,8 +133,17 @@ const DateField = ({
             ? "!top-auto !bottom-full mb-2"
             : "!top-10 !bottom-auto pt-2";
 
+    const popupPositionClass = shouldUseFixedPopup
+        ? "fixed !top-[var(--datepicker-fixed-top)] !left-[var(--datepicker-fixed-left)] !right-auto !bottom-auto z-[9999]"
+        : `absolute ${popupVerticalClass} ${popupHorizontalClass} z-[80]`;
+
     return (
-        <div className={`date-field-wrapper relative flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
+        <div
+            ref={wrapperRef}
+            onFocusCapture={updateFixedPopupPosition}
+            onClickCapture={updateFixedPopupPosition}
+            className={`date-field-wrapper relative flex w-full flex-col gap-1.5 ${wrapperClassName}`}
+        >
             <label className={`text-sm font-bold sm:text-base ${labelColor} ${labelClassName}`}>
                 {label}
             </label>
@@ -127,7 +177,7 @@ const DateField = ({
 
                     popup: {
                         root: {
-                            base: `absolute ${popupVerticalClass} ${popupHorizontalClass} z-[80] block`,
+                            base: `${popupPositionClass} block`,
                             inline: "relative top-0 z-auto",
                             inner: `inline-block rounded-lg bg-white shadow-lg dark:bg-gray-700 ${isCompactPopup ? "p-3" : "p-4"}`,
                         },
