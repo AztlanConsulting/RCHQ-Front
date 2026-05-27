@@ -548,7 +548,7 @@ describe("useCalendarPage", () => {
 
     it("muestra error de permisos si el back rechaza la eliminación de vacaciones", async () => {
         vi.mocked(deleteVacationRequest).mockRejectedValue(
-            new Error("No puede acceder a este recurso"),
+            new Error("Permisos insuficientes"),
         );
 
         const { result } = renderHook(() =>
@@ -567,7 +567,7 @@ describe("useCalendarPage", () => {
         });
 
         expect(result.current.deleteVacationError).toBe(
-            "No puede acceder a este recurso",
+            "Permisos insuficientes",
         );
         expect(result.current.isDeleteVacationOpen).toBe(true);
     });
