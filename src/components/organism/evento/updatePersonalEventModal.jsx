@@ -35,6 +35,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
     } = useUpdatePersonalEventForm({ event, isOpen, onClose, onSuccess });
 
     const showTimeFields = !form.allDay;
+    const descriptionLength = String(form.description ?? "").length;
 
     const today = new Date();
     const personalDateMin = today;
@@ -207,6 +208,9 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
                             style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                         />
+                        <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                            {`${descriptionLength}/250`}
+                        </div>
                         {errors.description && (
                             <ErrorText>{errors.description}</ErrorText>
                         )}

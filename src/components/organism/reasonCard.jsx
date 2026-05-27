@@ -1,5 +1,6 @@
 import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/employee/deactivate.schema";
 import SmallButton from "../atoms/smallButton";
+import Button from "../atoms/button";
 
 const MAX_CHARS = 250;
 

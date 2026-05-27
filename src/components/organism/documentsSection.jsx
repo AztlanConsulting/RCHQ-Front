@@ -45,8 +45,10 @@ const DocumentsSection = ({
 }) => {
   return (
     <div className="p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Documentos</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="min-w-0 text-xl font-bold text-slate-900 sm:text-2xl">
+          Documentos
+        </h1>
         {canModify && (
           <BigButton
             text="+ Subir documento"

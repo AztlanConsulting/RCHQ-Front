@@ -1,5 +1,7 @@
 import Alert from "../atoms/alerts";
 import SmallButton from "../atoms/smallButton";
+import Button from "../atoms/button";
+import ModalCloseButton from "../atoms/modalCloseButton";
 import SelectField from "../atoms/selectField";
 import DocumentFileField from "./documentFileField";
 
@@ -31,13 +33,10 @@ const DocumentUploadModal = ({
           <h2 className="text-xl font-bold text-slate-900">
             {isEditing ? "Editar documento" : "Subir documento"}
           </h2>
-          <button
+          <ModalCloseButton
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
+            ariaLabel="Cerrar"
+          />
         </div>
 
         {displayError && <Alert type="error" message={displayError} />}

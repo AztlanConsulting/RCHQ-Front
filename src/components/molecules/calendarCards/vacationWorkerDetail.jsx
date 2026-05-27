@@ -12,7 +12,6 @@ const VacationWorkerDetail = ({
     vacationRemainingInfo = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
-    onClose,
     onEdit,
     onCancelEdit,
     onSubmitEdit,
@@ -165,15 +164,7 @@ const VacationWorkerDetail = ({
                         className="h-8 rounded-md sm:w-[7.2rem]"
                         onClick={onEdit}
                     />
-                ) : (
-                    <SmallButton
-                        type="button"
-                        text="Cerrar"
-                        hasAdjustableWidth
-                        className="h-8 rounded-md sm:w-[7.2rem]"
-                        onClick={onClose}
-                    />
-                )}
+                ) : null}
             </div>
         </div>
     );

@@ -42,7 +42,6 @@ const WorkerAbsenceDetail = ({
   event,
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
-  onClose,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
@@ -107,16 +106,6 @@ const WorkerAbsenceDetail = ({
             <DetailValue>Sin evidencia</DetailValue>
           )}
         </div>
-      </div>
-
-      <div className="mt-12 flex justify-center">
-        <SmallButton
-          type="button"
-          text="Cerrar"
-          hasAdjustableWidth
-          className="rounded-md sm:w-[7.2rem]"
-          onClick={onClose}
-        />
       </div>
     </div>
   );
