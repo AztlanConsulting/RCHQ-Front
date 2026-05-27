@@ -22,7 +22,6 @@ const CONTRACT_TYPE_BY_NORMALIZED = {
   voluntariado: "Voluntariado",
 };
 
-/** Maps DB/UI variants (e.g. "nomina", "Nómina") to the canonical API value "Nomina". */
 export function normalizeEmployeeContractType(val) {
   if (val === null || val === undefined) return val;
   const s = String(val).trim();

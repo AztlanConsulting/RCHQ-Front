@@ -8,10 +8,6 @@ const DAY_NAME_TO_UTC = {
   "Sábado": 6,
 };
 
-/**
- * Counts days in [start, end] whose UTC weekday is in scheduledDays.
- * Inclusive. Uses UTC date parts to match API ISO strings (e.g. ...Z).
- */
 function countScheduledDaysInRange(start, end, scheduledDays) {
   const t0 = new Date(start);
   const t1 = new Date(end);
@@ -26,10 +22,6 @@ function countScheduledDaysInRange(start, end, scheduledDays) {
   return count;
 }
 
-/**
- * Sum of scheduled workdays used across all approved vacation requests.
- * Falls back to Mon–Fri if employeeWorkdays is not provided.
- */
 export function totalWorkDaysFromApprovedVacationRequests(vacationRequests, employeeWorkdays) {
   if (!Array.isArray(vacationRequests)) return 0;
 
