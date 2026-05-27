@@ -26,6 +26,7 @@ const CasaForm = (props) => {
     } = useHouseForm(props);
 
     const isTimeVisible = !form.allDay;
+    const descriptionLength = String(form.description ?? "").length;
 
     const currentYear = new Date().getFullYear();
     const houseDateMin = new Date(currentYear, 0, 1);
@@ -188,6 +189,10 @@ const CasaForm = (props) => {
                     style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                 />
 
+                <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                    {`${descriptionLength}/250`}
+                </div>
+
                 {errors.description && (
                     <ErrorText>{errors.description}</ErrorText>
                 )}
@@ -201,7 +206,13 @@ const CasaForm = (props) => {
                 />
             )}
 
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "12px",
+                }}
+            >
                 <Button
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}

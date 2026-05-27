@@ -87,7 +87,8 @@ const RegisterEventModal = ({
                         maxWidth: "560px",
                         boxSizing: "border-box",
                         maxHeight: "90vh",
-                        overflow: "visible",
+                        minHeight: 0,
+                        overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
@@ -143,7 +144,10 @@ const RegisterEventModal = ({
                     <div
                         style={{
                             flex: 1,
-                            overflowY: effectiveCategoryKey === "vacaciones" ? "visible" : "auto",
+                            overflowY:
+                                effectiveCategoryKey === "vacaciones"
+                                    ? "visible"
+                                    : "auto",
                             minHeight: 0,
                             display: "flex",
                             flexDirection: "column",
@@ -153,7 +157,12 @@ const RegisterEventModal = ({
                         <div
                             key={animationKey}
                             className="animate-[fadeSlideIn_220ms_ease-in-out]"
-                            style={{ paddingBottom: "4px" }}
+                            style={{
+                                paddingBottom:
+                                    effectiveCategoryKey === "vacaciones"
+                                        ? "4px"
+                                        : "24px",
+                            }}
                         >
                             {SubForm && (
                                 <SubForm
