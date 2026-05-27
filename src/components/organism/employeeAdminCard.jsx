@@ -55,6 +55,7 @@ const EmployeeAdminCard = ({
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
   const currentRoleOption = roles.find(
     (role) => String(role.roleId) === String(adminForm.originalRoleId),
@@ -88,14 +89,16 @@ const EmployeeAdminCard = ({
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
             <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
-            <SmallButton
-              text="Guardar"
-              onClick={onSubmit}
-              disabled={saving || loadingCatalogues}
-              leadingIcon={saving ? <Loader size="sm" /> : null}
-            />
+            {canEdit ? (
+              <SmallButton
+                text="Guardar"
+                onClick={onSubmit}
+                disabled={saving || loadingCatalogues}
+                leadingIcon={saving ? <Loader size="sm" /> : null}
+              />
+            ) : null}
           </div>
-        ) : (
+        ) : canEdit ? (
           <button
             type="button" aria-label="Editar información administrativa"
             className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -103,10 +106,10 @@ const EmployeeAdminCard = ({
           >
             <img src="/edit.svg" alt="" className="h-5 w-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {saveError && isEditing && (
+      {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
@@ -213,7 +216,7 @@ const EmployeeAdminCard = ({
       )}
 
       {/* Modo edición */}
-      {isEditing && (
+      {isEditing && canEdit && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (

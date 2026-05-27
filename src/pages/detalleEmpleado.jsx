@@ -15,6 +15,7 @@ import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
 import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
+import { getStoredUser } from "@/utils/authStorage";
 
 const tabs = [
   { id: "overview",   label: "Resumen" },
@@ -24,6 +25,9 @@ const tabs = [
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
+  const user = getStoredUser();
+
+  const canEdit = user?.role == "Coordinador";
 
   const {
     employee, employeeAddress, employeeHouse,
@@ -131,12 +135,14 @@ const DetalleEmpleado = () => {
           />
         </div>
 
-        <BigButton
-          text="Dar de baja"
-          onClick={openModal}
-          hasNoRollback
-          className="min-w-0 shrink-0 px-3"
-        />
+        {canEdit ? (
+          <BigButton
+            text="Dar de baja"
+            onClick={openModal}
+            hasNoRollback
+            className="min-w-0 shrink-0 px-3"
+          />
+        ) : null}
       </div>
 
       <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
@@ -168,12 +174,14 @@ const DetalleEmpleado = () => {
           </Tabs>
         </div>
 
-        <BigButton
-          text="Dar de baja"
-          onClick={openModal}
-          hasNoRollback
-          className="ml-auto mr-2 min-w-0 shrink-0 px-5"
-        />
+        {canEdit ? (
+          <BigButton
+            text="Dar de baja"
+            onClick={openModal}
+            hasNoRollback
+            className="ml-auto mr-2 min-w-0 shrink-0 px-5"
+          />
+        ) : null}
       </div>
 
       <EmployeeBasicCard
@@ -191,6 +199,7 @@ const DetalleEmpleado = () => {
         onOpenEdit={() => openBasicEdit(employee)}
         onSubmit={submitBasic}
         onCancel={closeEdit}
+        canEdit={canEdit}
       />
 
       {currentTab === "overview" && (
@@ -207,6 +216,7 @@ const DetalleEmpleado = () => {
             onOpenEdit={() => openContactEdit(employee, employeeAddress)}
             onSubmit={submitContact}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
 
           <EmployeeAdminCard
@@ -230,6 +240,7 @@ const DetalleEmpleado = () => {
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
         </div>
       )}
