@@ -126,6 +126,7 @@ const VacationList = () => {
             <Modal
                 open={isVacationEditing}
                 onClose={cancelVacationEdit}
+                scrollable
                 className="max-w-3xl"
             >
                 <VacationEditForm

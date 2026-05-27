@@ -189,12 +189,10 @@ const Calendario = () => {
         setCalendarMode,
     });
 
-    const isVacationDetailEditing =
-        selectedEvent?.focus === "vacaciones" && isVacationEditing;
     const shouldScrollDetailModal =
         ["eventos", "ausencias", "vacaciones"].includes(
             selectedEvent?.focus,
-        ) && !isVacationDetailEditing;
+        );
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
