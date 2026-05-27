@@ -1,4 +1,5 @@
 import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/employee/deactivate.schema";
+import SmallButton from "../atoms/smallButton";
 import Button from "../atoms/button";
 
 const MAX_CHARS = 250;
@@ -92,34 +93,20 @@ const ReasonCard = ({
           </span>
         </div>
 
-        <div className="flex justify-center gap-3 pt-1">
-          <Button
-            text="Cancelar"
-            onClick={onCancel}
-            disabled={isSubmitting}
-            bgColor="bg-white"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-slate-600"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 border border-slate-200 shadow-md"
-          />
-          <Button
+        <div className="flex gap-3">
+          <SmallButton
             text={isSubmitting ? "Procesando..." : "Dar de baja"}
             onClick={onSubmit}
             disabled={isSubmitting}
-            bgColor="bg-[#A20000]"
-            hoverColor="hover:bg-[#870000]"
-            activeColor="active:bg-[#6B0000]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 shadow-md"
+            hasNoRollback
+            className="flex-1"
+          />
+          <SmallButton
+            text="Cancelar"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            cancel
+            className="flex-1"
           />
         </div>
       </div>

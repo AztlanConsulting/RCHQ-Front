@@ -1,5 +1,5 @@
 import Alert from "../../../atoms/alerts";
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import CheckboxField from "../../../atoms/checkboxField";
 import DateField from "../../../atoms/dateField";
 import ErrorText from "../../../atoms/errorText";
@@ -206,26 +206,11 @@ const CasaForm = (props) => {
                 />
             )}
 
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    marginTop: "12px",
-                }}
-            >
-                <Button
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    bgColor="bg-[#1E3A5F]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f1f33]"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-semibold"
-                    className="px-5"
                 />
             </div>
 

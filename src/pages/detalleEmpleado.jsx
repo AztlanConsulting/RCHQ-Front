@@ -4,6 +4,7 @@ import Alert from "../components/atoms/alerts";
 import Type from "../components/atoms/type";
 import { Tabs } from "../components/molecules/tabs";
 import NativeSelect from "../components/atoms/nativeSelect";
+import BigButton from "../components/atoms/bigButton";
 import EmployeeBasicCard from "../components/organism/employeeBasicCard";
 import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
@@ -130,14 +131,12 @@ const DetalleEmpleado = () => {
           />
         </div>
 
-        <button
-          type="button"
+        <BigButton
+          text="Dar de baja"
           onClick={openModal}
-          className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
-            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
-        >
-          Dar de baja
-        </button>
+          hasNoRollback
+          className="min-w-0 shrink-0 px-3"
+        />
       </div>
 
       <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
@@ -169,14 +168,12 @@ const DetalleEmpleado = () => {
           </Tabs>
         </div>
 
-        <button
-          type="button"
+        <BigButton
+          text="Dar de baja"
           onClick={openModal}
-          className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
-            text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
-        >
-          Dar de baja
-        </button>
+          hasNoRollback
+          className="ml-auto mr-2 min-w-0 shrink-0 px-5"
+        />
       </div>
 
       <EmployeeBasicCard

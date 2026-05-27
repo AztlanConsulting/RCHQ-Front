@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getCalendarViewerRole } from "../../../../services/calendarService";
 
 import Alert from "../../../atoms/alerts";
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
@@ -159,19 +159,10 @@ const VacationForm = (props) => {
             )}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
+                <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
                     disabled={isSubmitting || isLoadingOptions}
-                    bgColor="bg-[#1E3A5F]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f1f33]"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-semibold"
-                    className="px-5"
                 />
             </div>
         </>

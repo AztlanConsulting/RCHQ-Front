@@ -1,5 +1,5 @@
 import Modal from "../atoms/modal";
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 import useBlacklistModal from "../../hooks/molecules/useBlacklistModal";
 import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/blacklist/create.schema";
 
@@ -61,33 +61,17 @@ const RemoveFromBlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, i
         </div>
 
         <div className="flex justify-center gap-3 pt-1">
-          <Button
+          <SmallButton
             text="Cancelar"
             onClick={handleCancel}
             disabled={isSubmitting}
-            bgColor="bg-white"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-slate-600"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 border border-slate-200 shadow-md"
+            cancel
           />
-          <Button
+          <SmallButton
             text={isSubmitting ? "Procesando..." : "Aceptar"}
             onClick={handleConfirm}
             disabled={isSubmitting}
-            bgColor="bg-[#9b1c1c]"
-            hoverColor="hover:bg-[#7a1616]"
-            activeColor="active:bg-[#5c1010]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 shadow-md"
+            hasNoRollback
           />
         </div>
       </div>

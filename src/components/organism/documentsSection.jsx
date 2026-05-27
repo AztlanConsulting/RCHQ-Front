@@ -1,5 +1,5 @@
 import Alert from "../atoms/alerts";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
@@ -50,24 +50,11 @@ const DocumentsSection = ({
           Documentos
         </h1>
         {canModify && (
-          <Button
+          <BigButton
+            text="+ Subir documento"
             onClick={handleOpenUpload}
-            bgColor="bg-[#1e2b4d]"
-            hoverColor="hover:bg-[#15203b]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[38px] sm:h-[42px]"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="shrink-0 px-3 sm:px-5"
-          >
-            <span className="text-sm font-semibold text-white sm:hidden">
-              Subir
-            </span>
-            <span className="hidden text-sm font-semibold text-white sm:inline">
-              + Subir documento
-            </span>
-          </Button>
+            className="h-[42px] min-w-0 px-5 text-sm"
+          />
         )}
       </div>
 

@@ -1,4 +1,5 @@
 import Alert from "../atoms/alerts";
+import SmallButton from "../atoms/smallButton";
 import Button from "../atoms/button";
 import ModalCloseButton from "../atoms/modalCloseButton";
 import SelectField from "../atoms/selectField";
@@ -56,35 +57,18 @@ const DocumentUploadModal = ({
           handleFileChange={handleFileChange}
         />
 
-        <div className="flex gap-3 justify-center pt-2">
-          <Button
+        <div className="flex gap-3 justify-end pt-2">
+          <SmallButton
             text="Cancelar"
             onClick={onClose}
-            bgColor="bg-white"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-[#121212]"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 border border-slate-200 shadow-md"
+            cancel
           />
-          <Button
+          <SmallButton
             text={
               loading ? "Guardando..." : isEditing ? "Guardar cambios" : "Subir"
             }
             onClick={handleSubmit}
             disabled={loading}
-            bgColor="bg-[#1F3664]"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 shadow-md"
           />
         </div>
       </div>

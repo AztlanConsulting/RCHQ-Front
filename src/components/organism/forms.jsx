@@ -1,5 +1,6 @@
 import TextField from "../atoms/textField";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
+import SmallButton from "../atoms/smallButton";
 
 const Forms = ({
   title,
@@ -54,24 +55,23 @@ const Forms = ({
             actions.length > 1 ? "flex-col gap-4" : "justify-center"
           }`}
         >
-          {actions.map((action) => (
-            <Button
-              key={action.id || action.text}
-              text={action.text}
-              type={action.type || "button"}
-              onClick={action.onClick}
-              disabled={action.disabled}
-              bgColor={action.bgColor}
-              textColor={action.textColor}
-              hoverColor={action.hoverColor}
-              activeColor={action.activeColor}
-              width={action.width}
-              height={action.height}
-              textSize={action.textSize}
-              fontWeight={action.fontWeight}
-              className={action.className}
-            />
-          ))}
+          {actions.map((action) => {
+            const ButtonComponent = actions.length > 1 ? SmallButton : BigButton;
+
+            return (
+              <ButtonComponent
+                key={action.id || action.text}
+                text={action.text}
+                type={action.type || "button"}
+                onClick={action.onClick}
+                disabled={action.disabled}
+                white={action.white}
+                hasNoRollback={action.hasNoRollback}
+                cancel={action.cancel ?? action.text === "Cancelar"}
+                className={action.className}
+              />
+            );
+          })}
         </div>
       )}
     </form>
