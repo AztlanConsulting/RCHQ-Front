@@ -1,5 +1,3 @@
-// src/tests/integration/employeeUpdate.integration.test.jsx
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   render,
@@ -10,10 +8,6 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import DetalleEmpleado from "../../pages/detalleEmpleado";
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Mocks
-// ══════════════════════════════════════════════════════════════════════════════
 
 vi.mock("../../services/employeeUpdateService", () => ({
   getUpdateFormService:     vi.fn(),
@@ -52,10 +46,6 @@ import {
   updateAdminInfoService,
 } from "../../services/employeeUpdateService";
 import { useEmployeeDetail } from "../../hooks/pages/useEmployeeDetail";
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Fixtures
-// ══════════════════════════════════════════════════════════════════════════════
 
 const TEST_EMPLOYEE_ID = "emp-001";
 
@@ -98,7 +88,6 @@ const mockWorkdays = [
   },
 ];
 
-// ── setupEmployeeDetail con setAlert reactivo ──────────────────────────────
 const setupEmployeeDetail = (overrides = {}) => {
   const mockSetAlert = vi.fn();
 
@@ -139,10 +128,6 @@ const renderPage = () => {
   );
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Setup / teardown
-// ══════════════════════════════════════════════════════════════════════════════
-
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
@@ -160,10 +145,6 @@ beforeEach(() => {
   updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
   updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Renderizado base
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("DetalleEmpleado — renderizado base", () => {
   it("muestra el nombre del empleado", async () => {
@@ -209,10 +190,6 @@ describe("DetalleEmpleado — renderizado base", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Edición de información básica
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("DetalleEmpleado — editar información básica", () => {
   it("abre el formulario de edición al hacer click en el lápiz de básica", async () => {
@@ -297,10 +274,6 @@ describe("DetalleEmpleado — editar información básica", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Edición de información de contacto
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("DetalleEmpleado — editar información de contacto", () => {
   it("abre el formulario de edición de contacto", async () => {
     renderPage();
@@ -377,10 +350,6 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Edición de información administrativa
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("DetalleEmpleado — editar información administrativa", () => {
   it("abre el formulario de edición administrativa", async () => {
@@ -503,10 +472,6 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     expect(saveBtn).toBeDisabled();
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Aislamiento de secciones de edición
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("DetalleEmpleado — aislamiento de edición", () => {
   it("al abrir básica, no muestra formulario de contacto", async () => {

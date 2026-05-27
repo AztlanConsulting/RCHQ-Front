@@ -1,4 +1,3 @@
-// tests/unit/documentService.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   getDocumentTypesService,
@@ -20,10 +19,6 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// getDocumentTypesService
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("getDocumentTypesService", () => {
   it("retorna los tipos de documento mapeados cuando la respuesta es exitosa", async () => {
@@ -74,10 +69,6 @@ describe("getDocumentTypesService", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// getDocumentsService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("getDocumentsService", () => {
   it("retorna los documentos con URL completa cuando la respuesta es exitosa", async () => {
     localStorage.setItem("token", "valid-token");
@@ -117,10 +108,6 @@ describe("getDocumentsService", () => {
     expect(result.data).toBeUndefined();
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// uploadDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("uploadDocumentService", () => {
   it("hace POST al endpoint correcto con el token", async () => {
@@ -163,10 +150,6 @@ describe("uploadDocumentService", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// updateDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("updateDocumentService", () => {
   it("hace PUT al endpoint con el field correcto", async () => {
     localStorage.setItem("token", "valid-token");
@@ -198,10 +181,6 @@ describe("updateDocumentService", () => {
     ).rejects.toMatchObject({ status: 404 });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// deleteDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("deleteDocumentService", () => {
   it("hace DELETE al endpoint con el field correcto", async () => {

@@ -12,10 +12,8 @@ import {
   deactivateTwoFactorAuthService,
 } from "../../services/authService";
 
-// ─── Factories ────────────────────────────────────────────────────────────────
-
 const makeLoginSuccess = (overrides = {}) => ({
-  isActiveTwoFactorAuth: false, // ← campo real del servicio
+  isActiveTwoFactorAuth: false,
   data: { token: "session-token", user: { id: 1, name: "Test" } },
   ...overrides,
 });
@@ -35,8 +33,6 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
 });
-
-// ─── getReadableErrors ────────────────────────────────────────────────────────
 
 describe("getReadableErrors", () => {
   it("extrae los mensajes del array errors cuando está presente", () => {
@@ -66,8 +62,6 @@ describe("getReadableErrors", () => {
   });
 });
 
-// ─── getToken ─────────────────────────────────────────────────────────────────
-
 describe("getToken", () => {
   it("retorna null cuando no existe ningún token en localStorage", () => {
     expect(getToken()).toBeNull();
@@ -79,8 +73,6 @@ describe("getToken", () => {
   });
 });
 
-// ─── getPreTwoFactorToken ─────────────────────────────────────────────────────
-
 describe("getPreTwoFactorAuthToken", () => {
   it("retorna null cuando no existe el token pre-TwoFactorAuth en localStorage", () => {
     expect(getPreTwoFactorAuthToken()).toBeNull();
@@ -91,8 +83,6 @@ describe("getPreTwoFactorAuthToken", () => {
     expect(getPreTwoFactorAuthToken()).toBe("pre-token-xyz");
   });
 });
-
-// ─── logoutService ────────────────────────────────────────────────────────────
 
 describe("logoutService", () => {
   it("elimina token, preTwoFactorToken y user del localStorage y llama al API", async () => {
@@ -112,8 +102,6 @@ describe("logoutService", () => {
     );
   });
 });
-
-// ─── loginService ─────────────────────────────────────────────────────────────
 
 describe("loginService", () => {
   it("guarda el token de sesión en localStorage cuando el login es exitoso sin TwoFactorAuth", async () => {
@@ -168,8 +156,6 @@ describe("loginService", () => {
   });
 });
 
-// ─── activateTwoFactorAuthService ─────────────────────────────────────────────
-
 describe("activateTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(activateTwoFactorAuthService()).rejects.toThrow(
@@ -205,8 +191,6 @@ describe("activateTwoFactorAuthService", () => {
   });
 });
 
-// ─── verifyTwoFactorAuthService ───────────────────────────────────────────────
-
 describe("verifyTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(verifyTwoFactorAuthService("123456")).rejects.toThrow(
@@ -231,8 +215,6 @@ describe("verifyTwoFactorAuthService", () => {
   });
 });
 
-// ─── validateLoginTwoFactorAuthService ───────────────────────────────────────
-
 describe("validateLoginTwoFactorAuthService", () => {
   it("lanza error cuando no hay preTwoFactorToken en localStorage", async () => {
     await expect(validateLoginTwoFactorAuthService("123456")).rejects.toThrow(
@@ -241,7 +223,7 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("retorna LOGIN_COMPLETE y el token final cuando el código es correcto", async () => {
-    seedLocalStorage({ preTwoFactorAuth: "pre-token" }); // ← clave real
+    seedLocalStorage({ preTwoFactorAuth: "pre-token" });
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
       token: "final-token",
@@ -261,8 +243,6 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 });
 
-// ─── getStatusTwoFactorAuth ───────────────────────────────────────────────────
-
 describe("getStatusTwoFactorAuth", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(getTwoFactorAuthStatus()).rejects.toThrow(
@@ -277,8 +257,6 @@ describe("getStatusTwoFactorAuth", () => {
     expect(result).toEqual({ isActive: true });
   });
 });
-
-// ─── desactivateTwoFactorAuthService ─────────────────────────────────────────
 
 describe("desactivateTwoFactorAuthService", () => {
   it("envía la password en el body POST al endpoint de desactivación", async () => {

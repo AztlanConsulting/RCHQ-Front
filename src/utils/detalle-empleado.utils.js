@@ -68,11 +68,8 @@ function countWorkdayHours(workday) {
   }
 
   return 0;
-  // start/end format: 1970-01-01T08:00:00.000Z
 }
 
-// input: "1970-01-01T08:00:00.000Z"
-// output: "08:00"
 export function parseUTCDateToHours(isoString) {
   if (!isoString) return "N/A";
   const d = new Date(isoString);

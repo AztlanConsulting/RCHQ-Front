@@ -1,4 +1,3 @@
-// tests/integration/LoginPage.integration.test.jsx
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -16,7 +15,6 @@ vi.mock("../../../src/hooks/useAuth", () => ({
   default: () => ({ login: mockLogin }),
 }));
 
-// ← mockear AuthService pero con implementaciones controladas
 vi.mock("../../../src/services/authService", () => ({
   loginService: vi.fn(),
   getReadableErrors: vi.fn((err) => [
@@ -52,7 +50,6 @@ beforeEach(() => {
 
 describe("LoginPage + AuthService — flujo de login", () => {
   it("guarda el token en localStorage y navega al dashboard cuando el login es exitoso", async () => {
-    // Arrange
     loginService.mockResolvedValue({
       success: true,
       isActiveTwoFactorAuth: false,
@@ -60,10 +57,8 @@ describe("LoginPage + AuthService — flujo de login", () => {
     });
     renderLogin();
 
-    // Act
     await fillAndSubmit("usuario@test.com", "Password123!");
 
-    // Assert
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
         token: "real-token-123",
@@ -76,7 +71,6 @@ describe("LoginPage + AuthService — flujo de login", () => {
   });
 
   it("guarda preTwoFactorAuth en localStorage y navega a /2FA cuando el usuario tiene TwoFactorAuth activo", async () => {
-    // Arrange
     loginService.mockResolvedValue({
       success: true,
       isActiveTwoFactorAuth: true,
@@ -84,17 +78,14 @@ describe("LoginPage + AuthService — flujo de login", () => {
     });
     renderLogin();
 
-    // Act
     await fillAndSubmit("usuario@test.com", "Password123!");
 
-    // Assert
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/2FA", { replace: true });
     });
   });
 
   it("muestra el error del servidor cuando las credenciales son inválidas", async () => {
-    // Arrange
     const error = new Error("Credenciales inválidas");
     error.status = 401;
     error.code = "INVALID_CREDENTIALS";
@@ -102,28 +93,22 @@ describe("LoginPage + AuthService — flujo de login", () => {
     loginService.mockRejectedValue(error);
     renderLogin();
 
-    // Act
     await fillAndSubmit("usuario@test.com", "WrongPassword1!");
 
-    // Assert
     await waitFor(() =>
       expect(screen.getByText(/credenciales inválidas/i)).toBeInTheDocument(),
     );
   });
 
   it("no llama al servicio cuando la validación Zod falla", async () => {
-    // Arrange
     renderLogin();
 
-    // Act
     await fillAndSubmit("no-es-email", "pass");
 
-    // Assert
     await waitFor(() => expect(loginService).not.toHaveBeenCalled());
   });
 
   it("muestra error de bloqueo temporal cuando el servidor responde 423", async () => {
-    // Arrange
     const error = new Error(
       "Tu cuenta está bloqueada temporalmente. Intenta más tarde.",
     );
@@ -132,10 +117,8 @@ describe("LoginPage + AuthService — flujo de login", () => {
     loginService.mockRejectedValue(error);
     renderLogin();
 
-    // Act
     await fillAndSubmit("usuario@test.com", "Password123!");
 
-    // Assert
     await waitFor(() =>
       expect(screen.getByText(/bloqueada temporalmente/i)).toBeInTheDocument(),
     );

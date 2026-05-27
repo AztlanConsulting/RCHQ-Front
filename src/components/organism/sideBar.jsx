@@ -4,7 +4,6 @@ import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
 import { hasRole } from "../../utils/auth/getRoleName";
 
-// ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
   <img
     src={`/${name}.svg`}
@@ -53,7 +52,6 @@ const getNavItems = (user) => {
   return navItems;
 };
 
-// ─── Desktop NavItem ──────────────────────────────────────────────────────────
 const NavItem = ({ to, label, icon, expanded }) => (
   <NavLink
     to={to}
@@ -87,7 +85,6 @@ const NavItem = ({ to, label, icon, expanded }) => (
   </NavLink>
 );
 
-// ─── Desktop BottomItem ───────────────────────────────────────────────────────
 const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
   const content = (isActive = false) => (
     <>
@@ -138,7 +135,6 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
   );
 };
 
-// ─── Desktop SidebarContent ───────────────────────────────────────────────────
 const SideBarContent = ({ expanded, toggle }) => {
   const sideBarRef = useRef(null);
   const navigate = useNavigate();
@@ -231,7 +227,6 @@ const SideBarContent = ({ expanded, toggle }) => {
   );
 };
 
-// ─── Mobile Navbar + Dropdown ─────────────────────────────────────────────────
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
@@ -350,7 +345,6 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   );
 };
 
-// ─── Root SideBar ─────────────────────────────────────────────────────────────
 const SideBar = () => {
   const { expanded, toggle, mobileOpen, openMobile, closeMobile } = useSideBar();
 

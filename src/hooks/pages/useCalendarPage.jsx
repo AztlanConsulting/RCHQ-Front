@@ -448,7 +448,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
     setAlert({
       type: "error",
       message: "No se puede modificar este tipo de evento.",
@@ -471,7 +470,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
   }, [selectedEvent]);
 
   const cancelDeleteHouseEvent = useCallback(() => {

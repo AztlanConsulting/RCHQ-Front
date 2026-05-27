@@ -69,7 +69,7 @@ export const refreshSessionService = async () => {
   const response = await fetch(`${API_URL}/auth/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // Envia la Cookie HTTPOnly
+    credentials: "include",
   });
   const data = await response.json();
 
@@ -87,11 +87,10 @@ export const logoutService = async () => {
     await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // Limpia la Cookie en el backend
+      credentials: "include",
     });
   } catch (error) {
-    // Ignoramos errores de red; lo importante es limpiar la sesión local
-  }
+    console.error("Error al cerrar sesión en el servidor:", error);}
 };
 
 export const activateTwoFactorAuthService = async () => {
