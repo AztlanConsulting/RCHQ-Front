@@ -23,10 +23,10 @@ const toDateInputValue = (value) => {
 
 const normalizeEmployeeOption = (employee) => {
     const id =
-    employee.employeeId ??
-    employee.employee_id ??
-    employee.id ??
-    "";
+        employee.employeeId ??
+        employee.employee_id ??
+        employee.id ??
+        "";
 
     const name =
         employee.fullName ??
@@ -78,13 +78,13 @@ export const useVacationForm = ({
                     },
             );
 
-            setErrors((current) => ({
-                ...current,
-                [field]: "",
-            }));
+        setErrors((current) => ({
+            ...current,
+            [field]: "",
+        }));
 
-            setServerError("");
-            onValidationAlert?.(null);
+        setServerError("");
+        onValidationAlert?.(null);
     }, [onValidationAlert]);
 
     useEffect(() => {

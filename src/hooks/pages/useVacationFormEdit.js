@@ -65,13 +65,13 @@ export const useVacationFormEdit = ({
             vacationRequestId: String(getVacationRequestId(currentSelectedEvent)),
             startDate: normalizeDateOnly(
                 currentSelectedEvent.startDate ??
-                    currentSelectedEvent.readableStart ??
-                    currentSelectedEvent.start,
+                currentSelectedEvent.readableStart ??
+                currentSelectedEvent.start,
             ),
             endDate: normalizeDateOnly(
                 currentSelectedEvent.endDate ??
-                    currentSelectedEvent.readableEnd ??
-                    currentSelectedEvent.end,
+                currentSelectedEvent.readableEnd ??
+                currentSelectedEvent.end,
             ),
         });
 
@@ -129,9 +129,9 @@ export const useVacationFormEdit = ({
         if (!validation.success) {
             setVacationEditError(
                 validation.errors.vacationRequestId ||
-                    validation.errors.startDate ||
-                    validation.errors.endDate ||
-                    "Revisa las fechas antes de continuar.",
+                validation.errors.startDate ||
+                validation.errors.endDate ||
+                "Revisa las fechas antes de continuar.",
             );
             return;
         }
@@ -139,13 +139,13 @@ export const useVacationFormEdit = ({
         const original = {
             startDate: normalizeDateOnly(
                 currentSelectedEvent.startDate ??
-                    currentSelectedEvent.readableStart ??
-                    currentSelectedEvent.start,
+                currentSelectedEvent.readableStart ??
+                currentSelectedEvent.start,
             ),
             endDate: normalizeDateOnly(
                 currentSelectedEvent.endDate ??
-                    currentSelectedEvent.readableEnd ??
-                    currentSelectedEvent.end,
+                currentSelectedEvent.readableEnd ??
+                currentSelectedEvent.end,
             ),
         };
 
