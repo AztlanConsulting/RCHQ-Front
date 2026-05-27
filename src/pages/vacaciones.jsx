@@ -127,7 +127,7 @@ const VacationList = () => {
                 open={isVacationEditing}
                 onClose={cancelVacationEdit}
                 scrollable
-                className="max-w-3xl"
+                className="w-[92vw] max-w-3xl max-h-[80vh]"
             >
                 <VacationEditForm
                     title="Modificar vacaciones"
@@ -152,7 +152,6 @@ const VacationList = () => {
             >
                 <VacationWorkerDetail
                     event={viewingVacation ?? {}}
-                    onClose={closeViewingVacation}
                     onDelete={() => {
                         openDeleteVacation(viewingVacation);
                         closeViewingVacation();

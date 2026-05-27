@@ -17,7 +17,6 @@ describe("WorkerAbsenceDetail", () => {
     render(
       <WorkerAbsenceDetail
         event={baseAbsence}
-        onClose={vi.fn()}
       />,
     );
 
@@ -30,7 +29,7 @@ describe("WorkerAbsenceDetail", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText(baseAbsence.description)).toBeInTheDocument();
     expect(screen.getByText("Sin evidencia")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /cerrar/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /cerrar/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /editar/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /eliminar/i })).not.toBeInTheDocument();
   });
@@ -43,7 +42,6 @@ describe("WorkerAbsenceDetail", () => {
         event={{ ...baseAbsence, link: "http://localhost:3000/uploads/absence.pdf" }}
         evidenceLabel="Ver evidencia"
         onOpenEvidence={onOpenEvidence}
-        onClose={vi.fn()}
       />,
     );
 
@@ -57,7 +55,6 @@ describe("WorkerAbsenceDetail", () => {
     render(
       <WorkerAbsenceDetail
         event={{ ...baseAbsence, usedDays: 0 }}
-        onClose={vi.fn()}
       />,
     );
 
@@ -71,7 +68,6 @@ Segunda línea completa`;
     render(
       <WorkerAbsenceDetail
         event={{ ...baseAbsence, description: longDescription }}
-        onClose={vi.fn()}
       />,
     );
 
