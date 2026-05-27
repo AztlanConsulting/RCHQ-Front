@@ -1,5 +1,6 @@
 import Alert from "../atoms/alerts";
 import Button from "../atoms/button";
+import ModalCloseButton from "../atoms/modalCloseButton";
 import SelectField from "../atoms/selectField";
 import DocumentFileField from "./documentFileField";
 
@@ -31,13 +32,10 @@ const DocumentUploadModal = ({
           <h2 className="text-xl font-bold text-slate-900">
             {isEditing ? "Editar documento" : "Subir documento"}
           </h2>
-          <button
+          <ModalCloseButton
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
+            ariaLabel="Cerrar"
+          />
         </div>
 
         {displayError && <Alert type="error" message={displayError} />}
@@ -58,19 +56,19 @@ const DocumentUploadModal = ({
           handleFileChange={handleFileChange}
         />
 
-        <div className="flex gap-3 justify-end pt-2">
+        <div className="flex gap-3 justify-center pt-2">
           <Button
             text="Cancelar"
             onClick={onClose}
-            bgColor="bg-transparent"
-            hoverColor="hover:bg-slate-100"
-            activeColor="active:bg-slate-200"
-            textColor="text-slate-600"
+            bgColor="bg-white"
+            hoverColor="hover:bg-slate-50"
+            activeColor="active:bg-slate-100"
+            textColor="text-[#121212]"
             width="w-auto"
-            height="h-[42px]"
+            height="h-[38px]"
             textSize="text-sm"
-            fontWeight="font-medium"
-            className="px-4"
+            fontWeight="font-bold"
+            className="px-5 border border-slate-200 shadow-md"
           />
           <Button
             text={
@@ -78,15 +76,15 @@ const DocumentUploadModal = ({
             }
             onClick={handleSubmit}
             disabled={loading}
-            bgColor="bg-[#1e2b4d]"
-            hoverColor="hover:bg-[#15203b]"
-            activeColor="active:bg-[#0f172a]"
+            bgColor="bg-[#1F3664]"
+            hoverColor="hover:bg-[#15284A]"
+            activeColor="active:bg-[#0E1B33]"
             textColor="text-white"
             width="w-auto"
-            height="h-[42px]"
+            height="h-[38px]"
             textSize="text-sm"
-            fontWeight="font-semibold"
-            className="px-6"
+            fontWeight="font-bold"
+            className="px-5 shadow-md"
           />
         </div>
       </div>

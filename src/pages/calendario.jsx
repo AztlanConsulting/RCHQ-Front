@@ -356,7 +356,6 @@ const Calendario = () => {
                                     event={selectedEvent}
                                     evidenceLabel={absenceEvidenceLabel}
                                     onOpenEvidence={openAbsenceEvidence}
-                                    onClose={closeDetail}
                                 />
                             );
 
@@ -387,7 +386,6 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
-                                    onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}
