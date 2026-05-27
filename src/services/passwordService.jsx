@@ -7,6 +7,7 @@ import {
 } from "../utils/authStorage";
 
 import { buildApiError } from "../utils/apiErrors";
+import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -26,7 +27,6 @@ const changePasswordFirstLoginService = async (
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    credentials: "include",
     body: JSON.stringify({ newPassword, confirmPassword }),
   });
 
@@ -60,17 +60,10 @@ const changePasswordService = async (
   newPassword,
   confirmPassword,
 ) => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
-
-  const response = await fetch(`${API_URL}/auth/change-password`, {
+  const response = await secureFetch(`/auth/change-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
   });
