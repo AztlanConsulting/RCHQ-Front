@@ -42,28 +42,33 @@ const LogReportModal = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+        <div className="flex justify-center gap-3 pt-2">
           <Button
             text="Cancelar"
             onClick={onClose}
-            bgColor="bg-slate-100"
-            hoverColor="hover:bg-slate-200"
-            activeColor="active:bg-slate-300"
-            textColor="text-slate-700"
-            width="w-full sm:w-36"
-            textSize="text-base"
+            bgColor="bg-white"
+            hoverColor="hover:bg-slate-50"
+            activeColor="active:bg-slate-100"
+            textColor="text-[#121212]"
+            width="w-auto"
+            height="h-[38px]"
+            textSize="text-sm"
+            fontWeight="font-bold"
+            className="px-5 border border-slate-200 shadow-md"
           />
           <Button
             text={loading ? "Generando..." : "Descargar PDF"}
             onClick={onConfirm}
             disabled={loading}
-            bgColor="bg-[#24375e]"
-            hoverColor="hover:bg-[#162d4a]"
-            activeColor="active:bg-[#0f2035]"
+            bgColor="bg-[#1F3664]"
+            hoverColor="hover:bg-[#15284A]"
+            activeColor="active:bg-[#0E1B33]"
             textColor="text-white"
-            width="w-full sm:w-44"
-            textSize="text-base"
-            className="disabled:cursor-not-allowed disabled:opacity-60"
+            width="w-auto"
+            height="h-[38px]"
+            textSize="text-sm"
+            fontWeight="font-bold"
+            className="px-5 shadow-md disabled:cursor-not-allowed disabled:opacity-60"
           />
         </div>
       </div>
