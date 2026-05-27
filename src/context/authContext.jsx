@@ -32,6 +32,20 @@ export const AuthProvider = ({ children }) => {
       window.removeEventListener("auth:forced-logout", handleForcedLogout);
   }, [logout]);
 
+  useEffect(() => {
+    const handleTokenRefreshed = (e) => setTokenState(e.detail);
+    const handleStorageChange = (e) => {
+      if (e.key === "token") setTokenState(e.newValue);
+    };
+
+    window.addEventListener("auth:token-refreshed", handleTokenRefreshed);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("auth:token-refreshed", handleTokenRefreshed);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   const login = useCallback(({ token: newToken, user: newUser = null }) => {
     setToken(newToken);
     setTokenState(newToken);
