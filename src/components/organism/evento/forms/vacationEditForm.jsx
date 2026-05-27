@@ -28,7 +28,10 @@ const VacationEditForm = ({
     );
 
     return (
-        <div key="vacation-edit" className="px-2 text-left sm:px-3">
+        <div
+            key="vacation-edit"
+            className="overflow-visible px-2 text-left sm:px-3"
+        >
             <Type
                 variant="page-title"
                 className="mb-5 text-[2rem] leading-none"
@@ -102,8 +105,9 @@ const VacationEditForm = ({
                     }
                     labelColor="text-[#121212]"
                     popupAlign="left"
-                    popupPlacement="top"
+                    popupPlacement="bottom"
                     popupSize="compact"
+                    popupStrategy="fixed"
                 />
 
                 <DateField
@@ -120,8 +124,9 @@ const VacationEditForm = ({
                     maxDate={vacationDateMax}
                     labelColor="text-[#121212]"
                     popupAlign="right"
-                    popupPlacement="top"
+                    popupPlacement="bottom"
                     popupSize="compact"
+                    popupStrategy="fixed"
                 />
             </div>
 

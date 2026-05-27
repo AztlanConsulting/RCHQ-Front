@@ -114,6 +114,7 @@ const VacationForm = (props) => {
                         minDate={vacationDateMin}
                         maxDate={vacationDateMax}
                         popupSize="compact"
+                        popupStrategy="fixed"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
 
@@ -132,6 +133,7 @@ const VacationForm = (props) => {
                         maxDate={vacationDateMax}
                         popupAlign="right"
                         popupSize="compact"
+                        popupStrategy="fixed"
                         onChange={(e) => setField("endDate", e.target.value)}
                     />
 
