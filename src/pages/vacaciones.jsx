@@ -151,7 +151,6 @@ const VacationList = () => {
             >
                 <VacationWorkerDetail
                     event={viewingVacation ?? {}}
-                    onClose={closeViewingVacation}
                     onDelete={() => {
                         openDeleteVacation(viewingVacation);
                         closeViewingVacation();

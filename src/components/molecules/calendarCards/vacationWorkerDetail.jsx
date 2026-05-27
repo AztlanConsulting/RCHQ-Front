@@ -12,7 +12,6 @@ const VacationWorkerDetail = ({
     vacationRemainingInfo = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
-    onClose,
     onEdit,
     onCancelEdit,
     onSubmitEdit,
@@ -145,53 +144,41 @@ const VacationWorkerDetail = ({
                 </div>
             </div>
 
-            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                {canDelete ? (
-                    <Button
-                        type="button"
-                        text="Eliminar"
-                        width="w-full sm:w-[7.2rem]"
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#A20000]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#870000]"
-                        activeColor="active:bg-[#6B0000]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
-                        onClick={onDelete}
-                    />
-                ) : null}
+            {canDelete || canEdit ? (
+                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                    {canDelete ? (
+                        <Button
+                            type="button"
+                            text="Eliminar"
+                            width="w-full sm:w-[7.2rem]"
+                            height="h-8"
+                            textSize="text-[0.95rem]"
+                            bgColor="bg-[#A20000]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#870000]"
+                            activeColor="active:bg-[#6B0000]"
+                            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+                            onClick={onDelete}
+                        />
+                    ) : null}
 
-                {canEdit ? (
-                    <Button
-                        type="button"
-                        text="Editar"
-                        width="w-full sm:w-[7.2rem]"
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#1F3664]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                        onClick={onEdit}
-                    />
-                ) : (
-                    <Button
-                        type="button"
-                        text="Cerrar"
-                        width="w-full sm:w-[7.2rem]"
-                        height="h-8"
-                        textSize="text-[0.95rem]"
-                        bgColor="bg-[#1F3664]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-                        onClick={onClose}
-                    />
-                )}
-            </div>
+                    {canEdit ? (
+                        <Button
+                            type="button"
+                            text="Editar"
+                            width="w-full sm:w-[7.2rem]"
+                            height="h-8"
+                            textSize="text-[0.95rem]"
+                            bgColor="bg-[#1F3664]"
+                            textColor="text-white"
+                            hoverColor="hover:bg-[#15284A]"
+                            activeColor="active:bg-[#0E1B33]"
+                            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+                            onClick={onEdit}
+                        />
+                    ) : null}
+                </div>
+            ) : null}
         </div>
     );
 };

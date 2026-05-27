@@ -42,7 +42,6 @@ const WorkerAbsenceDetail = ({
   event,
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
-  onClose,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
@@ -116,21 +115,6 @@ const WorkerAbsenceDetail = ({
         </div>
       </div>
 
-      <div className="mt-12 flex justify-center">
-        <Button
-          type="button"
-          text="Cerrar"
-          width="w-full sm:w-[7.2rem]"
-          height="h-10"
-          textSize="text-base"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-          onClick={onClose}
-        />
-      </div>
     </div>
   );
 };
