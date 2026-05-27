@@ -10,6 +10,7 @@ import {
   validateLoginTwoFactorAuthService,
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
+  refreshSessionService,
 } from "../../services/authService";
 
 const makeLoginSuccess = (overrides = {}) => ({
@@ -153,6 +154,36 @@ describe("loginService", () => {
         }),
       }),
     );
+  });
+});
+
+describe("refreshSessionService", () => {
+  it("llama al endpoint con credentials 'include' y actualiza el token en localStorage", async () => {
+    const apiResponse = {
+      success: true,
+      data: { token: "new-refresh-token-123" },
+    };
+    mockFetch(apiResponse);
+    
+    const result = await refreshSessionService();
+    
+    expect(result).toEqual(apiResponse);
+    expect(localStorage.getItem("token")).toBe("new-refresh-token-123");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/refresh"),
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("lanza un error si el refresh falla (ej. 401)", async () => {
+    mockFetch({ message: "Refresh token inválido" }, false, 401);
+    await expect(refreshSessionService()).rejects.toMatchObject({
+      message: "Refresh token inválido",
+      status: 401,
+    });
   });
 });
 

@@ -77,7 +77,9 @@ export const refreshSessionService = async () => {
     throw buildApiError(response, data, "Error al renovar la sesión");
   }
 
-  saveLoginSession(data);
+  const newToken = data?.data?.token;
+  if (newToken) setToken(newToken);
+  
   return data;
 };
 

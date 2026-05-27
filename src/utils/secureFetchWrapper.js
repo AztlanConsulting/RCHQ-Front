@@ -18,7 +18,7 @@ const processQueue = (error, token = null) => {
 
 export async function secureFetch(input, init = {}) {
   const headers = new Headers(init.headers || {});
-  const token = getToken();
+  let token = getToken();
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }
