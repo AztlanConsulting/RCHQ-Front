@@ -1,6 +1,7 @@
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const LAST_SAME_DAY_MINUTE = 23 * 60 + 59;
 
 const parseDateOnly = (value) => {
     if (!DATE_ONLY_PATTERN.test(String(value ?? ""))) return null;
@@ -41,6 +42,23 @@ const formatTime = (date) => {
     return `${hour}:${minute}`;
 };
 
+const parseTimeToMinutes = (value) => {
+    if (!TIME_PATTERN.test(String(value ?? ""))) return null;
+
+    const [hour, minute] = String(value).split(":").map(Number);
+
+    return hour * 60 + minute;
+};
+
+const formatMinutesAsTime = (value) => {
+    if (!Number.isFinite(value)) return "";
+
+    const hour = String(Math.floor(value / 60)).padStart(2, "0");
+    const minute = String(value % 60).padStart(2, "0");
+
+    return `${hour}:${minute}`;
+};
+
 export const shiftDateOnlyRange = (
     form,
     nextStartDate,
@@ -65,6 +83,52 @@ export const shiftDateOnlyRange = (
         ...form,
         [startDateKey]: nextStartDate,
         [endDateKey]: formatDateOnly(nextEnd),
+    };
+};
+
+export const shiftSameDayTimeRange = (
+    form,
+    field,
+    value,
+    {
+        startTimeKey = "startTime",
+        endTimeKey = "endTime",
+        allDayKey = "allDay",
+    } = {},
+) => {
+    if (field !== startTimeKey || form?.[allDayKey]) {
+        return {
+            ...form,
+            [field]: value,
+        };
+    }
+
+    const previousStart = parseTimeToMinutes(form?.[startTimeKey]);
+    const previousEnd = parseTimeToMinutes(form?.[endTimeKey]);
+    const nextStart = parseTimeToMinutes(value);
+
+    if (
+        previousStart === null ||
+        previousEnd === null ||
+        nextStart === null ||
+        previousEnd <= previousStart
+    ) {
+        return {
+            ...form,
+            [field]: value,
+        };
+    }
+
+    const durationMinutes = previousEnd - previousStart;
+    const nextEnd = Math.min(
+        nextStart + durationMinutes,
+        LAST_SAME_DAY_MINUTE,
+    );
+
+    return {
+        ...form,
+        [startTimeKey]: value,
+        [endTimeKey]: formatMinutesAsTime(nextEnd),
     };
 };
 

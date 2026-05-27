@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
     shiftDateOnlyRange,
     shiftDateTimeRange,
+    shiftSameDayTimeRange,
 } from "../../utils/dateRangeShift";
 
 describe("dateRangeShift", () => {
@@ -60,6 +61,40 @@ describe("dateRangeShift", () => {
             startTime: "23:00",
             endDate: "2026-05-28",
             endTime: "01:00",
+        });
+    });
+
+    it("keeps the duration in hours when moving a same-day start time", () => {
+        const result = shiftSameDayTimeRange(
+            {
+                allDay: false,
+                startTime: "09:00",
+                endTime: "10:30",
+            },
+            "startTime",
+            "11:00",
+        );
+
+        expect(result).toMatchObject({
+            startTime: "11:00",
+            endTime: "12:30",
+        });
+    });
+
+    it("caps a same-day end time before midnight", () => {
+        const result = shiftSameDayTimeRange(
+            {
+                allDay: false,
+                startTime: "21:00",
+                endTime: "23:00",
+            },
+            "startTime",
+            "23:00",
+        );
+
+        expect(result).toMatchObject({
+            startTime: "23:00",
+            endTime: "23:59",
         });
     });
 });
