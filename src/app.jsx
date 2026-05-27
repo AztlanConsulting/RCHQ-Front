@@ -36,7 +36,7 @@ function App() {
       const seconds = parseInt(e.detail?.resetSeconds, 10) || 60;
       const minutes = Math.ceil(seconds / 60);
       setRateLimitMessage(
-        `Has excedido el límite de peticiones. Intenta de nuevo en ${minutes} minuto(s).`
+        `Detente! Estás haciendo todo muy rápido. Intenta de nuevo en ${minutes} minuto(s).`
       );
     };
     window.addEventListener("api:rate-limit", handleRateLimit);
