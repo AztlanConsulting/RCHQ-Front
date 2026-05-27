@@ -41,6 +41,7 @@ export const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
 
@@ -64,8 +65,33 @@ export const loginService = async (email, password) => {
   return data;
 };
 
-export const logoutService = () => {
+export const refreshSessionService = async () => {
+  const response = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include", // Envia la Cookie HTTPOnly
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al renovar la sesión");
+  }
+
+  saveLoginSession(data);
+  return data;
+};
+
+export const logoutService = async () => {
   clearAuthStorage();
+  try {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include", // Limpia la Cookie en el backend
+    });
+  } catch (error) {
+    // Ignoramos errores de red; lo importante es limpiar la sesión local
+  }
 };
 
 export const activateTwoFactorAuthService = async () => {
@@ -102,6 +128,7 @@ export const verifyTwoFactorAuthService = async (code) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ token: code }),
   });
 

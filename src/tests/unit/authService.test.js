@@ -95,16 +95,21 @@ describe("getPreTwoFactorAuthToken", () => {
 // ─── logoutService ────────────────────────────────────────────────────────────
 
 describe("logoutService", () => {
-  it("elimina token, preTwoFactorToken y user del localStorage al cerrar sesión", () => {
+  it("elimina token, preTwoFactorToken y user del localStorage y llama al API", async () => {
     seedLocalStorage({
       token: "session-abc",
       preTwoFactorAuth: "pre-token",
       user: JSON.stringify({ id: 1 }),
     });
-    logoutService();
+    mockFetch({ success: true });
+    await logoutService();
     expect(localStorage.getItem("token")).toBeNull();
     expect(localStorage.getItem("preTwoFactorAuth")).toBeNull();
     expect(localStorage.getItem("user")).toBeNull();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/logout"),
+      expect.objectContaining({ method: "POST", credentials: "include" })
+    );
   });
 });
 
@@ -153,6 +158,7 @@ describe("loginService", () => {
       expect.stringContaining("/auth/login"),
       expect.objectContaining({
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({
           email: "user@test.com",
           password: "mypassword",

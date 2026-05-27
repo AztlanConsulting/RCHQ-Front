@@ -18,6 +18,13 @@ export const AuthProvider = ({ children }) => {
     setUserState(getStoredUser());
   }, []);
 
+  useEffect(() => {
+    const handleForcedLogout = () => logout();
+    window.addEventListener("auth:forced-logout", handleForcedLogout);
+    return () =>
+      window.removeEventListener("auth:forced-logout", handleForcedLogout);
+  }, []);
+
   const login = ({ token: newToken, user: newUser = null }) => {
     setToken(newToken);
     setTokenState(newToken);
