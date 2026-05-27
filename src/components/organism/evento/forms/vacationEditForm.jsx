@@ -5,6 +5,11 @@ import {
     getVacationDateRange,
     getVacationEndDateMin,
 } from "../../../../utils/vacationDateRange";
+import {
+    buildDateRuleFilter,
+    parseDateOnly,
+} from "../../../../utils/dateRules";
+import { useMemo } from "react";
 
 const VacationEditForm = ({
     title,
@@ -12,6 +17,7 @@ const VacationEditForm = ({
     vacationForm,
     vacationEditError = "",
     vacationRemainingInfo = null,
+    vacationDateRules = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
     onCancelEdit,
@@ -21,10 +27,16 @@ const VacationEditForm = ({
 }) => {
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
+    const ruleMinDate = parseDateOnly(vacationDateRules?.minDate) ?? vacationDateMin;
+    const ruleMaxDate = parseDateOnly(vacationDateRules?.maxDate) ?? vacationDateMax;
     const vacationEndDateMin = getVacationEndDateMin(
         vacationForm?.startDate,
-        vacationDateMin,
-        vacationDateMax,
+        ruleMinDate,
+        ruleMaxDate,
+    );
+    const dateRuleFilter = useMemo(
+        () => buildDateRuleFilter(vacationDateRules),
+        [vacationDateRules],
     );
 
     return (
@@ -92,8 +104,9 @@ const VacationEditForm = ({
                     label="Fecha de inicio"
                     name="startDate"
                     value={vacationForm?.startDate ?? ""}
-                    minDate={vacationDateMin}
-                    maxDate={vacationDateMax}
+                    minDate={ruleMinDate}
+                    maxDate={ruleMaxDate}
+                    filterDate={dateRuleFilter}
                     onChange={(editEvent) =>
                         onVacationFieldChange?.(
                             "startDate",
@@ -117,7 +130,8 @@ const VacationEditForm = ({
                         )
                     }
                     minDate={vacationEndDateMin}
-                    maxDate={vacationDateMax}
+                    maxDate={ruleMaxDate}
+                    filterDate={dateRuleFilter}
                     labelColor="text-[#121212]"
                     popupAlign="right"
                     popupPlacement="top"

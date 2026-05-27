@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getCalendarViewerRole, getOwnEmployeeId } from "../../services/calendarService";
+import {
+    getCalendarViewerRole,
+    getEmployeeDateRules,
+    getOwnEmployeeId,
+} from "../../services/calendarService";
 import {
     getVacationEmployees,
-    getRemainingVacations,
     registerEmployeeVacation,
     requestEmployeeVacation,
 } from "../../services/vacationService";
 import { getVacationFormErrors } from "../../utils/schema/vacation/vacation.schema";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
 
 const EMPTY_FORM = {
     employeeId: "",
@@ -57,10 +61,15 @@ export const useVacationForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [remainingInfo, setRemainingInfo] = useState(null);
     const [isLoadingRemaining, setIsLoadingRemaining] = useState(false);
+    const [dateRules, setDateRules] = useState(null);
 
     const employeeOptions = useMemo(
         () => employees.map(normalizeEmployeeOption).filter((option) => option.value),
         [employees],
+    );
+    const displayErrors = useMemo(
+        () => mergeDateRuleErrors(errors, form, dateRules),
+        [dateRules, errors, form],
     );
 
     const viewerRole = getCalendarViewerRole();
@@ -88,6 +97,7 @@ export const useVacationForm = ({
             setServerError("");
             setEmployees([]);
             setRemainingInfo(null);
+            setDateRules(null);
             setIsSubmitting(false);
             setIsLoadingOptions(false);
             setIsLoadingRemaining(false);
@@ -122,23 +132,46 @@ export const useVacationForm = ({
     useEffect(() => {
         if (!form.employeeId) {
             setRemainingInfo(null);
+            setDateRules(null);
             return;
         }
 
-        const loadRemainingVacations = async () => {
+        let isEffectActive = true;
+
+        const loadDateRules = async () => {
             setIsLoadingRemaining(true);
 
             try {
-                const result = await getRemainingVacations(form.employeeId);
-                setRemainingInfo(result);
-            } catch {
+                const rules = await getEmployeeDateRules(form.employeeId, "vacation");
+
+                if (!isEffectActive) return;
+
+                setDateRules(rules);
+                setRemainingInfo({
+                    remainingVacations: rules?.remainingVacations ?? 0,
+                    startDate: rules?.vacationPeriod?.startDate ?? "",
+                    endDate: rules?.vacationPeriod?.endDate ?? "",
+                });
+            } catch (error) {
+                if (!isEffectActive) return;
+
+                setDateRules(null);
                 setRemainingInfo(null);
+                setServerError(
+                    error?.message || "No se pudieron consultar las fechas disponibles",
+                );
             } finally {
-                setIsLoadingRemaining(false);
+                if (isEffectActive) {
+                    setIsLoadingRemaining(false);
+                }
             }
         };
 
-        loadRemainingVacations();
+        loadDateRules();
+
+        return () => {
+            isEffectActive = false;
+        };
     }, [form.employeeId]);
 
     const handleSubmit = async () => {
@@ -149,8 +182,14 @@ export const useVacationForm = ({
 
         const validation = getVacationFormErrors(form);
 
-        if (!validation.success) {
-            setErrors(validation.errors);
+        const fieldErrors = mergeDateRuleErrors(
+            validation.errors,
+            form,
+            dateRules,
+        );
+
+        if (!validation.success || Object.values(fieldErrors).some(Boolean)) {
+            setErrors(fieldErrors);
             onValidationAlert?.("Revisa los campos marcados antes de continuar");
             return;
         }
@@ -180,13 +219,14 @@ export const useVacationForm = ({
 
     return {
         form,
-        errors,
+        errors: displayErrors,
         serverError,
         employeeOptions,
         isLoadingOptions,
         isSubmitting,
         remainingInfo,
         isLoadingRemaining,
+        dateRules,
         setField,
         setServerError,
         handleSubmit,

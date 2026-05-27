@@ -89,7 +89,6 @@ const RegisterEventModal = ({
                         boxSizing: "border-box",
                         maxHeight: "90vh",
                         minHeight: 0,
-                        overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",

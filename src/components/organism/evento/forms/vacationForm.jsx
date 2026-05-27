@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getCalendarViewerRole } from "../../../../services/calendarService";
 
 import Alert from "../../../atoms/alerts";
@@ -12,6 +12,10 @@ import {
     getVacationDateRange,
     getVacationEndDateMin,
 } from "../../../../utils/vacationDateRange";
+import {
+    buildDateRuleFilter,
+    parseDateOnly,
+} from "../../../../utils/dateRules";
 
 const VacationForm = (props) => {
     const {
@@ -23,6 +27,7 @@ const VacationForm = (props) => {
         isSubmitting,
         remainingInfo,
         isLoadingRemaining,
+        dateRules,
         setField,
         setServerError,
         handleSubmit,
@@ -33,10 +38,16 @@ const VacationForm = (props) => {
     const viewerRole = getCalendarViewerRole();
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
+    const ruleMinDate = parseDateOnly(dateRules?.minDate) ?? vacationDateMin;
+    const ruleMaxDate = parseDateOnly(dateRules?.maxDate) ?? vacationDateMax;
     const vacationEndDateMin = getVacationEndDateMin(
         form.startDate,
-        vacationDateMin,
-        vacationDateMax,
+        ruleMinDate,
+        ruleMaxDate,
+    );
+    const dateRuleFilter = useMemo(
+        () => buildDateRuleFilter(dateRules),
+        [dateRules],
     );
 
     return (
@@ -111,8 +122,9 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.startDate}
                         placeholder="dd / mm / yyyy"
-                        minDate={vacationDateMin}
-                        maxDate={vacationDateMax}
+                        minDate={ruleMinDate}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupSize="compact"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
@@ -129,7 +141,8 @@ const VacationForm = (props) => {
                         value={form.endDate}
                         placeholder="dd / mm / yyyy"
                         minDate={vacationEndDateMin}
-                        maxDate={vacationDateMax}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupAlign="right"
                         popupSize="compact"
                         onChange={(e) => setField("endDate", e.target.value)}
@@ -162,7 +175,7 @@ const VacationForm = (props) => {
                 <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
-                    disabled={isSubmitting || isLoadingOptions}
+                    disabled={isSubmitting || isLoadingOptions || isLoadingRemaining}
                 />
             </div>
         </>

@@ -19,6 +19,7 @@ const DateField = ({
     inputClassName = "",
     labelClassName = "",
     error = false,
+    filterDate,
 }) => {
     const dateValue = value ? new Date(`${value}T12:00:00`) : null;
     const isCompactPopup = popupSize === "compact";
@@ -38,6 +39,7 @@ const DateField = ({
 
         if (minDate && date < minDate) return;
         if (maxDate && date > maxDate) return;
+        if (filterDate && !filterDate(date, "days")) return;
 
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -108,6 +110,7 @@ const DateField = ({
                 showClearButton={false}
                 minDate={minDate}
                 maxDate={maxDate}
+                filterDate={filterDate}
                 theme={{
                     root: {
                         input: {
@@ -153,6 +156,8 @@ const DateField = ({
                                         : "block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 hover:bg-gray-100",
                                     selected:
                                         "!bg-[#24375e] !text-white hover:!bg-[#162d4a] focus:!bg-[#24375e]",
+                                    disabled:
+                                        "cursor-not-allowed text-slate-300 line-through hover:bg-transparent",
                                 },
                             },
                         },

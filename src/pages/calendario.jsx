@@ -111,6 +111,8 @@ const Calendario = () => {
         absenceEvidenceError,
         absenceMinStartDate,
         absenceMaxEndDate,
+        absenceDateRules,
+        isLoadingAbsenceDateRules,
         closeDetail,
         handleEventClick,
         absenceEvidenceLabel,
@@ -152,6 +154,7 @@ const Calendario = () => {
         setVacationField,
         submitVacationEdit,
         vacationRemainingInfo,
+        vacationDateRules,
         isLoadingVacationRemaining,
         openCalendarItemDetail,
         isDeleteVacationOpen,
@@ -235,7 +238,7 @@ const Calendario = () => {
     };
 
     return (
-        <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start">
+        <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start overflow-visible">
             {alert?.message ? (
                 <div className="fixed top-30 left-[5%] right-0 z-50 px-4">
                     <Alert
@@ -331,6 +334,8 @@ const Calendario = () => {
                                     absenceEvidenceError={absenceEvidenceError}
                                     absenceMinStartDate={absenceMinStartDate}
                                     absenceMaxEndDate={absenceMaxEndDate}
+                                    absenceDateRules={absenceDateRules}
+                                    isLoadingAbsenceDateRules={isLoadingAbsenceDateRules}
                                     isSaving={isSavingAbsence}
                                     isDeleteOpen={isDeleteAbsenceOpen}
                                     isLoadingWhileDeleting={
@@ -367,6 +372,7 @@ const Calendario = () => {
                                     vacationForm={vacationForm}
                                     vacationEditError={vacationEditError}
                                     vacationRemainingInfo={vacationRemainingInfo}
+                                    vacationDateRules={vacationDateRules}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
                                     onEdit={startVacationEdit}
@@ -384,6 +390,7 @@ const Calendario = () => {
                                     vacationForm={vacationForm}
                                     vacationEditError={vacationEditError}
                                     vacationRemainingInfo={vacationRemainingInfo}
+                                    vacationDateRules={vacationDateRules}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
                                     onEdit={startVacationEdit}

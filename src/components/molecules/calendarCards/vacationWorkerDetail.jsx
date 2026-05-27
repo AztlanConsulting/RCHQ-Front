@@ -10,6 +10,7 @@ const VacationWorkerDetail = ({
     vacationForm,
     vacationEditError = "",
     vacationRemainingInfo = null,
+    vacationDateRules = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
     onEdit,
@@ -38,6 +39,7 @@ const VacationWorkerDetail = ({
                 vacationForm={vacationForm}
                 vacationEditError={vacationEditError}
                 vacationRemainingInfo={vacationRemainingInfo}
+                vacationDateRules={vacationDateRules}
                 isLoadingVacationRemaining={isLoadingVacationRemaining}
                 isSaving={isSaving}
                 onCancelEdit={onCancelEdit}

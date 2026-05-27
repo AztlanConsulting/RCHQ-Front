@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
 } from "../../services/calendarService";
 import {
     buildAbsenceDateLimits,
@@ -10,6 +11,7 @@ import {
     sanitizeAbsenceDescription,
 } from "../../utils/schema/evento/absence.schema";
 import { useDocumentFile } from "../atoms/useDocumentFile";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
 
 const DEFAULT_FORM = {
     employeeId: "",
@@ -81,8 +83,10 @@ export const useAbsenceForm = ({
     const [employeeOptions, setEmployeeOptions] = useState([]);
     const [absenceTypeOptions, setAbsenceTypeOptions] = useState([]);
     const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+    const [isLoadingDateRules, setIsLoadingDateRules] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [dateLimits] = useState(buildAbsenceDateLimits);
+    const [dateRules, setDateRules] = useState(null);
     const lastInitialDatesRef = useRef({
         startDate: normalizeInitialDate(initialStartDate),
         endDate: normalizeInitialDate(initialEndDate),
@@ -97,6 +101,10 @@ export const useAbsenceForm = ({
         invalidTypeMessage: "Formato invalido de ausencias",
         maxSizeMessage: "tamaño superior a 10mb",
     });
+    const displayErrors = useMemo(
+        () => mergeDateRuleErrors(errors, form, dateRules),
+        [dateRules, errors, form],
+    );
 
     useEffect(() => {
         if (!isOpen) return;
@@ -140,6 +148,42 @@ export const useAbsenceForm = ({
             isEffectActive = false;
         };
     }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen || !form.employeeId) {
+            setDateRules(null);
+            setIsLoadingDateRules(false);
+            return undefined;
+        }
+
+        let isEffectActive = true;
+
+        setIsLoadingDateRules(true);
+        getEmployeeDateRules(form.employeeId, "absence")
+            .then((rules) => {
+                if (isEffectActive) {
+                    setDateRules(rules);
+                }
+            })
+            .catch((error) => {
+                if (isEffectActive) {
+                    setDateRules(null);
+                    setServerError(
+                        error?.message ||
+                            "No se pudieron consultar las fechas disponibles",
+                    );
+                }
+            })
+            .finally(() => {
+                if (isEffectActive) {
+                    setIsLoadingDateRules(false);
+                }
+            });
+
+        return () => {
+            isEffectActive = false;
+        };
+    }, [form.employeeId, isOpen]);
 
     useEffect(() => {
         const nextInitialDates = {
@@ -211,9 +255,15 @@ export const useAbsenceForm = ({
             });
         }
 
-        setErrors(fieldErrors);
+        const nextFieldErrors = mergeDateRuleErrors(
+            fieldErrors,
+            form,
+            dateRules,
+        );
 
-        const messages = Object.values(fieldErrors).filter(Boolean);
+        setErrors(nextFieldErrors);
+
+        const messages = Object.values(nextFieldErrors).filter(Boolean);
         onValidationAlert?.(
             messages.length > 0 ? [...new Set(messages)].join("\n") : null,
         );
@@ -221,7 +271,7 @@ export const useAbsenceForm = ({
         if (messages.length > 0) return null;
 
         return result.data;
-    }, [dateLimits, evidenceError, form, onValidationAlert]);
+    }, [dateLimits, dateRules, evidenceError, form, onValidationAlert]);
 
     const handleSubmit = useCallback(async () => {
         const validated = validate();
@@ -256,16 +306,18 @@ export const useAbsenceForm = ({
 
     return {
         form,
-        errors,
+        errors: displayErrors,
         serverError,
         employeeOptions,
         absenceTypeOptions,
         isLoadingOptions,
+        isLoadingDateRules,
         isSubmitting,
         evidenceFileName,
         evidenceError,
         minStartDate: dateLimits.minStartDate,
         maxEndDate: dateLimits.maxEndDate,
+        dateRules,
         setField,
         setServerError,
         handleEvidenceChange,
