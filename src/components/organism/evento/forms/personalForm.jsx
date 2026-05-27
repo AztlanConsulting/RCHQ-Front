@@ -35,7 +35,8 @@ const PersonalForm = (props) => {
     const descriptionLength = String(form.description ?? "").length;
 
     const today = new Date();
-    const personalDateMin = today;
+    const personalDateMin = new Date();
+    personalDateMin.setDate(personalDateMin.getDate() + 1);
     const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
 
     return (
