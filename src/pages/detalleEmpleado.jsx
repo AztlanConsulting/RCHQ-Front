@@ -4,6 +4,7 @@ import Alert from "../components/atoms/alerts";
 import Type from "../components/atoms/type";
 import { Tabs } from "../components/molecules/tabs";
 import NativeSelect from "../components/atoms/nativeSelect";
+import BigButton from "../components/atoms/bigButton";
 import EmployeeBasicCard from "../components/organism/employeeBasicCard";
 import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
@@ -37,6 +38,7 @@ const DetalleEmpleado = () => {
 
   const {
     editSection, saving, saveError, loadingCatalogues,
+    basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
     roles,
@@ -134,14 +136,12 @@ const DetalleEmpleado = () => {
         </div>
 
         {canEdit ? (
-          <button
-            type="button"
+          <BigButton
+            text="Dar de baja"
             onClick={openModal}
-            className="shrink-0 rounded-lg bg-[#9b1c1c] px-3 py-2 text-xs font-semibold
-            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
-          >
-            Dar de baja
-          </button>
+            hasNoRollback
+            className="min-w-0 shrink-0 px-3"
+          />
         ) : null}
       </div>
 
@@ -175,14 +175,12 @@ const DetalleEmpleado = () => {
         </div>
 
         {canEdit ? (
-          <button
-            type="button"
+          <BigButton
+            text="Dar de baja"
             onClick={openModal}
-            className="ml-auto mr-2 shrink-0 rounded-xl bg-[#b42318] px-5 py-2.5 text-sm font-semibold
-            text-white shadow-sm hover:bg-[#8f1c13] active:bg-[#73170f] transition-colors"
-          >
-            Dar de baja
-          </button>
+            hasNoRollback
+            className="ml-auto mr-2 min-w-0 shrink-0 px-5"
+          />
         ) : null}
       </div>
 
@@ -196,6 +194,7 @@ const DetalleEmpleado = () => {
         setBasicPicture={setBasicPicture}
         saving={saving}
         saveError={editSection === "basic" ? saveError : null}
+        errors={editSection === "basic" ? basicErrors : {}}
         infoDrawer={infoDrawer}
         onOpenEdit={() => openBasicEdit(employee)}
         onSubmit={submitBasic}
@@ -213,6 +212,7 @@ const DetalleEmpleado = () => {
             setContactField={setContactField}
             saving={saving}
             saveError={editSection === "contact" ? saveError : null}
+            errors={editSection === "contact" ? contactErrors : {}}
             onOpenEdit={() => openContactEdit(employee, employeeAddress)}
             onSubmit={submitContact}
             onCancel={closeEdit}
@@ -236,6 +236,7 @@ const DetalleEmpleado = () => {
             setWorkdayAllDay={setWorkdayAllDay}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
+            errors={editSection === "Administrador" ? adminErrors : {}}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}

@@ -1,5 +1,5 @@
 import Modal from "../atoms/modal";
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 import useBlacklistModal from "../../hooks/molecules/useBlacklistModal";
 import { INVALID_REASON_CHARS_REGEX } from "../../utils/schema/blacklist/create.schema";
 
@@ -60,34 +60,18 @@ const BlacklistModal = ({ isOpen, employeeName, onConfirm, onCancel, isSubmittin
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <Button
-            text={isSubmitting ? "Procesando..." : "Aceptar"}
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            bgColor="bg-[#9b1c1c]"
-            hoverColor="hover:bg-[#7a1616]"
-            activeColor="active:bg-[#5c1010]"
-            textColor="text-white"
-            width="w-full"
-            height="h-auto"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="flex-1 py-2.5"
-          />
-          <Button
+        <div className="flex justify-center gap-3 pt-1">
+          <SmallButton
             text="Cancelar"
             onClick={handleCancel}
             disabled={isSubmitting}
-            bgColor="bg-white"
-            hoverColor="hover:bg-gray-50"
-            activeColor="active:bg-gray-100"
-            textColor="text-gray-700"
-            width="w-full"
-            height="h-auto"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="flex-1 py-2.5 border border-gray-300"
+            cancel
+          />
+          <SmallButton
+            text={isSubmitting ? "Procesando..." : "Aceptar"}
+            onClick={handleConfirm}
+            disabled={isSubmitting}
+            hasNoRollback
           />
         </div>
       </div>

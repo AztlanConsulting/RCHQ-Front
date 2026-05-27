@@ -1,6 +1,8 @@
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
+import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 
 const EmployeeContactCard = ({
   employee,
@@ -10,6 +12,7 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
+  errors = {},
   onOpenEdit,
   onSubmit,
   onCancel,
@@ -24,20 +27,14 @@ const EmployeeContactCard = ({
 
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
-            <button
-              type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-            >
-              Cancelar
-            </button>
+            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
             {canEdit ? (
-              <button
-                type="button" onClick={onSubmit} disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-              >
-                {saving && <Loader size="sm" />}
-                Guardar
-              </button>
+              <SmallButton
+                text="Guardar"
+                onClick={onSubmit}
+                disabled={saving}
+                leadingIcon={saving ? <Loader size="sm" /> : null}
+              />
             ) : null}
           </div>
         ) : canEdit ? (
@@ -103,6 +100,9 @@ const EmployeeContactCard = ({
                 labelClassName="hidden"
                 text=""
               />
+              <div className="min-h-5">
+                {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+              </div>
             </div>
           ))}
         </div>

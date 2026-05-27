@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 const CURP_REGEX         = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
-const RFC_REGEX          = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+const RFC_REGEX          = /^[A-ZÑ]{3,4}\d{6}[A-Z0-9]{3}$/;
 const ONLY_NUMBERS_REGEX = /^\d+$/;
 const NAMES_REGEX        = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
 const EMAIL_SAFE_REGEX   = /^[A-Za-z0-9._@-]+$/;
 const CURP_ALLOWED_REGEX = /^[A-Z0-9]*$/;
-const RFC_ALLOWED_REGEX  = /^[A-ZÑ&0-9]*$/;
+const RFC_ALLOWED_REGEX  = /^[A-ZÑ0-9]*$/;
 const ADDRESS_REGEX      = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9.\-\s]*$/;
 const DATE_REGEX         = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_REGEX         = /^\d{2}:\d{2}$/;
@@ -34,12 +34,14 @@ export function normalizeEmployeeContractType(val) {
 export const employeeBasicUpdateSchema = z
   .object({
     name: z.string().trim()
+      .min(1, "El nombre es obligatorio")
       .max(50, "El nombre es demasiado largo")
       .refine((val) => val === "" || val.length >= 2, { message: "El nombre debe tener al menos 2 caracteres" })
       .refine((val) => val === "" || NAMES_REGEX.test(val), { message: "No se permiten caracteres especiales en el nombre" })
       .optional(),
 
     surname: z.string().trim()
+      .min(1, "El apellido es obligatorio")
       .max(50, "El apellido es demasiado largo")
       .refine((val) => val === "" || val.length >= 2, { message: "El apellido debe tener al menos 2 caracteres" })
       .refine((val) => val === "" || NAMES_REGEX.test(val), { message: "No se permiten caracteres especiales en el apellido" })
@@ -47,6 +49,7 @@ export const employeeBasicUpdateSchema = z
 
     curp: z.string().trim()
       .toUpperCase()
+      .min(1, "El CURP es obligatorio")
       .refine((val) => val === "" || val.length === 18, { message: "El CURP debe tener exactamente 18 caracteres" })
       .refine((val) => val === "" || CURP_ALLOWED_REGEX.test(val), { message: "El CURP solo puede contener letras y números" })
       .refine((val) => val === "" || CURP_REGEX.test(val), { message: "Formato del CURP inválido" })
@@ -54,7 +57,7 @@ export const employeeBasicUpdateSchema = z
 
     rfc: z.string().trim().transform(emptyToNull).nullable()
       .refine((val) => val === null || RFC_ALLOWED_REGEX.test(val), {
-        message: "El RFC solo puede contener letras, números y &",
+        message: "El RFC solo puede contener letras, números",
       })
       .refine((val) => val === null || val.length === 13, { message: "El RFC debe tener exactamente 13 dígitos" })
       .refine((val) => val === null || RFC_REGEX.test(val), { message: "Formato del RFC inválido" })
@@ -107,6 +110,9 @@ export const employeeContactUpdateSchema = z
 
     street: z.string().trim()
       .max(70, "La calle y número no pueden exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 10, {
+        message: "La calle y número deben tener al menos 10 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "La calle y número contienen caracteres no permitidos",
       })
@@ -115,6 +121,9 @@ export const employeeContactUpdateSchema = z
       .optional(),
     municipio: z.string().trim()
       .max(70, "El municipio no puede exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 4, {
+        message: "El municipio debe tener al menos 4 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "El municipio contiene caracteres no permitidos",
       })
@@ -123,6 +132,9 @@ export const employeeContactUpdateSchema = z
       .optional(),
     city: z.string().trim()
       .max(70, "La ciudad no puede exceder 70 caracteres")
+      .refine((val) => val === "" || val.length >= 4, {
+        message: "La ciudad debe tener al menos 4 caracteres",
+      })
       .refine((val) => val === "" || ADDRESS_REGEX.test(val), {
         message: "La ciudad contiene caracteres no permitidos",
       })
@@ -130,7 +142,9 @@ export const employeeContactUpdateSchema = z
       .nullable()
       .optional(),
     postalCode: z.string().trim()
-      .max(5, "El código postal no puede exceder 5 dígitos")
+      .refine(val => val === "" || val.length === 5, {
+        message: "El código postal debe tener exactamente 5 caracteres"
+      })
       .transform(emptyToNull)
       .nullable()
       .optional(),

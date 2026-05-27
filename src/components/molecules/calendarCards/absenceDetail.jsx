@@ -1,9 +1,11 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
+import DocumentFileField from "../documentFileField";
 import { formatEventDate } from "../../../utils/calendarEventDetail";
+import { getDocumentFileNameFromLink } from "../../../utils/documentCard.utils";
 import documentIcon from "/document.svg";
 
 const DocumentWhiteIcon = () => (
@@ -11,7 +13,7 @@ const DocumentWhiteIcon = () => (
     src={documentIcon}
     alt=""
     aria-hidden="true"
-    className="mr-1.5 h-3.5 w-3.5 shrink-0 brightness-0 invert"
+    className="mr-1.5 h-4.5 w-4.5 shrink-0 brightness-0 invert"
   />
 );
 
@@ -84,6 +86,8 @@ const AbsenceDetail = ({
   absenceDeleteError = "",
   absenceEvidenceFileName = "",
   absenceEvidenceError = "",
+  absenceMinStartDate,
+  absenceMaxEndDate,
   isSaving = false,
   isDeleteOpen = false,
   isLoadingWhileDeleting = false,
@@ -102,6 +106,21 @@ const AbsenceDetail = ({
 
   const canModifyAbsence = canManageAbsence && !event.isDeleted;
   const hasEvidence = Boolean(event.link);
+  const fileName = hasEvidence
+    ? getDocumentFileNameFromLink(event.link)
+    : "";
+  const displayedFileName =
+    absenceEvidenceFileName || fileName;
+  const evidencePlaceholder = hasEvidence
+    ? "Selecciona un nuevo archivo para reemplazar la evidencia"
+    : "Selecciona un archivo de evidencia";
+  const selectedStartDate = absenceForm?.startDate
+    ? new Date(`${absenceForm.startDate}T00:00:00`)
+    : null;
+  const absenceEndMinDate =
+    selectedStartDate && absenceMinStartDate && selectedStartDate < absenceMinStartDate
+      ? absenceMinStartDate
+      : selectedStartDate ?? absenceMinStartDate;
 
   if (isEditing) {
     return (
@@ -136,6 +155,8 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("startDate", editEvent.target.value)
             }
+            minDate={absenceMinStartDate}
+            maxDate={absenceMaxEndDate}
             labelColor="text-[#121212]"
             popupAlign="left"
             popupSize="compact"
@@ -147,11 +168,8 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("endDate", editEvent.target.value)
             }
-            minDate={
-              absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T00:00:00`)
-                : undefined
-            }
+            minDate={absenceEndMinDate}
+            maxDate={absenceMaxEndDate}
             labelColor="text-[#121212]"
             popupAlign="right"
             popupSize="compact"
@@ -164,39 +182,14 @@ const AbsenceDetail = ({
         </div>
 
         <div className="sm:col-span-2">
-          <Type variant="metric-label" className="mb-1.5 block font-bold text-[#121212]">
-            Evidencia
-          </Type>
-          <label
-            htmlFor="absence-evidence-file"
-            className={`flex min-h-[50px] w-full cursor-pointer items-center justify-between rounded-lg border-2 border-dashed bg-neutral-50 px-4 transition-colors ${
-              absenceEvidenceFileName
-                ? "border-[#1F3664]"
-                : "border-slate-300 hover:border-slate-400"
-            }`}
-          >
-            <span
-              className={`truncate text-sm font-medium ${
-                absenceEvidenceFileName ? "text-[#222]" : "text-[#aaaaaa]"
-              }`}
-            >
-              {absenceEvidenceFileName ||
-                (event.link
-                  ? "Selecciona un nuevo archivo para reemplazar la evidencia"
-                  : "Selecciona un archivo de evidencia")}
-            </span>
-            <span className="ml-3 shrink-0 rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-[#1F3664]">
-              Examinar
-            </span>
-          </label>
-          <input
+          <DocumentFileField
             id="absence-evidence-file"
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg"
-            onChange={onAbsenceEvidenceChange}
-            className="hidden"
+            label="Evidencia"
+            labelColor="text-[#121212]"
+            fileName={displayedFileName}
+            handleFileChange={onAbsenceEvidenceChange}
+            placeholder={evidencePlaceholder}
           />
-          <p className="mt-1 text-xs text-slate-400">Máximo 10 MB · PDF, PNG o JPG</p>
         </div>
 
         {absenceEditError || absenceEvidenceError ? (
@@ -205,32 +198,17 @@ const AbsenceDetail = ({
           </p>
         ) : null}
 
-        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-5">
-          <Button
+        <div className="mt-8 flex justify-center gap-3">
+          <SmallButton
             type="button"
             text="Cancelar"
-            width="w-full sm:w-[10rem]"
-            height="h-11"
-            textSize="text-base"
-            bgColor="bg-white"
-            textColor="text-[#121212]"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            className="border border-slate-200 shadow-md"
             onClick={onCancelEdit}
             disabled={isSaving}
+            cancel
           />
-          <Button
+          <SmallButton
             type="button"
             text="Guardar"
-            width="w-full sm:w-[10rem]"
-            height="h-11"
-            textSize="text-base"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="shadow-md"
             onClick={onSubmitEdit}
             disabled={isSaving}
           />
@@ -315,19 +293,12 @@ const AbsenceDetail = ({
           Evidencia:
         </Type>
         {hasEvidence ? (
-          <Button
+          <SmallButton
             type="button"
             text={evidenceLabel}
-            width="w-auto"
-            height="h-8"
-            textSize="text-[0.72rem]"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
             onClick={onOpenEvidence}
-            icon={<DocumentWhiteIcon />}
-            className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+            leadingIcon={<DocumentWhiteIcon />}
+            className="h-8 min-w-0 rounded-md px-2.5"
           />
         ) : (
           <Type variant="body" className="text-[1.05rem] leading-snug">
@@ -338,30 +309,19 @@ const AbsenceDetail = ({
 
       {canModifyAbsence ? (
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-          <Button
+          <SmallButton
             type="button"
             text="Eliminar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#A20000]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#870000]"
-            activeColor="active:bg-[#6B0000]"
-            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+            hasNoRollback
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onOpenDelete}
           />
-          <Button
+          <SmallButton
             type="button"
             text="Editar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onStartEdit}
           />
         </div>

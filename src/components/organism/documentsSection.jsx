@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, matchPath } from "react-router-dom";
 import Alert from "../atoms/alerts";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
@@ -68,17 +68,10 @@ const DocumentsSection = ({
           <h1 className="text-2xl font-bold text-slate-900">Documentos</h1>
         </div>
         {canModify && (
-          <Button
+          <BigButton
             text="+ Subir documento"
             onClick={handleOpenUpload}
-            bgColor="bg-[#1e2b4d]"
-            hoverColor="hover:bg-[#15203b]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[42px]"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="px-5"
+            className="h-[42px] min-w-0 px-5 text-sm"
           />
         )}
       </div>

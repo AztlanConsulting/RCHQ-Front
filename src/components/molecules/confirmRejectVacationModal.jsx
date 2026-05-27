@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import Button from "../atoms/button";
+import { useState } from "react";
+import SmallButton from "../atoms/smallButton";
 import ErrorText from "../atoms/errorText";
 import {
     VACATION_REJECTION_FEEDBACK_MAX_LENGTH,
     getVacationRejectionFeedbackErrors,
 } from "../../utils/schema/vacation/vacation.schema";
 
-const ConfirmRejectVacationModal = ({
+const ConfirmRejectVacationModalContent = ({
     request,
     loading = false,
     error = "",
@@ -16,23 +16,12 @@ const ConfirmRejectVacationModal = ({
     const [feedback, setFeedback] = useState("");
     const [fieldError, setFieldError] = useState("");
 
-    useEffect(() => {
-        if (request) {
-            setFeedback("");
-            setFieldError("");
-        }
-    }, [request]);
-
-    if (!request) return null;
-
     const employee = request.employee || {};
     const employeeName = employee.fullName || "este empleado";
     const curp = employee.curp;
 
     const handleFeedbackChange = (event) => {
-        const value = event.target.value;
-
-        setFeedback(value);
+        setFeedback(event.target.value);
 
         if (fieldError) {
             setFieldError("");
@@ -79,7 +68,7 @@ const ConfirmRejectVacationModal = ({
                         htmlFor="vacation-rejection-feedback"
                         className="mb-1.5 block text-sm font-bold text-[#121212]"
                     >
-                        Retroalimentación
+                        Motivo del rechazo (opcional)
                     </label>
 
                     <textarea
@@ -107,38 +96,34 @@ const ConfirmRejectVacationModal = ({
                 ) : null}
 
                 <div className="flex justify-center gap-3 pt-1">
-                    <Button
+                    <SmallButton
                         text="Cancelar"
                         onClick={onCancel}
                         disabled={loading}
-                        width="w-auto"
-                        height="h-[38px]"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        bgColor="bg-white"
-                        textColor="text-[#121212]"
-                        hoverColor="hover:bg-slate-50"
-                        activeColor="active:bg-slate-100"
-                        className="px-5 border border-slate-200 shadow-md"
+                        cancel
                     />
 
-                    <Button
+                    <SmallButton
                         text={loading ? "Rechazando..." : "Rechazar"}
                         onClick={handleConfirm}
                         disabled={loading}
-                        width="w-auto"
-                        height="h-[38px]"
-                        textSize="text-sm"
-                        fontWeight="font-bold"
-                        bgColor="bg-[#A20000]"
-                        textColor="text-white"
-                        hoverColor="hover:bg-[#870000]"
-                        activeColor="active:bg-[#6B0000]"
-                        className="px-5 shadow-md"
+                        hasNoRollback
                     />
                 </div>
             </div>
         </div>
+    );
+};
+
+const ConfirmRejectVacationModal = ({ request, ...props }) => {
+    if (!request) return null;
+
+    return (
+        <ConfirmRejectVacationModalContent
+            key={request.vacationRequestId ?? "vacation-request"}
+            request={request}
+            {...props}
+        />
     );
 };
 

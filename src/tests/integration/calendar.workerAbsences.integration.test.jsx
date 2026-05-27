@@ -236,7 +236,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
         ).not.toBeInTheDocument();
 
         fireEvent.click(
-            within(dialog).getByRole("button", { name: /cerrar/i }),
+            within(dialog).getByRole("button", { name: /close modal/i }),
         );
 
         await waitFor(() =>

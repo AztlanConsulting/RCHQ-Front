@@ -4,6 +4,8 @@ import TextField from "../atoms/textField";
 import DateField from "../atoms/dateField";
 import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
+import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -18,6 +20,7 @@ const EmployeeBasicCard = ({
   setBasicPicture,
   saving,
   saveError,
+  errors = {},
   infoDrawer,
   onOpenEdit,
   onSubmit,
@@ -56,20 +59,14 @@ const EmployeeBasicCard = ({
 
           {isEditing ? (
             <div className="flex gap-2 shrink-0">
-              <button
-                type="button" onClick={onCancel} disabled={saving}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-              >
-                Cancelar
-              </button>
+              <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
               {canEdit ? (
-                <button
-                  type="button" onClick={onSubmit} disabled={saving}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-                >
-                  {saving && <Loader size="sm" />}
-                  Guardar
-                </button>
+                <SmallButton
+                  text="Guardar"
+                  onClick={onSubmit}
+                  disabled={saving}
+                  leadingIcon={saving ? <Loader size="sm" /> : null}
+                />
               ) : null}
             </div>
           ) : canEdit ? (
@@ -175,6 +172,7 @@ const EmployeeBasicCard = ({
                       name={field}
                       value={basicForm[field]}
                       onChange={(e) => setBasicField(field, e.target.value)}
+                      minDate={new Date("1900-01-01")}
                       maxDate={new Date()}
                     />
                   ) : (
@@ -190,6 +188,9 @@ const EmployeeBasicCard = ({
                       />
                     </>
                   )}
+                  <div className="min-h-5">
+                    {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+                  </div>
                 </div>
               ))}
             </div>

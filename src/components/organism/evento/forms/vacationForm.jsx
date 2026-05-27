@@ -2,12 +2,16 @@ import { useState } from "react";
 import { getCalendarViewerRole } from "../../../../services/calendarService";
 
 import Alert from "../../../atoms/alerts";
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useVacationForm } from "../../../../hooks/pages/useVacationForm";
+import {
+    getVacationDateRange,
+    getVacationEndDateMin,
+} from "../../../../utils/vacationDateRange";
 
 const VacationForm = (props) => {
     const {
@@ -27,6 +31,13 @@ const VacationForm = (props) => {
     const [openDropdown, setOpenDropdown] = useState(null);
 
     const viewerRole = getCalendarViewerRole();
+    const { minDate: vacationDateMin, maxDate: vacationDateMax } =
+        getVacationDateRange();
+    const vacationEndDateMin = getVacationEndDateMin(
+        form.startDate,
+        vacationDateMin,
+        vacationDateMax,
+    );
 
     return (
         <>
@@ -100,6 +111,8 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.startDate}
                         placeholder="dd / mm / yyyy"
+                        minDate={vacationDateMin}
+                        maxDate={vacationDateMax}
                         popupSize="compact"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
@@ -115,6 +128,8 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.endDate}
                         placeholder="dd / mm / yyyy"
+                        minDate={vacationEndDateMin}
+                        maxDate={vacationDateMax}
                         popupAlign="right"
                         popupSize="compact"
                         onChange={(e) => setField("endDate", e.target.value)}
@@ -144,19 +159,10 @@ const VacationForm = (props) => {
             )}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
+                <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
                     disabled={isSubmitting || isLoadingOptions}
-                    bgColor="bg-[#1E3A5F]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f1f33]"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-semibold"
-                    className="px-5"
                 />
             </div>
         </>

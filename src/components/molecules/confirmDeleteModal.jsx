@@ -1,4 +1,4 @@
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 
 const ConfirmDeleteModal = ({
   label,
@@ -46,9 +46,6 @@ const ConfirmDeleteModal = ({
     title: defaultTitle,
     body: defaultBody,
     confirmText,
-    confirmColor,
-    confirmHover,
-    confirmActive,
   } = config[mode];
 
   const wrapperClass = inline
@@ -73,32 +70,16 @@ const ConfirmDeleteModal = ({
         <h3 id={titleId} className="text-2xl font-bold text-[#121212]">{resolvedTitle}</h3>
         <div className="text-sm text-slate-500">{body ?? defaultBody}</div>
         <div className="flex gap-3 justify-center pt-1">
-          <Button
+          <SmallButton
             text="Cancelar"
             onClick={onCancel}
-            bgColor="bg-white"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-slate-600"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 border border-slate-200 shadow-md"
+            cancel
           />
-          <Button
+          <SmallButton
             text={confirmText}
             onClick={onConfirm}
             disabled={loading}
-            bgColor={confirmColor}
-            hoverColor={confirmHover}
-            activeColor={confirmActive}
-            textColor="text-white"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            className="px-5 shadow-md"
+            hasNoRollback
           />
         </div>
       </div>

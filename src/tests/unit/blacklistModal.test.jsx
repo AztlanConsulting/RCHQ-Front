@@ -53,4 +53,11 @@ describe("BlacklistModal", () => {
     expect(textarea).toBeDisabled();
     expect(acceptButton).toBeDisabled();
   });
-});
+
+  it("usa el mismo estilo de cancelar que los demás modales de confirmación", () => {
+    render(<BlacklistModal {...defaultProps} />);
+
+    const cancelButton = screen.getByRole("button", { name: /Cancelar/i });
+    expect(cancelButton).toHaveClass("border", "border-slate-200", "shadow-md");
+  });
+}); 

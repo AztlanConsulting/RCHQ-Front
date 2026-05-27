@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/landing";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/auth/loginPages";
 import Dashboard from "./pages/dashboard";
 import Casas from "./pages/casas";
@@ -25,12 +25,38 @@ import RoleRoute from "./components/roleRoute";
 import Vacaciones from "./pages/vacaciones";
 import Donaciones from "./pages/donaciones";
 import Certificaciones from "./pages/certificaciones";
+import Alert from "./components/atoms/alerts";
+import warningSvg from "/error.svg";
 
 function App() {
+  const [rateLimitMessage, setRateLimitMessage] = useState(null);
+
+  useEffect(() => {
+    const handleRateLimit = (e) => {
+      const seconds = parseInt(e.detail?.resetSeconds, 10) || 60;
+      const minutes = Math.ceil(seconds / 60);
+      setRateLimitMessage(
+        `Detente! Estás haciendo todo muy rápido. Intenta de nuevo en ${minutes} minuto(s).`
+      );
+    };
+    window.addEventListener("api:rate-limit", handleRateLimit);
+    return () => window.removeEventListener("api:rate-limit", handleRateLimit);
+  }, []);
+
   return (
     <BrowserRouter>
+      {rateLimitMessage && (
+        <div className="fixed left-1/2 top-4 z-[9999] w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2">
+          <Alert
+            type="warning"
+            message={rateLimitMessage}
+            icon={warningSvg}
+            onClose={() => setRateLimitMessage(null)}
+          />
+        </div>
+      )}
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Navigate to="/iniciar-sesion" replace />} />
 
         <Route element={<PublicRoute />}>
           <Route path="/iniciar-sesion" element={<LoginPage />} />

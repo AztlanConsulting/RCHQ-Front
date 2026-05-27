@@ -109,6 +109,8 @@ const Calendario = () => {
         setAlert,
         absenceEvidenceFileName,
         absenceEvidenceError,
+        absenceMinStartDate,
+        absenceMaxEndDate,
         closeDetail,
         handleEventClick,
         absenceEvidenceLabel,
@@ -186,6 +188,11 @@ const Calendario = () => {
         reloadVisibleRange,
         setCalendarMode,
     });
+
+    const shouldScrollDetailModal =
+        ["eventos", "ausencias", "vacaciones"].includes(
+            selectedEvent?.focus,
+        );
 
     const calendarFiltersProps = {
         houseName: employeeHouseName,
@@ -299,11 +306,7 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                scrollable={
-                    selectedEvent?.focus === "eventos" ||
-                    selectedEvent?.focus === "ausencias" ||
-                    selectedEvent?.focus === "vacaciones"
-                }
+                scrollable={shouldScrollDetailModal}
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
                         ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
@@ -326,6 +329,8 @@ const Calendario = () => {
                                         absenceEvidenceFileName
                                     }
                                     absenceEvidenceError={absenceEvidenceError}
+                                    absenceMinStartDate={absenceMinStartDate}
+                                    absenceMaxEndDate={absenceMaxEndDate}
                                     isSaving={isSavingAbsence}
                                     isDeleteOpen={isDeleteAbsenceOpen}
                                     isLoadingWhileDeleting={
@@ -351,7 +356,6 @@ const Calendario = () => {
                                     event={selectedEvent}
                                     evidenceLabel={absenceEvidenceLabel}
                                     onOpenEvidence={openAbsenceEvidence}
-                                    onClose={closeDetail}
                                 />
                             );
 
@@ -382,7 +386,6 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
-                                    onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}
