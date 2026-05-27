@@ -45,21 +45,29 @@ const DocumentsSection = ({
 }) => {
   return (
     <div className="p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Documentos</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="min-w-0 text-xl font-bold text-slate-900 sm:text-2xl">
+          Documentos
+        </h1>
         {canModify && (
           <Button
-            text="+ Subir documento"
             onClick={handleOpenUpload}
             bgColor="bg-[#1e2b4d]"
             hoverColor="hover:bg-[#15203b]"
             textColor="text-white"
             width="w-auto"
-            height="h-[42px]"
+            height="h-[38px] sm:h-[42px]"
             textSize="text-sm"
             fontWeight="font-semibold"
-            className="px-5"
-          />
+            className="shrink-0 px-3 sm:px-5"
+          >
+            <span className="text-sm font-semibold text-white sm:hidden">
+              Subir
+            </span>
+            <span className="hidden text-sm font-semibold text-white sm:inline">
+              + Subir documento
+            </span>
+          </Button>
         )}
       </div>
 
