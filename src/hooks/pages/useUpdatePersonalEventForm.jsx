@@ -4,6 +4,7 @@ import { updatePersonalEvent } from "../../services/updateEventService";
 import { getEventTypes, getEmployeesForSelector } from "../../services/eventService";
 import { getCalendarViewerRole } from "../../services/calendarService";
 import { normalizeDateOnly } from "../../utils/calendarEventDetail";
+import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
 import {
     buildPersonalPayload,
     personalEventSchema,
@@ -134,13 +135,14 @@ export const useUpdatePersonalEventForm = ({
     );
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]:
+        setForm((prev) => {
+            const nextValue =
                 field === "name" || field === "description"
                     ? String(value).replace(TEXT_SANITIZER, "")
-                    : value,
-        }));
+                    : value;
+
+            return shiftSameDayTimeRange(prev, field, nextValue);
+        });
         setErrors((prev) => ({
             ...prev,
             [field]: undefined,

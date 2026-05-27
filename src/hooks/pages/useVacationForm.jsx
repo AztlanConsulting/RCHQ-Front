@@ -6,6 +6,7 @@ import {
     registerEmployeeVacation,
     requestEmployeeVacation,
 } from "../../services/vacationService";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { getVacationFormErrors } from "../../utils/schema/vacation/vacation.schema";
 
 const EMPTY_FORM = {
@@ -66,11 +67,16 @@ export const useVacationForm = ({
     const viewerRole = getCalendarViewerRole();
     const ownEmployeeId = getOwnEmployeeId();
 
-    const setField = useCallback((field, value) => {
-        setForm((current) => ({
-            ...current,
-            [field]: value,
-        }));
+    const setField = useCallback(
+        (field, value) => {
+            setForm((current) =>
+                field === "startDate"
+                    ? shiftDateOnlyRange(current, value)
+                    : {
+                        ...current,
+                        [field]: value,
+                    },
+            );
 
         setErrors((current) => ({
             ...current,
