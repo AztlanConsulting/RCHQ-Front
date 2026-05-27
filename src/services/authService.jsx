@@ -92,7 +92,8 @@ export const logoutService = async () => {
       credentials: "include",
     });
   } catch (error) {
-    console.error("Error al cerrar sesión en el servidor:", error);}
+    console.error("Error al cerrar sesión en el servidor:", error);
+  }
 };
 
 export const activateTwoFactorAuthService = async () => {
@@ -156,6 +157,7 @@ export const validateLoginTwoFactorAuthService = async (code) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ token: code }),
   });
 

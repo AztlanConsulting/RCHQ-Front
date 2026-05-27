@@ -36,6 +36,10 @@ export async function secureFetch(input, init = {}) {
       try {
         const refreshData = await refreshSessionService();
         token = refreshData?.data?.token;
+
+        if (!token) {
+          throw new Error("Token no recibido tras la renovación de la sesión.");
+        }
         
         processQueue(null, token);
         
@@ -60,8 +64,8 @@ export async function secureFetch(input, init = {}) {
           headers.set("Authorization", `Bearer ${newToken}`);
           return fetch(url, { ...init, headers });
         })
-        .catch((err) => {
-          return res;
+        .catch((error) => {
+          throw error;
         });
     }
   }
