@@ -58,9 +58,7 @@ const VacationList = () => {
         <div className="p-8 md:flex md:flex-col md:h-full">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isFutureView
-                        ? "Vacaciones futuras"
-                        : "Vacaciones pasadas"}
+                    {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
                 </h1>
 
                 <Button
@@ -91,11 +89,7 @@ const VacationList = () => {
 
             {error && (
                 <div className="mb-5">
-                    <Alert
-                        type="error"
-                        message={error}
-                        onClose={clearError}
-                    />
+                    <Alert type="error" message={error} onClose={clearError} />
                 </div>
             )}
 
@@ -152,7 +146,8 @@ const VacationList = () => {
             <Modal
                 open={viewingVacation != null}
                 onClose={closeViewingVacation}
-                className="max-w-3xl"
+                scrollable
+                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
             >
                 <VacationWorkerDetail
                     event={viewingVacation ?? {}}

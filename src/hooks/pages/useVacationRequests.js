@@ -46,12 +46,7 @@ const getVacationRequestEmployeeName = (request) => {
 const getVacationRequestEmployeeId = (request) => {
     const employee = getVacationRequestEmployee(request);
 
-    return (
-        request?.employeeId ??
-        employee.employeeId ??
-        employee.id ??
-        ""
-    );
+    return request?.employeeId ?? employee.employeeId ?? employee.id ?? "";
 };
 
 const mapVacationRequestToEvent = (request) => {
@@ -269,15 +264,23 @@ const getVacationListFetcher = (view) => {
 
 export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [viewingRequest, setViewingRequest] = useState(null);
     const [approvingRequestId, setApprovingRequestId] = useState(null);
     const [rejectingRequestId, setRejectingRequestId] = useState(null);
+
+    const closeViewingRequest = useCallback(() => {
+        setViewingRequest(null);
+    }, []);
 
     const vacationRequests = useVacationRequestsBase({
         initialView,
         getFetcher: getVacationRequestsFetcher,
         includeSearch: true,
         errorMessage: "No se pudieron cargar las solicitudes",
-        onReset: () => setSelectedRequest(null),
+        onReset: () => {
+            setSelectedRequest(null);
+            closeViewingRequest();
+        },
     });
 
     const {
@@ -285,9 +288,27 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         page,
         refetch,
         setError,
+        onViewDetail: navigateToRequestDetail,
     } = vacationRequests;
 
     const clearError = vacationRequests.clearError;
+
+    const handleViewDetail = useCallback(
+        (request) => {
+            if (Number(request?.status) === REJECTED_STATUS) {
+                const vacationEvent = mapVacationRequestToEvent(request);
+
+                if (vacationEvent) {
+                    setViewingRequest(vacationEvent);
+                }
+
+                return;
+            }
+
+            navigateToRequestDetail(request);
+        },
+        [navigateToRequestDetail],
+    );
 
     const handleApproveRequest = async (vacationRequestId) => {
         if (!vacationRequestId || approvingRequestId) return;
@@ -314,7 +335,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     };
 
     const handleRejectRequest = async (vacationRequestId, feedback) => {
-        if (!vacationRequestId || approvingRequestId || rejectingRequestId) return;
+        if (!vacationRequestId || approvingRequestId || rejectingRequestId)
+            return;
 
         setRejectingRequestId(vacationRequestId);
         setError("");
@@ -340,8 +362,11 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
 
     return {
         ...vacationRequests,
+        onViewDetail: handleViewDetail,
         selectedRequest,
         setSelectedRequest,
+        viewingRequest,
+        closeViewingRequest,
         clearError,
         approvingRequestId,
         rejectingRequestId,
@@ -383,9 +408,7 @@ export const useVacationList = ({ initialView = "future" } = {}) => {
         const refreshedRequests = await refetch(page);
 
         return Array.isArray(refreshedRequests)
-            ? refreshedRequests
-                .map(mapVacationRequestToEvent)
-                .filter(Boolean)
+            ? refreshedRequests.map(mapVacationRequestToEvent).filter(Boolean)
             : [];
     }, [page, refetch]);
 

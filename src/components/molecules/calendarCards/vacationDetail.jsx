@@ -27,21 +27,21 @@ const VacationDetail = ({
     const isApproved = status === 1;
     const isRejected = status === 2;
 
-    const canDelete = !isApproved || !isPast;
-    const canEdit = !isPast && !isRejected;
-    const canReview = !isPast && isPending;
+    const canDelete = Boolean(onDelete) && (!isApproved || !isPast);
+    const canEdit = Boolean(onEdit) && !isPast && !isRejected;
+    const canReview = Boolean(onApprove && onReject) && !isPast && isPending;
 
     const title = isPending
         ? "Solicitud de Vacaciones"
         : isRejected
-            ? "Vacaciones Rechazadas"
-            : "Vacaciones";
+          ? "Vacaciones Rechazadas"
+          : "Vacaciones";
 
     const statusLabel = isApproved
         ? "Aprobadas"
         : isRejected
-            ? "Rechazadas"
-            : "En espera";
+          ? "Rechazadas"
+          : "En espera";
 
     const feedback = event.feedback || event.vacationFeedback || "";
     const shouldShowFeedback = Boolean(feedback);
@@ -81,7 +81,10 @@ const VacationDetail = ({
                     >
                         Nombre del trabajador
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
                         {event.employeeName || "—"}
                     </Type>
                 </div>
@@ -108,8 +111,15 @@ const VacationDetail = ({
                     >
                         Fecha de inicio:
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
-                        {formatEventDate(event.readableStart || event.startDate || event.start)}
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
+                        {formatEventDate(
+                            event.readableStart ||
+                                event.startDate ||
+                                event.start,
+                        )}
                     </Type>
                 </div>
 
@@ -120,8 +130,13 @@ const VacationDetail = ({
                     >
                         Fecha de fin:
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
-                        {formatEventDate(event.readableEnd || event.endDate || event.end)}
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
+                        {formatEventDate(
+                            event.readableEnd || event.endDate || event.end,
+                        )}
                     </Type>
                 </div>
 
@@ -132,7 +147,10 @@ const VacationDetail = ({
                     >
                         Días totales:
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
                         {event.totalDays === "" || event.totalDays == null
                             ? "-"
                             : event.totalDays}
@@ -146,7 +164,10 @@ const VacationDetail = ({
                     >
                         Días hábiles:
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
                         {event.usedDays === "" || event.usedDays == null
                             ? "-"
                             : event.usedDays}
@@ -160,7 +181,10 @@ const VacationDetail = ({
                     >
                         Estado:
                     </Type>
-                    <Type variant="body" className="text-[1.05rem] leading-snug">
+                    <Type
+                        variant="body"
+                        className="text-[1.05rem] leading-snug"
+                    >
                         {statusLabel}
                     </Type>
                 </div>
@@ -173,7 +197,10 @@ const VacationDetail = ({
                         >
                             Retroalimentación:
                         </Type>
-                        <Type variant="body" className="text-[1.05rem] leading-snug">
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
                             {feedback}
                         </Type>
                     </div>

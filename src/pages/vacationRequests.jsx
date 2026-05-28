@@ -7,6 +7,8 @@ import ConfirmApproveVacationModal from "../components/molecules/confirmApproveV
 import ConfirmRejectVacationModal from "../components/molecules/confirmRejectVacationModal";
 import { useVacationRequests } from "../hooks/pages/useVacationRequests";
 import Alert from "../components/atoms/alerts";
+import Modal from "../components/atoms/modal";
+import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
 
 const VacationRequests = () => {
     const {
@@ -23,7 +25,6 @@ const VacationRequests = () => {
         setEndDate,
         statusFilter,
         setStatusFilter,
-        setSelectedRequest,
         loading,
         error,
         clearError,
@@ -35,6 +36,8 @@ const VacationRequests = () => {
         handlePrevPage,
         clearFilters,
         onViewDetail,
+        viewingRequest,
+        closeViewingRequest,
     } = useVacationRequests();
 
     const [requestToApprove, setRequestToApprove] = useState(null);
@@ -72,7 +75,9 @@ const VacationRequests = () => {
             setSuccessMessage("Solicitud de vacaciones aprobada con éxito");
         } catch (err) {
             clearError();
-            setApproveModalError(err.message || "No se pudo aprobar la solicitud");
+            setApproveModalError(
+                err.message || "No se pudo aprobar la solicitud",
+            );
         }
     };
 
@@ -98,12 +103,17 @@ const VacationRequests = () => {
         setSuccessMessage("");
 
         try {
-            await handleRejectRequest(requestToReject.vacationRequestId, feedback);
+            await handleRejectRequest(
+                requestToReject.vacationRequestId,
+                feedback,
+            );
             setRequestToReject(null);
             setSuccessMessage("Solicitud de vacaciones rechazada con éxito");
         } catch (err) {
             clearError();
-            setRejectModalError(err.message || "No se pudo rechazar la solicitud");
+            setRejectModalError(
+                err.message || "No se pudo rechazar la solicitud",
+            );
         }
     };
 
@@ -131,7 +141,9 @@ const VacationRequests = () => {
                             ? "Solicitudes revisadas"
                             : "Regresar a pendientes"
                     }
-                    onClick={() => setView(isPendingView ? "reviewed" : "pending")}
+                    onClick={() =>
+                        setView(isPendingView ? "reviewed" : "pending")
+                    }
                     bgColor="bg-[#24375e]"
                     hoverColor="hover:bg-[#162d4a]"
                     activeColor="active:bg-[#0f2035]"
@@ -156,11 +168,7 @@ const VacationRequests = () => {
 
             {error && !requestToApprove && !requestToReject && (
                 <div className="mb-5">
-                    <Alert
-                        type="error"
-                        message={error}
-                        onClose={clearError}
-                    />
+                    <Alert type="error" message={error} onClose={clearError} />
                 </div>
             )}
 
@@ -203,6 +211,15 @@ const VacationRequests = () => {
                 onCancel={handleCloseRejectModal}
                 onConfirm={handleConfirmReject}
             />
+
+            <Modal
+                open={viewingRequest != null}
+                onClose={closeViewingRequest}
+                scrollable
+                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
+            >
+                <VacationDetail event={viewingRequest ?? {}} />
+            </Modal>
         </div>
     );
 };
