@@ -59,7 +59,7 @@ describe("VacationListRow", () => {
         });
 
         expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-        expect(screen.queryByTitle("Modificar vacación")).toBeNull();
+        expect(screen.queryByTitle("Editar vacación")).toBeNull();
         expect(screen.getByTitle("Borrar vacación")).toBeDisabled();
     });
 
@@ -74,7 +74,7 @@ describe("VacationListRow", () => {
         });
 
         expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-        expect(screen.queryByTitle("Modificar vacación")).toBeNull();
+        expect(screen.queryByTitle("Editar vacación")).toBeNull();
         expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
     });
 
@@ -82,7 +82,7 @@ describe("VacationListRow", () => {
         renderRow();
 
         expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-        expect(screen.getByTitle("Modificar vacación")).toBeEnabled();
+        expect(screen.getByTitle("Editar vacación")).toBeEnabled();
         expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
     });
 
@@ -101,7 +101,7 @@ describe("VacationListRow", () => {
             });
 
             expect(screen.getByAltText("Ver detalle")).toBeInTheDocument();
-            expect(screen.getByTitle("Modificar vacación")).toBeDisabled();
+            expect(screen.getByTitle("Editar vacación")).toBeDisabled();
             expect(screen.getByTitle("Borrar vacación")).toBeEnabled();
         },
     );
@@ -123,7 +123,7 @@ describe("VacationListRow", () => {
 
         renderRow({ onEdit, onDelete });
 
-        fireEvent.click(screen.getByTitle("Modificar vacación"));
+        fireEvent.click(screen.getByTitle("Editar vacación"));
         fireEvent.click(screen.getByTitle("Borrar vacación"));
 
         expect(onEdit).toHaveBeenCalledWith(baseRequest);

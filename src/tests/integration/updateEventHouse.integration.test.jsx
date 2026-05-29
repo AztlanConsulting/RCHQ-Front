@@ -95,7 +95,7 @@ const waitForForm = async () => {
 
 const clickSubmit = async () => {
     await act(async () => {
-        fireEvent.click(screen.getByRole("button", { name: /^modificar$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^Editar$/i }));
     });
 };
 
@@ -109,7 +109,7 @@ const clickLastConfirm = async () => {
     });
 };
 
-describe("Integración: modificar evento de casa", () => {
+describe("Integración: editar evento de casa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
@@ -199,7 +199,7 @@ describe("Integración: modificar evento de casa", () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it("muestra error si se intenta modificar sin nombre", async () => {
+    it("muestra error si se intenta editar sin nombre", async () => {
         await renderModal();
         await waitForForm();
 
@@ -326,7 +326,7 @@ describe("Integración: modificar evento de casa", () => {
 
     it("muestra error del servidor si falla updateHouseEvent", async () => {
         updateHouseEvent.mockRejectedValueOnce(
-            new Error("Error al modificar evento"),
+            new Error("Error al editar evento"),
         );
 
         await renderModal();
@@ -339,7 +339,7 @@ describe("Integración: modificar evento de casa", () => {
         });
 
         expect(
-            await screen.findByText("Error al modificar evento"),
+            await screen.findByText("Error al editar evento"),
         ).toBeInTheDocument();
     });
 });

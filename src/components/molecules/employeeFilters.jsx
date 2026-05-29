@@ -91,6 +91,7 @@ const EmployeeFilters = ({
                 value={inputValue}
                 setValue={handleChange}
                 onKeyDown={handleKeyDown}
+                maxLength={100}
                 labelClassName="text-sm font-bold text-[#121212]"
               />
               <SelectField
@@ -131,6 +132,7 @@ const EmployeeFilters = ({
             value={inputValue}
             setValue={handleChange}
             onKeyDown={handleKeyDown}
+            maxLength={100}
             labelClassName="text-sm font-bold text-[#121212]"
           />
         )}

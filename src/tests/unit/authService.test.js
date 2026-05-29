@@ -257,8 +257,7 @@ describe("validateLoginTwoFactorAuthService", () => {
     seedLocalStorage({ preTwoFactorAuth: "pre-token" });
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
-      token: "final-token",
-      data: { id: 1 },
+      data: { token: "final-token", id: 1 },
     };
     mockFetch(apiResponse);
     const result = await validateLoginTwoFactorAuthService("123456");

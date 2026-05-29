@@ -101,7 +101,7 @@ const UpdatePersonalEventModal = ({
                         className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
                     >
                     <h2 className="text-2xl font-bold text-[#121212]">
-                        Modificar evento personal
+                        Editar evento personal
                     </h2>
 
                     <TextField
@@ -293,7 +293,7 @@ const UpdatePersonalEventModal = ({
                             cancel
                         />
                         <SmallButton
-                            text={isSubmitting ? "Modificando..." : "Modificar"}
+                            text={isSubmitting ? "Editando..." : "Editar"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                         />

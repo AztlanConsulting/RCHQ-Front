@@ -21,7 +21,7 @@ export const updatePersonalEvent = async (personalEventId, payload) => {
         throw buildApiError(
             rawResponse,
             response,
-            "No se pudo modificar el evento personal",
+            "No se pudo editar el evento personal",
         );
     }
 
@@ -46,7 +46,7 @@ export const updateHouseEvent = async (houseEventId, payload) => {
         throw buildApiError(
             rawResponse,
             response,
-            "No se pudo modificar el evento de casa",
+            "No se pudo editar el evento de casa",
         );
     }
 

@@ -44,6 +44,41 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         ]);
     });
 
+    it("usa el color de eliminadas cuando se activa el filtro de ausencias eliminadas", async () => {
+        const events = [
+            buildAbsence({
+                absenceId: "deleted-absence",
+                isDeleted: true,
+            }),
+        ];
+
+        const { result } = renderHook(() =>
+            useCalendarFilters(events, {
+                isList: false,
+                viewerRole: "Psicóloga",
+            }),
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+
+        act(() => {
+            result.current.setAbsenceStatusFilters(["eliminadas"]);
+        });
+
+        await waitFor(() => {
+            expect(result.current.visibleEvents).toHaveLength(1);
+        });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            backgroundColor: "#3E000C",
+            borderColor: "#3E000C",
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            absenceId: "deleted-absence",
+            isDeleted: true,
+        });
+    });
+
     it("no carga el catálogo de empleados de casa para un trabajador", async () => {
         const events = [
             buildAbsence({ link: "http://localhost:3000/uploads/absence.pdf" }),
@@ -85,7 +120,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         expect(absenceEvent).toMatchObject({
             title: "Ausencia Médica",
             backgroundColor: "#A8201A",
-            borderColor: "#DC2626",
+            borderColor: "#A8201A",
             allDay: true,
         });
         expect(absenceEvent.extendedProps).toMatchObject({

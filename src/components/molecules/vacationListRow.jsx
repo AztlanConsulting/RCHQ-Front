@@ -74,7 +74,7 @@ const VacationListRow = ({
 
                     {shouldShowEdit ? (
                         <Button
-                            title="Modificar vacación"
+                            title="Editar vacación"
                             onClick={() => onEdit?.(request)}
                             disabled={!canEdit}
                             bgColor="bg-transparent"
@@ -86,7 +86,7 @@ const VacationListRow = ({
                         >
                             <img
                                 src="/lightEdit.svg"
-                                alt="Modificar vacación"
+                                alt="Editar vacación"
                                 className="h-5 w-5"
                             />
                         </Button>

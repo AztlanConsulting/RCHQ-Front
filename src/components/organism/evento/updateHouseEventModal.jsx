@@ -87,7 +87,7 @@ const UpdateHouseEventModal = ({
                         className="flex flex-col gap-4 animate-[fadeSlideIn_220ms_ease-in-out]"
                     >
                     <h2 className="text-2xl font-bold text-[#121212]">
-                        Modificar evento de casa
+                        Editar evento de casa
                     </h2>
 
                     <TextField
@@ -264,7 +264,7 @@ const UpdateHouseEventModal = ({
                             cancel
                         />
                         <SmallButton
-                            text={isSubmitting ? "Modificando..." : "Modificar"}
+                            text={isSubmitting ? "Editando..." : "Editar"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                         />
