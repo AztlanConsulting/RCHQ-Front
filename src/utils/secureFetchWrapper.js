@@ -111,7 +111,6 @@ const releaseFallbackLock = (owner) => {
       globalThis.localStorage?.removeItem(FALLBACK_LOCK_KEY);
     }
   } catch {
-    // Best effort cleanup only.
   }
 };
 
