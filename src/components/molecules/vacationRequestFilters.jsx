@@ -47,7 +47,20 @@ const VacationRequestFilters = ({
 
     return (
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
-            <div className={`grid grid-cols-1 gap-6 ${gridColumns}`}>
+            <div>
+
+                <div className={`flex flex-row align-bottom content-end gap-3`}>
+
+                <TextField
+                    id="vacation-search"
+                    text="Buscar empleado"
+                    placeholder="Ingresa nombre, apellido o CURP"
+                    value={searchQuery}
+                    setValue={handleSearchChange}
+                    maxLength={100}
+                    labelClassName="text-sm font-bold text-[#121212]"
+                />
+
                 <SelectField
                     id="vacation-request-view"
                     name="vacation-request-view"
@@ -59,16 +72,6 @@ const VacationRequestFilters = ({
                         { value: "reviewed", label: "Revisadas" },
                     ]}
                     labelColor="text-[#121212]"
-                />
-
-                <TextField
-                    id="vacation-search"
-                    text="Buscar empleado"
-                    placeholder="Ingresa nombre, apellido o CURP"
-                    value={searchQuery}
-                    setValue={handleSearchChange}
-                    maxLength={100}
-                    labelClassName="text-sm font-bold text-[#121212]"
                 />
 
                 {view === "reviewed" && (
@@ -86,6 +89,10 @@ const VacationRequestFilters = ({
                         labelColor="text-[#121212]"
                     />
                 )}
+
+                </div>
+
+                <div className={`flex flex-row align-bottom content-end gap-3 mt-2`}>
 
                 <VacationDateField
                     label="Fecha de inicio"
@@ -112,6 +119,8 @@ const VacationRequestFilters = ({
                         onClick={clearFilters}
                         className="w-full min-w-0 px-4 lg:w-28"
                     />
+                </div>
+
                 </div>
             </div>
         </div>
