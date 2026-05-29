@@ -51,8 +51,8 @@ export const calculateDateRangeDays = (startDate, endDate) => {
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
-    const start = ev.start;
-    const end = ev.end;
+    const start = x.sourceStart ?? ev.start;
+    const end = x.sourceEnd ?? ev.end;
     return {
         id: ev.id,
         houseEventId: x.houseEventId,
@@ -85,6 +85,7 @@ export const eventApiToDetail = (ev) => {
         scopeLabel: x.scopeLabel,
         eventType: x.eventType,
         isFreeDay: x.isFreeDay,
+        multiDay: Boolean(x.multiDay),
         date: x.date,
         icon: x.icon,
         status: x.status,
@@ -92,8 +93,8 @@ export const eventApiToDetail = (ev) => {
         usedDays: x.usedDays,
         totalDays: x.totalDays,
         link: x.link,
-        startDate: normalizeDateOnly(x.startDate ?? start),
-        endDate: normalizeDateOnly(x.endDate ?? end),
+        startDate: normalizeDateOnly(x.startDate ?? x.sourceStart ?? start),
+        endDate: normalizeDateOnly(x.endDate ?? x.sourceEnd ?? end),
         isDeleted: x.isDeleted,
         peopleInsideEvent: x.peopleInsideEvent ?? null,
     };

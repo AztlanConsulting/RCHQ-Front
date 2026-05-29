@@ -1,16 +1,39 @@
 import { getStartHour } from "@/utils/dates";
+import { formatEventDateRange } from "@/utils/calendarEventDetail";
 
 const DayTimeCard = ({ arg }) => {
   const ev = arg.event;
   const start = ev.start;
   const end = ev.end;
   const x = ev.extendedProps ?? {};
+  const isMultiDay = Boolean(x.multiDay);
+  const isRangeRecord =
+    x.focus === "vacaciones" || x.focus === "ausencias";
+  const isTimeGridView =
+    arg.view.type === "timeGridWeek" || arg.view.type === "timeGridDay";
+  const showAsAllDay = ev.allDay || (isMultiDay && isTimeGridView);
+  const showDayRange = isMultiDay || isRangeRecord;
   const icon = x.icon;
   const subtitle = String(x.subtitle ?? "").trim();
   const description = String(x.description ?? "").trim();
 
+  const dayLine =
+    showDayRange && (x.startReadableDate || x.startDate)
+      ? formatEventDateRange(
+            x.startReadableDate || x.startDate,
+            x.endReadableDate || x.endDate,
+            {
+              endExclusive: isRangeRecord,
+            },
+        )
+      : "";
+
   let timeLine = "";
-  if (!ev.allDay && start != null && end != null) {
+  if (isMultiDay && x.sourceStart != null && x.sourceEnd != null) {
+    const a = getStartHour(x.sourceStart);
+    const b = getStartHour(x.sourceEnd);
+    if (a && b) timeLine = `${a} – ${b}`;
+  } else if (!showAsAllDay && start != null && end != null) {
     const a = getStartHour(start);
     const b = getStartHour(end);
     if (a && b) timeLine = `${a} – ${b}`;
@@ -18,7 +41,7 @@ const DayTimeCard = ({ arg }) => {
 
   return (
     <div
-      className="fc-dayTimeCard"
+      className={`fc-dayTimeCard${showAsAllDay ? " fc-dayTimeCard--allday" : ""}`}
       style={{
         backgroundColor: ev.backgroundColor,
         borderColor: ev.borderColor ?? ev.backgroundColor,
@@ -35,6 +58,10 @@ const DayTimeCard = ({ arg }) => {
           />
         ) : null}
       </div>
+
+      {dayLine ? (
+        <span className="fc-dayTimeCard-meta block">{dayLine}</span>
+      ) : null}
 
       {timeLine ? (
         <span className="fc-dayTimeCard-meta block">

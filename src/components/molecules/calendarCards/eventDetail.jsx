@@ -46,11 +46,27 @@ const EventDetail = ({
     const showDelete = canDelete(event.scope, viewerRole);
     const showEdit = canEdit(event.scope, viewerRole);
 
-    const dayText = formatEventDateRange(
-        event.date || event.startDate || event.start || event.startStr,
-        event.date || event.endDate || event.end || event.endStr,
-        { endExclusive: Boolean(event.allDay) && !event.date },
-    );
+    const isMultiDay = Boolean(event.multiDay);
+    const rangeStart =
+        event.readableStart ||
+        event.startDate ||
+        event.date ||
+        event.startStr ||
+        event.start;
+    const rangeEnd =
+        event.readableEnd ||
+        event.endDate ||
+        event.date ||
+        event.endStr ||
+        event.end;
+    const dayText = formatEventDateRange(rangeStart, rangeEnd, {
+        endExclusive:
+            Boolean(event.allDay) &&
+            !event.date &&
+            !isMultiDay &&
+            !event.readableEnd,
+    });
+    const showTimes = !event.allDay || isMultiDay;
 
     return (
         <div className="relative min-w-0 max-w-full overflow-x-hidden text-left">
@@ -104,11 +120,11 @@ const EventDetail = ({
 
             <div className="w-full flex items-center justify-between gap-4 mb-2">
                 <Type variant="metric-label" className="font-bold">
-                    Día (calendario):
+                    {isMultiDay ? "Días (calendario):" : "Día (calendario):"}
                 </Type>
                 <p className="text-sm">{dayText}</p>
             </div>
-            {!event.allDay ? (
+            {showTimes ? (
                 <>
                     <div className="w-full flex items-center justify-between gap-4 mb-2">
                         <Type variant="metric-label" className="font-bold">

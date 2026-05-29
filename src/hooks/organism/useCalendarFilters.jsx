@@ -9,6 +9,35 @@ import {
     dateOnlyToLocalDate,
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
+
+const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
+
+const normalizeUTCDateOnly = (value) => {
+    if (value == null || value === "") return "";
+
+    if (typeof value === "string") {
+        const matchedDate = value.trim().match(DATE_ONLY_PATTERN);
+        if (matchedDate) return matchedDate[1];
+    }
+
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    const year = parsedDate.getUTCFullYear();
+    const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const addDaysToUTCDateOnly = (value, days) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    const [year, month, day] = normalizedValue.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day + days, 0, 0, 0, 0));
+    return normalizeUTCDateOnly(date);
+};
 import {
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
@@ -44,6 +73,17 @@ const getAbsenceEvidenceValue = (event) =>
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
+
+const isEventMultiDay = (rawEvent) => {
+    if (rawEvent.focus !== "eventos") return false;
+    const startDay = normalizeDateOnly(rawEvent.start ?? rawEvent.startDate);
+    const endDay = normalizeDateOnly(rawEvent.end ?? rawEvent.endDate);
+    if (!startDay || !endDay) return false;
+    return startDay !== endDay;
+};
+
+const isTimeGridCalendarView = (calendarView) =>
+    calendarView === "timeGridWeek" || calendarView === "timeGridDay";
 
 const expandEventsForList = (events = [], isList) => {
     if (!isList) return events;
@@ -99,6 +139,7 @@ const getFilteredEvents = (
     absenceEvidenceFilters,
     calendarMode,
     viewerRole,
+    calendarView = "dayGridMonth",
 ) => {
     const selectedAbsenceTypeNames = new Set(
         absenceTypeOptions
@@ -162,7 +203,11 @@ const getFilteredEvents = (
             const isRangeRecord =
                 rawEvent.focus === "ausencias" ||
                 rawEvent.focus === "vacaciones";
-            const isAllDay = isRangeRecord || rawEvent.allDay === true;
+            const isMultiDay = isEventMultiDay(rawEvent);
+            const showInAllDayRow =
+                isMultiDay && isTimeGridCalendarView(calendarView);
+            const isAllDay =
+                isRangeRecord || rawEvent.allDay === true || showInAllDayRow;
             const isExpandedListAbsence = Boolean(
                 isList &&
                 (rawEvent.focus === "ausencias" ||
@@ -180,20 +225,22 @@ const getFilteredEvents = (
                     ? rawEvent.end
                     : (rawEvent.endDate ?? rawEvent.end),
             );
-            const eventStart =
-                isAllDay && normalizedStartDate
-                    ? normalizedStartDate
-                    : rawEvent.start;
-            const eventEnd =
-                isAllDay && normalizedEndDate
-                    ? isExpandedListAbsence
-                        ? normalizedEndDate
-                        : isRangeRecord
+            const eventStart = showInAllDayRow
+                ? normalizeUTCDateOnly(rawEvent.start ?? rawEvent.startDate)
+                : isAllDay && normalizedStartDate
+                  ? normalizedStartDate
+                  : rawEvent.start;
+            const eventEnd = showInAllDayRow
+                ? addDaysToUTCDateOnly(rawEvent.end ?? rawEvent.endDate, 1)
+                : isAllDay && normalizedEndDate
+                  ? isExpandedListAbsence
+                      ? normalizedEndDate
+                      : isRangeRecord
+                        ? addDaysToDateOnly(normalizedEndDate, 1)
+                        : normalizedEndDate === normalizedStartDate
                           ? addDaysToDateOnly(normalizedEndDate, 1)
-                          : normalizedEndDate === normalizedStartDate
-                            ? addDaysToDateOnly(normalizedEndDate, 1)
-                            : normalizedEndDate
-                    : rawEvent.end;
+                          : normalizedEndDate
+                  : rawEvent.end;
 
             return {
                 id: String(idx),
@@ -233,6 +280,9 @@ const getFilteredEvents = (
                         getScopeOption(rawEvent)?.label ?? rawEvent.scope,
                     eventType: rawEvent.type,
                     isFreeDay: Boolean(rawEvent.isFreeDay),
+                    multiDay: isMultiDay,
+                    sourceStart: rawEvent.start,
+                    sourceEnd: rawEvent.end,
                     date: rawEvent.date ?? "",
                     icon: getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,
@@ -271,7 +321,12 @@ const getFilteredEvents = (
 
 export const useCalendarFilters = (
     allEvents = [],
-    { isList = false, viewerRole = "", calendarMode = "personal" } = {},
+    {
+        isList = false,
+        viewerRole = "",
+        calendarMode = "personal",
+        calendarView = "dayGridMonth",
+    } = {},
 ) => {
     const [focusFilters, setFocusFilters] = useState(() =>
         FOCUS_OPTIONS.map((o) => o.value),
@@ -526,6 +581,7 @@ export const useCalendarFilters = (
                 absenceEvidenceFilters,
                 calendarMode,
                 viewerRole,
+                calendarView,
             ),
         [
             allEvents,
@@ -541,6 +597,7 @@ export const useCalendarFilters = (
             absenceEvidenceFilters,
             calendarMode,
             viewerRole,
+            calendarView,
         ],
     );
 
