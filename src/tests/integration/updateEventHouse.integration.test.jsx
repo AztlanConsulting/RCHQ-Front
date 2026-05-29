@@ -312,7 +312,7 @@ describe("Integración: editar evento de casa", () => {
 
     it("muestra error del servidor si falla updateHouseEvent", async () => {
         updateHouseEvent.mockRejectedValueOnce(
-            new Error("Error al modificar evento"),
+            new Error("Error al editar evento"),
         );
 
         await renderModal();
@@ -325,7 +325,7 @@ describe("Integración: editar evento de casa", () => {
         });
 
         expect(
-            await screen.findByText("Error al modificar evento"),
+            await screen.findByText("Error al editar evento"),
         ).toBeInTheDocument();
     });
 });
