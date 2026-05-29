@@ -407,12 +407,12 @@ describe("Integración: VacationList", () => {
 
         expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
 
-        fireEvent.click(screen.getAllByTitle("Modificar vacación")[0]);
+        fireEvent.click(screen.getAllByTitle("Editar vacación")[0]);
 
         const dialog = await screen.findByRole("dialog");
 
         expect(
-            within(dialog).getByText("Modificar vacaciones"),
+            within(dialog).getByText("Editar vacaciones"),
         ).toBeInTheDocument();
         expect(within(dialog).queryByText("Nombre del trabajador")).toBeNull();
         expect(within(dialog).queryByText("CURP")).toBeNull();

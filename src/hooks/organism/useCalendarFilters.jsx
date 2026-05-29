@@ -296,7 +296,7 @@ export const useCalendarFilters = (
         hasCustomizedAbsenceTypeFilters,
         setHasCustomizedAbsenceTypeFilters,
     ] = useState(false);
-    const [employeeFilters, setEmployeeFilters] = useState([]);
+    const [employeeFilters, setEmployeeFilters] = useState(null);
     const [employeeSearch, setEmployeeSearch] = useState("");
     const [absenceStatusFilters, setAbsenceStatusFilters] = useState(() => [
         "no_eliminadas",
@@ -456,12 +456,13 @@ export const useCalendarFilters = (
     const effectiveEmployeeFilters = useMemo(() => {
         const nextValues = employeeOptions.map((opt) => opt.value);
 
-        if (employeeFilters.length === 0) return nextValues;
+        if (employeeFilters === null) return nextValues;
+        if (employeeFilters.length === 0) return [];
 
         const kept = employeeFilters.filter((value) =>
             nextValues.includes(value),
         );
-        return kept.length > 0 ? kept : nextValues;
+        return kept;
     }, [employeeFilters, employeeOptions]);
 
     const filteredEmployeeOptions = useMemo(() => {
@@ -506,6 +507,10 @@ export const useCalendarFilters = (
 
     const clearEmployeeSelection = () => {
         setEmployeeFilters([]);
+    };
+
+    const resetEmployeeSelection = () => {
+        setEmployeeFilters(null);
     };
 
     const showEventFilters = focusFilters.includes("eventos");
@@ -570,6 +575,7 @@ export const useCalendarFilters = (
         setEmployeeSearch,
         toggleEmployeeValue,
         clearEmployeeSelection,
+        resetEmployeeSelection,
         employeeOptions,
         absenceStatusFilters,
         setAbsenceStatusFilters,

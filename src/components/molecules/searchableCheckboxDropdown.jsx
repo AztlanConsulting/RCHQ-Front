@@ -1,4 +1,5 @@
-import { Checkbox, Dropdown } from "flowbite-react";
+import { Dropdown } from "flowbite-react";
+import SmallButton from "../atoms/smallButton";
 import Type from "../atoms/type";
 
 const SearchableCheckboxDropdown = ({
@@ -11,6 +12,7 @@ const SearchableCheckboxDropdown = ({
   onSearchChange,
   onToggleValue,
   onClearSelection,
+  onResetSelection,
   searchPlaceholder = "Buscar",
   labelClassName = "",
   triggerClassName = "",
@@ -39,6 +41,7 @@ const SearchableCheckboxDropdown = ({
         dismissOnClick={false}
         enableTypeAhead={false}
         placement="bottom-start"
+        className="z-[9999]"
         renderTrigger={() => (
           <button
             type="button"
@@ -134,14 +137,20 @@ const SearchableCheckboxDropdown = ({
             ) : null}
           </ul>
 
-          <div className="p-2">
-            <button
-              type="button"
+          <div className="flex flex-col gap-2 p-2">
+            {onResetSelection ? (
+              <SmallButton
+                text="Seleccionar todo"
+                onClick={onResetSelection}
+                className="h-8 w-full min-w-0 rounded-md px-3 text-xs shadow-none"
+              />
+            ) : null}
+            <SmallButton
+              text="Limpiar selección"
               onClick={onClearSelection}
-              className="inline-flex w-full items-center justify-center rounded-md bg-[#C20000] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#930000] focus:outline-none focus:ring-2 focus:ring-[#C20000]/25"
-            >
-              Limpiar selección
-            </button>
+              hasNoRollback
+              className="h-8 w-full min-w-0 rounded-md px-3 text-xs shadow-none"
+            />
           </div>
         </div>
       </Dropdown>
