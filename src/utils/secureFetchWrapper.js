@@ -1,7 +1,6 @@
-import { getToken, clearAuthStorage } from "./authStorage";
+import { getToken } from "./authStorage";
 import { refreshSessionService } from "../services/authService";
 
-const LOGIN_PATH = "/iniciar-sesion";
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -31,6 +30,8 @@ export async function secureFetch(input, init = {}) {
     }).then((newToken) => {
       headers.set("Authorization", `Bearer ${newToken}`);
       return fetch(url, { ...init, headers });
+    }).catch(() => {
+      return new Response(JSON.stringify({ message: "Sesión expirada" }), { status: 401 });
     });
   }
 
@@ -42,6 +43,10 @@ export async function secureFetch(input, init = {}) {
 
   if (res.status === 401 && !init.skipAuthRedirect) {
     const currentToken = getToken();
+    if (!currentToken) {
+      return res;
+    }
+
     if (currentToken && currentToken !== token) {
       headers.set("Authorization", `Bearer ${currentToken}`);
       return fetch(url, { ...init, headers });
@@ -50,14 +55,18 @@ export async function secureFetch(input, init = {}) {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        const refreshData = await refreshSessionService();
-        token = refreshData?.data?.token;
+        token = await navigator.locks.request("auth-refresh-lock", async () => {
+          const doubleCheckToken = getToken();
+          if (doubleCheckToken && doubleCheckToken !== token) return doubleCheckToken;
 
-        if (!token) {
-          throw new Error("Token no recibido tras la renovación de la sesión.");
-        }
-        
-        window.dispatchEvent(new CustomEvent("auth:token-refreshed", { detail: token }));
+          const refreshData = await refreshSessionService();
+          const newToken = refreshData?.data?.token;
+          if (!newToken) throw new Error("Token no recibido tras la renovación de la sesión.");
+          
+          window.dispatchEvent(new CustomEvent("auth:token-refreshed", { detail: newToken }));
+          return newToken;
+        });
+
         processQueue(null, token);
         
         headers.set("Authorization", `Bearer ${token}`);
@@ -77,7 +86,8 @@ export async function secureFetch(input, init = {}) {
           return fetch(url, { ...init, headers });
         })
         .catch((error) => {
-          throw error;
+          // Idem: Devolvemos un 401 limpio en lugar de lanzar una excepción fatal
+          return new Response(JSON.stringify({ message: "Sesión expirada" }), { status: 401 });
         });
     }
   }
