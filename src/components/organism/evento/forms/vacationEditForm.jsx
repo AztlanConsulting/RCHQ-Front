@@ -40,7 +40,10 @@ const VacationEditForm = ({
     );
 
     return (
-        <div key="vacation-edit" className="px-2 text-left sm:px-3">
+        <div
+            key="vacation-edit"
+            className="overflow-visible px-2 text-left sm:px-3"
+        >
             <Type
                 variant="page-title"
                 className="mb-5 text-[2rem] leading-none"

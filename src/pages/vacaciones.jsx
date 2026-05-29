@@ -1,4 +1,3 @@
-import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationListFilters from "../components/molecules/vacationListFilters";
 import VacationListTable from "../components/molecules/vacationListTable";
@@ -51,29 +50,21 @@ const VacationList = () => {
         openDeleteVacation,
         cancelDeleteVacation,
         confirmDeleteVacation,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     } = useVacationList();
-
-    const isFutureView = view === "future";
 
     return (
         <div className="p-8 md:flex md:flex-col md:h-full">
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
+                    Vacaciones
                 </h1>
-
-                <BigButton
-                    text={
-                        isFutureView
-                            ? "Vacaciones pasadas"
-                            : "Vacaciones futuras"
-                    }
-                    onClick={() => setView(isFutureView ? "past" : "future")}
-                    className="min-w-0"
-                />
             </div>
 
             <VacationListFilters
+                view={view}
+                setView={setView}
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}
@@ -81,6 +72,8 @@ const VacationList = () => {
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 clearFilters={clearFilters}
+                isMobileExpanded={isMobileFiltersExpanded}
+                onToggleMobileFilters={toggleMobileFilters}
             />
 
             {error && (
@@ -123,10 +116,10 @@ const VacationList = () => {
                 open={isVacationEditing}
                 onClose={cancelVacationEdit}
                 scrollable
-                className="w-[92vw] max-w-3xl max-h-[80vh]"
+                className="max-w-3xl max-h-[min(96vh,70rem)]"
             >
                 <VacationEditForm
-                    title="Modificar vacaciones"
+                    title="Editar vacaciones"
                     event={selectedVacation ?? {}}
                     vacationForm={vacationForm}
                     vacationEditError={vacationEditError}
@@ -145,7 +138,7 @@ const VacationList = () => {
                 open={viewingVacation != null}
                 onClose={closeViewingVacation}
                 scrollable
-                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
+                className="w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[min(96vh,70rem)]"
             >
                 <VacationWorkerDetail
                     event={viewingVacation ?? {}}

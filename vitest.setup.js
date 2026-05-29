@@ -2,7 +2,6 @@ import "@testing-library/jest-dom";
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 
-// Mock SVG imports
 vi.mock("/error.svg", () => ({ default: "error.svg" }));
 vi.mock("/check.svg", () => ({ default: "check.svg" }));
 vi.mock("/showEye.svg", () => ({ default: "showEye.svg" }));
@@ -19,7 +18,6 @@ vi.mock("/add.svg", () => ({ default: "add.svg" }));
 vi.mock("/edit.svg", () => ({ default: "edit.svg" }));
 vi.mock("/close.svg", () => ({ default: "close.svg" }));
 
-// Mock de localStorage para evitar errores y advertencias de jsdom
 const localStorageMock = (function () {
   let store = {};
   return {

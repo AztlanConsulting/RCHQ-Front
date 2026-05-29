@@ -10,6 +10,7 @@ import {
     buildPayload,
     houseEventSchema,
 } from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     name: "",
@@ -153,19 +154,23 @@ export const useUpdateHouseEventForm = ({
     }, [event?.eventType, isOpen]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            ...(field === "allDay" && value
-                ? {
-                      startTime: "",
-                      endTime: "",
-                  }
-                : {}),
-            [field]:
+        setForm((prev) => {
+            const nextValue =
                 field === "name" || field === "description"
                     ? String(value).replace(TEXT_SANITIZER, "")
-                    : value,
-        }));
+                    : value;
+
+            if (field === "allDay" && value) {
+                return {
+                    ...prev,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            return shiftDateTimeRange(prev, field, nextValue);
+        });
 
         setErrors((prev) => ({
             ...prev,
@@ -229,7 +234,7 @@ export const useUpdateHouseEventForm = ({
             onClose?.();
         } catch (error) {
             setServerError(
-                error?.message ?? "Error inesperado al modificar el evento",
+                error?.message ?? "Error inesperado al editar el evento",
             );
         } finally {
             setIsSubmitting(false);
@@ -269,7 +274,7 @@ export const useUpdateHouseEventForm = ({
                 pendingPayload: null,
                 isForcing: false,
             });
-            setServerError(error?.message ?? "Error al forzar la modificación");
+            setServerError(error?.message ?? "Error al forzar la edición");
         }
     };
 

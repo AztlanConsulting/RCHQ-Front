@@ -12,6 +12,7 @@ import {
     personalEventSchema,
     buildPersonalPayload,
 } from "../../utils/schema/evento/personalEvent.schema";
+import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -106,7 +107,7 @@ export const usePersonalForm = ({
     }, [isOpen, initialStartDate, onValidationAlert]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
+        setForm((prev) => shiftSameDayTimeRange(prev, field, value));
         setErrors((prev) => ({ ...prev, [field]: undefined }));
     }, []);
 

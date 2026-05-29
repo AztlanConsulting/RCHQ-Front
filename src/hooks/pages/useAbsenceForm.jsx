@@ -10,6 +10,7 @@ import {
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,
 } from "../../utils/schema/evento/absence.schema";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import { mergeDateRuleErrors } from "../../utils/dateRules";
 
@@ -217,13 +218,22 @@ export const useAbsenceForm = ({
 
     const setField = useCallback(
         (field, value) => {
-            setForm((prev) => ({
-                ...prev,
-                [field]:
-                    field === "description"
-                        ? sanitizeAbsenceDescription(value, prev.description)
-                        : value,
-            }));
+            setForm((prev) => {
+                if (field === "startDate") {
+                    return shiftDateOnlyRange(prev, value);
+                }
+
+                return {
+                    ...prev,
+                    [field]:
+                        field === "description"
+                            ? sanitizeAbsenceDescription(
+                                value,
+                                prev.description,
+                            )
+                            : value,
+                };
+            });
 
             setErrors((prev) => ({
                 ...prev,

@@ -4,6 +4,7 @@ import { updatePersonalEvent } from "../../services/updateEventService";
 import { getEventTypes, getEmployeesForSelector } from "../../services/eventService";
 import { getCalendarViewerRole } from "../../services/calendarService";
 import { normalizeDateOnly } from "../../utils/calendarEventDetail";
+import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
 import {
     buildPersonalPayload,
     personalEventSchema,
@@ -134,13 +135,18 @@ export const useUpdatePersonalEventForm = ({
     );
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]:
-                field === "name" || field === "description"
-                    ? String(value).replace(TEXT_SANITIZER, "")
-                    : value,
-        }));
+        setForm((prev) => {
+            const nextValue =
+                field === "name"
+                    ? String(value)
+                            .replace(TEXT_SANITIZER, "")
+                            .slice(0, 70)
+                    : field === "description"
+                        ? String(value).replace(TEXT_SANITIZER, "")
+                        : value;
+
+            return shiftSameDayTimeRange(prev, field, nextValue);
+        });
         setErrors((prev) => ({
             ...prev,
             [field]: undefined,
@@ -219,7 +225,7 @@ export const useUpdatePersonalEventForm = ({
             onClose?.();
         } catch (error) {
             setServerError(
-                error?.message ?? "Error inesperado al modificar el evento",
+                error?.message ?? "Error inesperado al editar el evento",
             );
         } finally {
             setIsSubmitting(false);
@@ -257,7 +263,7 @@ export const useUpdatePersonalEventForm = ({
                 pendingPayload: null,
                 isForcing: false,
             });
-            setServerError(error?.message ?? "Error al forzar la modificación");
+            setServerError(error?.message ?? "Error al forzar la edición");
         }
     };
 

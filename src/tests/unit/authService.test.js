@@ -10,12 +10,11 @@ import {
   validateLoginTwoFactorAuthService,
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
+  refreshSessionService,
 } from "../../services/authService";
 
-// ─── Factories ────────────────────────────────────────────────────────────────
-
 const makeLoginSuccess = (overrides = {}) => ({
-  isActiveTwoFactorAuth: false, // ← campo real del servicio
+  isActiveTwoFactorAuth: false,
   data: { token: "session-token", user: { id: 1, name: "Test" } },
   ...overrides,
 });
@@ -35,8 +34,6 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
 });
-
-// ─── getReadableErrors ────────────────────────────────────────────────────────
 
 describe("getReadableErrors", () => {
   it("extrae los mensajes del array errors cuando está presente", () => {
@@ -66,8 +63,6 @@ describe("getReadableErrors", () => {
   });
 });
 
-// ─── getToken ─────────────────────────────────────────────────────────────────
-
 describe("getToken", () => {
   it("retorna null cuando no existe ningún token en localStorage", () => {
     expect(getToken()).toBeNull();
@@ -78,8 +73,6 @@ describe("getToken", () => {
     expect(getToken()).toBe("abc123");
   });
 });
-
-// ─── getPreTwoFactorToken ─────────────────────────────────────────────────────
 
 describe("getPreTwoFactorAuthToken", () => {
   it("retorna null cuando no existe el token pre-TwoFactorAuth en localStorage", () => {
@@ -92,23 +85,24 @@ describe("getPreTwoFactorAuthToken", () => {
   });
 });
 
-// ─── logoutService ────────────────────────────────────────────────────────────
-
 describe("logoutService", () => {
-  it("elimina token, preTwoFactorToken y user del localStorage al cerrar sesión", () => {
+  it("elimina token, preTwoFactorToken y user del localStorage y llama al API", async () => {
     seedLocalStorage({
       token: "session-abc",
       preTwoFactorAuth: "pre-token",
       user: JSON.stringify({ id: 1 }),
     });
-    logoutService();
+    mockFetch({ success: true });
+    await logoutService();
     expect(localStorage.getItem("token")).toBeNull();
     expect(localStorage.getItem("preTwoFactorAuth")).toBeNull();
     expect(localStorage.getItem("user")).toBeNull();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/logout"),
+      expect.objectContaining({ method: "POST", credentials: "include" })
+    );
   });
 });
-
-// ─── loginService ─────────────────────────────────────────────────────────────
 
 describe("loginService", () => {
   it("guarda el token de sesión en localStorage cuando el login es exitoso sin TwoFactorAuth", async () => {
@@ -153,6 +147,7 @@ describe("loginService", () => {
       expect.stringContaining("/auth/login"),
       expect.objectContaining({
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({
           email: "user@test.com",
           password: "mypassword",
@@ -162,7 +157,35 @@ describe("loginService", () => {
   });
 });
 
-// ─── activateTwoFactorAuthService ─────────────────────────────────────────────
+describe("refreshSessionService", () => {
+  it("llama al endpoint con credentials 'include' y actualiza el token en localStorage", async () => {
+    const apiResponse = {
+      success: true,
+      data: { token: "new-refresh-token-123" },
+    };
+    mockFetch(apiResponse);
+    
+    const result = await refreshSessionService();
+    
+    expect(result).toEqual(apiResponse);
+    expect(localStorage.getItem("token")).toBe("new-refresh-token-123");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/refresh"),
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("lanza un error si el refresh falla (ej. 401)", async () => {
+    mockFetch({ message: "Refresh token inválido" }, false, 401);
+    await expect(refreshSessionService()).rejects.toMatchObject({
+      message: "Refresh token inválido",
+      status: 401,
+    });
+  });
+});
 
 describe("activateTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
@@ -199,8 +222,6 @@ describe("activateTwoFactorAuthService", () => {
   });
 });
 
-// ─── verifyTwoFactorAuthService ───────────────────────────────────────────────
-
 describe("verifyTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(verifyTwoFactorAuthService("123456")).rejects.toThrow(
@@ -225,8 +246,6 @@ describe("verifyTwoFactorAuthService", () => {
   });
 });
 
-// ─── validateLoginTwoFactorAuthService ───────────────────────────────────────
-
 describe("validateLoginTwoFactorAuthService", () => {
   it("lanza error cuando no hay preTwoFactorToken en localStorage", async () => {
     await expect(validateLoginTwoFactorAuthService("123456")).rejects.toThrow(
@@ -235,11 +254,10 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("retorna LOGIN_COMPLETE y el token final cuando el código es correcto", async () => {
-    seedLocalStorage({ preTwoFactorAuth: "pre-token" }); // ← clave real
+    seedLocalStorage({ preTwoFactorAuth: "pre-token" });
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
-      token: "final-token",
-      data: { id: 1 },
+      data: { token: "final-token", id: 1 },
     };
     mockFetch(apiResponse);
     const result = await validateLoginTwoFactorAuthService("123456");
@@ -255,8 +273,6 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 });
 
-// ─── getStatusTwoFactorAuth ───────────────────────────────────────────────────
-
 describe("getStatusTwoFactorAuth", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(getTwoFactorAuthStatus()).rejects.toThrow(
@@ -271,8 +287,6 @@ describe("getStatusTwoFactorAuth", () => {
     expect(result).toEqual({ isActive: true });
   });
 });
-
-// ─── desactivateTwoFactorAuthService ─────────────────────────────────────────
 
 describe("desactivateTwoFactorAuthService", () => {
   it("envía la password en el body POST al endpoint de desactivación", async () => {

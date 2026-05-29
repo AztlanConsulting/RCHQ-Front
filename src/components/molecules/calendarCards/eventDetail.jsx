@@ -53,12 +53,16 @@ const EventDetail = ({
     );
 
     return (
-        <div className="relative text-left">
-            <Type variant="page-title" className="mb-2" as="h2">
+        <div className="relative min-w-0 max-w-full overflow-x-hidden text-left">
+            <Type
+                variant="page-title"
+                as="h2"
+                className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+            >
                 {event.title ?? "—"}
             </Type>
 
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2">
                 <span
                     className="inline-block size-3 rounded-full shrink-0"
                     style={{
@@ -69,20 +73,31 @@ const EventDetail = ({
                     }}
                     aria-hidden
                 />
-                <Type variant="subtitle" as="span">
+                <Type
+                    variant="subtitle"
+                    as="span"
+                    className="min-w-0 break-words [overflow-wrap:anywhere]"
+                >
                     {event.scopeLabel || event.scope || "—"}
                 </Type>
             </div>
 
             <div className="mb-4">
-                <Type variant="subtitle" as="span">
+                <Type
+                    variant="subtitle"
+                    as="span"
+                    className="block max-w-full break-words [overflow-wrap:anywhere]"
+                >
                     {event.focusLabel || event.focus || "—"}
                     {event.eventType ? ` · ${event.eventType}` : ""}
                 </Type>
             </div>
 
             {event.subtitle ? (
-                <Type variant="body" className="mb-4 block">
+                <Type
+                    variant="body"
+                    className="mb-6 block max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+                >
                     {event.subtitle}
                 </Type>
             ) : null}
@@ -115,7 +130,7 @@ const EventDetail = ({
             ) : null}
 
             {event.description ? (
-                <div className="mb-4">
+                <div className="mb-6">
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
@@ -124,7 +139,7 @@ const EventDetail = ({
                     </Type>
                     <Type
                         variant="body"
-                        className="block whitespace-pre-wrap text-[1.05rem] leading-snug text-[#121212]"
+                        className="block max-w-full whitespace-pre-wrap break-words text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
                     >
                         {event.description}
                     </Type>
@@ -144,7 +159,7 @@ const EventDetail = ({
                             <Type
                                 key={person?.id ?? idx}
                                 variant="body"
-                                className="block text-[1.05rem] leading-snug text-[#121212]"
+                                className="block max-w-full break-words text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
                                 as="p"
                             >
                                 {person?.name || "-"}
@@ -198,7 +213,7 @@ const EventDetail = ({
                     body={
                         <>
                             ¿Estás seguro que deseas eliminar el evento{" "}
-                            <span className="font-semibold text-slate-700">
+                            <span className="font-semibold break-words text-slate-700 [overflow-wrap:anywhere]">
                                 {event?.title ?? "este evento"}
                             </span>
                             ? Esta acción no se puede deshacer.

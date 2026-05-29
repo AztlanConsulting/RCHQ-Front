@@ -41,7 +41,6 @@ describe("calendarService", () => {
       expect.objectContaining({
         method: "PUT",
         headers: expect.objectContaining({
-          Authorization: "Bearer token-test",
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({ description: "Nueva descripción" }),
@@ -72,9 +71,6 @@ describe("calendarService", () => {
       "http://api.test/absence/absence-1",
       expect.objectContaining({
         method: "PUT",
-        headers: expect.objectContaining({
-          Authorization: "Bearer token-test",
-        }),
         body: expect.any(FormData),
       }),
     );

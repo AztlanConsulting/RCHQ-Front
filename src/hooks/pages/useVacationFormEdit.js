@@ -3,8 +3,11 @@ import {
     calendarItemToDetail,
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
+import {
+    updateVacationRequestDates,
+} from "../../services/vacationService";
 import { getEmployeeDateRules } from "../../services/calendarService";
-import { updateVacationRequestDates } from "../../services/vacationService";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { getVacationEditDatesErrors } from "../../utils/schema/vacation/vacation.schema";
 import { mergeDateRuleErrors } from "../../utils/dateRules";
 
@@ -56,7 +59,7 @@ export const useVacationFormEdit = ({
         if (status === 2) {
             setAlert({
                 type: "error",
-                message: "No se pueden modificar vacaciones rechazadas",
+                message: "No se pueden editar vacaciones rechazadas",
             });
             return;
         }
@@ -106,10 +109,16 @@ export const useVacationFormEdit = ({
     }, [resetVacationEdit]);
 
     const setVacationField = useCallback((field, value) => {
-        setVacationForm((prev) => ({
-            ...prev,
-            [field]: String(value ?? "").slice(0, 80),
-        }));
+        const nextValue = String(value ?? "").slice(0, 80);
+
+        setVacationForm((prev) =>
+            field === "startDate"
+                ? shiftDateOnlyRange(prev, nextValue)
+                : {
+                    ...prev,
+                    [field]: nextValue,
+                },
+        );
 
         setVacationEditError("");
     }, []);
@@ -214,13 +223,13 @@ export const useVacationFormEdit = ({
 
             setAlert({
                 type: "success",
-                message: "Vacaciones modificadas correctamente",
+                message: "Vacaciones editadas correctamente",
             });
 
             resetVacationEdit();
         } catch (error) {
             setVacationEditError(
-                error?.message || "No se pudieron modificar las vacaciones.",
+                error?.message || "No se pudieron editar las vacaciones.",
             );
         } finally {
             setIsSavingVacation(false);

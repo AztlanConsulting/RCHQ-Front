@@ -1,23 +1,15 @@
 import { buildApiError } from "../utils/apiErrors";
-import { getToken } from "../utils/authStorage";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const deleteHouseEvent = async (houseEventId) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/house/${houseEventId}`,
         {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -36,19 +28,12 @@ export const deleteHouseEvent = async (houseEventId) => {
 };
 
 export const deletePersonalEvent = async (personalEventId) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/personal/${personalEventId}`,
         {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );

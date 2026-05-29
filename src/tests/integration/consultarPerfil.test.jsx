@@ -88,7 +88,7 @@ describe("Consultar Perfil — integración", () => {
     expect(document.querySelector(".animate-pulse")).not.toBeInTheDocument();
   });
 
-  it("200 — la llamada a la API recibe el token correcto", async () => {
+  it("200 — llama a la API para obtener los datos del usuario", async () => {
     getUserData.mockResolvedValue({ data: mockUserRaw });
 
     renderPage();
@@ -97,7 +97,7 @@ describe("Consultar Perfil — integración", () => {
     );
 
     expect(getUserData).toHaveBeenCalledTimes(1);
-    expect(getUserData).toHaveBeenCalledWith("fake-token");
+    expect(getUserData).toHaveBeenCalledWith();
   });
 
   it("401 — muestra error de permisos sin botón de reintentar", async () => {

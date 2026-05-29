@@ -126,6 +126,7 @@ const VacationForm = (props) => {
                         maxDate={ruleMaxDate}
                         filterDate={dateRuleFilter}
                         popupSize="compact"
+                        popupStrategy="fixed"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
 
@@ -145,6 +146,7 @@ const VacationForm = (props) => {
                         filterDate={dateRuleFilter}
                         popupAlign="right"
                         popupSize="compact"
+                        popupStrategy="fixed"
                         onChange={(e) => setField("endDate", e.target.value)}
                     />
 
@@ -155,7 +157,7 @@ const VacationForm = (props) => {
             </div>
 
             {viewerRole === "Coordinador" ? (
-                <p className="mb-5 text-xs text-slate-400">
+                <p className="mb-10 mt-2 text-xs text-slate-400">
                     Las vacaciones registradas por coordinación quedarán
                     aprobadas automáticamente.
                 </p>

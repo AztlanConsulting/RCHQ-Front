@@ -46,6 +46,8 @@ const RegisterEventModal = ({
     const shouldShowNameField =
         effectiveCategoryKey !== "ausencias" &&
         effectiveCategoryKey !== "vacaciones";
+    
+    const shouldAllowFloatingPicker = effectiveCategoryKey === "vacaciones";
 
     return (
         <>
@@ -87,8 +89,9 @@ const RegisterEventModal = ({
                         width: "100%",
                         maxWidth: "560px",
                         boxSizing: "border-box",
-                        maxHeight: "90vh",
+                        maxHeight: shouldAllowFloatingPicker ? "none" : "90vh",
                         minHeight: 0,
+                        overflow: shouldAllowFloatingPicker ? "visible" : "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
@@ -158,11 +161,8 @@ const RegisterEventModal = ({
 
                     <div
                         style={{
-                            flex: 1,
-                            overflowY:
-                                effectiveCategoryKey === "vacaciones"
-                                    ? "visible"
-                                    : "auto",
+                            flex: shouldAllowFloatingPicker ? "initial" : 1,
+                            overflowY: shouldAllowFloatingPicker ? "visible" : "auto",
                             minHeight: 0,
                             display: "flex",
                             flexDirection: "column",
@@ -173,10 +173,7 @@ const RegisterEventModal = ({
                             key={animationKey}
                             className="animate-[fadeSlideIn_220ms_ease-in-out]"
                             style={{
-                                paddingBottom:
-                                    effectiveCategoryKey === "vacaciones"
-                                        ? "4px"
-                                        : "24px",
+                                paddingBottom: shouldAllowFloatingPicker ? "0" : "24px",
                             }}
                         >
                             {SubForm && (

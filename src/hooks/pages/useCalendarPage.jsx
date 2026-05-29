@@ -22,6 +22,7 @@ import {
   buildAbsenceFormSchema,
 } from "../../utils/schema/evento/absence.schema";
 import { mergeDateRuleErrors } from "../../utils/dateRules";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -278,13 +279,19 @@ export const useCalendarPage = ({
   }, []);
 
   const setAbsenceField = useCallback((field, value) => {
-    setAbsenceForm((prev) => ({
-      ...prev,
-      [field]:
-        field === "description"
-          ? sanitizeAbsenceDescription(value)
-          : value,
-    }));
+    setAbsenceForm((prev) => {
+      if (field === "startDate") {
+        return shiftDateOnlyRange(prev, value);
+      }
+
+      return {
+        ...prev,
+        [field]:
+          field === "description"
+            ? sanitizeAbsenceDescription(value)
+            : value,
+      };
+    });
   }, []);
 
   const submitAbsenceEdit = useCallback(async () => {
@@ -489,10 +496,9 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
     setAlert({
       type: "error",
-      message: "No se puede modificar este tipo de evento.",
+      message: "No se puede editar este tipo de evento.",
     });
   }, [closeDetail, selectedEvent]);
 
@@ -512,7 +518,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
   }, [selectedEvent]);
 
   const cancelDeleteHouseEvent = useCallback(() => {
@@ -613,7 +618,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
 
@@ -636,7 +641,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
   const getVacationRequestId = useCallback((event) =>
