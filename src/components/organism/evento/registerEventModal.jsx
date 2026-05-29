@@ -5,12 +5,14 @@ import Type from "../../atoms/type";
 import ButtonGroup from "../../molecules/buttonGroup";
 import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
+import GlobalForm from "./forms/globalForm";
 import PersonalForm from "./forms/personalForm";
 import VacationForm from "./forms/vacationForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
 import { getCalendarViewerRole } from "../../../services/calendarService";
 
 const CATEGORY_FORMS = {
+    global: GlobalForm,
     ausencias: AusenciaForm,
     vacaciones: VacationForm,
     casa: CasaForm,
