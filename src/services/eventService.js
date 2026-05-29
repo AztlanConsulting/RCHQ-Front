@@ -53,6 +53,28 @@ export async function getEmployeesForSelector(params = {}) {
     return json?.data?.employees ?? [];
 }
 
+export async function createGlobalEvent(payload) {
+    const response = await secureFetch(`${BASE_URL}/event/global/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok && response.status !== 409) {
+        throw new APIError(
+            json?.message ?? "Error al registrar el evento global",
+            response.status,
+            json,
+        );
+    }
+
+    return json;
+}
+
 export async function createPersonalEvent(payload) {
     const response = await secureFetch(`${BASE_URL}/event/personal/add`, {
         method: "POST",
