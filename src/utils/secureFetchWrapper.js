@@ -8,6 +8,7 @@ const FALLBACK_LOCK_POLL_MS = 50;
 let isRefreshing = false;
 let failedQueue = [];
 let fallbackRefreshPromise = null;
+let fallbackStorageUsable = true;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -22,6 +23,9 @@ const processQueue = (error, token = null) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const isActiveFallbackLock = (lock) =>
+  Boolean(lock?.owner && lock.expiresAt > Date.now());
+
 const readFallbackLock = () => {
   try {
     const rawLock = globalThis.localStorage?.getItem(FALLBACK_LOCK_KEY);
@@ -29,6 +33,52 @@ const readFallbackLock = () => {
   } catch {
     return null;
   }
+};
+
+const hasFallbackStorage = () => {
+  try {
+    return fallbackStorageUsable && Boolean(globalThis.localStorage);
+  } catch {
+    return false;
+  }
+};
+
+const waitForFallbackSignal = (timeoutMs) =>
+  new Promise((resolve) => {
+    let timeoutId;
+
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+      globalThis.window?.removeEventListener?.("storage", handleSignal);
+      globalThis.window?.removeEventListener?.(
+        "auth:token-refreshed",
+        handleSignal,
+      );
+    };
+
+    const handleSignal = () => {
+      cleanup();
+      resolve();
+    };
+
+    timeoutId = setTimeout(handleSignal, timeoutMs);
+    globalThis.window?.addEventListener?.("storage", handleSignal);
+    globalThis.window?.addEventListener?.(
+      "auth:token-refreshed",
+      handleSignal,
+    );
+  });
+
+const waitForTokenFromActiveFallbackLock = async (previousToken) => {
+  while (isActiveFallbackLock(readFallbackLock())) {
+    const nextToken = getToken();
+    if (nextToken && nextToken !== previousToken) return nextToken;
+
+    await waitForFallbackSignal(FALLBACK_LOCK_POLL_MS);
+  }
+
+  const nextToken = getToken();
+  return nextToken && nextToken !== previousToken ? nextToken : null;
 };
 
 const tryAcquireFallbackLock = (owner) => {
@@ -39,7 +89,7 @@ const tryAcquireFallbackLock = (owner) => {
     const now = Date.now();
     const currentLock = readFallbackLock();
 
-    if (currentLock?.expiresAt > now && currentLock.owner !== owner) {
+    if (isActiveFallbackLock(currentLock) && currentLock.owner !== owner) {
       return false;
     }
 
@@ -50,6 +100,7 @@ const tryAcquireFallbackLock = (owner) => {
 
     return readFallbackLock()?.owner === owner;
   } catch {
+    fallbackStorageUsable = false;
     return true;
   }
 };
@@ -67,17 +118,36 @@ const releaseFallbackLock = (owner) => {
 const runWithFallbackRefreshLock = async (callback) => {
   if (fallbackRefreshPromise) return fallbackRefreshPromise;
 
+  const previousToken = getToken();
+  const tokenFromOtherTab =
+    await waitForTokenFromActiveFallbackLock(previousToken);
+  if (tokenFromOtherTab) return tokenFromOtherTab;
+
   const owner = `${Date.now()}-${Math.random()}`;
   let hasLock = false;
 
   fallbackRefreshPromise = (async () => {
     try {
-      while (!hasLock) {
-        hasLock = tryAcquireFallbackLock(owner);
-        if (!hasLock) await sleep(FALLBACK_LOCK_POLL_MS);
-      }
+      while (true) {
+        const refreshedToken =
+          await waitForTokenFromActiveFallbackLock(previousToken);
+        if (refreshedToken) return refreshedToken;
 
-      return await callback();
+        hasLock = tryAcquireFallbackLock(owner);
+        if (!hasLock) {
+          await sleep(FALLBACK_LOCK_POLL_MS);
+          continue;
+        }
+
+        await sleep(FALLBACK_LOCK_POLL_MS);
+
+        if (hasFallbackStorage() && readFallbackLock()?.owner !== owner) {
+          hasLock = false;
+          continue;
+        }
+
+        return await callback();
+      }
     } finally {
       if (hasLock) releaseFallbackLock(owner);
       fallbackRefreshPromise = null;
