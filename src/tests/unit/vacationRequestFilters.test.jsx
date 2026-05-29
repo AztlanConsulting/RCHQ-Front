@@ -46,6 +46,7 @@ describe("VacationRequestFilters", () => {
 
     const defaultProps = {
         view: "pending",
+        setView: vi.fn(),
         searchQuery: "",
         setSearchQuery: vi.fn(),
         startDate: "",
@@ -57,13 +58,31 @@ describe("VacationRequestFilters", () => {
         clearFilters: vi.fn(),
     };
 
-    it("renderiza búsqueda y fechas en vista pending", () => {
+    it("renderiza selector de vista, búsqueda y fechas en vista pending", () => {
         render(<VacationRequestFilters {...defaultProps} />);
 
+        expect(screen.getByLabelText("Vista de solicitudes")).toBeInTheDocument();
         expect(screen.getByLabelText("Buscar empleado")).toBeInTheDocument();
         expect(screen.getByLabelText("Fecha de inicio")).toBeInTheDocument();
         expect(screen.getByLabelText("Fecha de término")).toBeInTheDocument();
         expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
+    });
+
+    it("llama setView al cambiar la vista de solicitudes", () => {
+        const setView = vi.fn();
+
+        render(
+            <VacationRequestFilters
+                {...defaultProps}
+                setView={setView}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
+
+        expect(setView).toHaveBeenCalledWith("reviewed");
     });
 
     it("llama setSearchQuery al escribir en búsqueda", () => {
@@ -88,12 +107,14 @@ describe("VacationRequestFilters", () => {
             <VacationRequestFilters
                 {...defaultProps}
                 view="reviewed"
+                statusFilter="approved"
             />,
         );
 
         expect(screen.getByLabelText("Filtrar por estado")).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "Todas" })).toBeInTheDocument();
         expect(screen.getByRole("option", { name: "Aprobadas" })).toBeInTheDocument();
+        expect(screen.getByRole("option", { name: "Rechazadas" })).toBeInTheDocument();
     });
 
     it("llama setStatusFilter al cambiar estado", () => {

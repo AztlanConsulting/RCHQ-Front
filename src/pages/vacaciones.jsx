@@ -1,4 +1,3 @@
-import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationListFilters from "../components/molecules/vacationListFilters";
 import VacationListTable from "../components/molecules/vacationListTable";
@@ -56,23 +55,15 @@ const VacationList = () => {
 
     return (
         <div className="p-8 md:flex md:flex-col md:h-full">
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
                     {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
                 </h1>
-
-                <BigButton
-                    text={
-                        isFutureView
-                            ? "Vacaciones pasadas"
-                            : "Vacaciones futuras"
-                    }
-                    onClick={() => setView(isFutureView ? "past" : "future")}
-                    className="min-w-0"
-                />
             </div>
 
             <VacationListFilters
+                view={view}
+                setView={setView}
                 startDate={startDate}
                 setStartDate={setStartDate}
                 endDate={endDate}

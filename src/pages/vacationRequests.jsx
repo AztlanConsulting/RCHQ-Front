@@ -1,5 +1,4 @@
 import { useState } from "react";
-import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
@@ -128,28 +127,17 @@ const VacationRequests = () => {
                     />
                 </div>
             )}
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
                     {isPendingView
                         ? "Solicitudes de vacaciones pendientes"
                         : "Solicitudes de vacaciones revisadas"}
                 </h1>
-
-                <BigButton
-                    text={
-                        isPendingView
-                            ? "Solicitudes revisadas"
-                            : "Regresar a pendientes"
-                    }
-                    onClick={() =>
-                        setView(isPendingView ? "reviewed" : "pending")
-                    }
-                    className="min-w-0"
-                />
             </div>
 
             <VacationRequestFilters
                 view={view}
+                setView={setView}
                 searchQuery={searchInput}
                 setSearchQuery={setSearchInput}
                 startDate={startDate}

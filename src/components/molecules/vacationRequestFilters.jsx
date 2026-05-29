@@ -12,6 +12,7 @@ import {
 
 const VacationRequestFilters = ({
     view,
+    setView,
     searchQuery,
     setSearchQuery,
     startDate,
@@ -41,12 +42,25 @@ const VacationRequestFilters = ({
 
     const gridColumns =
         view === "reviewed"
-            ? "lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]"
-            : "lg:grid-cols-[1.4fr_1fr_1fr_auto]";
+            ? "lg:grid-cols-[1fr_1.4fr_1fr_1fr_1fr_auto]"
+            : "lg:grid-cols-[1fr_1.4fr_1fr_1fr_auto]";
 
     return (
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
             <div className={`grid grid-cols-1 gap-6 ${gridColumns}`}>
+                <SelectField
+                    id="vacation-request-view"
+                    name="vacation-request-view"
+                    label="Vista de solicitudes"
+                    value={view}
+                    onChange={(event) => setView(event.target.value)}
+                    options={[
+                        { value: "pending", label: "Pendientes" },
+                        { value: "reviewed", label: "Revisadas" },
+                    ]}
+                    labelColor="text-[#121212]"
+                />
+
                 <TextField
                     id="vacation-search"
                     text="Buscar empleado"

@@ -172,6 +172,8 @@ describe("Integración: VacationRequests", () => {
                 status: "all",
             }),
         );
+
+        expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
     });
 
     it("mantiene la tabla visible mientras carga una nueva búsqueda", async () => {
@@ -274,9 +276,9 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.click(
-            screen.getByRole("button", { name: "Solicitudes revisadas" }),
-        );
+        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
 
         expect(
             await screen.findByText("Solicitudes de vacaciones revisadas"),
@@ -292,6 +294,10 @@ describe("Integración: VacationRequests", () => {
                 status: "all",
             }),
         );
+
+        expect(
+            screen.getByLabelText("Filtrar por estado"),
+        ).toHaveValue("all");
     });
 
     it("manda status approved al servicio cuando se filtra revisadas por aprobadas", async () => {
@@ -299,9 +305,9 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.click(
-            screen.getByRole("button", { name: "Solicitudes revisadas" }),
-        );
+        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
 
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
 
@@ -317,6 +323,30 @@ describe("Integración: VacationRequests", () => {
                 }),
             );
         });
+    });
+
+    it("oculta el filtro de estado en pendientes y muestra solo aprobadas o rechazadas en revisadas", async () => {
+        await renderComponent();
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+        expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
+
+        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
+
+        const statusSelect = await screen.findByLabelText("Filtrar por estado");
+
+        expect(
+            screen.getByRole("option", { name: "Aprobadas" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("option", { name: "Rechazadas" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("option", { name: "Todas" }),
+        ).toBeInTheDocument();
+        expect(statusSelect).toHaveValue("all");
     });
 
     it("muestra error local si la fecha de inicio es posterior a la fecha de término", async () => {

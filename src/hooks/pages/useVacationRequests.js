@@ -30,6 +30,15 @@ const PENDING_STATUS = 0;
 const APPROVED_STATUS = 1;
 const REJECTED_STATUS = 2;
 
+const getAllowedStatusFilters = (view) =>
+    view === "past"
+        ? ["all", "approved", "rejected"]
+        : view === "reviewed"
+          ? ["all", "approved", "rejected"]
+        : ["all", "pending", "approved", "rejected"];
+
+const getDefaultStatusFilter = () => "all";
+
 const getVacationRequestEmployee = (request) => request?.employee ?? {};
 
 const getVacationRequestEmployeeName = (request) => {
@@ -101,7 +110,9 @@ const useVacationRequestsBase = ({
     } = useDebouncedVacationSearch("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState(
+        getDefaultStatusFilter(initialView),
+    );
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -112,14 +123,22 @@ const useVacationRequestsBase = ({
         setError("");
     };
 
+    useEffect(() => {
+        if (!getAllowedStatusFilters(view).includes(statusFilter)) {
+            setStatusFilter(getDefaultStatusFilter(view));
+        }
+    }, [statusFilter, view]);
+
     const filters = useMemo(
         () => ({
             ...(includeSearch ? { search: searchQuery } : {}),
             startDate,
             endDate,
-            status: statusFilter,
+            status: getAllowedStatusFilters(view).includes(statusFilter)
+                ? statusFilter
+                : getDefaultStatusFilter(view),
         }),
-        [includeSearch, searchQuery, startDate, endDate, statusFilter],
+        [includeSearch, searchQuery, startDate, endDate, statusFilter, view],
     );
 
     const fetchRequests = useCallback(
@@ -194,7 +213,7 @@ const useVacationRequestsBase = ({
         clearSearch();
         setStartDate("");
         setEndDate("");
-        setStatusFilter("all");
+        setStatusFilter(getDefaultStatusFilter(view));
         setPage(1);
         onReset();
     };
