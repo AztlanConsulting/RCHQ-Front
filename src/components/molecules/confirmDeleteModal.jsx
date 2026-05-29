@@ -18,7 +18,9 @@ const ConfirmDeleteModal = ({
       body: (
         <>
           ¿Seguro que quiere eliminar{" "}
-          <span className="font-semibold text-slate-700">{label}</span>?{" "}
+          <span className="font-semibold break-words text-slate-700 [overflow-wrap:anywhere]">
+            {label}
+          </span>?{" "}
           Esta acción no se puede revertir.
         </>
       ),
@@ -31,8 +33,10 @@ const ConfirmDeleteModal = ({
       title: "Documento ya existe",
       body: (
         <>
-          <span className="font-semibold text-slate-700">{label}</span> ya
-          existe. ¿Desea reemplazarlo?
+          <span className="font-semibold break-words text-slate-700 [overflow-wrap:anywhere]">
+            {label}
+          </span>{" "}
+          ya existe. ¿Desea reemplazarlo?
         </>
       ),
       confirmText: loading ? "Reemplazando..." : "Reemplazar",
@@ -65,10 +69,17 @@ const ConfirmDeleteModal = ({
         role="dialog"
         aria-modal={inline ? undefined : true}
         aria-labelledby={titleId}
-        className={`${cardClass} relative flex flex-col gap-4`}
+        className={`${cardClass} relative flex min-w-0 flex-col gap-4 overflow-x-hidden`}
       >
-        <h3 id={titleId} className="text-2xl font-bold text-[#121212]">{resolvedTitle}</h3>
-        <div className="text-sm text-slate-500">{body ?? defaultBody}</div>
+        <h3
+          id={titleId}
+          className="break-words text-2xl font-bold text-[#121212] [overflow-wrap:anywhere]"
+        >
+          {resolvedTitle}
+        </h3>
+        <div className="max-w-full break-words text-sm text-slate-500 [overflow-wrap:anywhere]">
+          {body ?? defaultBody}
+        </div>
         <div className="flex gap-3 justify-center pt-1">
           <SmallButton
             text="Cancelar"

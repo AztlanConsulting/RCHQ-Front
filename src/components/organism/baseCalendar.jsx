@@ -47,6 +47,26 @@ const renderEventContent = (arg) => {
     return <DayGridCard arg={arg} />;
 };
 
+const closeDayGrid = (eventTarget) => {
+    const clickedInsidePopover = eventTarget?.closest?.(".fc-popover");
+    if (!clickedInsidePopover) return;
+
+    const closeControls = document.querySelectorAll(
+        ".fc-popover .fc-popover-close",
+    );
+
+    if (closeControls.length > 0) {
+        closeControls.forEach((button) => {
+            button.click();
+        });
+        return;
+    }
+
+    document.querySelectorAll(".fc-popover").forEach((popover) => {
+        popover.remove();
+    });
+};
+
 const BaseCalendar = ({
     initialView,
     initialDate,
@@ -176,7 +196,10 @@ const BaseCalendar = ({
             datesSet={handleDatesSet}
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
-            eventClick={(info) => onEventClick?.(info)}
+            eventClick={(info) => {
+                closeDayGrid(info?.jsEvent?.target);
+                onEventClick?.(info);
+            }}
             selectable={true}
             select={(info) => onDateDrag?.(info, calendarRef)}
             selectAllow={() => onDateDragging?.()}

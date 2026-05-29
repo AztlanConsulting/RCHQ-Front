@@ -137,9 +137,13 @@ export const useUpdatePersonalEventForm = ({
     const setField = useCallback((field, value) => {
         setForm((prev) => {
             const nextValue =
-                field === "name" || field === "description"
-                    ? String(value).replace(TEXT_SANITIZER, "")
-                    : value;
+                field === "name"
+                    ? String(value)
+                            .replace(TEXT_SANITIZER, "")
+                            .slice(0, 70)
+                    : field === "description"
+                        ? String(value).replace(TEXT_SANITIZER, "")
+                        : value;
 
             return shiftSameDayTimeRange(prev, field, nextValue);
         });
