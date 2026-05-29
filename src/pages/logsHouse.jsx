@@ -39,6 +39,8 @@ const LogsHouse = () => {
     handleDownloadReport,
     handleNextPage,
     handlePrevPage,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   } = useHouseLogs();
 
   return (
@@ -74,6 +76,8 @@ const LogsHouse = () => {
           setDateFilter={setDateFilter}
           minDate={minLogsDate}
           maxDate={maxLogsDate}
+          isMobileExpanded={isMobileFiltersExpanded}
+          onToggleMobileFilters={toggleMobileFilters}
         />
       </div>
 
