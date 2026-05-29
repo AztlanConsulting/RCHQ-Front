@@ -205,10 +205,12 @@ const getFilteredEvents = (
                 start: eventStart,
                 end: eventEnd,
                 backgroundColor:
-                    rawEvent.focus === "ausencias" ? "#A8201A" : rawEvent.color,
+                    rawEvent.focus === "ausencias"
+                        ? rawEvent.isDeleted ? "#3E000C" : "#A8201A"
+                        : rawEvent.color,
                 borderColor:
                     rawEvent.focus === "ausencias"
-                        ? "#DC2626"
+                        ? rawEvent.isDeleted ? "#3E000C" : "#A8201A"
                         : rawEvent.color || rawEvent.backgroundColor || "#000",
                 allDay: isAllDay,
                 extendedProps: {
