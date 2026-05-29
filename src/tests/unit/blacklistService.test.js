@@ -30,10 +30,23 @@ describe("blacklistService", () => {
     it("lanza un error si la respuesta no es exitosa", async () => {
       secureFetch.mockResolvedValueOnce({
         ok: false,
+        status: 500,
         json: async () => ({ message: "Error interno" }),
       });
 
       await expect(getBlacklist()).rejects.toThrow("Error interno");
+    });
+
+    it("lanza error legible si el backend responde contenido que no es JSON", async () => {
+      secureFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => {
+          throw new SyntaxError("Unexpected token '<'");
+        },
+      });
+
+      await expect(getBlacklist()).rejects.toThrow("Error al obtener la lista negra");
     });
   });
 

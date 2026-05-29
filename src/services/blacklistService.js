@@ -1,6 +1,14 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
 import { buildApiError } from "../utils/apiErrors";
 
+const parseJsonResponse = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    return {};
+  }
+};
+
 export const getBlacklist = async (
   page = 1,
   limit = 7,
@@ -15,7 +23,7 @@ export const getBlacklist = async (
     method: "GET",
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(
@@ -44,7 +52,7 @@ export const addToBlacklist = async (curp, reason) => {
     body: JSON.stringify({ curp, reason }),
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(
@@ -66,7 +74,7 @@ export const removeFromBlacklist = async (curp, reason) => {
     body: JSON.stringify({ curp, reason }),
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(
