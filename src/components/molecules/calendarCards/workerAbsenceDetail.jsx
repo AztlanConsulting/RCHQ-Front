@@ -46,7 +46,6 @@ const WorkerAbsenceDetail = ({
   event,
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
-  onClose,
   showMexicoReferenceNotice = false,
   calendarTimeZone,
 }) => {

@@ -276,7 +276,7 @@ describe("Integración: modificar evento personal", () => {
         fireEvent.click(screen.getByLabelText(/todo el día/i));
 
         expect(
-            screen.getByText(/los eventos personales de todo el día se guardan con base en horario central de méxico/i),
+            screen.getByText(/Este evento se guardará con base en tu horario local. Sin embargo, no puede abarcar más de 1 día en horario central de México./i),
         ).toBeInTheDocument();
 
         await clickSubmit();

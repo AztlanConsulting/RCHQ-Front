@@ -3,11 +3,15 @@ export const MEXICO_TIME_ZONE = "America/Mexico_City";
 export const getBrowserTimeZone = () =>
     Intl.DateTimeFormat().resolvedOptions().timeZone || MEXICO_TIME_ZONE;
 
-export const isMexicoTimeZone = () =>
-    getBrowserTimeZone() === MEXICO_TIME_ZONE;
+export const isMexicoTimeZone = () => getBrowserTimeZone() === MEXICO_TIME_ZONE;
 
-const getPartsInTimeZone = (date, timeZone) => {
-    const parts = new Intl.DateTimeFormat("en-US", {
+const FORMATTER_CACHE = new Map();
+
+const getPartsFormatter = (timeZone) => {
+    const key = String(timeZone || "");
+    const cached = FORMATTER_CACHE.get(key);
+    if (cached) return cached;
+    const formatter = new Intl.DateTimeFormat("en-US", {
         timeZone,
         hourCycle: "h23",
         year: "numeric",
@@ -16,7 +20,13 @@ const getPartsInTimeZone = (date, timeZone) => {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-    }).formatToParts(date);
+    });
+    FORMATTER_CACHE.set(key, formatter);
+    return formatter;
+};
+
+const getPartsInTimeZone = (date, timeZone) => {
+    const parts = getPartsFormatter(timeZone).formatToParts(date);
 
     return Object.fromEntries(
         parts
@@ -45,7 +55,9 @@ export const zonedDateTimeToIso = (
     timeZone = getBrowserTimeZone(),
 ) => {
     const [year, month, day] = String(date).split("-").map(Number);
-    const [hour, minute] = String(time || "00:00").split(":").map(Number);
+    const [hour, minute] = String(time || "00:00")
+        .split(":")
+        .map(Number);
     if ([year, month, day, hour, minute].some(Number.isNaN)) return "";
 
     const localAsUtc = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
@@ -125,9 +137,8 @@ export const getAllDayRangeInTimeZone = (
         return { isAllDay: false };
     }
 
-    const startDate = startValue instanceof Date
-        ? startValue
-        : new Date(startValue);
+    const startDate =
+        startValue instanceof Date ? startValue : new Date(startValue);
     const endDate = endValue instanceof Date ? endValue : new Date(endValue);
 
     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
@@ -140,8 +151,7 @@ export const getAllDayRangeInTimeZone = (
         startParts.hour === "00" &&
         startParts.minute === "00" &&
         startParts.second === "00";
-    const endsAtLastMinute =
-        endParts.hour === "23" && endParts.minute === "59";
+    const endsAtLastMinute = endParts.hour === "23" && endParts.minute === "59";
     const endsOnNextMidnight =
         endParts.hour === "00" &&
         endParts.minute === "00" &&

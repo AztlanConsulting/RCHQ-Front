@@ -502,7 +502,7 @@ describe("Integración: agregar evento de personal", () => {
         });
 
         expect(
-            screen.getByText(/los eventos personales de todo el día se guardan con base en horario central de méxico/i),
+            screen.getByText(/Este evento se guardará con base en tu horario local. Sin embargo, no puede abarcar más de 1 día en horario central de México./i),
         ).toBeInTheDocument();
 
         await clickFormConfirm();
