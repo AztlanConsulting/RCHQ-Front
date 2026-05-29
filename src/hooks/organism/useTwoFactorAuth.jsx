@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useField } from "../atoms/useField";
 import {
@@ -12,7 +12,7 @@ const useGeneration = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const generateQR = async () => {
+  const generateQR = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -32,7 +32,7 @@ const useGeneration = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { qr, manualCode, loading, error, setError, generateQR };
 };
@@ -74,28 +74,19 @@ const useVerification = (onSuccess) => {
 
 export const useTwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();
-  const [step, setStep] = useState("qr");
 
   const generation = useGeneration();
   const verification = useVerification(() => {
     if (onClose) onClose();
     else navigate("app/opciones");
   });
+  const { generateQR } = generation;
 
   useEffect(() => {
-    generation.generateQR();
-  }, []);
+    generateQR();
+  }, [generateQR]);
 
   return {
-    step,
-    handleGoToCode: () => {
-      generation.setError("");
-      setStep("code");
-    },
-    handleGoToQr: () => {
-      verification.setError("");
-      setStep("qr");
-    },
     qr: generation.qr,
     manualCode: generation.manualCode,
     isGenerating: generation.loading,
