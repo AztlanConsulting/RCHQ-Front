@@ -129,9 +129,7 @@ const VacationRequests = () => {
             )}
             <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isPendingView
-                        ? "Solicitudes de vacaciones pendientes"
-                        : "Solicitudes de vacaciones revisadas"}
+                    Solicitud de vacaciones
                 </h1>
             </div>
 
