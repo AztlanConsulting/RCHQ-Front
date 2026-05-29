@@ -82,7 +82,7 @@ const UpdatePersonalEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                         value={form.name}
                         setValue={(value) => setField("name", value)}
                         placeholder="Evento personal"
-                        maxLength={120}
+                        maxLength={70}
                         labelClassName="hidden"
                     />
                     {errors.name && <ErrorText>{errors.name}</ErrorText>}
