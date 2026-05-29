@@ -17,6 +17,11 @@ import {
     MEXICO_TIME_ZONE,
 } from "../../utils/timeZone";
 
+const SHORT_MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+const FULL_MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const SHORT_DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const FULL_DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
 const getPaddedFetchRange = (startValue, endValue) => {
     const startDate = String(startValue ?? "").split("T")[0];
     const endDate = String(endValue ?? "").split("T")[0];
@@ -33,8 +38,7 @@ export const useBaseCalendar = () => {
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [viewerRole, setViewerRole] = useState("");
     const [calendarMode, setCalendarMode] = useState("personal");
-    const [calendarTimeZoneMode, setCalendarTimeZoneMode] =
-        useState("local");
+    const [calendarTimeZoneMode, setCalendarTimeZoneMode] = useState("local");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
@@ -71,7 +75,7 @@ export const useBaseCalendar = () => {
         () => getCalendarNowValue(calendarTimeZone, calendarClock),
         [calendarTimeZone, calendarClock],
     );
-    const fullCalendarTimeZone = "local";
+    const fullCalendarTimeZone = calendarTimeZone;
     const calendarTimeZoneOptions = useMemo(
         () => [
             { value: "local", label: "Horario local" },
@@ -205,39 +209,7 @@ export const useBaseCalendar = () => {
     };
 
     const getMonth = (monthNumber, isComplete) => {
-        const shortenedMonths = [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sept",
-            "Oct",
-            "Nov",
-            "Dic",
-        ];
-        const fullMonths = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
-        ];
-        const monthText = isComplete
-            ? fullMonths[monthNumber]
-            : shortenedMonths[monthNumber];
-
-        return monthText;
+        return isComplete ? FULL_MONTHS[monthNumber] : SHORT_MONTHS[monthNumber];
     };
 
     const generateTitle = (currentStatus) => {
@@ -263,7 +235,7 @@ export const useBaseCalendar = () => {
         const endMonthNumber = currentStatus.end.month;
         const endMonth = getMonth(endMonthNumber, isDay);
         const endYear = currentStatus.end.year;
-        
+
         const monthDescriber = isDay ? " de" : "";
 
         const startMonthText = startMonth != endMonth ? ` ${startMonth}` : "";
@@ -297,25 +269,16 @@ export const useBaseCalendar = () => {
     };
 
     const getWeekDayName = (currentDay) => {
-        const weekDayIndex = currentDay.dow;
-        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-        const fullDays = [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-        ];
-
+        const weekDayIndex = currentDay.date.getDay();
         const hasNumber = viewType == "Week";
+
         const weekDay = validateShortenedSize(hasNumber)
-            ? shortenedDays[weekDayIndex]
-            : fullDays[weekDayIndex];
-        const dayNumber = hasNumber ? ` ${currentDay.date.getDate()}` : "";
-        const viewableString = `${weekDay}${dayNumber}`;
-        return viewableString;
+            ? SHORT_DAYS[weekDayIndex]
+            : FULL_DAYS[weekDayIndex];
+
+        const dayNumber = hasNumber ? ` ${currentDay.date.getDate() + 1}` : "";
+
+        return `${weekDay}${dayNumber}`;
     };
 
     const resizeHandler = (calendarRef) => {
