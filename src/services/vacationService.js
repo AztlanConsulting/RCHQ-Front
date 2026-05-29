@@ -1,7 +1,5 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const parseJson = async (res) => {
     const data = await res.json().catch(() => ({}));
 
@@ -23,7 +21,7 @@ const parseJson = async (res) => {
 };
 
 export const getVacationEmployees = async () => {
-    const res = await secureFetch(`${API_URL}/vacation/employees/eligible`, {
+    const res = await secureFetch(`/vacation/employees/eligible`, {
         method: "GET",
     });
 
@@ -33,7 +31,7 @@ export const getVacationEmployees = async () => {
 };
 
 export const getRemainingVacations = async (employeeId) => {
-    const res = await secureFetch(`${API_URL}/vacation/remaining/${employeeId}`, {
+    const res = await secureFetch(`/vacation/remaining/${employeeId}`, {
         method: "GET",
     });
 
@@ -52,7 +50,7 @@ export const registerEmployeeVacation = async ({
     endDate,
 }) => {
     const res = await secureFetch(
-        `${API_URL}/vacation/employees/${employeeId}/register`,
+        `/vacation/employees/${employeeId}/register`,
         {
             method: "POST",
             headers: {
@@ -76,7 +74,7 @@ export const updateVacationRequestDates = async ({
     endDate,
 }) => {
     const res = await secureFetch(
-        `${API_URL}/vacation/request/${vacationRequestId}/dates`,
+        `/vacation/request/${vacationRequestId}/dates`,
         {
             method: "PATCH",
             headers: {
@@ -95,7 +93,7 @@ export const updateVacationRequestDates = async ({
 };
 
 export const requestEmployeeVacation = async ({ startDate, endDate }) => {
-    const res = await secureFetch(`${API_URL}/vacation/request`, {
+    const res = await secureFetch(`/vacation/request`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -113,7 +111,7 @@ export const requestEmployeeVacation = async ({ startDate, endDate }) => {
 
 export const deleteVacationRequest = async (vacationRequestId) => {
     const res = await secureFetch(
-        `${API_URL}/vacation/request/${vacationRequestId}`,
+        `/vacation/request/${vacationRequestId}`,
         {
             method: "DELETE",
             headers: {
