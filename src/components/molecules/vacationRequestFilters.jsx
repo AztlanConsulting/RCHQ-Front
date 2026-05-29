@@ -1,4 +1,3 @@
-import { useState } from "react";
 import VacationDateField from "../atoms/vacationDateField";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
@@ -23,9 +22,9 @@ const VacationRequestFilters = ({
     statusFilter,
     setStatusFilter,
     clearFilters,
+    isMobileExpanded,
+    onToggleMobileFilters,
 }) => {
-    const [isMobileExpanded, setIsMobileExpanded] = useState(false);
-
     const handleSearchChange = (value) => {
         setSearchQuery(sanitizeSearchInput(value));
     };
@@ -48,7 +47,7 @@ const VacationRequestFilters = ({
             <div className="mb-4 sm:hidden">
                 <button
                     type="button"
-                    onClick={() => setIsMobileExpanded((current) => !current)}
+                    onClick={onToggleMobileFilters}
                     className="flex w-full items-center justify-between rounded-lg bg-[#24375e] px-4 py-3 text-left text-sm font-semibold text-white"
                     aria-expanded={isMobileExpanded}
                     aria-controls="vacation-request-filters-panel"

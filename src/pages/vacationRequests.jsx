@@ -37,6 +37,8 @@ const VacationRequests = () => {
         onViewDetail,
         viewingRequest,
         closeViewingRequest,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     } = useVacationRequests();
 
     const [requestToApprove, setRequestToApprove] = useState(null);
@@ -143,6 +145,8 @@ const VacationRequests = () => {
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 clearFilters={clearFilters}
+                isMobileExpanded={isMobileFiltersExpanded}
+                onToggleMobileFilters={toggleMobileFilters}
             />
 
             {error && !requestToApprove && !requestToReject && (

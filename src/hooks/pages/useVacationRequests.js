@@ -286,6 +286,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
     const [viewingRequest, setViewingRequest] = useState(null);
     const [approvingRequestId, setApprovingRequestId] = useState(null);
     const [rejectingRequestId, setRejectingRequestId] = useState(null);
+    const [isMobileFiltersExpanded, setIsMobileFiltersExpanded] =
+        useState(false);
 
     const closeViewingRequest = useCallback(() => {
         setViewingRequest(null);
@@ -379,6 +381,10 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         }
     };
 
+    const toggleMobileFilters = useCallback(() => {
+        setIsMobileFiltersExpanded((current) => !current);
+    }, []);
+
     return {
         ...vacationRequests,
         onViewDetail: handleViewDetail,
@@ -391,6 +397,8 @@ export const useVacationRequests = ({ initialView = "pending" } = {}) => {
         rejectingRequestId,
         handleApproveRequest,
         handleRejectRequest,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     };
 };
 
