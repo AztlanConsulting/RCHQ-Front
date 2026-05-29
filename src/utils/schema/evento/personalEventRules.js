@@ -29,7 +29,7 @@ export const getPersonalTimeZoneSaveNotice = ({
     calendarTimeZoneMode,
     canSwitchCalendarTimeZone,
 }) => {
-    if (allDay) {
+    if (allDay && calendarTimeZoneMode !== "local") {
         return "Los eventos personales de todo el día se guardan con base en horario central de México porque, por regla de negocio, solo pueden durar 1 día en el calendario mexicano.";
     }
 
@@ -37,7 +37,7 @@ export const getPersonalTimeZoneSaveNotice = ({
 
     return calendarTimeZoneMode === "mexico"
         ? "Este evento se guardará con base en horario central de México. Además, no puede abarcar más de 1 día en horario central de México."
-        : "Este evento se guardará con base en tu horario local. Además, no puede abarcar más de 1 día en horario central de México.";
+        : "Este evento se guardará con base en tu horario local. Sin embargo, no puede abarcar más de 1 día en horario central de México.";
 };
 
 export const getPersonalEndTimeMinTime = ({ date, endDate, startTime }) =>
