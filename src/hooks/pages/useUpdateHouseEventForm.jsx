@@ -234,7 +234,7 @@ export const useUpdateHouseEventForm = ({
             onClose?.();
         } catch (error) {
             setServerError(
-                error?.message ?? "Error inesperado al modificar el evento",
+                error?.message ?? "Error inesperado al editar el evento",
             );
         } finally {
             setIsSubmitting(false);
@@ -274,7 +274,7 @@ export const useUpdateHouseEventForm = ({
                 pendingPayload: null,
                 isForcing: false,
             });
-            setServerError(error?.message ?? "Error al forzar la modificación");
+            setServerError(error?.message ?? "Error al forzar la edición");
         }
     };
 

@@ -125,7 +125,7 @@ const VacationList = () => {
                 className="max-w-3xl max-h-[min(96vh,70rem)]"
             >
                 <VacationEditForm
-                    title="Modificar vacaciones"
+                    title="Editar vacaciones"
                     event={selectedVacation ?? {}}
                     vacationForm={vacationForm}
                     vacationEditError={vacationEditError}
