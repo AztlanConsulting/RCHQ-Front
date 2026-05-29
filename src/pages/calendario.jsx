@@ -202,6 +202,11 @@ const Calendario = () => {
         setCalendarMode,
     });
 
+    const shouldScrollDetailModal =
+        ["eventos", "ausencias", "vacaciones"].includes(
+            selectedEvent?.focus,
+        );
+
     const calendarFiltersProps = {
         houseName: employeeHouseName,
         focusFilters,
@@ -325,14 +330,10 @@ const Calendario = () => {
                 })()}
                 grayBackground={true}
                 placement="center"
-                scrollable={
-                    selectedEvent?.focus === "eventos" ||
-                    selectedEvent?.focus === "ausencias" ||
-                    selectedEvent?.focus === "vacaciones"
-                }
+                scrollable={shouldScrollDetailModal}
                 className={
                     ["ausencias", "vacaciones"].includes(selectedEvent?.focus)
-                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"
+                        ? "w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[min(96vh,56rem)]"
                         : "w-[92vw] max-w-[40rem] max-h-[calc(100vh-2rem)] scrollbar-hide"
                 }
             >
@@ -387,7 +388,6 @@ const Calendario = () => {
                                     }
                                     calendarTimeZone={calendarTimeZone}
                                     onOpenEvidence={openAbsenceEvidence}
-                                    onClose={closeDetail}
                                 />
                             );
 
@@ -422,7 +422,6 @@ const Calendario = () => {
                                     vacationRemainingInfo={vacationRemainingInfo}
                                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                                     isSaving={isSavingVacation}
-                                    onClose={closeDetail}
                                     onEdit={startVacationEdit}
                                     onCancelEdit={cancelVacationEdit}
                                     onSubmitEdit={submitVacationEdit}

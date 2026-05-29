@@ -1,4 +1,4 @@
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationListFilters from "../components/molecules/vacationListFilters";
 import VacationListTable from "../components/molecules/vacationListTable";
@@ -61,19 +61,14 @@ const VacationList = () => {
                     {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
                 </h1>
 
-                <Button
+                <BigButton
                     text={
                         isFutureView
                             ? "Vacaciones pasadas"
                             : "Vacaciones futuras"
                     }
                     onClick={() => setView(isFutureView ? "past" : "future")}
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    width="w-auto"
-                    className="px-6"
+                    className="min-w-0"
                 />
             </div>
 
@@ -126,7 +121,8 @@ const VacationList = () => {
             <Modal
                 open={isVacationEditing}
                 onClose={cancelVacationEdit}
-                className="max-w-3xl"
+                scrollable
+                className="max-w-3xl max-h-[min(96vh,70rem)]"
             >
                 <VacationEditForm
                     title="Modificar vacaciones"
@@ -147,11 +143,10 @@ const VacationList = () => {
                 open={viewingVacation != null}
                 onClose={closeViewingVacation}
                 scrollable
-                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
+                className="w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[min(96vh,70rem)]"
             >
                 <VacationWorkerDetail
                     event={viewingVacation ?? {}}
-                    onClose={closeViewingVacation}
                     onDelete={() => {
                         openDeleteVacation(viewingVacation);
                         closeViewingVacation();

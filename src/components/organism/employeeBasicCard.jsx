@@ -4,6 +4,8 @@ import TextField from "../atoms/textField";
 import DateField from "../atoms/dateField";
 import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
+import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -18,10 +20,12 @@ const EmployeeBasicCard = ({
   setBasicPicture,
   saving,
   saveError,
+  errors = {},
   infoDrawer,
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
   const currentImageUrl = employee?.picture ? `${API_URL}/${employee.picture}` : null;
   const displayImageUrl = basicPicturePreview || currentImageUrl || AVATAR_PLACEHOLDER;
@@ -55,21 +59,17 @@ const EmployeeBasicCard = ({
 
           {isEditing ? (
             <div className="flex gap-2 shrink-0">
-              <button
-                type="button" onClick={onCancel} disabled={saving}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button" onClick={onSubmit} disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-              >
-                {saving && <Loader size="sm" />}
-                Guardar
-              </button>
+              <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+              {canEdit ? (
+                <SmallButton
+                  text="Guardar"
+                  onClick={onSubmit}
+                  disabled={saving}
+                  leadingIcon={saving ? <Loader size="sm" /> : null}
+                />
+              ) : null}
             </div>
-          ) : (
+          ) : canEdit ? (
             <button
               type="button" aria-label="Editar información básica"
               className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -77,10 +77,10 @@ const EmployeeBasicCard = ({
             >
               <img src="/edit.svg" alt="" className="h-5 w-5" />
             </button>
-          )}
+          ) : null}
         </div>
 
-        {saveError && isEditing && (
+        {saveError && isEditing && canEdit && (
           <p className="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
             {saveError}
           </p>
@@ -122,7 +122,7 @@ const EmployeeBasicCard = ({
           </>
         )}
 
-        {isEditing && (
+        {isEditing && canEdit && (
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -172,6 +172,7 @@ const EmployeeBasicCard = ({
                       name={field}
                       value={basicForm[field]}
                       onChange={(e) => setBasicField(field, e.target.value)}
+                      minDate={new Date("1900-01-01")}
                       maxDate={new Date()}
                     />
                   ) : (
@@ -187,6 +188,9 @@ const EmployeeBasicCard = ({
                       />
                     </>
                   )}
+                  <div className="min-h-5">
+                    {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+                  </div>
                 </div>
               ))}
             </div>

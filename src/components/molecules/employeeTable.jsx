@@ -8,6 +8,10 @@ const EmployeeTable = ({
   onAddToBlacklist = () => {}, 
   onRemoveFromBlacklist = () => {} 
 }) => {
+  const emptyMessage = isBlacklistMode
+    ? "No hay personas en la lista negra"
+    : "No hay empleados disponibles";
+
   if (loading) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
@@ -30,7 +34,7 @@ const EmployeeTable = ({
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-8 text-center text-gray-500">
-          No hay empleados disponibles
+          {emptyMessage}
         </div>
       </div>
     );

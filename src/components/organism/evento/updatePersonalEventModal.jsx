@@ -1,5 +1,5 @@
 import Alert from "../../atoms/alerts";
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import CheckboxField from "../../atoms/checkboxField";
 import DateField from "../../atoms/dateField";
 import EmployeeSearchSelect from "../../atoms/employeeSearchSelect";
@@ -62,6 +62,7 @@ const UpdatePersonalEventModal = ({
         calendarTimeZoneMode,
         canSwitchCalendarTimeZone,
     });
+    const descriptionLength = String(form.description ?? "").length;
 
     const today = new Date();
     const personalDateMin = today;
@@ -108,7 +109,7 @@ const UpdatePersonalEventModal = ({
                         value={form.name}
                         setValue={(value) => setField("name", value)}
                         placeholder="Evento personal"
-                        maxLength={120}
+                        maxLength={70}
                         labelClassName="hidden"
                     />
                     {errors.name && <ErrorText>{errors.name}</ErrorText>}
@@ -268,6 +269,9 @@ const UpdatePersonalEventModal = ({
                             className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
                             style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                         />
+                        <div className="mt-1 text-right text-xs font-medium text-slate-500">
+                            {`${descriptionLength}/250`}
+                        </div>
                         {errors.description && (
                             <ErrorText>{errors.description}</ErrorText>
                         )}
@@ -282,33 +286,16 @@ const UpdatePersonalEventModal = ({
                     )}
 
                     <div className="flex justify-center gap-3 pt-1">
-                        <Button
+                        <SmallButton
                             text="Cancelar"
                             onClick={onClose}
                             disabled={isSubmitting}
-                            width="w-auto"
-                            height="h-[38px]"
-                            textSize="text-sm"
-                            fontWeight="font-bold"
-                            bgColor="bg-white"
-                            textColor="text-[#121212]"
-                            hoverColor="hover:bg-slate-50"
-                            activeColor="active:bg-slate-100"
-                            className="px-5 border border-slate-200 shadow-md"
+                            cancel
                         />
-                        <Button
+                        <SmallButton
                             text={isSubmitting ? "Modificando..." : "Modificar"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            width="w-auto"
-                            height="h-[38px]"
-                            textSize="text-sm"
-                            fontWeight="font-bold"
-                            bgColor="bg-[#1F3664]"
-                            textColor="text-white"
-                            hoverColor="hover:bg-[#15284A]"
-                            activeColor="active:bg-[#0E1B33]"
-                            className="px-5 shadow-md"
                         />
                     </div>
                     </div>

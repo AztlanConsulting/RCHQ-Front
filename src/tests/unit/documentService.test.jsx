@@ -1,4 +1,3 @@
-// tests/unit/documentService.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   getDocumentTypesService,
@@ -7,9 +6,14 @@ import {
   updateDocumentService,
   deleteDocumentService,
 } from "../../services/documentService";
+import { secureFetch } from "../../utils/secureFetchWrapper";
+
+vi.mock("../../utils/secureFetchWrapper", () => ({
+  secureFetch: vi.fn(),
+}));
 
 const mockFetch = (body, ok = true, status = 200) => {
-  globalThis.fetch = vi.fn().mockResolvedValue({
+  secureFetch.mockResolvedValue({
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),
@@ -20,10 +24,6 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// getDocumentTypesService
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("getDocumentTypesService", () => {
   it("retorna los tipos de documento mapeados cuando la respuesta es exitosa", async () => {
@@ -41,16 +41,10 @@ describe("getDocumentTypesService", () => {
     ]);
   });
 
-  it("hace GET al endpoint correcto con Authorization header", async () => {
-    localStorage.setItem("token", "my-token");
+  it("hace GET al endpoint correcto", async () => {
     mockFetch({ data: [] });
     await getDocumentTypesService();
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/employee/document-types"),
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer my-token" }),
-      }),
-    );
+    expect(secureFetch).toHaveBeenCalledWith(expect.stringContaining("/employee/document-types"));
   });
 
   it("lanza error cuando la respuesta no es ok", async () => {
@@ -61,22 +55,7 @@ describe("getDocumentTypesService", () => {
       status: 401,
     });
   });
-
-  it("envía token null si no hay token en localStorage (sin validación previa)", async () => {
-    mockFetch({ data: [] });
-    await getDocumentTypesService();
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/employee/document-types"),
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer null" }),
-      }),
-    );
-  });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// getDocumentsService
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("getDocumentsService", () => {
   it("retorna los documentos con URL completa cuando la respuesta es exitosa", async () => {
@@ -89,16 +68,10 @@ describe("getDocumentsService", () => {
     expect(result.data[0].url).toContain("uploads/documents/cv.pdf");
   });
 
-  it("hace GET al endpoint correcto con Authorization header", async () => {
-    localStorage.setItem("token", "my-token");
+  it("hace GET al endpoint correcto", async () => {
     mockFetch({ data: [] });
     await getDocumentsService("emp-456");
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/employee/emp-456/documents"),
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer my-token" }),
-      }),
-    );
+    expect(secureFetch).toHaveBeenCalledWith(expect.stringContaining("/employee/emp-456/documents"));
   });
 
   it("lanza error con status cuando la respuesta no es ok", async () => {
@@ -118,22 +91,16 @@ describe("getDocumentsService", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// uploadDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("uploadDocumentService", () => {
-  it("hace POST al endpoint correcto con el token", async () => {
-    localStorage.setItem("token", "valid-token");
+  it("hace POST al endpoint correcto", async () => {
     mockFetch({ success: true });
     const formData = new FormData();
     await uploadDocumentService("emp-123", formData);
-    expect(globalThis.fetch).toHaveBeenCalledWith(
+    expect(secureFetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents"),
       expect.objectContaining({
         method: "POST",
         body: formData,
-        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
       }),
     );
   });
@@ -163,22 +130,16 @@ describe("uploadDocumentService", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// updateDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("updateDocumentService", () => {
   it("hace PUT al endpoint con el field correcto", async () => {
-    localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     const formData = new FormData();
     await updateDocumentService("emp-123", "cv", formData);
-    expect(globalThis.fetch).toHaveBeenCalledWith(
+    expect(secureFetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
       expect.objectContaining({
         method: "PUT",
         body: formData,
-        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
       }),
     );
   });
@@ -199,20 +160,14 @@ describe("updateDocumentService", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// deleteDocumentService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("deleteDocumentService", () => {
   it("hace DELETE al endpoint con el field correcto", async () => {
-    localStorage.setItem("token", "valid-token");
     mockFetch({ success: true });
     await deleteDocumentService("emp-123", "cv");
-    expect(globalThis.fetch).toHaveBeenCalledWith(
+    expect(secureFetch).toHaveBeenCalledWith(
       expect.stringContaining("/employee/emp-123/documents/cv"),
       expect.objectContaining({
         method: "DELETE",
-        headers: expect.objectContaining({ Authorization: "Bearer valid-token" }),
       }),
     );
   });

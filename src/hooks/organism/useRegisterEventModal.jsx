@@ -12,7 +12,9 @@ const CATEGORY_OPTIONS = [
 const DEFAULT_CATEGORY = "personal";
 
 const sanitizeName = (value) =>
-    value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, "");
+    value
+        .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, "")
+        .slice(0, 70);
 
 const normalizeRole = (role) =>
     String(role ?? "")

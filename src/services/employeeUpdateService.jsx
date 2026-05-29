@@ -1,28 +1,20 @@
-import { getToken } from "../utils/authStorage";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const getUpdateFormService = async () => {
-  const token = getToken();
-  if (!token) throw new Error("No se encontró token de sesión");
-  const response = await secureFetch(`${API_URL}/employee/update-form`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await secureFetch(`${API_URL}/employee/update-form`);
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al obtener catálogos");
   return data;
 };
 
 export const updateBasicInfoService = async (employeeId, body) => {
-  const token = getToken();
-  if (!token) throw new Error("No se encontró token de sesión");
   const isFormData = body instanceof FormData;
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/basic-info`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
     },
     body: isFormData ? body : JSON.stringify(body),
@@ -33,12 +25,9 @@ export const updateBasicInfoService = async (employeeId, body) => {
 };
 
 export const updateContactInfoService = async (employeeId, body) => {
-  const token = getToken();
-  if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/contact-info`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
@@ -49,12 +38,9 @@ export const updateContactInfoService = async (employeeId, body) => {
 };
 
 export const updateAdminInfoService = async (employeeId, body) => {
-  const token = getToken();
-  if (!token) throw new Error("No se encontró token de sesión");
   const response = await secureFetch(`${API_URL}/employee/${employeeId}/admin-info`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),

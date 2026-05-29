@@ -20,6 +20,7 @@ import {
   buildAbsenceDateLimits,
   buildAbsenceFormSchema,
 } from "../../utils/schema/evento/absence.schema";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -256,13 +257,19 @@ export const useCalendarPage = ({
   }, []);
 
   const setAbsenceField = useCallback((field, value) => {
-    setAbsenceForm((prev) => ({
-      ...prev,
-      [field]:
-        field === "description"
-          ? sanitizeAbsenceDescription(value)
-          : value,
-    }));
+    setAbsenceForm((prev) => {
+      if (field === "startDate") {
+        return shiftDateOnlyRange(prev, value);
+      }
+
+      return {
+        ...prev,
+        [field]:
+          field === "description"
+            ? sanitizeAbsenceDescription(value)
+            : value,
+      };
+    });
   }, []);
 
   const submitAbsenceEdit = useCallback(async () => {
@@ -448,7 +455,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
     setAlert({
       type: "error",
       message: "No se puede modificar este tipo de evento.",
@@ -471,7 +477,6 @@ export const useCalendarPage = ({
       return;
     }
 
-    // TODO: agregar handler para scope "global" cuando esté disponible
   }, [selectedEvent]);
 
   const cancelDeleteHouseEvent = useCallback(() => {

@@ -41,6 +41,7 @@ export const loginService = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
 
@@ -64,8 +65,35 @@ export const loginService = async (email, password) => {
   return data;
 };
 
-export const logoutService = () => {
+export const refreshSessionService = async () => {
+  const response = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw buildApiError(response, data, "Error al renovar la sesión");
+  }
+
+  const newToken = data?.data?.token;
+  if (newToken) setToken(newToken);
+  
+  return data;
+};
+
+export const logoutService = async () => {
   clearAuthStorage();
+  try {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Error al cerrar sesión en el servidor:", error);
+  }
 };
 
 export const activateTwoFactorAuthService = async () => {
@@ -102,6 +130,7 @@ export const verifyTwoFactorAuthService = async (code) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ token: code }),
   });
 
@@ -128,6 +157,7 @@ export const validateLoginTwoFactorAuthService = async (code) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    credentials: "include",
     body: JSON.stringify({ token: code }),
   });
 

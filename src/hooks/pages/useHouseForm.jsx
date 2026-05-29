@@ -6,6 +6,7 @@ import {
     houseEventSchema,
     buildPayload,
 } from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -104,22 +105,27 @@ export const useHouseForm = ({
     ]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            ...(field === "isFreeDay" && value
-                ? {
-                      allDay: true,
-                      startTime: "",
-                      endTime: "",
-                  }
-                : {}),
-            ...(field === "allDay" && value === false
-                ? {
-                      isFreeDay: false,
-                  }
-                : {}),
-            [field]: value,
-        }));
+        setForm((prev) => {
+            if (field === "isFreeDay" && value) {
+                return {
+                    ...prev,
+                    allDay: true,
+                    startTime: "",
+                    endTime: "",
+                    [field]: value,
+                };
+            }
+
+            if (field === "allDay" && value === false) {
+                return {
+                    ...prev,
+                    isFreeDay: false,
+                    [field]: value,
+                };
+            }
+
+            return shiftDateTimeRange(prev, field, value);
+        });
 
         setErrors((prev) => ({
             ...prev,

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import EmployeeFilters from "../components/molecules/employeeFilters";
 import EmployeeTable from "../components/molecules/employeeTable";
 import Pagination from "../components/molecules/pagination";
@@ -55,15 +55,10 @@ const Personal = () => {
             <div className="flex items-center justify-between mb-4 md:mb-8">
                 <h1 className="font-bold text-3xl md:text-4xl text-[#121212]">Usuarios</h1>
                 {!isBlacklistMode && (
-                    <Button
+                    <BigButton
                         text="Añadir"
                         onClick={() => navigate("/app/personal/nuevo")}
-                        bgColor="bg-[#24375e]"
-                        hoverColor="hover:bg-[#162d4a]"
-                        activeColor="active:bg-[#0f2035]"
-                        textColor="text-white"
-                        width="w-auto"
-                        className="px-6"
+                        className="min-w-0"
                     />
                 )}
             </div>
@@ -122,7 +117,7 @@ const Personal = () => {
                 onPrevPage={activePrevPage}
                 onNextPage={activeNextPage}
                 loading={activeLoading}
-                hasEmployees={activeEmployees.length > 0}
+                hasItems={activePagination.total > 0}
             />
 
             <BlacklistModal

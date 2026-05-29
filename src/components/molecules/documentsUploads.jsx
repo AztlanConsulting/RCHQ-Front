@@ -1,5 +1,7 @@
 import Alert from "../atoms/alerts";
+import SmallButton from "../atoms/smallButton";
 import Button from "../atoms/button";
+import ModalCloseButton from "../atoms/modalCloseButton";
 import SelectField from "../atoms/selectField";
 import DocumentFileField from "./documentFileField";
 
@@ -31,13 +33,10 @@ const DocumentUploadModal = ({
           <h2 className="text-xl font-bold text-slate-900">
             {isEditing ? "Editar documento" : "Subir documento"}
           </h2>
-          <button
+          <ModalCloseButton
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
+            ariaLabel="Cerrar"
+          />
         </div>
 
         {displayError && <Alert type="error" message={displayError} />}
@@ -59,34 +58,17 @@ const DocumentUploadModal = ({
         />
 
         <div className="flex gap-3 justify-end pt-2">
-          <Button
+          <SmallButton
             text="Cancelar"
             onClick={onClose}
-            bgColor="bg-transparent"
-            hoverColor="hover:bg-slate-100"
-            activeColor="active:bg-slate-200"
-            textColor="text-slate-600"
-            width="w-auto"
-            height="h-[42px]"
-            textSize="text-sm"
-            fontWeight="font-medium"
-            className="px-4"
+            cancel
           />
-          <Button
+          <SmallButton
             text={
               loading ? "Guardando..." : isEditing ? "Guardar cambios" : "Subir"
             }
             onClick={handleSubmit}
             disabled={loading}
-            bgColor="bg-[#1e2b4d]"
-            hoverColor="hover:bg-[#15203b]"
-            activeColor="active:bg-[#0f172a]"
-            textColor="text-white"
-            width="w-auto"
-            height="h-[42px]"
-            textSize="text-sm"
-            fontWeight="font-semibold"
-            className="px-6"
           />
         </div>
       </div>

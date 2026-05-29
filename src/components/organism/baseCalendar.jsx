@@ -19,6 +19,17 @@ const LIST_EVENT_TIME_FORMAT = {
     hour12: true,
 };
 
+function formatUtcSlotLabel12h(date) {
+    if (!date || !(date instanceof Date) || Number.isNaN(date.getTime()))
+        return "";
+    const h = date.getUTCHours();
+    const m = date.getUTCMinutes();
+    const isPm = h >= 12;
+    const hour12 = h % 12 || 12;
+    const minutePart = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+    return `${hour12}${minutePart} ${isPm ? "pm" : "am"}`;
+}
+
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
 
@@ -40,6 +51,26 @@ const renderEventContent = (arg) => {
     }
 
     return <DayGridCard arg={arg} />;
+};
+
+const closeDayGrid = (eventTarget) => {
+    const clickedInsidePopover = eventTarget?.closest?.(".fc-popover");
+    if (!clickedInsidePopover) return;
+
+    const closeControls = document.querySelectorAll(
+        ".fc-popover .fc-popover-close",
+    );
+
+    if (closeControls.length > 0) {
+        closeControls.forEach((button) => {
+            button.click();
+        });
+        return;
+    }
+
+    document.querySelectorAll(".fc-popover").forEach((popover) => {
+        popover.remove();
+    });
 };
 
 const BaseCalendar = ({
@@ -155,9 +186,13 @@ const BaseCalendar = ({
             views={{
                 timeGridDay: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
@@ -179,7 +214,10 @@ const BaseCalendar = ({
             datesSet={handleDatesSet}
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
-            eventClick={(info) => onEventClick?.(info)}
+            eventClick={(info) => {
+                closeDayGrid(info?.jsEvent?.target);
+                onEventClick?.(info);
+            }}
             selectable={true}
             select={(info) => onDateDrag?.(info, calendarRef)}
             selectAllow={() => onDateDragging?.()}

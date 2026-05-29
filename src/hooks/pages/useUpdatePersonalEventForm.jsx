@@ -5,6 +5,12 @@ import { getEventTypes, getEmployeesForSelector } from "../../services/eventServ
 import { getCalendarViewerRole } from "../../services/calendarService";
 import { normalizeDateOnly } from "../../utils/calendarEventDetail";
 import {
+    getPersonalEventMexicoRangeError,
+    getPersonalMexicoRangeErrorKey,
+    shouldShowPersonalEndDateField,
+} from "../../utils/schema/evento/personalEventRules";
+import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
+import {
     dateInTimeZoneToInputValue,
     timeInTimeZoneToInputValue,
 } from "../../utils/timeZone";
@@ -12,11 +18,6 @@ import {
     buildPersonalPayload,
     personalEventSchema,
 } from "../../utils/schema/evento/personalEvent.schema";
-import {
-    getPersonalEventMexicoRangeError,
-    getPersonalMexicoRangeErrorKey,
-    shouldShowPersonalEndDateField,
-} from "../../utils/schema/evento/personalEventRules";
 
 const DEFAULT_FORM = {
     name: "",
@@ -163,17 +164,14 @@ export const useUpdatePersonalEventForm = ({
     );
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]:
+        setForm((prev) => {
+            const nextValue =
                 field === "name" || field === "description"
                     ? String(value).replace(TEXT_SANITIZER, "")
-                    : value,
-            ...(field === "date" && (!prev.endDate || prev.endDate < value)
-                ? { endDate: value }
-                : {}),
-            ...(field === "allDay" && value ? { endDate: prev.date } : {}),
-        }));
+                    : value;
+
+            return shiftSameDayTimeRange(prev, field, nextValue);
+        });
         setErrors((prev) => ({
             ...prev,
             [field]: undefined,

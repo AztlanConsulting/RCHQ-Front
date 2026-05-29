@@ -1,23 +1,15 @@
 import { buildApiError } from "../utils/apiErrors";
-import { getToken } from "../utils/authStorage";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const updatePersonalEvent = async (personalEventId, payload) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/personal/${personalEventId}`,
         {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(payload),
         },
@@ -37,19 +29,12 @@ export const updatePersonalEvent = async (personalEventId, payload) => {
 };
 
 export const updateHouseEvent = async (houseEventId, payload) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/house/${houseEventId}`,
         {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(payload),
         },

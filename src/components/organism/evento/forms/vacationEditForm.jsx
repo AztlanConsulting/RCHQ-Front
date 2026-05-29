@@ -1,7 +1,11 @@
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
 import { isMexicoTimeZone } from "../../../../utils/timeZone";
+import {
+    getVacationDateRange,
+    getVacationEndDateMin,
+} from "../../../../utils/vacationDateRange";
 
 const VacationEditForm = ({
     title,
@@ -17,9 +21,19 @@ const VacationEditForm = ({
     showEmployeeInfo = true,
 }) => {
     const showMexicoTimeZoneMessage = !isMexicoTimeZone();
+    const { minDate: vacationDateMin, maxDate: vacationDateMax } =
+        getVacationDateRange();
+    const vacationEndDateMin = getVacationEndDateMin(
+        vacationForm?.startDate,
+        vacationDateMin,
+        vacationDateMax,
+    );
 
     return (
-        <div key="vacation-edit" className="px-2 text-left sm:px-3">
+        <div
+            key="vacation-edit"
+            className="overflow-visible px-2 text-left sm:px-3"
+        >
             <Type
                 variant="page-title"
                 className="mb-5 text-[2rem] leading-none"
@@ -79,42 +93,45 @@ const VacationEditForm = ({
                     )}
                 </div>
 
-                <DateField
-                    label="Fecha de inicio"
-                    name="startDate"
-                    value={vacationForm?.startDate ?? ""}
-                    onChange={(editEvent) =>
-                        onVacationFieldChange?.(
-                            "startDate",
-                            editEvent.target.value,
-                        )
-                    }
-                    labelColor="text-[#121212]"
-                    popupAlign="left"
-                    popupPlacement="top"
-                    popupSize="compact"
-                />
+                <div className="col-span-1 mt-8 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-10">
+                    <DateField
+                        label="Fecha de inicio"
+                        name="startDate"
+                        value={vacationForm?.startDate ?? ""}
+                        minDate={vacationDateMin}
+                        maxDate={vacationDateMax}
+                        onChange={(editEvent) =>
+                            onVacationFieldChange?.(
+                                "startDate",
+                                editEvent.target.value,
+                            )
+                        }
+                        labelColor="text-[#121212]"
+                        popupAlign="left"
+                        popupPlacement="bottom"
+                        popupSize="compact"
+                        popupStrategy="fixed"
+                    />
 
-                <DateField
-                    label="Fecha de fin"
-                    name="endDate"
-                    value={vacationForm?.endDate ?? ""}
-                    onChange={(editEvent) =>
-                        onVacationFieldChange?.(
-                            "endDate",
-                            editEvent.target.value,
-                        )
-                    }
-                    minDate={
-                        vacationForm?.startDate
-                            ? new Date(`${vacationForm.startDate}T00:00:00`)
-                            : undefined
-                    }
-                    labelColor="text-[#121212]"
-                    popupAlign="right"
-                    popupPlacement="top"
-                    popupSize="compact"
-                />
+                    <DateField
+                        label="Fecha de fin"
+                        name="endDate"
+                        value={vacationForm?.endDate ?? ""}
+                        onChange={(editEvent) =>
+                            onVacationFieldChange?.(
+                                "endDate",
+                                editEvent.target.value,
+                            )
+                        }
+                        minDate={vacationEndDateMin}
+                        maxDate={vacationDateMax}
+                        labelColor="text-[#121212]"
+                        popupAlign="right"
+                        popupPlacement="bottom"
+                        popupSize="compact"
+                        popupStrategy="fixed"
+                    />
+                </div>
             </div>
 
             {showMexicoTimeZoneMessage ? (
@@ -132,33 +149,16 @@ const VacationEditForm = ({
             ) : null}
 
             <div className="mt-8 flex justify-center gap-3">
-                <Button
+                <SmallButton
                     type="button"
                     text="Cancelar"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-bold"
-                    bgColor="bg-white"
-                    textColor="text-[#121212]"
-                    hoverColor="hover:bg-slate-50"
-                    activeColor="active:bg-slate-100"
-                    className="px-5 border border-slate-200 shadow-md"
                     onClick={onCancelEdit}
                     disabled={isSaving}
+                    cancel
                 />
-                <Button
+                <SmallButton
                     type="button"
                     text="Guardar"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-bold"
-                    bgColor="bg-[#1F3664]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#15284A]"
-                    activeColor="active:bg-[#0E1B33]"
-                    className="px-5 shadow-md"
                     onClick={onSubmitEdit}
                     disabled={isSaving}
                 />

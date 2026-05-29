@@ -5,6 +5,8 @@ import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
 import TimeField from "../atoms/timeField";
 import CheckboxField from "../atoms/checkboxField";
+import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -49,9 +51,11 @@ const EmployeeAdminCard = ({
   setWorkdayAllDay,
   saving,
   saveError,
+  errors = {},
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
   const currentRoleOption = roles.find(
     (role) => String(role.roleId) === String(adminForm.originalRoleId),
@@ -84,21 +88,17 @@ const EmployeeAdminCard = ({
 
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
-            <button
-              type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button" onClick={onSubmit} disabled={saving || loadingCatalogues}
-              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-            >
-              {saving && <Loader size="sm" />}
-              Guardar
-            </button>
+            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            {canEdit ? (
+              <SmallButton
+                text="Guardar"
+                onClick={onSubmit}
+                disabled={saving || loadingCatalogues}
+                leadingIcon={saving ? <Loader size="sm" /> : null}
+              />
+            ) : null}
           </div>
-        ) : (
+        ) : canEdit ? (
           <button
             type="button" aria-label="Editar información administrativa"
             className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -106,18 +106,16 @@ const EmployeeAdminCard = ({
           >
             <img src="/edit.svg" alt="" className="h-5 w-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {saveError && isEditing && (
+      {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
-      {/* Modo lectura */}
       {!isEditing && (
         <div className="mt-6 w-full flex flex-col gap-7">
 
-          {/* Fila 1: Tipo | Salario */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Tipo</Type>
@@ -133,7 +131,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Fila 2: Frecuencia de Pago */}
           <div className="min-w-0">
             <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Frecuencia de pago</Type>
             <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
@@ -141,7 +138,6 @@ const EmployeeAdminCard = ({
             </Type>
           </div>
 
-          {/* Fila 3: Resumen de horario */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Horario</Type>
@@ -164,7 +160,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Drawer días */}
           {workdaysDrawer.isOpen && (
             <div className="-mt-3">
               <Drawer isOpen={workdaysDrawer.isOpen}>
@@ -182,7 +177,6 @@ const EmployeeAdminCard = ({
             </div>
           )}
 
-          {/* Fila 4: Ausencias justificadas | número */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Ausencias justificadas</Type>
@@ -197,7 +191,6 @@ const EmployeeAdminCard = ({
             </div>
           </div>
 
-          {/* Fila 5: Vacaciones | Días usados */}
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             <div className="min-w-0">
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Vacaciones</Type>
@@ -216,28 +209,40 @@ const EmployeeAdminCard = ({
       )}
 
       {/* Modo edición */}
-      {isEditing && (
+      {isEditing && canEdit && (
         loadingCatalogues ? (
           <div className="py-8 flex justify-center"><Loader size="lg" /></div>
         ) : (
           <div className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Puesto" id="roleId"
-                value={adminForm.roleId}
-                onChange={(e) => setAdminField("roleId", e.target.value)}
-                options={roleOptions}
-                placeholder="Selecciona un puesto"
-                labelColor="text-slate-500"
-              />
-              <SelectField
-                label="Tipo de contrato" id="type"
-                value={adminForm.type}
-                onChange={(e) => setAdminField("type", e.target.value)}
-                options={TIPOS}
-                placeholder="Selecciona tipo"
-                labelColor="text-slate-500"
-              />
+              <div className="flex flex-col gap-1">
+                <SelectField
+                  label="Puesto" id="roleId"
+                  value={adminForm.roleId}
+                  onChange={(e) => setAdminField("roleId", e.target.value)}
+                  options={roleOptions}
+                  placeholder="Selecciona un puesto"
+                  labelColor="text-slate-500"
+                  error={!!errors.roleId}
+                />
+                <div className="min-h-5">
+                  {errors.roleId && <ErrorText>{errors.roleId}</ErrorText>}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <SelectField
+                  label="Tipo de contrato" id="type"
+                  value={adminForm.type}
+                  onChange={(e) => setAdminField("type", e.target.value)}
+                  options={TIPOS}
+                  placeholder="Selecciona tipo"
+                  labelColor="text-slate-500"
+                  error={!!errors.type}
+                />
+                <div className="min-h-5">
+                  {errors.type && <ErrorText>{errors.type}</ErrorText>}
+                </div>
+              </div>
               <div className="flex flex-col gap-1">
                 <Type variant="metric-label" as="p">Salario (MXN)</Type>
                 <TextField
@@ -247,6 +252,9 @@ const EmployeeAdminCard = ({
                   placeholder="Ej: 15000"
                   labelClassName="hidden" text=""
                 />
+                <div className="min-h-5">
+                  {errors.salary && <ErrorText>{errors.salary}</ErrorText>}
+                </div>
               </div>
               <div className="flex flex-col gap-1">
                 <SelectField
@@ -262,7 +270,13 @@ const EmployeeAdminCard = ({
                   ]}
                   placeholder="Selecciona frecuencia"
                   labelColor="text-slate-500"
+                  error={!!errors.frequencyOfPaymentId}
                 />
+                <div className="min-h-5">
+                  {errors.frequencyOfPaymentId && (
+                    <ErrorText>{errors.frequencyOfPaymentId}</ErrorText>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -324,6 +338,9 @@ const EmployeeAdminCard = ({
                       )}
                     </div>
                   ))}
+                </div>
+                <div className="min-h-5">
+                  {errors.workdays && <ErrorText>{errors.workdays}</ErrorText>}
                 </div>
               </div>
             )}

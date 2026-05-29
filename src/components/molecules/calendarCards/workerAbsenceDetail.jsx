@@ -1,4 +1,4 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
 import {
   formatEventDate,
@@ -37,7 +37,7 @@ const EvidenceButtonIcon = () => (
   <img
     src="/document.svg"
     alt=""
-    className="mr-1.5 h-4 w-4 shrink-0 brightness-0 invert"
+    className="mr-1.5 h-4.5 w-4.5 shrink-0 brightness-0 invert"
     aria-hidden
   />
 );
@@ -137,40 +137,17 @@ const WorkerAbsenceDetail = ({
         >
           <DetailLabel className="mb-0">Evidencia:</DetailLabel>
           {hasEvidence ? (
-            <Button
+            <SmallButton
               type="button"
               text={evidenceLabel}
-              width="w-auto min-w-[7.25rem]"
-              height="h-7"
-              textSize="text-xs"
-              bgColor="bg-[#1F3664]"
-              textColor="text-white"
-              hoverColor="hover:bg-[#15284A]"
-              activeColor="active:bg-[#0E1B33]"
               onClick={onOpenEvidence}
-              icon={<EvidenceButtonIcon />}
-              className="rounded-md px-3 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+              leadingIcon={<EvidenceButtonIcon />}
+              className="h-7 min-w-[7.25rem] rounded-md px-3"
             />
           ) : (
             <DetailValue>Sin evidencia</DetailValue>
           )}
         </div>
-      </div>
-
-      <div className="mt-12 flex justify-center">
-        <Button
-          type="button"
-          text="Cerrar"
-          width="w-full sm:w-[7.2rem]"
-          height="h-10"
-          textSize="text-base"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-          onClick={onClose}
-        />
       </div>
     </div>
   );

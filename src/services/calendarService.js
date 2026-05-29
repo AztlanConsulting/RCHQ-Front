@@ -36,19 +36,12 @@ const parseJwtPayload = (token) => {
 };
 
 export const getEventsTypes = async () => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/getAllTypes`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -67,19 +60,12 @@ export const getEventsTypes = async () => {
 }
 
 export const getAbsenceTypes = async () => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/absence/types`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -96,17 +82,10 @@ export const getAbsenceTypes = async () => {
 };
 
 export const getAbsenceAddData = async () => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(`${API_URL}/absence/add`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
         },
     });
 
@@ -126,19 +105,12 @@ export const getAbsenceAddData = async () => {
 };
 
 export const getHouseEmployees = async () => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/house/employees`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -160,19 +132,12 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
         return [];
     }
 
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -191,19 +156,12 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
 };
 
 export const getHouseEventsInRange = async (startDate, endDate) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/event/house/range/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -222,17 +180,9 @@ export const getHouseEventsInRange = async (startDate, endDate) => {
 };
 
 export const createAbsenceService = async (employeeId, payload) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const hasFile =
         typeof File !== "undefined" && payload?.file instanceof File;
-    let headers = {
-        Authorization: `Bearer ${token}`,
-    };
+    let headers = {};
     let body;
 
     if (hasFile) {
@@ -285,17 +235,9 @@ export const createAbsenceService = async (employeeId, payload) => {
 };
 
 export const updateAbsenceService = async (absenceId, payload) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const hasFile = payload?.file instanceof File;
 
-    let headers = {
-        Authorization: `Bearer ${token}`,
-    };
+    let headers = {};
     let body;
 
     if (hasFile) {
@@ -353,19 +295,12 @@ export const buildAbsenceEvidenceUrl = (link) => {
 };
 
 export const deleteAbsenceService = async (absenceId) => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/absence/${absenceId}`,
         {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );
@@ -398,19 +333,12 @@ export const getCalendarViewerRole = () => {
 };
 
 export const getEmployeeHouseName = async () => {
-    const token = getToken();
-
-    if (!token) {
-        throw new Error("No se encontró token de sesión");
-    }
-
     const rawResponse = await secureFetch(
         `${API_URL}/house/getHouseName`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         },
     );

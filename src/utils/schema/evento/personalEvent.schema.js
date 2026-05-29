@@ -21,7 +21,7 @@ export const baseSchema = z.object({
         .trim()
         .min(1, "El titulo es obligatorio")
         .min(3, "Titulo demasiado corto")
-        .max(120, "Máximo 120 caracteres")
+        .max(70, "Máximo 70 caracteres")
         .regex(TEXT_REGEX, "El título contiene caracteres no permitidos"),
 
     categoryKey: z

@@ -45,3 +45,15 @@ export const isPastDate = (date) => {
     const now = new Date();
     return now > date;
 };
+
+export const getStartHour = (timestamp) => {
+    if (timestamp == null) return "";
+    const base =
+        timestamp instanceof Date
+            ? new Date(timestamp.getTime())
+            : new Date(timestamp);
+    if (Number.isNaN(base.getTime())) return "";
+    const h = base.getUTCHours();
+    const m = base.getUTCMinutes();
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};

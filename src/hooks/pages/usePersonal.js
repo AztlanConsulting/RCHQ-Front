@@ -11,8 +11,8 @@ const usePersonal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  const employeesQuery = useEmployees();
-  const blacklistQuery = useGetBlacklist();
+  const employeesQuery = useEmployees({ enabled: !isBlacklistMode });
+  const blacklistQuery = useGetBlacklist({ enabled: isBlacklistMode });
 
   const showAlert = useCallback((type, message) => {
     setAlert({ type, message });
@@ -20,11 +20,8 @@ const usePersonal = () => {
 
   const handleToggleBlacklistMode = useCallback(() => {
     setAlert(null);
-    setIsBlacklistMode((prev) => {
-      if (!prev) blacklistQuery.refresh();
-      return !prev;
-    });
-  }, [blacklistQuery]);
+    setIsBlacklistMode((prev) => !prev);
+  }, []);
 
   const handleAddToBlacklist = useCallback((employee) => {
     setSelectedEmployee(employee);
@@ -64,7 +61,7 @@ const usePersonal = () => {
       } catch (err) {
         const status = err.status;
         if (status === 400) {
-          showAlert("error", "Datos inválidos. Verifica el formato de la CURP o la razón ingresada.");
+          showAlert("error", err.message || "No se pudo agregar a la lista negra por datos inválidos.");
         } else if (status === 403) {
           showAlert("error", err.message || "No tienes permisos para realizar esta acción.");
         } else if (status === 404) {
@@ -101,7 +98,7 @@ const usePersonal = () => {
       } catch (err) {
         const status = err.status;
         if (status === 400) {
-          showAlert("error", "Datos inválidos. Verifica el formato de la CURP o la razón ingresada.");
+          showAlert("error", err.message || "No se pudo eliminar de la lista negra por datos inválidos.");
         } else if (status === 403) {
           showAlert("error", err.message || "No tienes permisos para realizar esta acción.");
         } else if (status === 404) {

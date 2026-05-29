@@ -72,7 +72,11 @@ export const useDeactivateEmployee = (employeeId, employeeName, setAlert, isActi
       setIsModalOpen(false);
       setAlert({
         type: "error",
-        message: err?.message ?? `Hubo un error al dar de baja a "${employeeName}".`,
+        message:
+          err?.message ??
+          (addToBlacklist
+            ? `Hubo un error al agregar a "${employeeName}" a la lista negra durante la baja.`
+            : `Hubo un error al dar de baja a "${employeeName}".`),
       });
     }
     setIsSubmitting(false);

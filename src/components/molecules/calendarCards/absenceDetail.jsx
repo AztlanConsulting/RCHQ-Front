@@ -1,4 +1,4 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
@@ -14,7 +14,7 @@ const DocumentWhiteIcon = () => (
     src={documentIcon}
     alt=""
     aria-hidden="true"
-    className="mr-1.5 h-3.5 w-3.5 shrink-0 brightness-0 invert"
+    className="mr-1.5 h-4.5 w-4.5 shrink-0 brightness-0 invert"
   />
 );
 
@@ -205,33 +205,16 @@ const AbsenceDetail = ({
         ) : null}
 
         <div className="mt-8 flex justify-center gap-3">
-          <Button
+          <SmallButton
             type="button"
             text="Cancelar"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            bgColor="bg-white"
-            textColor="text-[#121212]"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            className="px-5 border border-slate-200 shadow-md"
             onClick={onCancelEdit}
             disabled={isSaving}
+            cancel
           />
-          <Button
+          <SmallButton
             type="button"
             text="Guardar"
-            width="w-auto"
-            height="h-[38px]"
-            textSize="text-sm"
-            fontWeight="font-bold"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="px-5 shadow-md"
             onClick={onSubmitEdit}
             disabled={isSaving}
           />
@@ -356,19 +339,12 @@ const AbsenceDetail = ({
           Evidencia:
         </Type>
         {hasEvidence ? (
-          <Button
+          <SmallButton
             type="button"
             text={evidenceLabel}
-            width="w-auto"
-            height="h-8"
-            textSize="text-[0.72rem]"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
             onClick={onOpenEvidence}
-            icon={<DocumentWhiteIcon />}
-            className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+            leadingIcon={<DocumentWhiteIcon />}
+            className="h-8 min-w-0 rounded-md px-2.5"
           />
         ) : (
           <Type variant="body" className="text-[1.05rem] leading-snug">
@@ -379,30 +355,19 @@ const AbsenceDetail = ({
 
       {canModifyAbsence ? (
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-          <Button
+          <SmallButton
             type="button"
             text="Eliminar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#A20000]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#870000]"
-            activeColor="active:bg-[#6B0000]"
-            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+            hasNoRollback
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onOpenDelete}
           />
-          <Button
+          <SmallButton
             type="button"
             text="Editar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onStartEdit}
           />
         </div>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import {
   clearAuthStorage,
   getStoredUser,
@@ -6,6 +6,7 @@ import {
   setStoredUser,
   setToken,
 } from "../utils/authStorage";
+import { logoutService } from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -18,7 +19,34 @@ export const AuthProvider = ({ children }) => {
     setUserState(getStoredUser());
   }, []);
 
-  const login = ({ token: newToken, user: newUser = null }) => {
+  const logout = useCallback(async () => {
+    await logoutService();
+    setTokenState(null);
+    setUserState(null);
+  }, []);
+
+  useEffect(() => {
+    const handleForcedLogout = () => logout();
+    window.addEventListener("auth:forced-logout", handleForcedLogout);
+    return () =>
+      window.removeEventListener("auth:forced-logout", handleForcedLogout);
+  }, [logout]);
+
+  useEffect(() => {
+    const handleTokenRefreshed = (e) => setTokenState(e.detail);
+    const handleStorageChange = (e) => {
+      if (e.key === "token") setTokenState(e.newValue);
+    };
+
+    window.addEventListener("auth:token-refreshed", handleTokenRefreshed);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("auth:token-refreshed", handleTokenRefreshed);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  const login = useCallback(({ token: newToken, user: newUser = null }) => {
     setToken(newToken);
     setTokenState(newToken);
 
@@ -26,13 +54,7 @@ export const AuthProvider = ({ children }) => {
       setStoredUser(newUser);
       setUserState(newUser);
     }
-  };
-
-  const logout = () => {
-    clearAuthStorage();
-    setTokenState(null);
-    setUserState(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({

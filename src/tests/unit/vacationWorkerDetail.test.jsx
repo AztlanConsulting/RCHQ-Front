@@ -30,7 +30,6 @@ const baseVacation = {
 const renderVacationWorkerDetail = (props = {}) => {
     const defaultProps = {
         event: baseVacation,
-        onClose: vi.fn(),
         onEdit: vi.fn(),
         onDelete: vi.fn(),
     };
@@ -84,7 +83,7 @@ describe("VacationWorkerDetail", () => {
         ).not.toBeInTheDocument();
     });
 
-    it("muestra eliminar y cerrar si la solicitud futura está aceptada", () => {
+    it("muestra eliminar si la solicitud futura está aceptada", () => {
         renderVacationWorkerDetail({
             event: {
                 ...baseVacation,
@@ -99,8 +98,8 @@ describe("VacationWorkerDetail", () => {
             screen.getByRole("button", { name: /eliminar/i }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: /cerrar/i }),
-        ).toBeInTheDocument();
+            screen.queryByRole("button", { name: /cerrar/i }),
+        ).not.toBeInTheDocument();
         expect(
             screen.queryByRole("button", { name: /editar/i }),
         ).not.toBeInTheDocument();
@@ -112,7 +111,7 @@ describe("VacationWorkerDetail", () => {
         ).not.toBeInTheDocument();
     });
 
-    it("solo muestra cerrar cuando la solicitud aprobada ya está en el pasado", () => {
+    it("no muestra acciones cuando la solicitud aprobada ya está en el pasado", () => {
         renderVacationWorkerDetail({
             event: {
                 ...baseVacation,
@@ -125,8 +124,8 @@ describe("VacationWorkerDetail", () => {
         });
 
         expect(
-            screen.getByRole("button", { name: /cerrar/i }),
-        ).toBeInTheDocument();
+            screen.queryByRole("button", { name: /cerrar/i }),
+        ).not.toBeInTheDocument();
         expect(
             screen.queryByRole("button", { name: /eliminar/i }),
         ).not.toBeInTheDocument();
@@ -159,8 +158,8 @@ describe("VacationWorkerDetail", () => {
             screen.getByRole("button", { name: /eliminar/i }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: /cerrar/i }),
-        ).toBeInTheDocument();
+            screen.queryByRole("button", { name: /cerrar/i }),
+        ).not.toBeInTheDocument();
         expect(
             screen.queryByRole("button", { name: /editar/i }),
         ).not.toBeInTheDocument();

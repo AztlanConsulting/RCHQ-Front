@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
@@ -135,7 +135,7 @@ const VacationRequests = () => {
                         : "Solicitudes de vacaciones revisadas"}
                 </h1>
 
-                <Button
+                <BigButton
                     text={
                         isPendingView
                             ? "Solicitudes revisadas"
@@ -144,12 +144,7 @@ const VacationRequests = () => {
                     onClick={() =>
                         setView(isPendingView ? "reviewed" : "pending")
                     }
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    width="w-auto"
-                    className="px-6"
+                    className="min-w-0"
                 />
             </div>
 

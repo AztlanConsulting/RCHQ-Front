@@ -17,6 +17,7 @@ import {
     getPersonalMexicoRangeErrorKey,
     shouldShowPersonalEndDateField,
 } from "../../utils/schema/evento/personalEventRules";
+import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -210,19 +211,7 @@ export const usePersonalForm = ({
     );
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => {
-            const next = { ...prev, [field]: value };
-
-            if (field === "date" && (!prev.endDate || prev.endDate < value)) {
-                next.endDate = value;
-            }
-
-            if (field === "allDay" && value) {
-                next.endDate = next.date;
-            }
-
-            return next;
-        });
+        setForm((prev) => shiftSameDayTimeRange(prev, field, value));
         setErrors((prev) => ({ ...prev, [field]: undefined }));
     }, []);
 

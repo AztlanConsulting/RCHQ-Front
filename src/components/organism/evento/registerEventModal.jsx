@@ -1,4 +1,5 @@
 import Alert from "../../atoms/alerts";
+import ModalCloseButton from "../../atoms/modalCloseButton";
 import TextField from "../../atoms/textField";
 import Type from "../../atoms/type";
 import ButtonGroup from "../../molecules/buttonGroup";
@@ -51,6 +52,8 @@ const RegisterEventModal = ({
     const shouldShowNameField =
         effectiveCategoryKey !== "ausencias" &&
         effectiveCategoryKey !== "vacaciones";
+    
+    const shouldAllowFloatingPicker = effectiveCategoryKey === "vacaciones";
 
     return (
         <>
@@ -92,15 +95,31 @@ const RegisterEventModal = ({
                         width: "100%",
                         maxWidth: "560px",
                         boxSizing: "border-box",
-                        maxHeight: "90vh",
-                        overflow: "visible",
+                        maxHeight: shouldAllowFloatingPicker ? "none" : "90vh",
+                        minHeight: 0,
+                        overflow: shouldAllowFloatingPicker ? "visible" : "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
                     }}
                 >
+                    <div className="flex justify-end">
+                        <ModalCloseButton
+                            onClick={onClose}
+                            className="shrink-0"
+                        />
+                    </div>
+
                     {shouldShowNameField ? (
-                        <div>
+                        <div className="min-w-0">
+                            <Type
+                                variant="page-title"
+                                as="h2"
+                                className="mb-3 min-w-0 text-[2rem] leading-none"
+                            >
+                                Registro de Evento
+                            </Type>
+
                             <TextField
                                 id="event-name"
                                 placeholder="Agregar título"
@@ -125,7 +144,7 @@ const RegisterEventModal = ({
                         <Type
                             variant="page-title"
                             as="h2"
-                            className="mb-0 text-[2rem] leading-none"
+                            className="mb-0 min-w-0 text-[2rem] leading-none"
                             style={{
                                 margin: 0,
                             }}
@@ -148,8 +167,8 @@ const RegisterEventModal = ({
 
                     <div
                         style={{
-                            flex: 1,
-                            overflowY: effectiveCategoryKey === "vacaciones" ? "visible" : "auto",
+                            flex: shouldAllowFloatingPicker ? "initial" : 1,
+                            overflowY: shouldAllowFloatingPicker ? "visible" : "auto",
                             minHeight: 0,
                             display: "flex",
                             flexDirection: "column",
@@ -159,7 +178,9 @@ const RegisterEventModal = ({
                         <div
                             key={animationKey}
                             className="animate-[fadeSlideIn_220ms_ease-in-out]"
-                            style={{ paddingBottom: "4px" }}
+                            style={{
+                                paddingBottom: shouldAllowFloatingPicker ? "0" : "24px",
+                            }}
                         >
                             {SubForm && (
                                 <SubForm

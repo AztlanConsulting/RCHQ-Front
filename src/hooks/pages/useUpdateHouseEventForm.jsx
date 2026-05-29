@@ -10,9 +10,10 @@ import {
     buildPayload,
     houseEventSchema,
 } from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
 import {
-    dateInTimeZoneToInputValue,
-    timeInTimeZoneToInputValue,
+     dateInTimeZoneToInputValue,
+     timeInTimeZoneToInputValue,
 } from "../../utils/timeZone";
 
 const DEFAULT_FORM = {
@@ -157,31 +158,41 @@ export const useUpdateHouseEventForm = ({
     }, [event?.eventType, isOpen]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            ...(field === "allDay" && value
-                ? {
-                      startTime: "",
-                      endTime: "",
-                  }
-                : {}),
-            ...(field === "isFreeDay" && value
-                ? {
-                      allDay: true,
-                      startTime: "",
-                      endTime: "",
-                  }
-                : {}),
-            ...(field === "allDay" && value === false
-                ? {
-                      isFreeDay: false,
-                  }
-                : {}),
-            [field]:
+        setForm((prev) => {
+            const nextValue =
                 field === "name" || field === "description"
                     ? String(value).replace(TEXT_SANITIZER, "")
-                    : value,
-        }));
+                    : value;
+
+            if (field === "allDay" && value) {
+                return {
+                    ...prev,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            if (field === "isFreeDay" && value) {
+                return {
+                    ...prev,
+                    allDay: true,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            if (field === "allDay" && value === false) {
+                return {
+                    ...prev,
+                    isFreeDay: false,
+                    [field]: nextValue,
+                };
+            }
+
+            return shiftDateTimeRange(prev, field, nextValue);
+        });
 
         setErrors((prev) => ({
             ...prev,
