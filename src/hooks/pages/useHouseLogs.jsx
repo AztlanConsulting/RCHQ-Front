@@ -55,6 +55,7 @@ export const formatLogMoment = (momentValue) => {
 
 export const useHouseLogs = () => {
   const [serverLogs, setServerLogs] = useState([]);
+  const [isMobileFiltersExpanded, setIsMobileFiltersExpanded] = useState(false);
   const [limit, setLimit] = useState(() => getResponsiveLimit());
   const [pagination, setPagination] = useState(() =>
     buildDefaultPagination(getResponsiveLimit()),
@@ -237,6 +238,10 @@ export const useHouseLogs = () => {
     setIsReportModalOpen(false);
   };
 
+  const toggleMobileFilters = () => {
+    setIsMobileFiltersExpanded((current) => !current);
+  };
+
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     setError("");
@@ -298,5 +303,7 @@ export const useHouseLogs = () => {
     dateFilter,
     setDateFilter,
     actionOptions,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   };
 };

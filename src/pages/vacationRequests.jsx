@@ -1,5 +1,4 @@
 import { useState } from "react";
-import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
@@ -38,6 +37,8 @@ const VacationRequests = () => {
         onViewDetail,
         viewingRequest,
         closeViewingRequest,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     } = useVacationRequests();
 
     const [requestToApprove, setRequestToApprove] = useState(null);
@@ -45,8 +46,6 @@ const VacationRequests = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [requestToReject, setRequestToReject] = useState(null);
     const [rejectModalError, setRejectModalError] = useState("");
-
-    const isPendingView = view === "pending";
 
     const handleOpenApproveModal = (request) => {
         clearError();
@@ -128,28 +127,15 @@ const VacationRequests = () => {
                     />
                 </div>
             )}
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isPendingView
-                        ? "Solicitudes de vacaciones pendientes"
-                        : "Solicitudes de vacaciones revisadas"}
+                    Solicitud de vacaciones
                 </h1>
-
-                <BigButton
-                    text={
-                        isPendingView
-                            ? "Solicitudes revisadas"
-                            : "Regresar a pendientes"
-                    }
-                    onClick={() =>
-                        setView(isPendingView ? "reviewed" : "pending")
-                    }
-                    className="min-w-0"
-                />
             </div>
 
             <VacationRequestFilters
                 view={view}
+                setView={setView}
                 searchQuery={searchInput}
                 setSearchQuery={setSearchInput}
                 startDate={startDate}
@@ -159,6 +145,8 @@ const VacationRequests = () => {
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 clearFilters={clearFilters}
+                isMobileExpanded={isMobileFiltersExpanded}
+                onToggleMobileFilters={toggleMobileFilters}
             />
 
             {error && !requestToApprove && !requestToReject && (
