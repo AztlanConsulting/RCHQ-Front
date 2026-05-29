@@ -49,15 +49,15 @@ const VacationList = () => {
         openDeleteVacation,
         cancelDeleteVacation,
         confirmDeleteVacation,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     } = useVacationList();
-
-    const isFutureView = view === "future";
 
     return (
         <div className="p-8 md:flex md:flex-col md:h-full">
             <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isFutureView ? "Vacaciones futuras" : "Vacaciones pasadas"}
+                    Vacaciones
                 </h1>
             </div>
 
@@ -71,6 +71,8 @@ const VacationList = () => {
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 clearFilters={clearFilters}
+                isMobileExpanded={isMobileFiltersExpanded}
+                onToggleMobileFilters={toggleMobileFilters}
             />
 
             {error && (

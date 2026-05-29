@@ -410,6 +410,8 @@ export const useVacationList = ({ initialView = "future" } = {}) => {
     const [isDeletingVacation, setIsDeletingVacation] = useState(false);
     const [deleteVacationError, setDeleteVacationError] = useState("");
     const [alert, setAlert] = useState(null);
+    const [isMobileFiltersExpanded, setIsMobileFiltersExpanded] =
+        useState(false);
 
     const vacationList = useVacationRequestsBase({
         initialView,
@@ -583,6 +585,10 @@ export const useVacationList = ({ initialView = "future" } = {}) => {
         }
     }, [isDeletingVacation, page, refetch, requests.length, vacationToDelete]);
 
+    const toggleMobileFilters = useCallback(() => {
+        setIsMobileFiltersExpanded((current) => !current);
+    }, []);
+
     return {
         ...vacationList,
         setView: handleChangeView,
@@ -609,5 +615,7 @@ export const useVacationList = ({ initialView = "future" } = {}) => {
         openDeleteVacation,
         cancelDeleteVacation,
         confirmDeleteVacation,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     };
 };
