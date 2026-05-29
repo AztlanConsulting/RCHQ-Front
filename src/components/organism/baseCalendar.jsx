@@ -154,7 +154,7 @@ const BaseCalendar = ({
     useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
-    });
+    }, [calendarRef, loadButtonsAtStart, resizeHandler]);
 
     return (
         <FullCalendar
