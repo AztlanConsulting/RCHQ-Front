@@ -38,7 +38,9 @@ export const useTwoFactorLogin = () => {
       const response = await validateLoginTwoFactorAuthService(codeField.value);
 
       if (response.nextStep === "LOGIN_COMPLETE") {
-        const { token, ...user } = response?.data || {};
+        const responseData = response?.data || {};
+        const { token, ...user } = responseData;
+
         if (!token) {
           setError("No se recibió un token de sesión válido");
           return;

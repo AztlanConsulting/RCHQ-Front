@@ -1,8 +1,13 @@
 import { getToken } from "./authStorage";
 import { refreshSessionService } from "../services/authService";
 
+const REFRESH_LOCK_NAME = "auth-refresh-lock";
+const FALLBACK_LOCK_KEY = "auth-refresh-lock:fallback";
+const FALLBACK_LOCK_TTL_MS = 10000;
+const FALLBACK_LOCK_POLL_MS = 50;
 let isRefreshing = false;
 let failedQueue = [];
+let fallbackRefreshPromise = null;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -13,6 +18,83 @@ const processQueue = (error, token = null) => {
     }
   });
   failedQueue = [];
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const readFallbackLock = () => {
+  try {
+    const rawLock = globalThis.localStorage?.getItem(FALLBACK_LOCK_KEY);
+    return rawLock ? JSON.parse(rawLock) : null;
+  } catch {
+    return null;
+  }
+};
+
+const tryAcquireFallbackLock = (owner) => {
+  try {
+    const storage = globalThis.localStorage;
+    if (!storage) return true;
+
+    const now = Date.now();
+    const currentLock = readFallbackLock();
+
+    if (currentLock?.expiresAt > now && currentLock.owner !== owner) {
+      return false;
+    }
+
+    storage.setItem(
+      FALLBACK_LOCK_KEY,
+      JSON.stringify({ owner, expiresAt: now + FALLBACK_LOCK_TTL_MS }),
+    );
+
+    return readFallbackLock()?.owner === owner;
+  } catch {
+    return true;
+  }
+};
+
+const releaseFallbackLock = (owner) => {
+  try {
+    if (readFallbackLock()?.owner === owner) {
+      globalThis.localStorage?.removeItem(FALLBACK_LOCK_KEY);
+    }
+  } catch {
+    // Best effort cleanup only.
+  }
+};
+
+const runWithFallbackRefreshLock = async (callback) => {
+  if (fallbackRefreshPromise) return fallbackRefreshPromise;
+
+  const owner = `${Date.now()}-${Math.random()}`;
+  let hasLock = false;
+
+  fallbackRefreshPromise = (async () => {
+    try {
+      while (!hasLock) {
+        hasLock = tryAcquireFallbackLock(owner);
+        if (!hasLock) await sleep(FALLBACK_LOCK_POLL_MS);
+      }
+
+      return await callback();
+    } finally {
+      if (hasLock) releaseFallbackLock(owner);
+      fallbackRefreshPromise = null;
+    }
+  })();
+
+  return fallbackRefreshPromise;
+};
+
+const runWithRefreshLock = async (callback) => {
+  const locks = globalThis.navigator?.locks;
+
+  if (typeof locks?.request === "function") {
+    return locks.request(REFRESH_LOCK_NAME, callback);
+  }
+
+  return runWithFallbackRefreshLock(callback);
 };
 
 export async function secureFetch(input, init = {}) {
@@ -55,7 +137,7 @@ export async function secureFetch(input, init = {}) {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        token = await navigator.locks.request("auth-refresh-lock", async () => {
+        token = await runWithRefreshLock(async () => {
           const doubleCheckToken = getToken();
           if (doubleCheckToken && doubleCheckToken !== token) return doubleCheckToken;
 
