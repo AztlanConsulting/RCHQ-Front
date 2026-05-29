@@ -86,7 +86,6 @@ export async function secureFetch(input, init = {}) {
           return fetch(url, { ...init, headers });
         })
         .catch((error) => {
-          // Idem: Devolvemos un 401 limpio en lugar de lanzar una excepción fatal
           return new Response(JSON.stringify({ message: "Sesión expirada" }), { status: 401 });
         });
     }
