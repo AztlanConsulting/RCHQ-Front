@@ -213,6 +213,27 @@ const VacationDetail = ({
                 ) : null}
             </div>
 
+            {canReview ? (
+                <div>
+                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                        <SmallButton
+                            type="button"
+                            text="Aprobar"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onApprove}
+                        />
+                        <SmallButton
+                            type="button"
+                            text="Rechazar"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onReject}
+                        />
+                    </div>
+                </div>
+            ) : null}
+
             {canDelete || canEdit ? (
                 <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
                     {canDelete ? (
@@ -235,30 +256,6 @@ const VacationDetail = ({
                             onClick={onEdit}
                         />
                     ) : null}
-                </div>
-            ) : null}
-
-            {canReview ? (
-                <div>
-                    <div className="mt-4 border border-b border-[#EAEAEA]"></div>
-
-                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                        <SmallButton
-                            type="button"
-                            text="Aprobar"
-                            hasAdjustableWidth
-                            className="h-8 rounded-md sm:w-[7.2rem]"
-                            onClick={onApprove}
-                        />
-                        <SmallButton
-                            type="button"
-                            text="Rechazar"
-                            hasNoRollback
-                            hasAdjustableWidth
-                            className="h-8 rounded-md sm:w-[7.2rem]"
-                            onClick={onReject}
-                        />
-                    </div>
                 </div>
             ) : null}
         </div>
