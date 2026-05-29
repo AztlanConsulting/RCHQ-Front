@@ -54,6 +54,7 @@ const CalendarFilters = ({
   setEmployeeSearch,
   toggleEmployeeValue,
   clearEmployeeSelection,
+  resetEmployeeSelection,
   absenceStatusFilters,
   setAbsenceStatusFilters,
   absenceStatusOptions,
@@ -128,6 +129,7 @@ const CalendarFilters = ({
               onSearchChange={setEmployeeSearch}
               onToggleValue={toggleEmployeeValue}
               onClearSelection={clearEmployeeSelection}
+              onResetSelection={resetEmployeeSelection}
             />
             <div className="border border-b border-[#EAEAEA]"></div>
           </>
