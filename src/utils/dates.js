@@ -1,26 +1,44 @@
-export const normalToUTCWithOffset = (
-    date,
-    {
-        days = 0,
-        months = 0,
-        years = 0,
-        hours = 0,
-        minutes = 0,
-        seconds = 0,
-    } = {},
-) => {
-    const newDate = new Date(
-        Date.UTC(
-            date.getUTCFullYear() + years,
-            date.getUTCMonth() + months,
-            date.getUTCDate() + days,
-            date.getUTCHours() + hours,
-            date.getUTCMinutes() + minutes,
-            date.getUTCSeconds() + seconds,
-        ),
-    );
+export const dateToInputValue = (date) => {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
 
-    return newDate;
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+};
+
+export const timeToInputValue = (date) => {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+
+    return [
+        String(date.getHours()).padStart(2, "0"),
+        String(date.getMinutes()).padStart(2, "0"),
+    ].join(":");
+};
+
+export const dateStringToInputValue = (value, fallbackDate) => {
+    const matchedDate = String(value ?? "").match(/^(\d{4}-\d{2}-\d{2})/);
+    if (matchedDate) return matchedDate[1];
+
+    return dateToInputValue(fallbackDate);
+};
+
+export const timeStringToInputValue = (value, fallbackDate) => {
+    const matchedTime = String(value ?? "").match(/T(\d{2}:\d{2})/);
+    if (matchedTime) return matchedTime[1];
+
+    return timeToInputValue(fallbackDate);
+};
+
+export const addDaysToInputValue = (dateValue, days) => {
+    const [year, month, day] = String(dateValue).split("-").map(Number);
+    if ([year, month, day].some(Number.isNaN)) return "";
+
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+
+    return dateToInputValue(date);
 };
 
 export const isPastDate = (date) => {

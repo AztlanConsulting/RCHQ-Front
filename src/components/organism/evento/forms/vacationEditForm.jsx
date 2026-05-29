@@ -1,6 +1,7 @@
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
+import { isMexicoTimeZone } from "../../../../utils/timeZone";
 import {
     getVacationDateRange,
     getVacationEndDateMin,
@@ -19,6 +20,7 @@ const VacationEditForm = ({
     onVacationFieldChange,
     showEmployeeInfo = true,
 }) => {
+    const showMexicoTimeZoneMessage = !isMexicoTimeZone();
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
     const vacationEndDateMin = getVacationEndDateMin(
@@ -131,6 +133,14 @@ const VacationEditForm = ({
                     />
                 </div>
             </div>
+
+            {showMexicoTimeZoneMessage ? (
+                <p className="mx-auto mt-5 mb-1 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
+                    Las vacaciones se guardan con base en horario central de
+                    México porque se contabilizan contra días laborales y días
+                    libres mexicanos.
+                </p>
+            ) : null}
 
             {vacationEditError ? (
                 <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">

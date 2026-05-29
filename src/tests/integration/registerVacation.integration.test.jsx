@@ -37,6 +37,15 @@ vi.mock("../../services/eventService", () => ({
     getEventTypes: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock("../../utils/timeZone", async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        isMexicoTimeZone: vi.fn(() => false),
+    };
+});
+
 vi.mock("../../components/atoms/alerts", () => ({
     default: ({ message }) => <div role="alert">{message}</div>,
 }));
@@ -93,6 +102,8 @@ const renderModal = async (props = {}) => {
                 onFeedback={onFeedback}
                 initialStartDate="2026-05-05"
                 initialEndDate="2026-05-07"
+                calendarTimeZoneMode="local"
+                canSwitchCalendarTimeZone
                 {...props}
             />,
         );
@@ -199,6 +210,16 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
         expect(screen.getByText("10")).toBeInTheDocument();
         expect(screen.getByText(/periodo actual:/i)).toBeInTheDocument();
+    });
+
+    it("muestra el mensaje de horario central de México al crear vacaciones desde zona foránea", async () => {
+        await renderModal();
+
+        await openVacationForm();
+
+        expect(
+            screen.getByText(/las vacaciones se guardan con base en horario central de/i),
+        ).toBeInTheDocument();
     });
 
     it("registra vacaciones con los datos del formulario", async () => {
