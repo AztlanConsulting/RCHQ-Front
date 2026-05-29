@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import VacationRequestFilters from "../../components/molecules/vacationRequestFilters";
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
@@ -44,6 +44,8 @@ describe("VacationRequestFilters", () => {
         vi.useRealTimers();
     });
 
+    const getField = (label, index = 0) => screen.getAllByLabelText(label)[index];
+
     const defaultProps = {
         view: "pending",
         setView: vi.fn(),
@@ -56,15 +58,17 @@ describe("VacationRequestFilters", () => {
         statusFilter: "all",
         setStatusFilter: vi.fn(),
         clearFilters: vi.fn(),
+        isMobileExpanded: false,
+        onToggleMobileFilters: vi.fn(),
     };
 
     it("renderiza selector de vista, búsqueda y fechas en vista pending", () => {
         render(<VacationRequestFilters {...defaultProps} />);
 
-        expect(screen.getByLabelText("Vista de solicitudes")).toBeInTheDocument();
-        expect(screen.getByLabelText("Buscar empleado")).toBeInTheDocument();
-        expect(screen.getByLabelText("Fecha de inicio")).toBeInTheDocument();
-        expect(screen.getByLabelText("Fecha de término")).toBeInTheDocument();
+        expect(getField("Vista de solicitudes")).toBeInTheDocument();
+        expect(getField("Buscar empleado")).toBeInTheDocument();
+        expect(getField("Fecha de inicio")).toBeInTheDocument();
+        expect(getField("Fecha de término")).toBeInTheDocument();
         expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
     });
 
@@ -78,7 +82,7 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+        fireEvent.change(getField("Vista de solicitudes"), {
             target: { value: "reviewed" },
         });
 
@@ -95,7 +99,7 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
+        fireEvent.change(getField("Buscar empleado"), {
             target: { value: "ana" },
         });
 
@@ -111,10 +115,18 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        expect(screen.getByLabelText("Filtrar por estado")).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Todas" })).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Aprobadas" })).toBeInTheDocument();
-        expect(screen.getByRole("option", { name: "Rechazadas" })).toBeInTheDocument();
+        const statusSelect = getField("Filtrar por estado");
+
+        expect(statusSelect).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Todas" }),
+        ).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Aprobadas" }),
+        ).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Rechazadas" }),
+        ).toBeInTheDocument();
     });
 
     it("llama setStatusFilter al cambiar estado", () => {
@@ -128,7 +140,7 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Filtrar por estado"), {
+        fireEvent.change(getField("Filtrar por estado"), {
             target: { value: "approved" },
         });
 
@@ -147,11 +159,11 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        fireEvent.change(screen.getByLabelText("Fecha de inicio"), {
+        fireEvent.change(getField("Fecha de inicio"), {
             target: { value: "2026-05-01" },
         });
 
-        fireEvent.change(screen.getByLabelText("Fecha de término"), {
+        fireEvent.change(getField("Fecha de término"), {
             target: { value: "2026-05-15" },
         });
 
@@ -171,8 +183,8 @@ describe("VacationRequestFilters", () => {
             />,
         );
 
-        const startDateInput = screen.getByLabelText("Fecha de inicio");
-        const endDateInput = screen.getByLabelText("Fecha de término");
+        const startDateInput = getField("Fecha de inicio");
+        const endDateInput = getField("Fecha de término");
 
         expect(startDateInput).toHaveAttribute("data-min-date", "2021-05-25");
         expect(startDateInput).toHaveAttribute("data-max-date", "2026-06-15");
@@ -184,18 +196,29 @@ describe("VacationRequestFilters", () => {
         );
     });
 
-    it("llama clearFilters al presionar Limpiar", () => {
-        const clearFilters = vi.fn();
-
-        render(
+    it("muestra y alterna el boton de filtros moviles", () => {
+        const onToggleMobileFilters = vi.fn();
+        const { rerender } = render(
             <VacationRequestFilters
                 {...defaultProps}
-                clearFilters={clearFilters}
+                onToggleMobileFilters={onToggleMobileFilters}
             />,
         );
 
-        fireEvent.click(screen.getByRole("button", { name: "Limpiar" }));
+        fireEvent.click(screen.getByRole("button", { name: "Mostrar filtros" }));
 
-        expect(clearFilters).toHaveBeenCalledTimes(1);
+        expect(onToggleMobileFilters).toHaveBeenCalledTimes(1);
+
+        rerender(
+            <VacationRequestFilters
+                {...defaultProps}
+                isMobileExpanded
+                onToggleMobileFilters={onToggleMobileFilters}
+            />,
+        );
+
+        expect(
+            screen.getByRole("button", { name: "Ocultar filtros" }),
+        ).toBeInTheDocument();
     });
 });

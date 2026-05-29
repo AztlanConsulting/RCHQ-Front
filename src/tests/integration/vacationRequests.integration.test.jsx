@@ -5,6 +5,7 @@ import {
     fireEvent,
     waitFor,
     act,
+    within,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import VacationRequests from "../../pages/vacationRequests";
@@ -126,6 +127,9 @@ const renderComponent = async () => {
     });
 };
 
+const getField = (label, index = 0) => screen.getAllByLabelText(label)[index];
+const getButton = (name, index = 0) => screen.getAllByRole("button", { name })[index];
+
 describe("Integración: VacationRequests", () => {
     beforeEach(() => {
         vi.resetAllMocks();
@@ -153,7 +157,7 @@ describe("Integración: VacationRequests", () => {
         await renderComponent();
 
         expect(
-            screen.getByText("Solicitudes de vacaciones pendientes"),
+            screen.getByRole("heading", { name: "Solicitud de vacaciones" }),
         ).toBeInTheDocument();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
@@ -192,7 +196,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
+        fireEvent.change(getField("Buscar empleado"), {
             target: { value: "ana" },
         });
 
@@ -221,7 +225,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
+        fireEvent.change(getField("Buscar empleado"), {
             target: { value: "  ana    pendiente  " },
         });
 
@@ -244,7 +248,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar empleado");
+        const input = getField("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "us9" },
@@ -276,12 +280,12 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+        fireEvent.change(getField("Vista de solicitudes"), {
             target: { value: "reviewed" },
         });
 
         expect(
-            await screen.findByText("Solicitudes de vacaciones revisadas"),
+            screen.getByRole("heading", { name: "Solicitud de vacaciones" }),
         ).toBeInTheDocument();
 
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
@@ -295,9 +299,7 @@ describe("Integración: VacationRequests", () => {
             }),
         );
 
-        expect(
-            screen.getByLabelText("Filtrar por estado"),
-        ).toHaveValue("all");
+        expect(getField("Filtrar por estado")).toHaveValue("all");
     });
 
     it("manda status approved al servicio cuando se filtra revisadas por aprobadas", async () => {
@@ -305,13 +307,13 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+        fireEvent.change(getField("Vista de solicitudes"), {
             target: { value: "reviewed" },
         });
 
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Filtrar por estado"), {
+        fireEvent.change(getField("Filtrar por estado"), {
             target: { value: "approved" },
         });
 
@@ -331,20 +333,20 @@ describe("Integración: VacationRequests", () => {
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
         expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
 
-        fireEvent.change(screen.getByLabelText("Vista de solicitudes"), {
+        fireEvent.change(getField("Vista de solicitudes"), {
             target: { value: "reviewed" },
         });
 
-        const statusSelect = await screen.findByLabelText("Filtrar por estado");
+        const statusSelect = getField("Filtrar por estado");
 
         expect(
-            screen.getByRole("option", { name: "Aprobadas" }),
+            within(statusSelect).getByRole("option", { name: "Aprobadas" }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("option", { name: "Rechazadas" }),
+            within(statusSelect).getByRole("option", { name: "Rechazadas" }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("option", { name: "Todas" }),
+            within(statusSelect).getByRole("option", { name: "Todas" }),
         ).toBeInTheDocument();
         expect(statusSelect).toHaveValue("all");
     });
@@ -354,11 +356,11 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Fecha de inicio"), {
+        fireEvent.change(getField("Fecha de inicio"), {
             target: { value: "2026-06-10" },
         });
 
-        fireEvent.change(screen.getByLabelText("Fecha de término"), {
+        fireEvent.change(getField("Fecha de término"), {
             target: { value: "2026-06-01" },
         });
 
@@ -390,7 +392,7 @@ describe("Integración: VacationRequests", () => {
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar empleado");
+        const input = getField("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "ana" },
@@ -402,19 +404,19 @@ describe("Integración: VacationRequests", () => {
 
         expect(input).toHaveValue("ana");
 
-        fireEvent.change(screen.getByLabelText("Fecha de inicio"), {
+        fireEvent.change(getField("Fecha de inicio"), {
             target: { value: "2026-05-01" },
         });
 
-        fireEvent.change(screen.getByLabelText("Fecha de término"), {
+        fireEvent.change(getField("Fecha de término"), {
             target: { value: "2026-05-10" },
         });
 
-        fireEvent.click(screen.getByRole("button", { name: "Limpiar" }));
+        fireEvent.click(getButton("Limpiar"));
 
         expect(input).toHaveValue("");
-        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("");
-        expect(screen.getByLabelText("Fecha de término")).toHaveValue("");
+        expect(getField("Fecha de inicio")).toHaveValue("");
+        expect(getField("Fecha de término")).toHaveValue("");
     });
 
     it("abre modal de confirmación al presionar aprobar", async () => {
