@@ -213,7 +213,7 @@ const EventDetail = ({
                     body={
                         <>
                             ¿Estás seguro que deseas eliminar el evento{" "}
-                            <span className="font-semibold text-slate-700">
+                            <span className="font-semibold break-words text-slate-700 [overflow-wrap:anywhere]">
                                 {event?.title ?? "este evento"}
                             </span>
                             ? Esta acción no se puede deshacer.
