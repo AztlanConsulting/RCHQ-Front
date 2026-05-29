@@ -30,6 +30,15 @@ const vacationTrailing = (opt) =>
     />
   ) : null;
 
+const absenceStatusTrailing = (opt) =>
+  opt.color ? (
+    <span
+      className="inline-block size-2.5 shrink-0 rounded-full border border-slate-200/30"
+      style={{ backgroundColor: opt.color }}
+      aria-hidden
+    />
+  ) : null;
+
 const CalendarFilters = ({
   houseName,
   focusFilters,
@@ -182,6 +191,7 @@ const CalendarFilters = ({
                 options={absenceStatusOptions}
                 values={absenceStatusFilters}
                 setValues={setAbsenceStatusFilters}
+                renderTrailing={absenceStatusTrailing}
               />
               <FilterGroup
                 label="EVIDENCIA"
