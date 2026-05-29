@@ -437,7 +437,7 @@ describe("useCalendarPage", () => {
         expect(result.current.isVacationEditing).toBe(false);
         expect(result.current.alert).toEqual({
             type: "success",
-            message: "Vacaciones modificadas correctamente",
+            message: "Vacaciones editadas correctamente",
         });
     });
 

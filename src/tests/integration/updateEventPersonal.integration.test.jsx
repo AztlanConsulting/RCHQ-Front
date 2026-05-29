@@ -146,7 +146,7 @@ const waitForForm = async () => {
 
 const clickSubmit = async () => {
     await act(async () => {
-        fireEvent.click(screen.getByRole("button", { name: /^modificar$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^editar$/i }));
     });
 };
 
@@ -309,7 +309,7 @@ describe("Integración: modificar evento personal", () => {
 
     it("muestra error del servidor si falla updatePersonalEvent", async () => {
         updatePersonalEvent.mockRejectedValueOnce(
-            new Error("Error inesperado al modificar el evento"),
+            new Error("Error inesperado al editar el evento"),
         );
 
         await renderModal();
@@ -322,7 +322,7 @@ describe("Integración: modificar evento personal", () => {
         });
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
-            "Error inesperado al modificar el evento",
+            "Error inesperado al editar el evento",
         );
     });
 
