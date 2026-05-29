@@ -654,6 +654,98 @@ svg {
     color: inherit;
 }
 
+/* Overflow popover — align with Modal / event detail cards */
+.fc .fc-popover {
+    border: none !important;
+    border-radius: 0.75rem;
+    background: #fff !important;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-width: 14rem;
+    max-width: min(92vw, 40rem);
+}
+
+.fc .fc-popover-header {
+    background: #fff !important;
+    padding: 1.875rem 1.875rem 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: none;
+}
+
+.fc .fc-popover-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #0f172a;
+    flex: 1;
+    min-width: 0;
+}
+
+.fc .fc-popover-close {
+    cursor: pointer;
+    opacity: 1;
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    line-height: 1;
+    font-weight: 400;
+    color: #94a3b8;
+    padding: 0;
+    border: none;
+    background: transparent;
+    transition: color 0.15s ease;
+}
+
+.fc .fc-popover-close.fc-icon-x::before {
+    content: "×";
+    font-family: inherit;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.fc .fc-popover-close:hover,
+.fc .fc-popover-close:focus-visible {
+    color: #334155;
+    background: transparent;
+}
+
+.fc .fc-popover-body {
+    background: #fff;
+    padding: 0.75rem 1.875rem 1.875rem;
+    color: #121212;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    max-height: min(56vh, 28rem);
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fc .fc-popover-body::-webkit-scrollbar {
+    display: none;
+}
+
+.fc .fc-popover .fc-daygrid-day-events {
+    margin: 0;
+}
+
+.fc .fc-popover .fc-daygrid-event-harness {
+    margin-top: 0.375rem;
+}
+
+.fc .fc-popover .fc-daygrid-event-harness:first-child {
+    margin-top: 0;
+}
+
+.fc .fc-popover .fc-daygrid-event {
+    border-radius: 0.25rem;
+    margin: 0;
+}
+
 .fc-dayGridMonth-view .fc-daygrid-day-number {
     padding: 1px 3px 0;
     font-size: 0.8em;
