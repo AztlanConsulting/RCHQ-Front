@@ -105,6 +105,9 @@ export const useBaseCalendar = () => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
             btn.classList.remove("active-btn");
         });
+        document
+            .querySelector(".fc-toggleListButton-button")
+            ?.classList.remove("list-mode");
 
         if (currentView.includes("Month")) {
             document
@@ -124,7 +127,7 @@ export const useBaseCalendar = () => {
         if (currentView.includes("list")) {
             document
                 .querySelector(".fc-toggleListButton-button")
-                ?.classList.add("active-btn");
+                ?.classList.add("list-mode");
         }
     };
 

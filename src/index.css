@@ -225,6 +225,23 @@ svg {
     -webkit-mask: url("/list.svg") no-repeat center / contain;
 }
 
+.fc .fc-toggleListButton-button {
+    background-color: var(--fc-button-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button:hover {
+    background-color: var(--fc-button-hover-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button:active {
+    background-color: var(--fc-button-active-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button.list-mode .fc-icon-list::before {
+    mask: url("/calendar.svg") no-repeat center / contain;
+    -webkit-mask: url("/calendar.svg") no-repeat center / contain;
+}
+
 @media (min-width: 1024px) {
     .fc .fc-calendarFiltersButton-button {
         display: none !important;
