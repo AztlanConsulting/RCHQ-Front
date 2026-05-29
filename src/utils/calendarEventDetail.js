@@ -249,6 +249,66 @@ export const formatEventDateRange = (
     return `${formatEventDateOnly(startDate)} - ${formatEventDateOnly(endDate)}`;
 };
 
+export const formatCardDateNoYear = (value) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    return new Date(`${normalizedValue}T12:00:00.000Z`).toLocaleDateString(
+        "es-MX",
+        {
+            day: "numeric",
+            month: "long",
+            timeZone: "UTC",
+        },
+    );
+};
+
+export const formatCardTime = (value) => {
+    if (value == null || value === "") return "";
+    const hourValue = typeof value === "string" ? value : null;
+    if (hourValue && /^\d{1,2}:\d{2}$/.test(hourValue)) {
+        const [hours, minutes] = hourValue.split(":");
+        return `${Number(hours)}:${minutes}`;
+    }
+
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    const hours = parsedDate.getUTCHours();
+    const minutes = parsedDate.getUTCMinutes();
+    return `${hours}:${String(minutes).padStart(2, "0")}`;
+};
+
+export const formatCardSchedulePoint = (value, { includeTime = true } = {}) => {
+    const dateLabel = formatCardDateNoYear(value);
+    if (!dateLabel) return "";
+
+    if (!includeTime) return dateLabel;
+
+    const timeLabel = formatCardTime(value);
+    if (!timeLabel || (timeLabel === "0:00" && parsedIsMidnight(value))) {
+        return dateLabel;
+    }
+
+    return `${timeLabel} ${dateLabel}`;
+};
+
+const parsedIsMidnight = (value) => {
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return false;
+    return parsedDate.getUTCHours() === 0 && parsedDate.getUTCMinutes() === 0;
+};
+
+export const formatCompactDateRange = (start, end) => {
+    const startLabel = formatCardDateNoYear(start);
+    const endLabel = formatCardDateNoYear(end);
+
+    if (!startLabel && !endLabel) return "";
+    if (!endLabel || startLabel === endLabel) return startLabel || endLabel;
+
+    return `${startLabel} - ${endLabel}`;
+};
+
 export const formatEventDate = (value) => {
     if (value == null || value === "") return "—";
     const dateOnly = dateOnlyToLocalDate(value);
