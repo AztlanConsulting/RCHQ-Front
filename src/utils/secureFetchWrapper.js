@@ -1,5 +1,5 @@
 import { getToken } from "./authStorage";
-import { refreshSessionService } from "../services/authService";
+import { refreshSessionService } from "../services/sessionService";
 
 const REFRESH_LOCK_NAME = "auth-refresh-lock";
 const FALLBACK_LOCK_KEY = "auth-refresh-lock:fallback";

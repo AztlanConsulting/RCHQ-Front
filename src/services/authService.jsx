@@ -10,6 +10,8 @@ import {
   removePreTwoFactorAuthToken,
 } from "../utils/authStorage";
 import { buildApiError, getReadableErrors } from "../utils/apiErrors";
+import { secureFetch } from "../utils/secureFetchWrapper";
+import { refreshSessionService } from "./sessionService";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -65,24 +67,6 @@ const loginService = async (email, password) => {
   return data;
 };
 
-const refreshSessionService = async () => {
-  const response = await fetch(`${API_URL}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw buildApiError(response, data, "Error al renovar la sesión");
-  }
-
-  const newToken = data?.data?.token;
-  if (newToken) setToken(newToken);
-  
-  return data;
-};
-
 const logoutService = async () => {
   clearAuthStorage();
   try {
@@ -100,11 +84,10 @@ const activateTwoFactorAuthService = async () => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/auth/2fa/setup`, {
+  const response = await secureFetch(`/auth/2fa/setup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
   const data = await response.json();
@@ -124,11 +107,10 @@ const verifyTwoFactorAuthService = async (code) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/auth/2fa/verify`, {
+  const response = await secureFetch(`/auth/2fa/verify`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     credentials: "include",
     body: JSON.stringify({ token: code }),
@@ -178,11 +160,10 @@ const getTwoFactorAuthStatus = async () => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/auth/2fa/status`, {
+  const response = await secureFetch(`/auth/2fa/status`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -203,11 +184,10 @@ const deactivateTwoFactorAuthService = async (password) => {
   const token = getToken();
   if (!token) throw new Error("No se encontró token de sesión");
 
-  const response = await fetch(`${API_URL}/auth/2fa/disable`, {
+  const response = await secureFetch(`/auth/2fa/disable`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ password }),
   });

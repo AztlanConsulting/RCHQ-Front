@@ -7,7 +7,7 @@ vi.mock("../../utils/authStorage", () => ({
   getToken: () => getTokenMock(),
 }));
 
-vi.mock("../../services/authService", () => ({
+vi.mock("../../services/sessionService", () => ({
   refreshSessionService: () => refreshSessionServiceMock(),
 }));
 
