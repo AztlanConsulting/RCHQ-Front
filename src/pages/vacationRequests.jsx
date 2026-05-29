@@ -45,8 +45,6 @@ const VacationRequests = () => {
     const [requestToReject, setRequestToReject] = useState(null);
     const [rejectModalError, setRejectModalError] = useState("");
 
-    const isPendingView = view === "pending";
-
     const handleOpenApproveModal = (request) => {
         clearError();
         setApproveModalError("");
