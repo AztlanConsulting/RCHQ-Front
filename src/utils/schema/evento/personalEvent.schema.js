@@ -39,6 +39,15 @@ export const baseSchema = z.object({
         )
         .optional(),
 
+    trainer: z
+        .string()
+        .max(100, "Máximo 100 caracteres")
+        .refine(
+            (val) => !val || TEXT_REGEX.test(val),
+            "El instructor contiene caracteres no permitidos",
+        )
+        .optional(),
+
     date: z
         .string({ required_error: "La fecha es obligatoria" })
         .regex(dateRegex, "Fecha inválida")
@@ -106,6 +115,7 @@ export function buildPersonalPayload(formData) {
         name,
         eventTypeId,
         description,
+        trainer,
         allDay,
         date,
         endDate,
@@ -123,6 +133,7 @@ export function buildPersonalPayload(formData) {
         allDay,
         timeZone,
         ...(description?.trim() ? { description: description.trim() } : {}),
+        ...(trainer?.trim() ? { trainer: trainer.trim() } : {}),
         employeeIds: employeeIds ?? [],
         forceOverlap,
     };
