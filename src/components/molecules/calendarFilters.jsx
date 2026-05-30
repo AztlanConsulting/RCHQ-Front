@@ -1,5 +1,6 @@
 import FilterGroup from "../atoms/filterGroup";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
+import InlineSearchableCheckboxDropdown from "./inlineSearchableCheckboxDropdown";
 import Type from "../atoms/type";
 
 const focusTrailing = (opt) =>
@@ -122,8 +123,12 @@ const CalendarFilters = ({
   className = "",
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-y-auto overflow-x-hidden",
-  employeeDropdownInline = false,
+  useInlineEmployeeDropdown = false,
 }) => {
+  const EmployeeDropdown = useInlineEmployeeDropdown
+    ? InlineSearchableCheckboxDropdown
+    : SearchableCheckboxDropdown;
+
   const toggleFocusFilter = (focusValue, checked) => {
     setFocusFilters((currentValues = []) => {
       if (checked) {
@@ -154,6 +159,24 @@ const CalendarFilters = ({
   const isEventChecked = focusFilters.includes("eventos");
   const isVacationChecked = focusFilters.includes("vacaciones");
   const isAbsenceChecked = focusFilters.includes("ausencias");
+
+  const showEmployeeFilter =
+    viewerRole === "Coordinador" && calendarMode === "house";
+
+  const employeeFilterNode = showEmployeeFilter ? (
+    <EmployeeDropdown
+      label="TRABAJADOR"
+      name="employee"
+      filteredOptions={filteredEmployeeOptions}
+      values={employeeFilters}
+      search={employeeSearch}
+      selectedLabel={selectedEmployeeLabel}
+      onSearchChange={setEmployeeSearch}
+      onToggleValue={toggleEmployeeValue}
+      onClearSelection={clearEmployeeSelection}
+      onResetSelection={resetEmployeeSelection}
+    />
+  ) : null;
 
   const renderSection = ({ focusOption, checked, content }) => (
     <details className="group w-full" onClick={(event) => !checked && event.preventDefault()}>
@@ -224,33 +247,27 @@ const CalendarFilters = ({
           />
         </>
       ) : null}
-      <div className={`flex flex-col gap-4 mt-4`}>
-        {viewerRole === "Coordinador" && calendarMode === "house" ? (
+      <div className={`mt-4 flex flex-col gap-4`}>
+        {!useInlineEmployeeDropdown && employeeFilterNode ? (
           <>
-            <SearchableCheckboxDropdown
-              label="TRABAJADOR"
-              name="employee"
-              filteredOptions={filteredEmployeeOptions}
-              values={employeeFilters}
-              search={employeeSearch}
-              selectedLabel={selectedEmployeeLabel}
-              onSearchChange={setEmployeeSearch}
-              onToggleValue={toggleEmployeeValue}
-              onClearSelection={clearEmployeeSelection}
-              onResetSelection={resetEmployeeSelection}
-              inlinePanel={employeeDropdownInline}
-              listMaxHeightClass={
-                employeeDropdownInline ? "max-h-28" : "max-h-48"
-              }
-              triggerClassName={
-                employeeDropdownInline ? "!min-h-11 py-1.5 text-sm" : ""
-              }
-            />
+            {employeeFilterNode}
             <FilterSeparator />
           </>
         ) : null}
-        <div className="border border-b  border-[#1F3664]"></div>
-        <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] scrollbar-hide">
+        {!useInlineEmployeeDropdown ? (
+          <div className="border border-b border-[#1F3664]"></div>
+        ) : null}
+        <div
+          className={
+            useInlineEmployeeDropdown
+              ? "flex flex-col gap-4"
+              : "flex flex-col gap-4 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] scrollbar-hide"
+          }
+        >
+          {useInlineEmployeeDropdown && employeeFilterNode ? employeeFilterNode : null}
+          {useInlineEmployeeDropdown ? (
+            <div className="border border-b border-[#1F3664]"></div>
+          ) : null}
           {renderSection({
             focusOption: eventFocusOption,
             checked: isEventChecked,

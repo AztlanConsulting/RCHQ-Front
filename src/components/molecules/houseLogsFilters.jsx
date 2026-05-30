@@ -1,6 +1,7 @@
 import DateField from "../atoms/dateField";
 import TextField from "../atoms/textField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
+import InlineSearchableCheckboxDropdown from "./inlineSearchableCheckboxDropdown";
 import useLogsSearch from "../../hooks/molecules/useLogsSearch";
 
 const HouseLogsFilters = ({
@@ -32,6 +33,22 @@ const HouseLogsFilters = ({
     handleChange: handleAffectedChange,
     handleKeyDown: handleAffectedKeyDown,
   } = useLogsSearch(affectedQuery, setAffectedQuery);
+
+  const actionDropdownProps = {
+    label: "Filtrar por Acción",
+    name: "house-log-actions",
+    filteredOptions: filteredActionOptions,
+    values: selectedActionIds,
+    search: actionSearch,
+    selectedLabel: selectedActionLabel,
+    onSearchChange: setActionSearch,
+    onToggleValue: toggleActionValue,
+    onClearSelection: clearActionSelection,
+    searchPlaceholder: "Buscar acción",
+    labelClassName: "font-bold text-[#121212]",
+    triggerClassName: "min-h-[44px] px-3.5 py-1.5 text-sm text-[#121212]",
+    menuClassName: "sm:min-w-[20rem]",
+  };
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-5">
@@ -98,21 +115,13 @@ const HouseLogsFilters = ({
         </div>
 
         <div className="flex flex-col justify-end">
-          <SearchableCheckboxDropdown
-            label="Filtrar por Acción"
-            name="house-log-actions"
-            filteredOptions={filteredActionOptions}
-            values={selectedActionIds}
-            search={actionSearch}
-            selectedLabel={selectedActionLabel}
-            onSearchChange={setActionSearch}
-            onToggleValue={toggleActionValue}
-            onClearSelection={clearActionSelection}
-            searchPlaceholder="Buscar acción"
-            labelClassName="font-bold text-[#121212]"
-            triggerClassName="min-h-[44px] px-3.5 py-1.5 text-sm text-[#121212]"
-            menuClassName="sm:min-w-[20rem]"
-          />
+          <div className="sm:hidden">
+            <InlineSearchableCheckboxDropdown {...actionDropdownProps} />
+          </div>
+
+          <div className="hidden sm:block">
+            <SearchableCheckboxDropdown {...actionDropdownProps} />
+          </div>
         </div>
 
         <div className="flex flex-col justify-end">

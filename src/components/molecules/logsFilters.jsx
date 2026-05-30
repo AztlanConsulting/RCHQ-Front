@@ -1,6 +1,7 @@
 import TextField from "../atoms/textField";
 import VacationDateField from "../atoms/vacationDateField";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
+import InlineSearchableCheckboxDropdown from "./inlineSearchableCheckboxDropdown";
 import { sanitizeSearchInput } from "../../utils/searchInput";
 
 const LogsFilters = ({
@@ -22,6 +23,20 @@ const LogsFilters = ({
 }) => {
   const handleSearchChange = (value) => {
     setSearchQuery(sanitizeSearchInput(value));
+  };
+
+  const actionDropdownProps = {
+    label: "ACCIONES",
+    name: "log-actions",
+    filteredOptions: actionOptions,
+    values: selectedActionIds,
+    search: actionSearch,
+    selectedLabel: selectedActionLabel,
+    onSearchChange: setActionSearch,
+    onToggleValue: toggleActionValue,
+    onClearSelection: clearActionSelection,
+    searchPlaceholder: "Buscar acción",
+    triggerClassName: "text-[#121212]",
   };
 
   return (
@@ -66,19 +81,13 @@ const LogsFilters = ({
           labelClassName="text-sm font-bold text-[#121212]"
         />
 
-        <SearchableCheckboxDropdown
-          label="ACCIONES"
-          name="log-actions"
-          filteredOptions={actionOptions}
-          values={selectedActionIds}
-          search={actionSearch}
-          selectedLabel={selectedActionLabel}
-          onSearchChange={setActionSearch}
-          onToggleValue={toggleActionValue}
-          onClearSelection={clearActionSelection}
-          searchPlaceholder="Buscar acción"
-          triggerClassName="text-[#121212]"
-        />
+        <div className="sm:hidden">
+          <InlineSearchableCheckboxDropdown {...actionDropdownProps} />
+        </div>
+
+        <div className="hidden sm:block">
+          <SearchableCheckboxDropdown {...actionDropdownProps} />
+        </div>
 
         <VacationDateField
           label="Fecha inicial"

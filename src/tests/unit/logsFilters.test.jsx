@@ -27,6 +27,17 @@ vi.mock("../../components/molecules/searchableCheckboxDropdown", () => ({
     ),
 }));
 
+vi.mock("../../components/molecules/inlineSearchableCheckboxDropdown", () => ({
+    default: ({ label }) => (
+        <label data-testid="inline-action-dropdown">
+            {label}
+            <select aria-label={`${label} inline`}>
+                <option>Todas las acciones</option>
+            </select>
+        </label>
+    ),
+}));
+
 describe("LogsFilters", () => {
     const defaultProps = {
         searchQuery: "",
@@ -81,6 +92,7 @@ describe("LogsFilters", () => {
 
         expect(screen.getByRole("button", { name: /mostrar filtros/i })).toBeInTheDocument();
         expect(screen.getByLabelText("Buscar trabajador")).toBeInTheDocument();
-        expect(screen.getByLabelText("ACCIONES")).toBeInTheDocument();
+        expect(screen.getByLabelText("ACCIONES inline")).toBeInTheDocument();
+        expect(screen.getAllByLabelText("ACCIONES").length).toBeGreaterThanOrEqual(1);
     });
 });
