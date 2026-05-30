@@ -1,8 +1,8 @@
-import { Dropdown } from "flowbite-react";
+import { useEffect, useRef, useState } from "react";
 import SmallButton from "../atoms/smallButton";
 import Type from "../atoms/type";
 
-const SearchableCheckboxDropdown = ({
+const InlineSearchableCheckboxDropdown = ({
   label,
   name,
   filteredOptions = [],
@@ -18,55 +18,70 @@ const SearchableCheckboxDropdown = ({
   triggerClassName = "",
   menuClassName = "",
   wrapperClassName = "",
+  listMaxHeightClass = "max-h-28",
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleOutsideClick = (event) => {
+      if (!containerRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
+    <div
+      ref={containerRef}
+      className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}
+    >
       {labelClassName ? (
         <label className={labelClassName}>{label}</label>
       ) : (
         <div className="flex items-center justify-between">
-          <Type
-            variant="metric-label"
-            className="text-sm"
-            as="p"
-          >
+          <Type variant="metric-label" className="text-sm" as="p">
             {label}
           </Type>
         </div>
       )}
 
-      <Dropdown
-        inline
-        arrowIcon={false}
-        dismissOnClick={false}
-        enableTypeAhead={false}
-        placement="bottom-start"
-        className="z-[9999]"
-        renderTrigger={() => (
-          <button
-            type="button"
-            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
-          >
-            <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
-            <svg
-              className="h-4 w-4 shrink-0 text-[#6b7280]"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 9-7 7-7-7"
-              />
-            </svg>
-          </button>
-        )}
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+        className={`inline-flex min-h-11 w-full items-center justify-between rounded-lg bg-neutral-50 px-4 py-1.5 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 ${triggerClassName}`}
       >
-        <div className={`w-[min(22rem,calc(100vw-2rem))] max-w-full sm:min-w-[17rem] ${menuClassName}`}>
+        <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
+        <svg
+          className="h-4 w-4 shrink-0 text-[#6b7280]"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m19 9-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {isOpen ? (
+        <div
+          className={`w-full rounded-lg border border-slate-200 bg-white shadow-sm ${menuClassName}`}
+        >
           <div className="px-2 pt-2">
             <label htmlFor={`${name}-search`} className="sr-only">
               {searchPlaceholder}
@@ -101,7 +116,9 @@ const SearchableCheckboxDropdown = ({
             </div>
           </div>
 
-          <ul className="max-h-48 overflow-y-auto p-2 text-sm font-medium text-slate-700">
+          <ul
+            className={`${listMaxHeightClass} overflow-y-auto p-2 text-sm font-medium text-slate-700`}
+          >
             {filteredOptions.map((option) => {
               const inputId = `${name}-${option.value}`;
 
@@ -120,7 +137,7 @@ const SearchableCheckboxDropdown = ({
                       onChange={(event) =>
                         onToggleValue?.(option.value, event.target.checked)
                       }
-                      className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
+                      className="h-4 w-4 shrink-0 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                     />
                     <span className="ms-2 w-full text-sm font-medium text-slate-800">
                       {option.label}
@@ -153,9 +170,9 @@ const SearchableCheckboxDropdown = ({
             />
           </div>
         </div>
-      </Dropdown>
+      ) : null}
     </div>
   );
 };
 
-export default SearchableCheckboxDropdown;
+export default InlineSearchableCheckboxDropdown;

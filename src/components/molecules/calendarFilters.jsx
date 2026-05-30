@@ -1,5 +1,6 @@
 import FilterGroup from "../atoms/filterGroup";
 import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
+import InlineSearchableCheckboxDropdown from "./inlineSearchableCheckboxDropdown";
 import Type from "../atoms/type";
 
 const focusTrailing = (opt) =>
@@ -122,8 +123,12 @@ const CalendarFilters = ({
   className = "",
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-y-auto overflow-x-hidden",
-  employeeDropdownInline = false,
+  useInlineEmployeeDropdown = false,
 }) => {
+  const EmployeeDropdown = useInlineEmployeeDropdown
+    ? InlineSearchableCheckboxDropdown
+    : SearchableCheckboxDropdown;
+
   const toggleFocusFilter = (focusValue, checked) => {
     setFocusFilters((currentValues = []) => {
       if (checked) {
@@ -227,7 +232,7 @@ const CalendarFilters = ({
       <div className={`flex flex-col gap-4 mt-4`}>
         {viewerRole === "Coordinador" && calendarMode === "house" ? (
           <>
-            <SearchableCheckboxDropdown
+            <EmployeeDropdown
               label="TRABAJADOR"
               name="employee"
               filteredOptions={filteredEmployeeOptions}
@@ -238,13 +243,6 @@ const CalendarFilters = ({
               onToggleValue={toggleEmployeeValue}
               onClearSelection={clearEmployeeSelection}
               onResetSelection={resetEmployeeSelection}
-              inlinePanel={employeeDropdownInline}
-              listMaxHeightClass={
-                employeeDropdownInline ? "max-h-28" : "max-h-48"
-              }
-              triggerClassName={
-                employeeDropdownInline ? "!min-h-11 py-1.5 text-sm" : ""
-              }
             />
             <FilterSeparator />
           </>
