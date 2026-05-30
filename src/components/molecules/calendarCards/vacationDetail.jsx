@@ -103,7 +103,7 @@ const VacationDetail = ({
                     </Type>
                     <Type
                         variant="body"
-                        className="text-[1.05rem] leading-snug"
+                        className="text-[1.05rem] leading-snug wrap-break-word"
                     >
                         {event.employeeName || "—"}
                     </Type>
@@ -257,7 +257,7 @@ const VacationDetail = ({
                         </Type>
                         <Type
                             variant="body"
-                            className="text-[1.05rem] leading-snug"
+                            className="text-[1.05rem] leading-snug wrap-break-word"
                         >
                             {feedback}
                         </Type>

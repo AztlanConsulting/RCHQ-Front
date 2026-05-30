@@ -40,6 +40,7 @@ const MoreOptions = () => {
     showNewPassword,
     showConfirmPassword,
     handleCloseChangePasswordModal,
+    handleDismissChangePasswordErrors,
     handleSubmitChangePassword,
   } = useTwoFactorAuthOptions();
 
@@ -193,6 +194,7 @@ const MoreOptions = () => {
         onClose={handleCloseChangePasswordModal}
         loading={changePasswordLoading}
         errors={changePasswordErrors}
+        onErrorsClose={handleDismissChangePasswordErrors}
         onSubmit={handleSubmitChangePassword}
         currentPassword={currentPassword}
         setCurrentPassword={setCurrentPassword}

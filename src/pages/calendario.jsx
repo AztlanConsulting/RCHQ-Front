@@ -107,6 +107,7 @@ const Calendario = () => {
         isList,
         viewerRole,
         calendarMode,
+        calendarView: currentCalendarView,
         calendarTimeZone,
     });
 

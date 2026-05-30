@@ -11,7 +11,7 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 
-const MONTH_DAY_EVENT_CAP = 3;
+const DAY_GRID_EVENT_CAP = 3;
 const LIST_EVENT_TIME_FORMAT = {
     hour: "numeric",
     minute: "2-digit",
@@ -188,15 +188,17 @@ const BaseCalendar = ({
                     dayHeaderContent: (arg) => getWeekDayName(arg),
                     slotLabelContent: (arg) =>
                         formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
                     slotLabelContent: (arg) =>
                         formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
-                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 listDay: {
                     eventTimeFormat: LIST_EVENT_TIME_FORMAT,

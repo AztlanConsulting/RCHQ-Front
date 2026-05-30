@@ -9,6 +9,35 @@ import {
     dateOnlyToLocalDate,
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
+
+const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
+
+const normalizeUTCDateOnly = (value) => {
+    if (value == null || value === "") return "";
+
+    if (typeof value === "string") {
+        const matchedDate = value.trim().match(DATE_ONLY_PATTERN);
+        if (matchedDate) return matchedDate[1];
+    }
+
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    const year = parsedDate.getUTCFullYear();
+    const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const addDaysToUTCDateOnly = (value, days) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    const [year, month, day] = normalizedValue.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day + days, 0, 0, 0, 0));
+    return normalizeUTCDateOnly(date);
+};
 import {
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
@@ -49,6 +78,24 @@ const getAbsenceEvidenceValue = (event) =>
 const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
+
+const isEventMultiDay = (rawEvent, calendarTimeZone) => {
+    if (rawEvent.focus !== "eventos") return false;
+    if (rawEvent.allDay === true) return false;
+    const startDay = dateInTimeZoneToInputValue(
+        rawEvent.start ?? rawEvent.startDate,
+        calendarTimeZone,
+    );
+    const endDay = dateInTimeZoneToInputValue(
+        rawEvent.end ?? rawEvent.endDate,
+        calendarTimeZone,
+    );
+    if (!startDay || !endDay) return false;
+    return startDay !== endDay;
+};
+
+const isTimeGridCalendarView = (calendarView) =>
+    calendarView === "timeGridWeek" || calendarView === "timeGridDay";
 
 const getTimedRangeInTimeZone = (event, calendarTimeZone) => {
     const startDate = dateInTimeZoneToInputValue(
@@ -162,6 +209,7 @@ const getFilteredEvents = (
     absenceEvidenceFilters,
     calendarMode,
     viewerRole,
+    calendarView = "dayGridMonth",
     calendarTimeZone,
 ) => {
     const selectedAbsenceTypeNames = new Set(
@@ -223,6 +271,12 @@ const getFilteredEvents = (
                 absenceEvidenceFilters.includes(getAbsenceEvidenceValue(e)),
         )
         .map((rawEvent, idx) => {
+            const isRangeRecord =
+                rawEvent.focus === "ausencias" ||
+                rawEvent.focus === "vacaciones";
+            const isMultiDay = isEventMultiDay(rawEvent, calendarTimeZone);
+            const showInAllDayRow =
+                isMultiDay && isTimeGridCalendarView(calendarView);
             const isExpandedListEvent = Boolean(
                 isList && rawEvent.currentDayIndex && rawEvent.totalDays,
             );
@@ -240,39 +294,49 @@ const getFilteredEvents = (
                   );
             const isAllDay = isExpandedListEvent
                 ? rawEvent.listEventAllDay === true
-                : rawEvent.allDay === true && allDayRange.isAllDay;
+                : showInAllDayRow ||
+                  (rawEvent.allDay === true && allDayRange.isAllDay);
             const normalizedStartDate =
                 allDayRange.startDate ||
                 normalizeDateOnly(rawEvent.startDate ?? rawEvent.start);
             const normalizedEndDate =
                 allDayRange.displayEndDate ||
                 normalizeDateOnly(rawEvent.endDate ?? rawEvent.end);
-            const eventStart = isAllDay
-                ? allDayRange.startDate
-                : rawEvent.listEventStart
-                  ? rawEvent.listEventStart
-                : dateTimeInTimeZoneToCalendarValue(
-                      rawEvent.start,
-                      calendarTimeZone,
-                  );
-            const eventEnd = isAllDay
-                ? allDayRange.calendarEndDate
-                : rawEvent.listEventEnd
-                  ? rawEvent.listEventEnd
-                : dateTimeInTimeZoneToCalendarValue(
-                      rawEvent.end,
-                      calendarTimeZone,
-                  );
+            const eventStart = showInAllDayRow
+                ? normalizeUTCDateOnly(rawEvent.start ?? rawEvent.startDate)
+                : isAllDay && normalizedStartDate && !isExpandedListEvent
+                  ? allDayRange.startDate || normalizedStartDate
+                  : rawEvent.listEventStart
+                    ? rawEvent.listEventStart
+                    : dateTimeInTimeZoneToCalendarValue(
+                          rawEvent.start,
+                          calendarTimeZone,
+                      );
+            const eventEnd = showInAllDayRow
+                ? addDaysToUTCDateOnly(rawEvent.end ?? rawEvent.endDate, 1)
+                : isAllDay && normalizedEndDate && !isExpandedListEvent
+                  ? allDayRange.calendarEndDate ||
+                    (isRangeRecord
+                        ? addDaysToDateOnly(normalizedEndDate, 1)
+                        : normalizedEndDate === normalizedStartDate
+                          ? addDaysToDateOnly(normalizedEndDate, 1)
+                          : normalizedEndDate)
+                  : rawEvent.listEventEnd
+                    ? rawEvent.listEventEnd
+                    : dateTimeInTimeZoneToCalendarValue(
+                          rawEvent.end,
+                          calendarTimeZone,
+                      );
             const displayStartDate = isAllDay
                 ? allDayRange.startDate
                 : rawEvent.listStartReadableDate
                   ? rawEvent.listStartReadableDate
-                : dateInTimeZoneToInputValue(rawEvent.start, calendarTimeZone);
+                  : dateInTimeZoneToInputValue(rawEvent.start, calendarTimeZone);
             const displayEndDate = isAllDay
                 ? allDayRange.displayEndDate
                 : rawEvent.listEndReadableDate
                   ? rawEvent.listEndReadableDate
-                : dateInTimeZoneToInputValue(rawEvent.end, calendarTimeZone);
+                  : dateInTimeZoneToInputValue(rawEvent.end, calendarTimeZone);
             const originalAllDayRange = getAllDayRangeInTimeZone(
                 rawEvent.start,
                 rawEvent.end,
@@ -327,6 +391,9 @@ const getFilteredEvents = (
                         getScopeOption(rawEvent)?.label ?? rawEvent.scope,
                     eventType: rawEvent.type,
                     isFreeDay: Boolean(rawEvent.isFreeDay),
+                    multiDay: isMultiDay,
+                    sourceStart: rawEvent.start,
+                    sourceEnd: rawEvent.end,
                     detailAllDay:
                         rawEvent.allDay === true &&
                         originalAllDayRange.isAllDay,
@@ -382,6 +449,7 @@ export const useCalendarFilters = (
         isList = false,
         viewerRole = "",
         calendarMode = "personal",
+        calendarView = "dayGridMonth",
         calendarTimeZone,
     } = {},
 ) => {
@@ -642,6 +710,7 @@ export const useCalendarFilters = (
                 absenceEvidenceFilters,
                 calendarMode,
                 viewerRole,
+                calendarView,
                 calendarTimeZone,
             ),
         [
@@ -658,6 +727,7 @@ export const useCalendarFilters = (
             absenceEvidenceFilters,
             calendarMode,
             viewerRole,
+            calendarView,
             calendarTimeZone,
         ],
     );
