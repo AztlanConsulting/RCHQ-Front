@@ -6,11 +6,15 @@ const WeekTimeCard = ({ arg }) => {
   const start = ev.start;
   const end = ev.end;
   const x = ev.extendedProps ?? {};
+  const isMultiDay = Boolean(x.multiDay);
+  const isTimeGridView =
+    arg.view.type === "timeGridWeek" || arg.view.type === "timeGridDay";
+  const showAsAllDay = ev.allDay || (isMultiDay && isTimeGridView);
   const subtitle = String(x.subtitle ?? "").trim();
   const description = String(x.description ?? "").trim();
 
   let timeLine = "";
-  if (!ev.allDay && start != null && end != null) {
+  if (!showAsAllDay && start != null && end != null) {
     const a = getStartHour(start);
     const b = getStartHour(end);
     if (a && b) timeLine = `${a} – ${b}`;
@@ -22,7 +26,7 @@ const WeekTimeCard = ({ arg }) => {
   const [showDescription, setShowDescription] = useState(false);
 
   useLayoutEffect(() => {
-    if (!description || ev.allDay) {
+    if (!description || showAsAllDay) {
       setShowDescription(false);
       return;
     }
@@ -57,17 +61,16 @@ const WeekTimeCard = ({ arg }) => {
     ro.observe(fixed);
 
     return () => ro.disconnect();
-  }, [description, subtitle, ev.title, timeLine, ev.allDay]);
+  }, [description, subtitle, ev.title, timeLine, showAsAllDay]);
 
-  const titleClass =
-    ev.allDay
+  const titleClass = showAsAllDay
       ? "fc-weekTimeCard-title font-medium text-xs"
       : "fc-weekTimeCard-title font-medium text-sm";
 
   return (
     <div
       ref={cardRef}
-      className={`fc-weekTimeCard${ev.allDay ? " fc-weekTimeCard--allday" : ""}`}
+      className={`fc-weekTimeCard${showAsAllDay ? " fc-weekTimeCard--allday" : ""}`}
       style={{
         backgroundColor: ev.backgroundColor,
         borderColor: ev.borderColor ?? ev.backgroundColor,
@@ -87,11 +90,11 @@ const WeekTimeCard = ({ arg }) => {
         ) : null}
       </div>
 
-      {!ev.allDay && description && showDescription ? (
+      {!showAsAllDay && description && showDescription ? (
         <div className="fc-weekTimeCard-description mt-3">{description}</div>
       ) : null}
 
-      {!ev.allDay && description ? (
+      {!showAsAllDay && description ? (
         <div
           aria-hidden
           className="fc-weekTimeCard-measure-host"

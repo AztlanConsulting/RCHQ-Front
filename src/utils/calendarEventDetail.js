@@ -51,8 +51,12 @@ export const calculateDateRangeDays = (startDate, endDate) => {
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
-    const start = x.utcStart ? new Date(x.utcStart) : ev.start;
-    const end = x.utcEnd ? new Date(x.utcEnd) : ev.end;
+    const start = x.utcStart
+        ? new Date(x.utcStart)
+        : (x.sourceStart ?? ev.start);
+    const end = x.utcEnd
+        ? new Date(x.utcEnd)
+        : (x.sourceEnd ?? ev.end);
     return {
         id: ev.id,
         houseEventId: x.houseEventId,
@@ -85,6 +89,7 @@ export const eventApiToDetail = (ev) => {
         scopeLabel: x.scopeLabel,
         eventType: x.eventType,
         isFreeDay: x.isFreeDay,
+        multiDay: Boolean(x.multiDay),
         date: x.date,
         icon: x.icon,
         status: x.status,
@@ -92,8 +97,8 @@ export const eventApiToDetail = (ev) => {
         usedDays: x.usedDays,
         totalDays: x.totalDays,
         link: x.link,
-        startDate: normalizeDateOnly(x.startDate ?? start),
-        endDate: normalizeDateOnly(x.endDate ?? end),
+        startDate: normalizeDateOnly(x.startDate ?? x.sourceStart ?? start),
+        endDate: normalizeDateOnly(x.endDate ?? x.sourceEnd ?? end),
         isDeleted: x.isDeleted,
         peopleInsideEvent: x.peopleInsideEvent ?? null,
     };
@@ -245,6 +250,66 @@ export const formatEventDateRange = (
     }
 
     return `${formatEventDateOnly(startDate)} - ${formatEventDateOnly(endDate)}`;
+};
+
+export const formatCardDateNoYear = (value) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    return new Date(`${normalizedValue}T12:00:00.000Z`).toLocaleDateString(
+        "es-MX",
+        {
+            day: "numeric",
+            month: "long",
+            timeZone: "UTC",
+        },
+    );
+};
+
+export const formatCardTime = (value) => {
+    if (value == null || value === "") return "";
+    const hourValue = typeof value === "string" ? value : null;
+    if (hourValue && /^\d{1,2}:\d{2}$/.test(hourValue)) {
+        const [hours, minutes] = hourValue.split(":");
+        return `${Number(hours)}:${minutes}`;
+    }
+
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    const hours = parsedDate.getUTCHours();
+    const minutes = parsedDate.getUTCMinutes();
+    return `${hours}:${String(minutes).padStart(2, "0")}`;
+};
+
+export const formatCardSchedulePoint = (value, { includeTime = true } = {}) => {
+    const dateLabel = formatCardDateNoYear(value);
+    if (!dateLabel) return "";
+
+    if (!includeTime) return dateLabel;
+
+    const timeLabel = formatCardTime(value);
+    if (!timeLabel || (timeLabel === "0:00" && parsedIsMidnight(value))) {
+        return dateLabel;
+    }
+
+    return `${timeLabel} ${dateLabel}`;
+};
+
+const parsedIsMidnight = (value) => {
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return false;
+    return parsedDate.getUTCHours() === 0 && parsedDate.getUTCMinutes() === 0;
+};
+
+export const formatCompactDateRange = (start, end) => {
+    const startLabel = formatCardDateNoYear(start);
+    const endLabel = formatCardDateNoYear(end);
+
+    if (!startLabel && !endLabel) return "";
+    if (!endLabel || startLabel === endLabel) return startLabel || endLabel;
+
+    return `${startLabel} - ${endLabel}`;
 };
 
 export const formatEventDate = (value) => {
