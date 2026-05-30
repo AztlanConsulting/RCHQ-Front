@@ -415,8 +415,7 @@ export const useCalendarFilters = (
         ABSENCE_EVIDENCE_OPTIONS.map((o) => o.value),
     );
     const [filtersModalOpen, setFiltersModalOpen] = useState(false);
-    const canUseEmployeeCatalog =
-        viewerRole === "Administrador" || viewerRole === "Coordinador";
+    const canUseEmployeeCatalog = viewerRole === "Coordinador";
 
     useEffect(() => {
         getEventsTypes()

@@ -1,11 +1,9 @@
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export const deleteHouseEvent = async (houseEventId) => {
     const rawResponse = await secureFetch(
-        `${API_URL}/event/house/${houseEventId}`,
+        `/event/house/${houseEventId}`,
         {
             method: "DELETE",
             headers: {
@@ -29,7 +27,7 @@ export const deleteHouseEvent = async (houseEventId) => {
 
 export const deletePersonalEvent = async (personalEventId) => {
     const rawResponse = await secureFetch(
-        `${API_URL}/event/personal/${personalEventId}`,
+        `/event/personal/${personalEventId}`,
         {
             method: "DELETE",
             headers: {

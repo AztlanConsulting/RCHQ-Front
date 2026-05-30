@@ -37,7 +37,7 @@ const parseJwtPayload = (token) => {
 
 export const getEventsTypes = async () => {
     const rawResponse = await secureFetch(
-        `${API_URL}/event/getAllTypes`,
+        `/event/getAllTypes`,
         {
             method: "GET",
             headers: {
@@ -61,7 +61,7 @@ export const getEventsTypes = async () => {
 
 export const getAbsenceTypes = async () => {
     const rawResponse = await secureFetch(
-        `${API_URL}/absence/types`,
+        `/absence/types`,
         {
             method: "GET",
             headers: {
@@ -82,7 +82,7 @@ export const getAbsenceTypes = async () => {
 };
 
 export const getAbsenceAddData = async () => {
-    const rawResponse = await secureFetch(`${API_URL}/absence/add`, {
+    const rawResponse = await secureFetch(`/absence/add`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export const getAbsenceAddData = async () => {
 
 export const getHouseEmployees = async () => {
     const rawResponse = await secureFetch(
-        `${API_URL}/house/employees`,
+        `/house/employees`,
         {
             method: "GET",
             headers: {
@@ -169,7 +169,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/event/range/${employeeId}/${startDate}/${endDate}`,
+        `/event/range/${employeeId}/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {
@@ -193,7 +193,7 @@ const getEventsInRange = async (employeeId, startDate, endDate) => {
 
 export const getHouseEventsInRange = async (startDate, endDate) => {
     const rawResponse = await secureFetch(
-        `${API_URL}/event/house/range/${startDate}/${endDate}`,
+        `/event/house/range/${startDate}/${endDate}`,
         {
             method: "GET",
             headers: {
@@ -246,7 +246,7 @@ export const createAbsenceService = async (employeeId, payload) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/absence/${employeeId}/add`,
+        `/absence/${employeeId}/add`,
         {
             method: "POST",
             headers,
@@ -296,7 +296,7 @@ export const updateAbsenceService = async (absenceId, payload) => {
     }
 
     const rawResponse = await secureFetch(
-        `${API_URL}/absence/${absenceId}`,
+        `/absence/${absenceId}`,
         {
             method: "PUT",
             headers,
@@ -332,7 +332,7 @@ export const buildAbsenceEvidenceUrl = (link) => {
 
 export const deleteAbsenceService = async (absenceId) => {
     const rawResponse = await secureFetch(
-        `${API_URL}/absence/${absenceId}`,
+        `/absence/${absenceId}`,
         {
             method: "DELETE",
             headers: {
@@ -370,7 +370,7 @@ export const getCalendarViewerRole = () => {
 
 export const getEmployeeHouseName = async () => {
     const rawResponse = await secureFetch(
-        `${API_URL}/house/getHouseName`,
+        `/house/getHouseName`,
         {
             method: "GET",
             headers: {
