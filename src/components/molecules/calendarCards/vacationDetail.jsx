@@ -36,6 +36,7 @@ const VacationDetail = ({
     const canDelete = Boolean(onDelete) && role == "Coordinador" && (!isApproved || !isPast);
     const canEdit = Boolean(onEdit) && (role == "Coordinador" || userId === subjectId ) && !isPast && !isRejected;
     const canReview = Boolean(onApprove && onReject) && role == "Coordinador" && !isPast && isPending;
+    const showEditInReviewRow = canReview && canEdit;
 
     const title = isPending
         ? "Solicitud de Vacaciones"
@@ -230,11 +231,20 @@ const VacationDetail = ({
                             className="h-8 rounded-md sm:w-[7.2rem]"
                             onClick={onReject}
                         />
+                        {showEditInReviewRow ? (
+                            <SmallButton
+                                type="button"
+                                text="Editar"
+                                hasAdjustableWidth
+                                className="h-8 rounded-md sm:w-[7.2rem]"
+                                onClick={onEdit}
+                            />
+                        ) : null}
                     </div>
                 </div>
             ) : null}
 
-            {canDelete || canEdit ? (
+            {canDelete || (canEdit && !showEditInReviewRow) ? (
                 <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
                     {canDelete ? (
                         <SmallButton
@@ -247,7 +257,7 @@ const VacationDetail = ({
                         />
                     ) : null}
 
-                    {canEdit ? (
+                    {canEdit && !showEditInReviewRow ? (
                         <SmallButton
                             type="button"
                             text="Editar"
