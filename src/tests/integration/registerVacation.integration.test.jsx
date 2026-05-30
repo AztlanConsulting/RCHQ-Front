@@ -496,21 +496,15 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si las vacaciones son en el pasado o el mismo día", async () => {
-        const currentDate = formatDateOnly(new Date());
+        const futureDate = "2026-06-15";
         const { onClose, onSuccess } = await renderModal({
-            initialStartDate: currentDate,
-            initialEndDate: currentDate,
+            initialStartDate: futureDate,
+            initialEndDate: futureDate,
         });
         const message =
             "No se pueden pedir vacaciones en el pasado ni para el mismo día";
 
-        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
-            if (startDate === currentDate && endDate === currentDate) {
-                throw new Error(message);
-            }
-
-            return null;
-        });
+        requestEmployeeVacation.mockRejectedValueOnce(new Error(message));
 
         await openWorkerVacationForm();
         await submitVacation();
@@ -518,8 +512,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         await waitFor(() => {
             expect(requestEmployeeVacation).toHaveBeenCalledWith({
                 employeeId: "own-employee",
-                startDate: currentDate,
-                endDate: currentDate,
+                startDate: futureDate,
+                endDate: futureDate,
             });
         });
         expect(await screen.findByRole("alert")).toHaveTextContent(message);

@@ -279,7 +279,9 @@ export const useBaseCalendar = () => {
             ? SHORT_DAYS[weekDayIndex]
             : FULL_DAYS[weekDayIndex];
 
-        const dayNumber = hasNumber ? ` ${currentDay.date.getDate() + 1}` : "";
+        currentDay.date.setDate(currentDay.date.getDate() + 1)
+
+        const dayNumber = hasNumber ? ` ${currentDay.date.getDate()}` : "";
 
         return `${weekDay}${dayNumber}`;
     };
