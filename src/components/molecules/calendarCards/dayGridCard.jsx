@@ -1,4 +1,5 @@
-import { getStartHour } from "@/utils/dates";
+
+import { getStartHour } from "../../../utils/dates";
 
 const DayGridCard = ({ arg }) => {
     const isMultiDay = Boolean(arg.event.extendedProps?.multiDay);

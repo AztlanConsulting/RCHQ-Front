@@ -82,6 +82,23 @@ Para todas las rutas protegidas, utilizamos `secureFetch` en lugar del `fetch` n
 1. Inyecta la cabecera `Authorization: Bearer <token>` de forma transparente.
 2. **Intercepta errores 401 (Unauthorized)**: Si el *Access Token* expiró, pausa temporalmente las peticiones, invoca automáticamente a `/auth/refresh` (utilizando la cookie `refreshToken`), actualiza el token en el cliente y reintenta las peticiones originales encoladas sin interrumpir la experiencia del usuario.
 
+#### Renovacion de token y concurrencia
+
+El endpoint `/auth/refresh` rota el refresh token. Por eso el frontend debe evitar que varias peticiones intenten renovar la sesion al mismo tiempo. Si dos refresh corren en paralelo, una peticion podria usar un refresh token viejo y provocar un logout forzado.
+
+La estrategia actual es:
+
+- **Misma pestana:** `secureFetch` usa una cola en memoria (`isRefreshing` + `failedQueue`). Mientras una peticion renueva el token, las demas esperan y luego reintentan con el token nuevo.
+- **Navegadores con Web Locks:** si existe `navigator.locks`, se usa `navigator.locks.request("auth-refresh-lock", ...)` para coordinar el refresh entre pestanas del mismo origen. Esta es la opcion preferida porque Web Locks esta disenado para exclusion mutua entre contextos del navegador.
+- **Fallback sin Web Locks:** Safari/Firefox pueden no exponer `navigator.locks`. En ese caso se usa un fallback cooperativo con `localStorage`:
+  - si detecta un refresh activo en otra pestana, espera a que el token cambie por `storage` event o por el evento local `auth:token-refreshed`;
+  - si el token cambia, reintenta la peticion con ese token y no llama a `/auth/refresh`;
+  - si necesita iniciar el refresh, escribe un owner temporal en `localStorage`, espera un poll corto y confirma que sigue siendo owner antes de llamar al backend;
+  - el owner tiene TTL para que una pestana cerrada no bloquee indefinidamente el refresh;
+  - si `localStorage` no esta disponible, el fallback se limita a coordinar peticiones dentro de la misma pestana.
+
+**Limitacion importante:** `localStorage` no ofrece una operacion atomica de lock. El fallback reduce carreras entre pestanas, pero no puede garantizar exclusion mutua perfecta como Web Locks. Si el backend rota refresh tokens estrictamente, la garantia fuerte debe complementarse del lado servidor con una estrategia idempotente o una pequena ventana de gracia para refresh tokens recien rotados.
+
 ```javascript
 // Ejemplo de uso en un Service:
 import { secureFetch } from "@/utils/secureFetchWrapper";

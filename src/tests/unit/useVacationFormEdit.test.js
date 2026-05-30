@@ -224,7 +224,7 @@ describe("useVacationFormEdit", () => {
         );
         expect(setAlert).toHaveBeenCalledWith({
             type: "success",
-            message: "Vacaciones modificadas correctamente",
+            message: "Vacaciones editadas correctamente",
         });
     });
 
@@ -296,7 +296,7 @@ describe("useVacationFormEdit", () => {
         expect(result.current.isVacationEditing).toBe(false);
         expect(setAlert).toHaveBeenCalledWith({
             type: "error",
-            message: "No se pueden modificar vacaciones rechazadas",
+            message: "No se pueden editar vacaciones rechazadas",
         });
     });
 

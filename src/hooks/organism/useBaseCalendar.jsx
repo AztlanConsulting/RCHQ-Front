@@ -6,7 +6,31 @@ import {
     getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
-import { normalToUTCWithOffset } from "../../utils/dates";
+import {
+    addDaysToInputValue,
+    dateStringToInputValue,
+    timeStringToInputValue,
+} from "../../utils/dates";
+import {
+    getBrowserTimeZone,
+    getCalendarNowValue,
+    MEXICO_TIME_ZONE,
+} from "../../utils/timeZone";
+
+const SHORT_MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+const FULL_MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const SHORT_DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const FULL_DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+const getPaddedFetchRange = (startValue, endValue) => {
+    const startDate = String(startValue ?? "").split("T")[0];
+    const endDate = String(endValue ?? "").split("T")[0];
+
+    return {
+        startDate: addDaysToInputValue(startDate, -1) || startDate,
+        endDate: addDaysToInputValue(endDate, 1) || endDate,
+    };
+};
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -14,10 +38,12 @@ export const useBaseCalendar = () => {
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [viewerRole, setViewerRole] = useState("");
     const [calendarMode, setCalendarMode] = useState("personal");
+    const [calendarTimeZoneMode, setCalendarTimeZoneMode] = useState("local");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
     const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+    const [calendarClock, setCalendarClock] = useState(() => new Date());
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -35,6 +61,27 @@ export const useBaseCalendar = () => {
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseEvents(effectiveViewerRole),
         [effectiveViewerRole],
+    );
+    const browserTimeZone = useMemo(() => getBrowserTimeZone(), []);
+    const canSwitchCalendarTimeZone = browserTimeZone !== MEXICO_TIME_ZONE;
+    const calendarTimeZone = useMemo(
+        () =>
+            calendarTimeZoneMode === "mexico"
+                ? MEXICO_TIME_ZONE
+                : browserTimeZone,
+        [browserTimeZone, calendarTimeZoneMode],
+    );
+    const calendarNow = useMemo(
+        () => getCalendarNowValue(calendarTimeZone, calendarClock),
+        [calendarTimeZone, calendarClock],
+    );
+    const fullCalendarTimeZone = calendarTimeZone;
+    const calendarTimeZoneOptions = useMemo(
+        () => [
+            { value: "local", label: "Horario local" },
+            { value: "mexico", label: "Horario central de México" },
+        ],
+        [],
     );
 
     const calendarModeOptions = useMemo(
@@ -165,39 +212,7 @@ export const useBaseCalendar = () => {
     };
 
     const getMonth = (monthNumber, isComplete) => {
-        const shortenedMonths = [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sept",
-            "Oct",
-            "Nov",
-            "Dic",
-        ];
-        const fullMonths = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
-        ];
-        const monthText = isComplete
-            ? fullMonths[monthNumber]
-            : shortenedMonths[monthNumber];
-
-        return monthText;
+        return isComplete ? FULL_MONTHS[monthNumber] : SHORT_MONTHS[monthNumber];
     };
 
     const generateTitle = (currentStatus) => {
@@ -223,7 +238,7 @@ export const useBaseCalendar = () => {
         const endMonthNumber = currentStatus.end.month;
         const endMonth = getMonth(endMonthNumber, isDay);
         const endYear = currentStatus.end.year;
-        
+
         const monthDescriber = isDay ? " de" : "";
 
         const startMonthText = startMonth != endMonth ? ` ${startMonth}` : "";
@@ -257,25 +272,16 @@ export const useBaseCalendar = () => {
     };
 
     const getWeekDayName = (currentDay) => {
-        const weekDayIndex = currentDay.dow;
-        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-        const fullDays = [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-        ];
-
+        const weekDayIndex = currentDay.date.getDay();
         const hasNumber = viewType == "Week";
+
         const weekDay = validateShortenedSize(hasNumber)
-            ? shortenedDays[weekDayIndex]
-            : fullDays[weekDayIndex];
-        const dayNumber = hasNumber ? ` ${currentDay.date.getUTCDate()}` : "";
-        const viewableString = `${weekDay}${dayNumber}`;
-        return viewableString;
+            ? SHORT_DAYS[weekDayIndex]
+            : FULL_DAYS[weekDayIndex];
+
+        const dayNumber = hasNumber ? ` ${currentDay.date.getDate() + 1}` : "";
+
+        return `${weekDay}${dayNumber}`;
     };
 
     const resizeHandler = (calendarRef) => {
@@ -312,9 +318,10 @@ export const useBaseCalendar = () => {
             return [];
 
         const { start, end } = lastFetchedRange.current;
+        const fetchRange = getPaddedFetchRange(start, end);
         const rawEvents = await loadCalendarEvents(
-            start.split("T")[0],
-            end.split("T")[0],
+            fetchRange.startDate,
+            fetchRange.endDate,
             effectiveEmployeeId,
             effectiveViewerRole,
         );
@@ -339,10 +346,11 @@ export const useBaseCalendar = () => {
             const end = currentView.activeEnd.toISOString();
 
             lastFetchedRange.current = { start, end };
+            const fetchRange = getPaddedFetchRange(start, end);
 
             const rawEvents = await loadCalendarEvents(
-                start.split("T")[0],
-                end.split("T")[0],
+                fetchRange.startDate,
+                fetchRange.endDate,
                 effectiveEmployeeId,
                 effectiveViewerRole,
             );
@@ -358,6 +366,14 @@ export const useBaseCalendar = () => {
             console.error(err);
         });
     }, [reloadCurrentRange]);
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            setCalendarClock(new Date());
+        }, 60000);
+
+        return () => window.clearInterval(intervalId);
+    }, []);
 
     const handleDatesSet = async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
@@ -382,9 +398,10 @@ export const useBaseCalendar = () => {
             return;
 
         try {
+            const fetchRange = getPaddedFetchRange(startStr, endStr);
             const rawEvents = await loadCalendarEvents(
-                startStr.split("T")[0],
-                endStr.split("T")[0],
+                fetchRange.startDate,
+                fetchRange.endDate,
                 effectiveEmployeeId,
                 effectiveViewerRole,
             );
@@ -416,10 +433,27 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const startDate = normalToUTCWithOffset(info.start);
-        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+        const isAllDaySelection = info.allDay === true;
+        const startDate = dateStringToInputValue(info.startStr, info.start);
+        const rawEndDate = dateStringToInputValue(
+            info.endStr,
+            info.end ?? info.start,
+        );
+        const endDate = isAllDaySelection
+            ? addDaysToInputValue(rawEndDate, -1)
+            : rawEndDate;
 
-        setSelectedDates({ startDate, endDate });
+        setSelectedDates({
+            startDate,
+            endDate,
+            startTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.startStr, info.start),
+            endTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.endStr, info.end),
+            allDay: isAllDaySelection,
+        });
 
         const calendarApi = calendarRef.current.getApi();
         calendarApi.selectable = false;
@@ -445,6 +479,13 @@ export const useBaseCalendar = () => {
         viewerRole,
         calendarMode,
         setCalendarMode,
+        calendarTimeZone,
+        calendarNow,
+        calendarTimeZoneMode,
+        setCalendarTimeZoneMode,
+        calendarTimeZoneOptions,
+        canSwitchCalendarTimeZone,
+        fullCalendarTimeZone,
         calendarModeOptions,
         canSwitchCalendarMode,
         handleDatesSet,

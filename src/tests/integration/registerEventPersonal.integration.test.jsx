@@ -12,6 +12,11 @@ import {
     createPersonalEvent,
     getEventTypes,
 } from "../../services/eventService";
+import {
+    getBrowserTimeZone,
+    MEXICO_TIME_ZONE,
+    zonedDateTimeToIso,
+} from "../../utils/timeZone";
 
 vi.mock("../../services/eventService", () => ({
     createPersonalEvent: vi.fn(),
@@ -67,6 +72,13 @@ vi.mock("/chevron-down.svg", () => ({ default: "chevron-down.svg" }));
 
 const _d = new Date();
 const TODAY = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, "0")}-${String(_d.getDate()).padStart(2, "0")}`;
+const addDaysToLocalDateOnly = (dateValue, days) => {
+    const [year, month, day] = dateValue.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
 
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
@@ -101,6 +113,8 @@ const renderModal = (props = {}) => {
             onSuccess={onSuccess}
             initialStartDate={TODAY}
             initialEndDate={TODAY}
+            calendarTimeZoneMode="local"
+            canSwitchCalendarTimeZone
             {...props}
         />,
     );
@@ -220,8 +234,13 @@ describe("Integración: agregar evento de personal", () => {
             name: "Reunión de equipo",
             date: TODAY,
             allDay: false,
-            start: "09:00:00",
-            end: "10:00:00",
+            start: zonedDateTimeToIso(
+                TODAY,
+                "09:00",
+                getBrowserTimeZone(),
+            ),
+            end: zonedDateTimeToIso(TODAY, "10:00", getBrowserTimeZone()),
+            timeZone: getBrowserTimeZone(),
             description: "Discutir avances del proyecto.",
             employeeIds: [],
             forceOverlap: false,
@@ -233,6 +252,218 @@ describe("Integración: agregar evento de personal", () => {
         });
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra la leyenda de horario local en modo local", async () => {
+        renderModal();
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(
+            screen.getByText(/este evento se guardará con base en tu horario local/i),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText(/no puede abarcar más de 1 día en horario central de méxico/i),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra la leyenda de horario central de México en modo México", async () => {
+        renderModal({ calendarTimeZoneMode: "mexico" });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(
+            screen.getByText(/este evento se guardará con base en horario central de méxico/i),
+        ).toBeInTheDocument();
+    });
+
+    it("bloquea un evento personal creado desde drag si abarca dos días en México central", async () => {
+        renderModal({
+            initialStartDate: "2026-06-05",
+            initialEndDate: "2026-06-06",
+            initialStartTime: "23:30",
+            initialEndTime: "00:30",
+            calendarTimeZone: "America/Mexico_City",
+            calendarTimeZoneMode: "mexico",
+        });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(
+            screen.getByText(/no se puede crear un evento personal que abarque más de 1 día/i),
+        ).toBeInTheDocument();
+
+        fillBaseFields();
+        await clickFormConfirm();
+
+        expect(
+            screen.getByText(/no se puede crear un evento personal que abarque más de 1 día/i),
+        ).toBeInTheDocument();
+        expect(createPersonalEvent).not.toHaveBeenCalled();
+    });
+
+    it("permite que un evento personal termine a las 00:00 como cierre del mismo día", async () => {
+        const { onClose, onSuccess } = renderModal({
+            initialStartDate: "2026-06-05",
+            initialEndDate: "2026-06-06",
+            initialStartTime: "23:30",
+            initialEndTime: "00:00",
+            calendarTimeZone: "America/Mexico_City",
+            calendarTimeZoneMode: "mexico",
+        });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        fillBaseFields();
+        await clickFormConfirm();
+
+        await waitFor(() => {
+            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+        });
+
+        expect(createPersonalEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "23:30",
+                    "America/Mexico_City",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-06",
+                    "00:00",
+                    "America/Mexico_City",
+                ),
+                timeZone: "America/Mexico_City",
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalledWith({
+            personalEventId: "evt-1",
+            name: "Reunión de equipo",
+        });
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("permite un drag en horario foráneo cuando equivale a un día completo en México central", async () => {
+        renderModal({
+            initialStartDate: "2026-06-05",
+            initialEndDate: "2026-06-06",
+            initialStartTime: "07:00",
+            initialEndTime: "07:00",
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+        });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        expect(screen.getByLabelText("Fecha final")).toHaveValue("2026-06-06");
+
+        fillBaseFields();
+        await clickFormConfirm();
+
+        await waitFor(() => {
+            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+        });
+
+        expect(createPersonalEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "07:00",
+                    "Europe/London",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-06",
+                    "07:00",
+                    "Europe/London",
+                ),
+                timeZone: "Europe/London",
+            }),
+        );
+    });
+
+    it("permite un evento personal manual con fecha final si equivale a un día de México central", async () => {
+        renderModal({
+            initialStartDate: undefined,
+            initialEndDate: undefined,
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+        });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        fireEvent.change(screen.getByLabelText("Fecha"), {
+            target: { value: "2026-06-05" },
+        });
+        fireEvent.change(screen.getByLabelText("Fecha final"), {
+            target: { value: "2026-06-06" },
+        });
+        fillBaseFields();
+        await selectStartTime("7:00 AM");
+        await selectEndTime("7:00 AM");
+
+        await clickFormConfirm();
+
+        await waitFor(() => {
+            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+        });
+
+        expect(createPersonalEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+                date: "2026-06-05",
+                start: zonedDateTimeToIso(
+                    "2026-06-05",
+                    "07:00",
+                    "Europe/London",
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-06-06",
+                    "07:00",
+                    "Europe/London",
+                ),
+                timeZone: "Europe/London",
+            }),
+        );
+    });
+
+    it("bloquea un evento personal manual si sus horas cruzan de día en México central", async () => {
+        renderModal({
+            initialStartDate: undefined,
+            initialEndDate: undefined,
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+        });
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        fireEvent.change(screen.getByLabelText("Fecha"), {
+            target: { value: "2026-06-05" },
+        });
+        fillBaseFields();
+        await selectStartTime("6:30 AM");
+        await selectEndTime("8:00 AM");
+
+        await clickFormConfirm();
+
+        expect(
+            screen.getByText(/no se puede crear un evento personal que abarque más de 1 día/i),
+        ).toBeInTheDocument();
+        expect(createPersonalEvent).not.toHaveBeenCalled();
     });
 
     it("muestra error si se intenta confirmar sin nombre", async () => {
@@ -255,7 +486,10 @@ describe("Integración: agregar evento de personal", () => {
     });
 
     it("crea un evento de todo el día", async () => {
-        renderModal();
+        renderModal({
+            calendarTimeZone: "Europe/London",
+            calendarTimeZoneMode: "local",
+        });
 
         await waitFor(() => {
             expect(getEventTypes).toHaveBeenCalledTimes(1);
@@ -267,6 +501,10 @@ describe("Integración: agregar evento de personal", () => {
             fireEvent.click(screen.getByRole("checkbox"));
         });
 
+        expect(
+            screen.getByText(/Este evento se guardará con base en tu horario local. Sin embargo, no puede abarcar más de 1 día en horario central de México./i),
+        ).toBeInTheDocument();
+
         await clickFormConfirm();
 
         await waitFor(() => {
@@ -277,6 +515,13 @@ describe("Integración: agregar evento de personal", () => {
             expect.objectContaining({
                 allDay: true,
                 date: TODAY,
+                start: zonedDateTimeToIso(TODAY, "00:00", MEXICO_TIME_ZONE),
+                end: zonedDateTimeToIso(
+                    addDaysToLocalDateOnly(TODAY, 1),
+                    "00:00",
+                    MEXICO_TIME_ZONE,
+                ),
+                timeZone: MEXICO_TIME_ZONE,
             }),
         );
     });

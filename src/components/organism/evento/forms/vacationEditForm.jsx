@@ -1,6 +1,7 @@
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import Type from "../../../atoms/type";
+import { isMexicoTimeZone } from "../../../../utils/timeZone";
 import {
     getVacationDateRange,
     getVacationEndDateMin,
@@ -19,6 +20,7 @@ const VacationEditForm = ({
     onVacationFieldChange,
     showEmployeeInfo = true,
 }) => {
+    const showMexicoTimeZoneMessage = !isMexicoTimeZone();
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
     const vacationEndDateMin = getVacationEndDateMin(
@@ -50,9 +52,12 @@ const VacationEditForm = ({
                             >
                                 Nombre del trabajador
                             </Type>
-                            <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <Type
+                                variant="body"
+                                className="text-[1.05rem] leading-snug wrap-break-word"
+                            >
                                 {event.employeeName || "-"}
-                            </div>
+                            </Type>
                         </div>
 
                         <div>
@@ -62,9 +67,12 @@ const VacationEditForm = ({
                             >
                                 CURP
                             </Type>
-                            <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <Type
+                                variant="body"
+                                className="break-all text-[1.05rem] leading-snug sm:break-normal"
+                            >
                                 {event.curp || "-"}
-                            </div>
+                            </Type>
                         </div>
                     </>
                 ) : null}
@@ -91,7 +99,7 @@ const VacationEditForm = ({
                     )}
                 </div>
 
-                <div className="col-span-1 mt-8 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-10">
+                <div className="col-span-1 mt-2 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-4">
                     <DateField
                         label="Fecha de inicio"
                         name="startDate"
@@ -131,6 +139,14 @@ const VacationEditForm = ({
                     />
                 </div>
             </div>
+
+            {showMexicoTimeZoneMessage ? (
+                <p className="mx-auto mt-5 mb-1 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
+                    Las vacaciones se guardan con base en horario central de
+                    México porque se contabilizan contra días laborales y días
+                    libres mexicanos.
+                </p>
+            ) : null}
 
             {vacationEditError ? (
                 <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">

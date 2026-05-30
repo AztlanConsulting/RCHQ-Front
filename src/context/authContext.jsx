@@ -20,9 +20,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    await logoutService();
+    clearAuthStorage();
     setTokenState(null);
     setUserState(null);
+    await logoutService();
   }, []);
 
   useEffect(() => {

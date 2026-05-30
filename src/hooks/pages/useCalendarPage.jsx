@@ -457,7 +457,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "error",
-      message: "No se puede modificar este tipo de evento.",
+      message: "No se puede editar este tipo de evento.",
     });
   }, [closeDetail, selectedEvent]);
 
@@ -577,7 +577,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
 
@@ -600,7 +600,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
   const getVacationRequestId = useCallback((event) =>

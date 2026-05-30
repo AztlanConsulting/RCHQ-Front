@@ -4,8 +4,9 @@ import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
 import DocumentFileField from "../documentFileField";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import { formatEventDate, formatEventTime } from "../../../utils/calendarEventDetail";
 import { getDocumentFileNameFromLink } from "../../../utils/documentCard.utils";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import documentIcon from "/document.svg";
 
 const DocumentWhiteIcon = () => (
@@ -17,16 +18,6 @@ const DocumentWhiteIcon = () => (
   />
 );
 
-const ReadOnlyField = ({ label, value, fullWidth = false }) => (
-  <div className={fullWidth ? "col-span-2" : ""}>
-    <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
-      {label}
-    </Type>
-    <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-      {value || "-"}
-    </div>
-  </div>
-);
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
   const shouldTruncate = displayValue.length > 200;
@@ -101,11 +92,16 @@ const AbsenceDetail = ({
   onConfirmDelete,
   onAbsenceFieldChange,
   onAbsenceEvidenceChange,
+  showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   if (!event) return null;
 
   const canModifyAbsence = canManageAbsence && !event.isDeleted;
   const hasEvidence = Boolean(event.link);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
   const fileName = hasEvidence
     ? getDocumentFileNameFromLink(event.link)
     : "";
@@ -130,8 +126,34 @@ const AbsenceDetail = ({
         </Type>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ReadOnlyField label="Nombre del trabajador" value={event.employeeName} />
-          <ReadOnlyField label="CURP" value={event.curp} />
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              Nombre del trabajador
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.employeeName || "-"}
+            </Type>
+          </div>
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              CURP
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.curp || "-"}
+            </Type>
+          </div>
           <div className="sm:col-span-2">
             <SelectField
               label="Tipo de ausencia"
@@ -222,6 +244,7 @@ const AbsenceDetail = ({
       <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
         Ausencia
       </Type>
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
@@ -249,7 +272,15 @@ const AbsenceDetail = ({
         </div>
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Días hábiles:
+            Días totales{mexicoDaysSuffix}:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.totalDays ?? "—"}
+          </Type>
+        </div>
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Días hábiles{mexicoDaysSuffix}:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
             {event.usedDays ?? "—"}
@@ -265,14 +296,45 @@ const AbsenceDetail = ({
             )}
           </Type>
         </div>
-        <div>
-          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Fecha de fin:
-          </Type>
-          <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
-          </Type>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de inicio:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.start, { timeZone: calendarTimeZone })}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Fecha de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.end, {
+                  timeZone: calendarTimeZone
+                })}
+              </Type>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+              Fecha de término:
+            </Type>
+            <Type variant="body" className="text-[1.05rem] leading-snug">
+              {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+            </Type>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Descripción:

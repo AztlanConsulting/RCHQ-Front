@@ -11,6 +11,10 @@ import {
     houseEventSchema,
 } from "../../utils/schema/evento/houseEvent.schema";
 import { shiftDateTimeRange } from "../../utils/dateRangeShift";
+import {
+     dateInTimeZoneToInputValue,
+     timeInTimeZoneToInputValue,
+} from "../../utils/timeZone";
 
 const DEFAULT_FORM = {
     name: "",
@@ -34,24 +38,15 @@ const getEventId = (event) => {
     return /^\d+$/.test(fallbackId) ? "" : fallbackId;
 };
 
-const getTimeValue = (value) => {
-    if (!value) return "";
-
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-
-    return `${String(date.getUTCHours()).padStart(2, "0")}:${String(
-        date.getUTCMinutes(),
-    ).padStart(2, "0")}`;
-};
-
-const getInitialForm = (event) => {
+const getInitialForm = (event, calendarTimeZone) => {
     if (!event) return DEFAULT_FORM;
 
-    const startDate = normalizeDateOnly(event.startDate ?? event.start);
-    const rawEndDate = normalizeDateOnly(
-        event.endDate ?? event.end ?? event.start,
-    );
+    const startDate =
+        normalizeDateOnly(event.startDate) ||
+        dateInTimeZoneToInputValue(event.start, calendarTimeZone);
+    const rawEndDate =
+        normalizeDateOnly(event.endDate) ||
+        dateInTimeZoneToInputValue(event.end ?? event.start, calendarTimeZone);
     const endDate =
         event.allDay && rawEndDate > startDate
             ? addDaysToDateOnly(rawEndDate, -1)
@@ -67,8 +62,16 @@ const getInitialForm = (event) => {
         endDate,
         startTime: event.allDay
             ? ""
-            : getTimeValue(event.start ?? event.startStr),
-        endTime: event.allDay ? "" : getTimeValue(event.end ?? event.endStr),
+            : timeInTimeZoneToInputValue(
+                  event.start ?? event.startStr,
+                  calendarTimeZone,
+              ),
+        endTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(
+                  event.end ?? event.endStr,
+                  calendarTimeZone,
+              ),
     };
 };
 
@@ -90,6 +93,7 @@ export const useUpdateHouseEventForm = ({
     isOpen,
     onClose,
     onSuccess,
+    calendarTimeZone,
 }) => {
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
@@ -109,7 +113,7 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        setForm(getInitialForm(event));
+        setForm(getInitialForm(event, calendarTimeZone));
         setErrors({});
         setServerError(null);
         setValidationAlert(null);
@@ -119,7 +123,7 @@ export const useUpdateHouseEventForm = ({
             pendingPayload: null,
             isForcing: false,
         });
-    }, [event, isOpen]);
+    }, [calendarTimeZone, event, isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -169,6 +173,24 @@ export const useUpdateHouseEventForm = ({
                 };
             }
 
+            if (field === "isFreeDay" && value) {
+                return {
+                    ...prev,
+                    allDay: true,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            if (field === "allDay" && value === false) {
+                return {
+                    ...prev,
+                    isFreeDay: false,
+                    [field]: nextValue,
+                };
+            }
+
             return shiftDateTimeRange(prev, field, nextValue);
         });
 
@@ -176,6 +198,12 @@ export const useUpdateHouseEventForm = ({
             ...prev,
             [field]: undefined,
             ...(field === "allDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
+            ...(field === "isFreeDay" && value
                 ? {
                       startTime: undefined,
                       endTime: undefined,
@@ -234,7 +262,7 @@ export const useUpdateHouseEventForm = ({
             onClose?.();
         } catch (error) {
             setServerError(
-                error?.message ?? "Error inesperado al modificar el evento",
+                error?.message ?? "Error inesperado al editar el evento",
             );
         } finally {
             setIsSubmitting(false);
@@ -246,7 +274,11 @@ export const useUpdateHouseEventForm = ({
         if (!validated) return;
 
         await submitPayload(
-            buildPayload({ ...validated, forceOverlap: false }),
+            buildPayload({
+                ...validated,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
         );
     };
 
@@ -274,7 +306,7 @@ export const useUpdateHouseEventForm = ({
                 pendingPayload: null,
                 isForcing: false,
             });
-            setServerError(error?.message ?? "Error al forzar la modificación");
+            setServerError(error?.message ?? "Error al forzar la edición");
         }
     };
 

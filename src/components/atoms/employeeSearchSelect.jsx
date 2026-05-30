@@ -37,6 +37,10 @@ const EmployeeSearchSelect = ({
         onSelect,
         selectedPreviewLimit,
     });
+    const emptyMessage =
+        query.trim().length > 0
+            ? "No se encontraron empleados"
+            : "No hay más empleados disponibles";
 
     return (
         <div className="flex flex-col gap-2 w-full">
@@ -107,13 +111,13 @@ const EmployeeSearchSelect = ({
                                         </button>
                                     ))}
                                 </div>
-                            ) : query.length > 0 ? (
+                            ) : (
                                 <div className="px-3 py-3">
                                     <span className="text-sm text-[#9ca3af]">
-                                        No se encontraron empleados
+                                        {emptyMessage}
                                     </span>
                                 </div>
-                            ) : null}
+                            )}
                         </div>,
                         document.body,
                     )}
