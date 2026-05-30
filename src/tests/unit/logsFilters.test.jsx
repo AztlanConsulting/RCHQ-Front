@@ -27,6 +27,17 @@ vi.mock("../../components/molecules/searchableCheckboxDropdown", () => ({
     ),
 }));
 
+vi.mock("../../components/molecules/inlineSearchableCheckboxDropdown", () => ({
+    default: ({ label }) => (
+        <label data-testid="inline-action-dropdown">
+            {label}
+            <select aria-label={`${label} inline`}>
+                <option>Todas las acciones</option>
+            </select>
+        </label>
+    ),
+}));
+
 describe("LogsFilters", () => {
     const defaultProps = {
         searchQuery: "",

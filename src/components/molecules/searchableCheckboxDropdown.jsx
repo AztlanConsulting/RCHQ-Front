@@ -20,7 +20,7 @@ const SearchableCheckboxDropdown = ({
   wrapperClassName = "",
 }) => {
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
+    <div className={`flex w-full min-w-0 flex-col gap-1.5 ${wrapperClassName}`}>
       {labelClassName ? (
         <label className={labelClassName}>{label}</label>
       ) : (
@@ -35,38 +35,39 @@ const SearchableCheckboxDropdown = ({
         </div>
       )}
 
-      <Dropdown
-        inline
-        arrowIcon={false}
-        dismissOnClick={false}
-        enableTypeAhead={false}
-        placement="bottom-start"
-        className="z-[9999]"
-        renderTrigger={() => (
-          <button
-            type="button"
-            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
-          >
-            <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
-            <svg
-              className="h-4 w-4 shrink-0 text-[#6b7280]"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
+      <div className="w-full min-w-0 [&_[data-testid=flowbite-dropdown]]:!min-w-0 [&_[data-testid=flowbite-dropdown]]:!w-[min(22rem,calc(100vw-2rem))]">
+        <Dropdown
+          inline
+          arrowIcon={false}
+          dismissOnClick={false}
+          enableTypeAhead={false}
+          placement="bottom-start"
+          className="z-[9999] block w-full min-w-0"
+          renderTrigger={() => (
+            <button
+              type="button"
+              className={`inline-flex min-h-[50px] w-full min-w-0 items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 9-7 7-7-7"
-              />
-            </svg>
-          </button>
-        )}
-      >
-        <div className={`w-[min(22rem,calc(100vw-2rem))] max-w-full sm:min-w-[17rem] ${menuClassName}`}>
+              <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
+              <svg
+                className="h-4 w-4 shrink-0 text-[#6b7280]"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 9-7 7-7-7"
+                />
+              </svg>
+            </button>
+          )}
+        >
+          <div className={`w-full ${menuClassName}`}>
           <div className="px-2 pt-2">
             <label htmlFor={`${name}-search`} className="sr-only">
               {searchPlaceholder}
@@ -154,6 +155,7 @@ const SearchableCheckboxDropdown = ({
           </div>
         </div>
       </Dropdown>
+      </div>
     </div>
   );
 };
