@@ -30,8 +30,14 @@ const isAdminRole = (roleName = "") =>
 
 const formatContractTypeLabel = (value) => {
   if (!value) return "N/A";
-  if (value === "Nomina") return "Nómina";
-  return value;
+
+  const matchedType = TIPOS.find(
+    (type) => type.value.toLowerCase() === String(value).toLowerCase(),
+  );
+  if (matchedType) return matchedType.label;
+
+  const normalized = String(value);
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 };
 
 const EmployeeAdminCard = ({
