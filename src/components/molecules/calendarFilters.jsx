@@ -190,7 +190,7 @@ const CalendarFilters = ({
 
   return (
     <div
-      className={`mb-auto flex flex-col gap-1 overflow-x-hidden p-2 ${stackMaxHeightClass} ${className}`}
+      className={`mb-auto flex flex-col gap-1 overflow-x-hidden [scrollbar-gutter:stable] p-2 ${stackMaxHeightClass} ${className}`}
     >
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
@@ -242,7 +242,7 @@ const CalendarFilters = ({
           </>
         ) : null}
         <div className="border border-b  border-[#1F3664]"></div>
-        <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto scrollbar-hide">
+        <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] scrollbar-hide">
           {renderSection({
             focusOption: eventFocusOption,
             checked: isEventChecked,
@@ -256,6 +256,7 @@ const CalendarFilters = ({
                   setValues={setScopeFilters}
                   renderTrailing={scopeTrailing}
                   disabled={!showEventFilters}
+                  collapsible={false}
                 />
                 <FilterGroup
                   label="CATEGORIA"
@@ -264,6 +265,7 @@ const CalendarFilters = ({
                   values={eventTypeFilters}
                   setValues={setEventTypeFilters}
                   disabled={!showEventFilters}
+                  collapsible={false}
                 />
               </>
             ),
@@ -281,6 +283,7 @@ const CalendarFilters = ({
                 setValues={setVacationStatusFilters}
                 renderTrailing={vacationTrailing}
                 disabled={!showVacationFilters}
+                collapsible={false}
               />
             ),
           })}
@@ -297,6 +300,7 @@ const CalendarFilters = ({
                   values={absenceTypeFilters}
                   setValues={setAbsenceTypeFilters}
                   disabled={!showAbscenceFilters}
+                  collapsible={false}
                 />
                 <FilterGroup
                   label="ESTATUS"
@@ -306,6 +310,7 @@ const CalendarFilters = ({
                   setValues={setAbsenceStatusFilters}
                   renderTrailing={absenceStatusTrailing}
                   disabled={!showAbscenceFilters}
+                  collapsible={false}
                 />
                 <FilterGroup
                   label="EVIDENCIA"
@@ -314,6 +319,7 @@ const CalendarFilters = ({
                   values={absenceEvidenceFilters}
                   setValues={setAbsenceEvidenceFilters}
                   disabled={!showAbscenceFilters}
+                  collapsible={false}
                 />
               </>
             ),
