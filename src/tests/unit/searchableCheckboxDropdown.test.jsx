@@ -95,4 +95,20 @@ describe("SearchableCheckboxDropdown", () => {
 
     expect(screen.getByText(/sin coincidencias/i)).toBeInTheDocument();
   });
+
+  it("renderiza el panel inline debajo del trigger cuando inlinePanel es true", () => {
+    render(
+      <SearchableCheckboxDropdown
+        {...defaultProps}
+        inlinePanel
+        listMaxHeightClass="max-h-28"
+      />,
+    );
+
+    expect(screen.queryByText("María González")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /luis martínez/i }));
+
+    expect(screen.getByText("María González")).toBeInTheDocument();
+  });
 });

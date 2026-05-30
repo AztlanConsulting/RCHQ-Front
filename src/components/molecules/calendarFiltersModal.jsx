@@ -16,6 +16,7 @@ const CalendarFiltersModal = ({ open, onClose, ...filterProps }) => (
       showPageHeading={false}
       stackMaxHeightClass="max-h-none overflow-visible"
       className="!mb-0 !min-h-0 !p-0"
+      employeeDropdownInline
     />
   </Modal>
 );

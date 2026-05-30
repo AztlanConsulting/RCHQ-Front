@@ -122,6 +122,7 @@ const CalendarFilters = ({
   className = "",
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-y-auto overflow-x-hidden",
+  employeeDropdownInline = false,
 }) => {
   const toggleFocusFilter = (focusValue, checked) => {
     setFocusFilters((currentValues = []) => {
@@ -237,6 +238,13 @@ const CalendarFilters = ({
               onToggleValue={toggleEmployeeValue}
               onClearSelection={clearEmployeeSelection}
               onResetSelection={resetEmployeeSelection}
+              inlinePanel={employeeDropdownInline}
+              listMaxHeightClass={
+                employeeDropdownInline ? "max-h-28" : "max-h-48"
+              }
+              triggerClassName={
+                employeeDropdownInline ? "!min-h-11 py-1.5 text-sm" : ""
+              }
             />
             <FilterSeparator />
           </>
