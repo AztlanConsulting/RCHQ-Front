@@ -45,7 +45,7 @@ const getSubmitErrorMessage = (error) => {
     if (error?.status === 404) {
         if (message) return message;
 
-        return "usuario no encontrado";
+        return "Usuario no encontrado";
     }
 
     if (error?.status === 406) {
@@ -96,7 +96,7 @@ export const useAbsenceForm = ({
         reset: resetEvidence,
     } = useDocumentFile({
         invalidTypeMessage: "Formato invalido de ausencias",
-        maxSizeMessage: "tamaño superior a 10mb",
+        maxSizeMessage: "Tamaño superior a 10mb",
     });
 
     useEffect(() => {
