@@ -21,7 +21,7 @@ const ProfileCard = ({ user }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 p-5 shadow-sm">
       <div className="flex justify-center mb-4 lg:hidden">
         <div className="h-[150px] w-[150px] rounded-full overflow-hidden flex-shrink-0">
           {imageUrl ? (

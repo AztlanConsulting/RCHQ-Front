@@ -55,7 +55,7 @@ const MoreOptions = () => {
         </div>
       )}
 
-      <div className="min-h-96 rounded-2xl border border-slate-200 bg-transparent p-4 sm:p-6 md:min-h-[30rem] md:p-8">
+      <div className="min-h-96 rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 md:min-h-[30rem] md:p-8">
         <div className="flex justify-center md:justify-start">
           <BigButton
             text="Regresar a mi perfil"
