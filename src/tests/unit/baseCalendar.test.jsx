@@ -46,6 +46,7 @@ describe("BaseCalendar", () => {
     visibleEvents: [{ id: "1", title: "Evento" }],
     handleDatesSet: vi.fn(),
     onEventClick: vi.fn(),
+    now: "2026-05-25T23:30:00",
   };
 
   beforeEach(() => {
@@ -78,9 +79,27 @@ describe("BaseCalendar", () => {
     render(<BaseCalendar {...defaultProps} />);
 
     expect(capturedProps.events).toEqual(defaultProps.visibleEvents);
+    expect(capturedProps.now).toBe(defaultProps.now);
 
     fireEvent.click(screen.getByRole("button", { name: /abrir evento/i }));
 
     expect(defaultProps.onEventClick).toHaveBeenCalledWith({ event: { id: "evt-1" } });
+  });
+
+  it("configura la vista de lista con horario de 12 horas", () => {
+    render(<BaseCalendar {...defaultProps} />);
+
+    expect(capturedProps.views.listDay.eventTimeFormat).toMatchObject({
+      hour: "numeric",
+      minute: "2-digit",
+      meridiem: "short",
+      hour12: true,
+    });
+    expect(capturedProps.views.listWeek.eventTimeFormat).toEqual(
+      capturedProps.views.listDay.eventTimeFormat,
+    );
+    expect(capturedProps.views.listMonth.eventTimeFormat).toEqual(
+      capturedProps.views.listDay.eventTimeFormat,
+    );
   });
 });

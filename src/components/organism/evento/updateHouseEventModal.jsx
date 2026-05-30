@@ -9,8 +9,15 @@ import TextField from "../../atoms/textField";
 import TimeField from "../../atoms/timeField";
 import OverlapModal from "../overlapModal";
 import { useUpdateHouseEventForm } from "../../../hooks/pages/useUpdateHouseEventForm";
+import { isMexicoTimeZone } from "../../../utils/timeZone";
 
-const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
+const UpdateHouseEventModal = ({
+    event,
+    isOpen,
+    onClose,
+    onSuccess,
+    calendarTimeZone,
+}) => {
     const {
         form,
         errors,
@@ -26,9 +33,16 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
         handleForceOverlap,
         handleCancelOverlap,
         getTimeContainerStyle,
-    } = useUpdateHouseEventForm({ event, isOpen, onClose, onSuccess });
+    } = useUpdateHouseEventForm({
+        event,
+        isOpen,
+        onClose,
+        onSuccess,
+        calendarTimeZone,
+    });
 
     const showTimeFields = !form.allDay;
+    const showMexicoTimeZoneMessage = form.isFreeDay && !isMexicoTimeZone();
     const descriptionLength = String(form.description ?? "").length;
 
     const currentYear = new Date().getFullYear();
@@ -191,6 +205,14 @@ const UpdateHouseEventModal = ({ event, isOpen, onClose, onSuccess }) => {
                             onChange={(value) => setField("isFreeDay", value)}
                         />
                     </div>
+
+                    {showMexicoTimeZoneMessage ? (
+                        <p className="mx-auto mt-1 mb-3 max-w-[30rem] rounded-md bg-amber-50 px-3 py-2 text-center text-xs font-medium text-amber-800">
+                            Los días libres se guardan a las 00:00 en horario
+                            central de México porque afectan el cálculo de
+                            vacaciones y ausencias.
+                        </p>
+                    ) : null}
 
                     <SelectField
                         value={form.eventTypeId}

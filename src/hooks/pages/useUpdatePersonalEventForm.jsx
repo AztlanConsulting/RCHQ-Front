@@ -4,7 +4,16 @@ import { updatePersonalEvent } from "../../services/updateEventService";
 import { getEventTypes, getEmployeesForSelector } from "../../services/eventService";
 import { getCalendarViewerRole } from "../../services/calendarService";
 import { normalizeDateOnly } from "../../utils/calendarEventDetail";
+import {
+    getPersonalEventMexicoRangeError,
+    getPersonalMexicoRangeErrorKey,
+    shouldShowPersonalEndDateField,
+} from "../../utils/schema/evento/personalEventRules";
 import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
+import {
+    dateInTimeZoneToInputValue,
+    timeInTimeZoneToInputValue,
+} from "../../utils/timeZone";
 import {
     buildPersonalPayload,
     personalEventSchema,
@@ -16,30 +25,39 @@ const DEFAULT_FORM = {
     description: "",
     allDay: false,
     date: "",
+    endDate: "",
     startTime: "",
     endTime: "",
 };
 
 const TEXT_SANITIZER = /[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g;
 
-const getTimeValue = (value) => {
-    if (!value) return "";
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-    return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
-};
-
-const getInitialForm = (event) => {
+const getInitialForm = (event, calendarTimeZone) => {
     if (!event) return DEFAULT_FORM;
-    const date = normalizeDateOnly(event.date ?? event.start);
+    const calendarStartDate = dateInTimeZoneToInputValue(
+        event.start,
+        calendarTimeZone,
+    );
+    const date = event.allDay
+        ? normalizeDateOnly(event.date) || calendarStartDate
+        : calendarStartDate || normalizeDateOnly(event.date);
+    const endDate = event.allDay
+        ? date
+        : dateInTimeZoneToInputValue(event.end ?? event.start, calendarTimeZone);
+
     return {
         name: event.title ?? "",
         eventTypeId: event.eventTypeId ?? "",
         description: event.description ?? "",
         allDay: Boolean(event.allDay),
         date,
-        startTime: event.allDay ? "" : getTimeValue(event.start),
-        endTime: event.allDay ? "" : getTimeValue(event.end),
+        endDate: endDate || date,
+        startTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(event.start, calendarTimeZone),
+        endTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(event.end, calendarTimeZone),
     };
 };
 
@@ -58,6 +76,9 @@ export const useUpdatePersonalEventForm = ({
     isOpen,
     onClose,
     onSuccess,
+    calendarTimeZone,
+    calendarTimeZoneMode,
+    canSwitchCalendarTimeZone,
 }) => {
     const [form, setForm] = useState(DEFAULT_FORM);
     const [errors, setErrors] = useState({});
@@ -76,6 +97,14 @@ export const useUpdatePersonalEventForm = ({
     });
 
     const personalEventId = useMemo(() => event?.eventId ?? "", [event]);
+    const showEndDateField = shouldShowPersonalEndDateField({
+        allDay: form.allDay,
+        calendarTimeZoneMode,
+        canSwitchCalendarTimeZone,
+    });
+    const effectiveEndDate = showEndDateField
+        ? form.endDate || form.date
+        : undefined;
 
     useEffect(() => {
         const role = getCalendarViewerRole();
@@ -84,7 +113,7 @@ export const useUpdatePersonalEventForm = ({
 
     useEffect(() => {
         if (!isOpen) return;
-        setForm(getInitialForm(event));
+        setForm(getInitialForm(event, calendarTimeZone));
         setSelectedEmployees(getInitialEmployees(event));
         setErrors({});
         setServerError(null);
@@ -95,7 +124,7 @@ export const useUpdatePersonalEventForm = ({
             pendingPayload: null,
             isForcing: false,
         });
-    }, [event, isOpen]);
+    }, [calendarTimeZone, event, isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -137,13 +166,9 @@ export const useUpdatePersonalEventForm = ({
     const setField = useCallback((field, value) => {
         setForm((prev) => {
             const nextValue =
-                field === "name"
-                    ? String(value)
-                            .replace(TEXT_SANITIZER, "")
-                            .slice(0, 70)
-                    : field === "description"
-                        ? String(value).replace(TEXT_SANITIZER, "")
-                        : value;
+                field === "name" || field === "description"
+                    ? String(value).replace(TEXT_SANITIZER, "")
+                    : value;
 
             return shiftSameDayTimeRange(prev, field, nextValue);
         });
@@ -173,13 +198,26 @@ export const useUpdatePersonalEventForm = ({
         const input = {
             ...form,
             categoryKey: "personal",
+            endDate: effectiveEndDate,
             forceOverlap: false,
             employeeIds: selectedEmployees.map((e) => e.employeeId),
         };
+        const mexicoRangeError = getPersonalEventMexicoRangeError({
+            startDate: form.date,
+            endDate: effectiveEndDate ?? form.date,
+            startTime: form.startTime,
+            endTime: form.endTime,
+            allDay: form.allDay,
+            calendarTimeZone,
+        });
 
         const result = personalEventSchema.safeParse(input);
 
-        if (result.success && !(isCoordinator && selectedEmployees.length === 0)) {
+        if (
+            result.success &&
+            !mexicoRangeError &&
+            !(isCoordinator && selectedEmployees.length === 0)
+        ) {
             setErrors({});
             return result.data;
         }
@@ -195,6 +233,11 @@ export const useUpdatePersonalEventForm = ({
 
         if (isCoordinator && selectedEmployees.length === 0) {
             fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
+        if (mexicoRangeError) {
+            fieldErrors[getPersonalMexicoRangeErrorKey(form.allDay)] =
+                mexicoRangeError;
         }
 
         setErrors(fieldErrors);
@@ -236,7 +279,12 @@ export const useUpdatePersonalEventForm = ({
         const validated = validate();
         if (!validated) return;
         await submitPayload(
-            buildPersonalPayload({ ...validated, forceOverlap: false }),
+            buildPersonalPayload({
+                ...validated,
+                endDate: effectiveEndDate,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
         );
     };
 
@@ -287,6 +335,7 @@ export const useUpdatePersonalEventForm = ({
         isSubmitting,
         isCoordinator,
         overlapState,
+        showEndDateField,
         setField,
         setServerError,
         setValidationAlert,

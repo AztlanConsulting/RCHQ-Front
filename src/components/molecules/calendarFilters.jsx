@@ -30,6 +30,47 @@ const vacationTrailing = (opt) =>
     />
   ) : null;
 
+const FilterSeparator = ({ emphasis = false, className = "" }) => (
+  <div
+    className={`border border-b ${
+      emphasis ? "border-[#1F3664]" : "border-[#EAEAEA]"
+    } ${className}`}
+  />
+);
+
+const CalendarSwitchGroup = ({
+  label,
+  options,
+  value,
+  onChange,
+}) => (
+  <div className="mt-2">
+    <Type variant="metric-label" className="text-sm" as="p">
+      {label}
+    </Type>
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      {options.map((option) => {
+        const isActive = option.value === value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange?.(option.value)}
+            className={`flex min-h-11 w-full items-center justify-center rounded-md border px-2.5 py-2 text-center text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
+              isActive
+                ? "border-transparent bg-[#1F3664] text-white shadow-sm"
+                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 const absenceStatusTrailing = (opt) =>
   opt.color ? (
     <span
@@ -78,6 +119,10 @@ const CalendarFilters = ({
   onCalendarModeChange,
   calendarModeOptions = [],
   canSwitchCalendarMode = false,
+  calendarTimeZoneMode = "local",
+  onCalendarTimeZoneModeChange,
+  calendarTimeZoneOptions = [],
+  canSwitchCalendarTimeZone = false,
   className = "",
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
@@ -148,26 +193,25 @@ const CalendarFilters = ({
         </Type>
       )}
       {canSwitchCalendarMode ? (
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {calendarModeOptions.map((option) => {
-            const isActive = option.value === calendarMode;
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => onCalendarModeChange?.(option.value)}
-                className={`w-full rounded-md px-2.5 py-2 text-xs font-semibold leading-tight transition sm:px-3 sm:text-sm ${
-                  isActive
-                    ? "bg-[#1F3664] text-white shadow-sm"
-                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
+        <CalendarSwitchGroup
+          label="CALENDARIO"
+          options={calendarModeOptions}
+          value={calendarMode}
+          onChange={onCalendarModeChange}
+        />
+      ) : null}
+      {canSwitchCalendarTimeZone ? (
+        <>
+          {canSwitchCalendarMode ? (
+            <FilterSeparator className="my-2" />
+          ) : null}
+          <CalendarSwitchGroup
+            label="HORARIO"
+            options={calendarTimeZoneOptions}
+            value={calendarTimeZoneMode}
+            onChange={onCalendarTimeZoneModeChange}
+          />
+        </>
       ) : null}
       <div className={`flex flex-col gap-4 mt-4`}>
         {viewerRole === "Coordinador" && calendarMode === "house" ? (
@@ -184,7 +228,7 @@ const CalendarFilters = ({
               onClearSelection={clearEmployeeSelection}
               onResetSelection={resetEmployeeSelection}
             />
-            <div className="border border-b border-[#EAEAEA]"></div>
+            <FilterSeparator />
           </>
         ) : null}
         <div className="border border-b  border-[#1F3664]"></div>
