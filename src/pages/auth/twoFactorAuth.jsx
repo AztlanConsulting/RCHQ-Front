@@ -64,12 +64,15 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
     manualCode,
     isGenerating,
     generationError,
+    clearGenerationError,
     copySuccessMessage,
+    clearCopySuccessMessage,
     copyManualCode,
     code,
     setCode,
     isVerifying,
     verificationError,
+    clearVerificationError,
     submitCode,
   } = useTwoFactorAuth({ onClose });
 
@@ -86,26 +89,38 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
           Autenticación en dos pasos
         </h2>
         <p className="mt-2 max-w-2xl text-sm font-medium leading-5 text-slate-600">
-          Guía paso a paso para configurar Google Authenticator y activar la 
+          Guía paso a paso para configurar Google Authenticator y activar la
           verificación de dos pasos.
         </p>
       </div>
 
       {generationError && (
         <div className="mb-4">
-          <Alert type="error" message={generationError} />
+          <Alert
+            type="error"
+            message={generationError}
+            onClose={clearGenerationError}
+          />
         </div>
       )}
 
       {copySuccessMessage && (
         <div className="mb-4">
-          <Alert type="success" message={copySuccessMessage} />
+          <Alert
+            type="success"
+            message={copySuccessMessage}
+            onClose={clearCopySuccessMessage}
+          />
         </div>
       )}
 
       {verificationError && (
         <div className="mb-4">
-          <Alert type="error" message={verificationError} />
+          <Alert
+            type="error"
+            message={verificationError}
+            onClose={clearVerificationError}
+          />
         </div>
       )}
 
@@ -117,8 +132,9 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
           onToggle={toggleStep}
         >
           <p>
-            Entra a la App Store o Play Store. Busca y descarga <strong>Google Authenticator</strong>; 
-            si ya tienes otra app compatible con codigos TOTP, tambien la puedes usar.
+            Entra a la App Store o Play Store. Busca y descarga{" "}
+            <strong>Google Authenticator</strong>; si ya tienes otra app
+            compatible con codigos TOTP, tambien la puedes usar.
           </p>
         </AccordionStep>
 
@@ -129,9 +145,10 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
           onToggle={toggleStep}
         >
           <p>
-            Abre la aplicación, presione comenzar y seleccione la cuenta de correo
-            con la que se quiera iniciar. Busca la opción para agregar un código.
-            Normalmente aparece con un botón <strong>+</strong> o con la opción
+            Abre la aplicación, presione comenzar y seleccione la cuenta de
+            correo con la que se quiera iniciar. Busca la opción para agregar un
+            código. Normalmente aparece con un botón <strong>+</strong> o con la
+            opción
             <strong> Agregar código</strong>.
           </p>
         </AccordionStep>
@@ -175,8 +192,8 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
 
           <p className="mb-4">
             Si prefieres, en la app también puedes elegir{" "}
-            <strong>Ingresar clave de config.</strong> y copiar esta clave secreta
-            en la parte de "Tu clave":
+            <strong>Ingresar clave de config.</strong> y copiar esta clave
+            secreta en la parte de "Tu clave":
           </p>
 
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-[inset_0px_2px_4px_#00000014]">
@@ -206,8 +223,8 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
           onToggle={toggleStep}
         >
           <p className="mb-4">
-            Cuando la app genere el código temporal, escríbelo aquí y
-            presiona <strong>Verificar</strong>.
+            Cuando la app genere el código temporal, escríbelo aquí y presiona{" "}
+            <strong>Verificar</strong>.
           </p>
 
           <TwoFactorCode

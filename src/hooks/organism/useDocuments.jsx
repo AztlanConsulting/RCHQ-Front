@@ -37,7 +37,14 @@ export const useDocuments = (employeeId) => {
   const [localError, setLocalError] = useState("");
 
   const documentType = useField();
-  const { file, fileName, error: fileError, handleFileChange, reset: resetFile } = useDocumentFile();
+  const {
+    file,
+    fileName,
+    error: fileError,
+    handleFileChange,
+    reset: resetFile,
+    clearError: clearFileError,
+  } = useDocumentFile();
 
   const isEditing = Boolean(editingDocument);
   const { handleValue: setDocumentType } = documentType;
@@ -85,11 +92,20 @@ export const useDocuments = (employeeId) => {
   }, [fetchDocuments]);
 
   const handleModalSubmit = useCallback(async () => {
-    if (!canModify) { setModalError("No tienes permisos."); return; }
+    if (!canModify) {
+      setModalError("No tienes permisos.");
+      return;
+    }
     setLocalError("");
 
-    if (!documentType.value) { setLocalError("Selecciona el tipo de documento."); return; }
-    if (!isEditing && !file) { setLocalError("Selecciona un archivo."); return; }
+    if (!documentType.value) {
+      setLocalError("Selecciona el tipo de documento.");
+      return;
+    }
+    if (!isEditing && !file) {
+      setLocalError("Selecciona un archivo.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("documentField", documentType.value);
@@ -99,7 +115,11 @@ export const useDocuments = (employeeId) => {
     setModalError("");
     try {
       if (isEditing) {
-        await updateDocumentService(employeeId, editingDocument.documentId, formData);
+        await updateDocumentService(
+          employeeId,
+          editingDocument.documentId,
+          formData,
+        );
         setSuccessMessage("Documento actualizado correctamente.");
       } else {
         await uploadDocumentService(employeeId, formData);
@@ -119,13 +139,25 @@ export const useDocuments = (employeeId) => {
     } finally {
       setModalLoading(false);
     }
-  }, [canModify, documentType.value, isEditing, file, employeeId, editingDocument, fetchDocuments]);
+  }, [
+    canModify,
+    documentType.value,
+    isEditing,
+    file,
+    employeeId,
+    editingDocument,
+    fetchDocuments,
+  ]);
 
   const handleConflictConfirm = useCallback(async () => {
     if (!conflictDocument) return;
     setModalLoading(true);
     try {
-      await updateDocumentService(employeeId, conflictDocument.field, conflictDocument.formData);
+      await updateDocumentService(
+        employeeId,
+        conflictDocument.field,
+        conflictDocument.formData,
+      );
       setSuccessMessage("Documento reemplazado correctamente.");
       fetchDocuments();
     } catch (err) {
@@ -143,7 +175,9 @@ export const useDocuments = (employeeId) => {
     setDeletingId(docToDelete.documentId);
     try {
       await deleteDocumentService(employeeId, docToDelete.documentId);
-      setDocuments((prev) => prev.filter((d) => d.documentId !== docToDelete.documentId));
+      setDocuments((prev) =>
+        prev.filter((d) => d.documentId !== docToDelete.documentId),
+      );
       setSuccessMessage("Documento eliminado correctamente.");
     } catch (err) {
       setFetchError(err.message || "Error al eliminar el documento");
@@ -153,12 +187,15 @@ export const useDocuments = (employeeId) => {
     }
   }, [employeeId, docToDelete, canModify]);
 
-  const handleOpenEdit = useCallback((doc) => {
-    if (!canModify) return;
-    setEditingDocument(doc);
-    setModalError("");
-    setShowUploadModal(true);
-  }, [canModify]);
+  const handleOpenEdit = useCallback(
+    (doc) => {
+      if (!canModify) return;
+      setEditingDocument(doc);
+      setModalError("");
+      setShowUploadModal(true);
+    },
+    [canModify],
+  );
 
   const handleOpenUpload = useCallback(() => {
     if (!canModify) return;
@@ -173,18 +210,29 @@ export const useDocuments = (employeeId) => {
     setModalError("");
   }, []);
 
+  const clearFetchError = useCallback(() => setFetchError(""), []);
+  const clearSuccessMessage = useCallback(() => setSuccessMessage(""), []);
+  const clearUploadError = useCallback(() => {
+    setLocalError("");
+    setModalError("");
+    clearFileError();
+  }, [clearFileError]);
+
   return {
     documents,
     documentTypes,
     loadingDocs,
     fetchError,
+    clearFetchError,
     showUploadModal,
     editingDocument,
     modalLoading,
     modalError,
+    clearUploadError,
     docToDelete,
     deletingId,
     successMessage,
+    clearSuccessMessage,
     canModify,
     conflictDocument,
     setDocToDelete,

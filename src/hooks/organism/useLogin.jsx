@@ -20,6 +20,8 @@ export const useLogin = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const clearErrors = () => setErrors([]);
+
   const email = {
     value: emailField.value,
     handleValue: (val) =>
@@ -81,5 +83,13 @@ export const useLogin = () => {
     }
   };
 
-  return { email, password, showPassword, errors, loading, handleSubmit };
+  return {
+    email,
+    password,
+    showPassword,
+    errors,
+    loading,
+    clearErrors,
+    handleSubmit,
+  };
 };

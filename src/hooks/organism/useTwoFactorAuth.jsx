@@ -73,6 +73,8 @@ const useGeneration = () => {
     error,
     copySuccess,
     setError,
+    clearError: () => setError(""),
+    clearCopySuccess: () => setCopySuccess(""),
     generateQR,
     copyManualCode,
   };
@@ -120,7 +122,15 @@ const useVerification = (onSuccess) => {
     return () => clearTimeout(timer);
   }, [error]);
 
-  return { code, setCode, loading, error, setError, verifyCode };
+  return {
+    code,
+    setCode,
+    loading,
+    error,
+    setError,
+    clearError: () => setError(""),
+    verifyCode,
+  };
 };
 
 export const useTwoFactorAuth = ({ onClose }) => {
@@ -149,11 +159,14 @@ export const useTwoFactorAuth = ({ onClose }) => {
     isGenerating: generation.loading,
     generationError: generation.error,
     copySuccessMessage: generation.copySuccess,
+    clearGenerationError: generation.clearError,
+    clearCopySuccessMessage: generation.clearCopySuccess,
     copyManualCode: generation.copyManualCode,
     code: verification.code,
     setCode: verification.setCode,
     isVerifying: verification.loading,
     verificationError: verification.error,
+    clearVerificationError: verification.clearError,
     submitCode: verification.verifyCode,
   };
 };

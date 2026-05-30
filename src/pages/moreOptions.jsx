@@ -23,6 +23,7 @@ const MoreOptions = () => {
     error,
     setError,
     successMessage,
+    setSuccessMessage,
     handleDisable,
     handleEnableSuccess,
     handleCancelDisable,
@@ -52,7 +53,11 @@ const MoreOptions = () => {
 
       {successMessage && (
         <div className="mb-4">
-          <Alert type="success" message={successMessage} />
+          <Alert
+            type="success"
+            message={successMessage}
+            onClose={() => setSuccessMessage("")}
+          />
         </div>
       )}
 
@@ -150,7 +155,13 @@ const MoreOptions = () => {
               Ingresa tu contraseña para confirmar.
             </p>
 
-            {error && <Alert type="error" message={error} />}
+            {error && (
+              <Alert
+                type="error"
+                message={error}
+                onClose={() => setError("")}
+              />
+            )}
 
             <TextField
               id="disable-password"

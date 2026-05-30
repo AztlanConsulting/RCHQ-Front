@@ -16,27 +16,30 @@ export const useDocumentFile = ({
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
 
-  const handleFileChange = useCallback((e) => {
-    const selected = e.target.files[0];
-    if (!selected) return;
+  const handleFileChange = useCallback(
+    (e) => {
+      const selected = e.target.files[0];
+      if (!selected) return;
 
-    if (!ALLOWED_TYPES.includes(selected.type)) {
-      setError(invalidTypeMessage);
-      setFile(null);
-      setFileName("");
-      return;
-    }
-    if (selected.size > MAX_SIZE) {
-      setError(maxSizeMessage);
-      setFile(null);
-      setFileName("");
-      return;
-    }
+      if (!ALLOWED_TYPES.includes(selected.type)) {
+        setError(invalidTypeMessage);
+        setFile(null);
+        setFileName("");
+        return;
+      }
+      if (selected.size > MAX_SIZE) {
+        setError(maxSizeMessage);
+        setFile(null);
+        setFileName("");
+        return;
+      }
 
-    setError("");
-    setFile(selected);
-    setFileName(selected.name);
-  }, [invalidTypeMessage, maxSizeMessage]);
+      setError("");
+      setFile(selected);
+      setFileName(selected.name);
+    },
+    [invalidTypeMessage, maxSizeMessage],
+  );
 
   const reset = useCallback(() => {
     setFile(null);
@@ -44,5 +47,7 @@ export const useDocumentFile = ({
     setError("");
   }, []);
 
-  return { file, fileName, error, handleFileChange, reset };
+  const clearError = useCallback(() => setError(""), []);
+
+  return { file, fileName, error, handleFileChange, reset, clearError };
 };
