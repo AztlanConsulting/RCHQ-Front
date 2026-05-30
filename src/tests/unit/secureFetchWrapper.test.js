@@ -16,17 +16,13 @@ describe("secureFetch", () => {
     vi.resetModules();
     vi.clearAllMocks();
     localStorage.clear();
-    Object.defineProperty(globalThis.navigator, "locks", {
-      configurable: true,
-      value: undefined,
-    });
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it("renueva la sesion sin navigator.locks y reintenta la peticion", async () => {
+  it("renueva la sesion y reintenta la peticion", async () => {
     getTokenMock.mockReturnValue("expired-token");
     refreshSessionServiceMock.mockResolvedValue({
       data: { token: "new-token" },
@@ -52,16 +48,10 @@ describe("secureFetch", () => {
     expect(retryHeaders.get("Authorization")).toBe("Bearer new-token");
   });
 
-  it("espera el token de otra pestana si ya hay un refresh fallback activo", async () => {
-    let storedToken = "expired-token";
-    getTokenMock.mockImplementation(() => storedToken);
-    localStorage.setItem(
-      "auth-refresh-lock:fallback",
-      JSON.stringify({
-        owner: "other-tab",
-        expiresAt: Date.now() + 10000,
-      }),
-    );
+  it("reintenta con el token actual si otro flujo ya lo actualizo", async () => {
+    getTokenMock
+      .mockReturnValueOnce("expired-token")
+      .mockReturnValueOnce("token-from-other-flow");
     globalThis.fetch = vi
       .fn()
       .mockResolvedValueOnce(
@@ -72,20 +62,7 @@ describe("secureFetch", () => {
       );
 
     const { secureFetch } = await import("../../utils/secureFetchWrapper");
-    const responsePromise = secureFetch("/event/getAllTypes");
-
-    setTimeout(() => {
-      storedToken = "token-from-other-tab";
-      localStorage.setItem("token", storedToken);
-      window.dispatchEvent(
-        new StorageEvent("storage", {
-          key: "token",
-          newValue: storedToken,
-        }),
-      );
-    }, 0);
-
-    const response = await responsePromise;
+    const response = await secureFetch("/event/getAllTypes");
 
     expect(response.status).toBe(200);
     expect(refreshSessionServiceMock).not.toHaveBeenCalled();
@@ -93,11 +70,11 @@ describe("secureFetch", () => {
 
     const retryHeaders = globalThis.fetch.mock.calls[1][1].headers;
     expect(retryHeaders.get("Authorization")).toBe(
-      "Bearer token-from-other-tab",
+      "Bearer token-from-other-flow",
     );
   });
 
-  it("agrupa refresh concurrentes sin navigator.locks en una sola llamada", async () => {
+  it("agrupa refresh concurrentes en una sola llamada", async () => {
     let storedToken = "expired-token";
     let resolveRefresh;
     getTokenMock.mockImplementation(() => storedToken);
