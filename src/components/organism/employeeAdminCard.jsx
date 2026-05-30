@@ -28,10 +28,22 @@ const isAdminRole = (roleName = "") =>
     .toLowerCase()
     .includes("Administrador");
 
+const capitalizeFirstLetter = (value) => {
+  if (value == null || value === "") return "N/A";
+
+  const normalized = String(value);
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+
 const formatContractTypeLabel = (value) => {
   if (!value) return "N/A";
-  if (value === "Nomina") return "Nómina";
-  return value;
+
+  const matchedType = TIPOS.find(
+    (type) => type.value.toLowerCase() === String(value).toLowerCase(),
+  );
+  if (matchedType) return matchedType.label;
+
+  return capitalizeFirstLetter(value);
 };
 
 const EmployeeAdminCard = ({
@@ -134,7 +146,7 @@ const EmployeeAdminCard = ({
           <div className="min-w-0">
             <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Frecuencia de pago</Type>
             <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem]">
-              {employee?.frequencyOfPaymentName ?? "N/A"}
+              {capitalizeFirstLetter(employee?.frequencyOfPaymentName)}
             </Type>
           </div>
 

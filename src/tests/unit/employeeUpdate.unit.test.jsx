@@ -553,9 +553,9 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Información Administrativa")).toBeInTheDocument();
     });
 
-    it("muestra el tipo de contrato", () => {
+    it("muestra el tipo de contrato con la primera letra en mayúscula", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("tiempo_completo")).toBeInTheDocument();
+      expect(screen.getByText("Tiempo_completo")).toBeInTheDocument();
     });
 
     it("muestra el salario con signo de pesos", () => {
