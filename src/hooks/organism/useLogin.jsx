@@ -77,7 +77,13 @@ export const useLogin = () => {
       navigate("/app/calendario", { replace: true });
     } catch (err) {
       console.error(err);
-      setErrors(getReadableErrors(err));
+      if (err.code === "SESSION_ALREADY_ACTIVE") {
+        setErrors([
+          "Ya hay una sesion activa para esta cuenta. No se puede iniciar otra sesion al mismo tiempo.",
+        ]);
+      } else {
+        setErrors(getReadableErrors(err));
+      }
     } finally {
       setLoading(false);
     }
