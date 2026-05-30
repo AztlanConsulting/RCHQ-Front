@@ -79,11 +79,17 @@ const toDateOnly = (value) => {
     return dateOnlyToLocalDate(value);
 };
 
-const isEventMultiDay = (rawEvent) => {
+const isEventMultiDay = (rawEvent, calendarTimeZone) => {
     if (rawEvent.focus !== "eventos") return false;
     if (rawEvent.allDay === true) return false;
-    const startDay = normalizeDateOnly(rawEvent.start ?? rawEvent.startDate);
-    const endDay = normalizeDateOnly(rawEvent.end ?? rawEvent.endDate);
+    const startDay = dateInTimeZoneToInputValue(
+        rawEvent.start ?? rawEvent.startDate,
+        calendarTimeZone,
+    );
+    const endDay = dateInTimeZoneToInputValue(
+        rawEvent.end ?? rawEvent.endDate,
+        calendarTimeZone,
+    );
     if (!startDay || !endDay) return false;
     return startDay !== endDay;
 };
@@ -268,7 +274,7 @@ const getFilteredEvents = (
             const isRangeRecord =
                 rawEvent.focus === "ausencias" ||
                 rawEvent.focus === "vacaciones";
-            const isMultiDay = isEventMultiDay(rawEvent);
+            const isMultiDay = isEventMultiDay(rawEvent, calendarTimeZone);
             const showInAllDayRow =
                 isMultiDay && isTimeGridCalendarView(calendarView);
             const isExpandedListEvent = Boolean(
