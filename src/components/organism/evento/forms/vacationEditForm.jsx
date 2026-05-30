@@ -52,7 +52,7 @@ const VacationEditForm = ({
                             </Type>
                             <Type
                                 variant="body"
-                                className="text-[1.05rem] leading-snug"
+                                className="text-[1.05rem] leading-snug wrap-break-word"
                             >
                                 {event.employeeName || "-"}
                             </Type>
