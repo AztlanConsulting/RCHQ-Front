@@ -1,5 +1,4 @@
 import Alert from "../../components/atoms/alerts";
-import SmallButton from "../../components/atoms/smallButton";
 import ModalCloseButton from "../../components/atoms/modalCloseButton";
 import TwoFactorCode from "../../components/organism/twoFactorCode";
 import { useTwoFactorAuth } from "../../hooks/organism/useTwoFactorAuth";
@@ -180,18 +179,22 @@ const TwoFactorAuth = ({ onClose, onDismiss }) => {
             en la parte de "Tu clave":
           </p>
 
-          <div className="space-y-3">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-[0.95rem] font-bold tracking-[0.06em] text-slate-800 break-all sm:px-4">
-              {manualCode || "Generando clave..."}
-            </div>
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-[inset_0px_2px_4px_#00000014]">
+            <div className="flex min-h-[56px] items-stretch">
+              <div className="flex min-w-0 flex-1 items-center px-3 py-3 sm:px-4">
+                <span className="w-full break-all text-left text-[0.95rem] font-bold tracking-[0.06em] text-slate-800">
+                  {manualCode || "Generando clave..."}
+                </span>
+              </div>
 
-            <div className="flex justify-center">
-              <SmallButton
-                text="Copiar clave"
+              <button
+                type="button"
                 onClick={copyManualCode}
                 disabled={!manualCode}
-                className="min-w-[10rem]"
-              />
+                className="shrink-0 border-l border-slate-200 bg-[#24375e] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#1d2c4b] disabled:cursor-not-allowed disabled:bg-slate-300 sm:px-5"
+              >
+                Copiar
+              </button>
             </div>
           </div>
         </AccordionStep>

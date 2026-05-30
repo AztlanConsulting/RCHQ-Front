@@ -44,7 +44,7 @@ describe("TwoFactorAuth", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("ABC123SECRET")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Copiar clave" }),
+      screen.getByRole("button", { name: "Copiar" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Código mock")).toBeInTheDocument();
   });
