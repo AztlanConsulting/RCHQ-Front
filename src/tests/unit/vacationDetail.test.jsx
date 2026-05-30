@@ -255,6 +255,27 @@ describe("VacationDetail", () => {
         expect(screen.getByText("3 de julio de 2026")).toBeInTheDocument();
     });
 
+    it("marca los días como horario cdmx cuando se consulta en horario foráneo", () => {
+        renderVacationDetail({
+            event: {
+                ...baseVacation,
+                start: "2026-06-05T06:00:00.000Z",
+                end: "2026-06-10T06:00:00.000Z",
+            },
+            showMexicoReferenceNotice: true,
+            calendarTimeZone: "America/Matamoros",
+        });
+
+        expect(
+            screen.getByText("Días totales (horario cdmx):"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Días hábiles (horario cdmx):"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Hora de inicio:")).toBeInTheDocument();
+        expect(screen.getByText("Hora de término:")).toBeInTheDocument();
+    });
+
     it("llama a onApprove al hacer click en aprobar", () => {
         const onApprove = vi.fn();
         renderVacationDetail({

@@ -1,8 +1,12 @@
 import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+    formatEventDate,
+    formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const VacationWorkerDetail = ({
     event,
@@ -18,6 +22,8 @@ const VacationWorkerDetail = ({
     onSubmitEdit,
     onVacationFieldChange,
     onDelete,
+    showMexicoReferenceNotice = false,
+    calendarTimeZone,
 }) => {
     const isPast = isPastDate(event.start);
     const status = Number(event.status);
@@ -30,6 +36,9 @@ const VacationWorkerDetail = ({
         isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
     const statusLabel =
         isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
+    const mexicoDaysSuffix = showMexicoReferenceNotice
+        ? " (horario cdmx)"
+        : "";
 
     if (isEditing) {
         return (
@@ -59,6 +68,7 @@ const VacationWorkerDetail = ({
             >
                 {title}
             </Type>
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
                     <Type
@@ -74,26 +84,78 @@ const VacationWorkerDetail = ({
                         {formatEventDate(event.readableStart) || "—"}
                     </Type>
                 </div>
+                {showMexicoReferenceNotice ? (
+                    <>
+                        <div>
+                            <Type
+                                variant="metric-label"
+                                className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                            >
+                                Hora de inicio:
+                            </Type>
+                            <Type
+                                variant="body"
+                                className="text-[1.05rem] leading-snug"
+                            >
+                                {formatEventTime(event.start, {
+                                    timeZone: calendarTimeZone,
+                                })}
+                            </Type>
+                        </div>
+
+                        <div>
+                            <Type
+                                variant="metric-label"
+                                className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                            >
+                                Fecha de término:
+                            </Type>
+                            <Type
+                                variant="body"
+                                className="text-[1.05rem] leading-snug"
+                            >
+                                {formatEventDate(event.readableEnd) || "—"}
+                            </Type>
+                        </div>
+                        <div>
+                            <Type
+                                variant="metric-label"
+                                className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                            >
+                                Hora de término:
+                            </Type>
+                            <Type
+                                variant="body"
+                                className="text-[1.05rem] leading-snug"
+                            >
+                                {formatEventTime(event.end, {
+                                    timeZone: calendarTimeZone
+                                })}
+                            </Type>
+                        </div>
+                    </>
+                ) : (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Fecha de término:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventDate(event.readableEnd) || "—"}
+                        </Type>
+                    </div>
+                )}
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de fin:
-                    </Type>
-                    <Type
-                        variant="body"
-                        className="text-[1.05rem] leading-snug"
-                    >
-                        {formatEventDate(event.readableEnd) || "—"}
-                    </Type>
-                </div>
-                <div>
-                    <Type
-                        variant="metric-label"
-                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
-                    >
-                        Días totales:
+                        Días totales{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -107,7 +169,7 @@ const VacationWorkerDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días hábiles:
+                        Días hábiles{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"

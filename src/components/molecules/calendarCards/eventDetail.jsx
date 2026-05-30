@@ -6,6 +6,7 @@ import {
     formatEventTime,
 } from "../../../utils/calendarEventDetail";
 import { useExpandableList } from "../../../hooks/atoms/useExpandableList";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const canDelete = (scope, role) => {
     if (scope === "global") return role === "Administrador";
@@ -29,6 +30,8 @@ const EventDetail = ({
     isDeleting = false,
     deleteError = "",
     viewerRole = "",
+    calendarTimeZone,
+    showMexicoReferenceNotice = false,
 }) => {
     const {
         visibleItems: visiblePeople,
@@ -93,6 +96,8 @@ const EventDetail = ({
                 </Type>
             </div>
 
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
+
             {event.subtitle ? (
                 <Type
                     variant="body"
@@ -115,7 +120,9 @@ const EventDetail = ({
                             Inicio:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.start ?? event.startStr)}
+                            {formatEventTime(event.start ?? event.startStr, {
+                                timeZone: calendarTimeZone,
+                            })}
                         </p>
                     </div>
                     <div className="w-full flex items-center justify-between gap-4 mb-4">
@@ -123,7 +130,9 @@ const EventDetail = ({
                             Fin:
                         </Type>
                         <p className="text-sm">
-                            {formatEventTime(event.end ?? event.endStr)}
+                            {formatEventTime(event.end ?? event.endStr, {
+                                timeZone: calendarTimeZone
+                            })}
                         </p>
                     </div>
                 </>

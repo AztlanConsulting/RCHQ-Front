@@ -21,6 +21,7 @@ import { useBaseCalendar } from "../hooks/organism/useBaseCalendar";
 import { useCalendarFilters } from "../hooks/organism/useCalendarFilters";
 import { useCalendarPage } from "../hooks/pages/useCalendarPage";
 import { useCalendarSearchParams } from "../hooks/pages/useCalendarSearchParams";
+import { MEXICO_TIME_ZONE } from "../utils/timeZone";
 
 const isManagementRole = (role) =>
     role === "Administrador" || role === "Coordinador";
@@ -40,6 +41,13 @@ const Calendario = () => {
         viewerRole,
         calendarMode,
         setCalendarMode,
+        calendarTimeZone,
+        calendarNow,
+        calendarTimeZoneMode,
+        setCalendarTimeZoneMode,
+        calendarTimeZoneOptions,
+        canSwitchCalendarTimeZone,
+        fullCalendarTimeZone,
         calendarModeOptions,
         canSwitchCalendarMode,
         toggleList,
@@ -95,7 +103,12 @@ const Calendario = () => {
         filtersModalOpen,
         setFiltersModalOpen,
         visibleEvents,
-    } = useCalendarFilters(allEvents, { isList, viewerRole, calendarMode });
+    } = useCalendarFilters(allEvents, {
+        isList,
+        viewerRole,
+        calendarMode,
+        calendarTimeZone,
+    });
 
     const {
         selectedEvent,
@@ -237,7 +250,16 @@ const Calendario = () => {
         onCalendarModeChange: setCalendarMode,
         calendarModeOptions,
         canSwitchCalendarMode,
+        calendarTimeZoneMode,
+        onCalendarTimeZoneModeChange: setCalendarTimeZoneMode,
+        calendarTimeZoneOptions,
+        canSwitchCalendarTimeZone,
     };
+    const showMexicoReferenceNotice =
+        calendarTimeZone !== MEXICO_TIME_ZONE &&
+        (selectedEvent?.focus === "ausencias" ||
+            selectedEvent?.focus === "vacaciones" ||
+            selectedEvent?.isFreeDay === true);
 
     return (
         <div className="relative flex w-full min-w-0 flex-col gap-4 lg:flex-row lg:items-start overflow-visible">
@@ -274,9 +296,11 @@ const Calendario = () => {
                 ) : null}
 
                 <BaseCalendar
-                    key={`${viewType}-${isList}`}
+                    key={`${viewType}-${isList}-${calendarTimeZoneMode}`}
                     initialView={currentCalendarView}
                     initialDate={currentCalendarDate}
+                    timeZone={fullCalendarTimeZone}
+                    now={calendarNow}
                     loadButtonsAtStart={loadButtonsAtStart}
                     calendarRef={calendarRef}
                     toggleList={toggleList}
@@ -346,6 +370,10 @@ const Calendario = () => {
                                     canManageAbsence={isManagementRole(
                                         viewerRole,
                                     )}
+                                    showMexicoReferenceNotice={
+                                        showMexicoReferenceNotice
+                                    }
+                                    calendarTimeZone={calendarTimeZone}
                                     onOpenEvidence={openAbsenceEvidence}
                                     onStartEdit={startAbsenceEdit}
                                     onCancelEdit={cancelAbsenceEdit}
@@ -362,6 +390,10 @@ const Calendario = () => {
                                 <WorkerAbsenceDetail
                                     event={selectedEvent}
                                     evidenceLabel={absenceEvidenceLabel}
+                                    showMexicoReferenceNotice={
+                                        showMexicoReferenceNotice
+                                    }
+                                    calendarTimeZone={calendarTimeZone}
                                     onOpenEvidence={openAbsenceEvidence}
                                 />
                             );
@@ -384,6 +416,10 @@ const Calendario = () => {
                                     onDelete={openDeleteVacation}
                                     onApprove={openApproveVacation}
                                     onReject={openRejectVacation}
+                                    showMexicoReferenceNotice={
+                                        showMexicoReferenceNotice
+                                    }
+                                    calendarTimeZone={calendarTimeZone}
                                 />
                             ) : (
                                 <VacationWorkerDetail
@@ -400,6 +436,10 @@ const Calendario = () => {
                                     onSubmitEdit={submitVacationEdit}
                                     onVacationFieldChange={setVacationField}
                                     onDelete={openDeleteVacation}
+                                    showMexicoReferenceNotice={
+                                        showMexicoReferenceNotice
+                                    }
+                                    calendarTimeZone={calendarTimeZone}
                                 />
                             );
 
@@ -439,6 +479,10 @@ const Calendario = () => {
                                         : ""
                                     }
                                     viewerRole={viewerRole}
+                                    calendarTimeZone={calendarTimeZone}
+                                    showMexicoReferenceNotice={
+                                        showMexicoReferenceNotice
+                                    }
                                 />
                             );
                         }
@@ -476,6 +520,7 @@ const Calendario = () => {
                 isOpen={editingHouseEvent != null}
                 onClose={() => setEditingHouseEvent(null)}
                 onSuccess={onHouseEventEditSuccess}
+                calendarTimeZone={calendarTimeZone}
             />
 
             <UpdatePersonalEventModal
@@ -483,6 +528,9 @@ const Calendario = () => {
                 isOpen={editingPersonalEvent != null}
                 onClose={() => setEditingPersonalEvent(null)}
                 onSuccess={onPersonalEventEditSuccess}
+                calendarTimeZone={calendarTimeZone}
+                calendarTimeZoneMode={calendarTimeZoneMode}
+                canSwitchCalendarTimeZone={canSwitchCalendarTimeZone}
             />
 
             <RegisterEventModal
@@ -497,12 +545,14 @@ const Calendario = () => {
                     });
                 }}
                 onFeedback={showCalendarAlert}
-                initialStartDate={
-                    selectedDates?.startDate?.toISOString().split("T")[0]
-                }
-                initialEndDate={
-                    selectedDates?.endDate?.toISOString().split("T")[0]
-                }
+                initialStartDate={selectedDates?.startDate}
+                initialEndDate={selectedDates?.endDate}
+                initialStartTime={selectedDates?.startTime}
+                initialEndTime={selectedDates?.endTime}
+                initialAllDay={selectedDates?.allDay}
+                calendarTimeZone={calendarTimeZone}
+                calendarTimeZoneMode={calendarTimeZoneMode}
+                canSwitchCalendarTimeZone={canSwitchCalendarTimeZone}
             />
         </div>
     );

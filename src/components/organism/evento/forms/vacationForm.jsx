@@ -5,6 +5,7 @@ import Alert from "../../../atoms/alerts";
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useVacationForm } from "../../../../hooks/pages/useVacationForm";
@@ -36,6 +37,9 @@ const VacationForm = (props) => {
     const [openDropdown, setOpenDropdown] = useState(null);
 
     const viewerRole = getCalendarViewerRole();
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? "Las vacaciones se guardan con base en horario central de México porque se contabilizan contra días laborales y días libres mexicanos."
+        : "";
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
     const ruleMinDate = parseDateOnly(dateRules?.minDate) ?? vacationDateMin;
@@ -155,6 +159,8 @@ const VacationForm = (props) => {
                     )}
                 </div>
             </div>
+
+            <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
             {viewerRole === "Coordinador" ? (
                 <p className="mb-10 mt-2 text-xs text-slate-400">

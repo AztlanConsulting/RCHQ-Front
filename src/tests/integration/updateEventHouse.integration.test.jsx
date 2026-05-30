@@ -10,6 +10,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import UpdateHouseEventModal from "../../components/organism/evento/updateHouseEventModal";
 import { updateHouseEvent } from "../../services/updateEventService";
 import { getEventTypes } from "../../services/eventService";
+import {
+    getBrowserTimeZone,
+    zonedDateTimeToIso,
+} from "../../utils/timeZone";
 
 vi.mock("../../services/updateEventService", () => ({
     updateHouseEvent: vi.fn(),
@@ -178,10 +182,11 @@ describe("Integración: editar evento de casa", () => {
         expect(updateHouseEvent).toHaveBeenCalledWith("evt-existing", {
             eventTypeId: EVENT_TYPE_ID,
             name: "Limpieza inicial",
-            start: "2026-05-05T09:00:00.000-06:00",
-            end: "2026-05-05T10:00:00.000-06:00",
+            start: mockEvent.start,
+            end: mockEvent.end,
             allDay: false,
             isFreeDay: false,
+            timeZone: getBrowserTimeZone(),
             description: "Descripción inicial.",
             forceOverlap: false,
         });
@@ -226,8 +231,17 @@ describe("Integración: editar evento de casa", () => {
             "evt-existing",
             expect.objectContaining({
                 allDay: true,
-                start: "2026-05-05",
-                end: "2026-05-05",
+                start: zonedDateTimeToIso(
+                    "2026-05-05",
+                    "00:00",
+                    getBrowserTimeZone(),
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-05-06",
+                    "00:00",
+                    getBrowserTimeZone(),
+                ),
+                timeZone: getBrowserTimeZone(),
             }),
         );
     });

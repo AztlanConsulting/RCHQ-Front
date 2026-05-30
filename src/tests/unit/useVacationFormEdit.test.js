@@ -6,10 +6,15 @@ import {
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
+import { getEmployeeDateRules } from "../../services/calendarService";
 
 vi.mock("../../services/vacationService", () => ({
     getRemainingVacations: vi.fn(),
     updateVacationRequestDates: vi.fn(),
+}));
+
+vi.mock("../../services/calendarService", () => ({
+    getEmployeeDateRules: vi.fn(),
 }));
 
 const baseVacation = {
@@ -51,6 +56,13 @@ describe("useVacationFormEdit", () => {
             startDate: "2026-01-01",
             endDate: "2026-12-31",
         });
+        getEmployeeDateRules.mockResolvedValue({
+            remainingVacations: 8,
+            vacationPeriod: {
+                startDate: "2026-01-01",
+                endDate: "2026-12-31",
+            },
+        });
     });
 
     it("inicializa el formulario con vacationRequestId, startDate y endDate existentes", async () => {
@@ -68,7 +80,7 @@ describe("useVacationFormEdit", () => {
         });
 
         await waitFor(() => {
-            expect(getRemainingVacations).toHaveBeenCalledWith("emp-1");
+            expect(getEmployeeDateRules).toHaveBeenCalledWith("emp-1", "vacation");
         });
     });
 
