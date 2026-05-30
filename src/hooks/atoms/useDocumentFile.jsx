@@ -9,7 +9,7 @@ const ALLOWED_TYPES = [
 const MAX_SIZE = 10 * 1024 * 1024;
 
 export const useDocumentFile = ({
-  invalidTypeMessage = "Solo se permiten archivos PDF, PNG o JPG.",
+  invalidTypeMessage = "Solo se permiten archivos PDF, PNG, JPG, JPEG o HEIC.",
   maxSizeMessage = "El archivo no puede superar los 10 MB.",
 } = {}) => {
   const [file, setFile] = useState(null);
