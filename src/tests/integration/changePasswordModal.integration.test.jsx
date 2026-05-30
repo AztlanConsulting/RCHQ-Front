@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { useState } from "react";
 import ChangePasswordModal from "../../components/organism/changePasswordModal";
 
@@ -10,6 +10,7 @@ const ChangePasswordModalHarness = ({
   onSubmit = vi.fn(),
   onClose = vi.fn(),
 }) => {
+  const [modalErrors, setModalErrors] = useState(errors);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -23,7 +24,8 @@ const ChangePasswordModalHarness = ({
       isOpen={isOpen}
       onClose={onClose}
       loading={loading}
-      errors={errors}
+      errors={modalErrors}
+      onErrorsClose={() => setModalErrors([])}
       onSubmit={onSubmit}
       currentPassword={currentPassword}
       setCurrentPassword={setCurrentPassword}
@@ -66,6 +68,10 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("ChangePasswordModal — integración", () => {
   it("llama onSubmit con los datos capturados", async () => {
     const onSubmit = vi.fn();
@@ -93,6 +99,28 @@ describe("ChangePasswordModal — integración", () => {
     expect(
       screen.getByText(/la contraseña actual es incorrecta/i),
     ).toBeInTheDocument();
+  });
+
+  it("oculta el snackbar de error después del tiempo configurado", () => {
+    vi.useFakeTimers();
+
+    renderModal({
+      errors: ["Las contraseñas no coinciden"],
+    });
+
+    expect(screen.getByText(/las contraseñas no coinciden/i)).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(5300);
+    });
+
+    expect(
+      screen.queryByText(/las contraseñas no coinciden/i),
+    ).not.toBeInTheDocument();
   });
 
   it("llama onClose al presionar el botón de cerrar", () => {
