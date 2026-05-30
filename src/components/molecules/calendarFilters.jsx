@@ -82,6 +82,59 @@ const CalendarFilters = ({
   showPageHeading = true,
   stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
 }) => {
+  const toggleFocusFilter = (focusValue, checked) => {
+    setFocusFilters((currentValues = []) => {
+      if (checked) {
+        return currentValues.includes(focusValue)
+          ? currentValues
+          : [...currentValues, focusValue];
+      }
+
+      return currentValues.filter((value) => value !== focusValue);
+    });
+  };
+
+  const eventFocusOption = focusOptions.find((option) => option.value === "eventos");
+  const vacationFocusOption = focusOptions.find((option) => option.value === "vacaciones");
+  const absenceFocusOption = focusOptions.find((option) => option.value === "ausencias");
+  const isEventChecked = focusFilters.includes("eventos");
+  const isVacationChecked = focusFilters.includes("vacaciones");
+  const isAbsenceChecked = focusFilters.includes("ausencias");
+
+  const renderSection = ({ focusOption, checked, content }) => (
+    <details className="group w-full" onClick={(event) => !checked && event.preventDefault()}>
+      <summary className="flex list-none items-center justify-between gap-3 cursor-pointer">
+        <label
+          className="flex min-w-0 items-center gap-2"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={(event) => toggleFocusFilter(focusOption.value, event.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 accent-slate-800 shrink-0"
+          />
+          {focusTrailing(focusOption)}
+          <Type variant="metric-label" as="span" className="text-sm text-[#121212]">
+            {String(focusOption.label).toUpperCase()}
+          </Type>
+        </label>
+        <span aria-hidden className={checked ? "" : "cursor-not-allowed opacity-40"}>
+          <svg
+            className="h-4 w-4 text-gray-400 transition-transform duration-200 group-open:rotate-180"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </summary>
+      {checked ? <div className="mt-4 flex flex-col gap-4">{content}</div> : null}
+    </details>
+  );
+
   return (
     <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
       {showPageHeading ? (
@@ -117,15 +170,6 @@ const CalendarFilters = ({
         </div>
       ) : null}
       <div className={`flex flex-col gap-4 mt-4`}>
-        <FilterGroup
-          label="ENFOQUE"
-          name="focus"
-          options={focusOptions}
-          values={focusFilters}
-          setValues={setFocusFilters}
-          renderTrailing={focusTrailing}
-        />
-        <div className="border border-b  border-[#1F3664]"></div>
         {viewerRole === "Coordinador" && calendarMode === "house" ? (
           <>
             <SearchableCheckboxDropdown
@@ -143,30 +187,38 @@ const CalendarFilters = ({
             <div className="border border-b border-[#EAEAEA]"></div>
           </>
         ) : null}
+        <div className="border border-b  border-[#1F3664]"></div>
         <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
-          <FilterGroup
-            label="VISIBILIDAD"
-            name="scope"
-            options={scopeOptions}
-            values={scopeFilters}
-            setValues={setScopeFilters}
-            renderTrailing={scopeTrailing}
-          />
+          {renderSection({
+            focusOption: eventFocusOption,
+            checked: isEventChecked,
+            content: (
+              <>
+                <FilterGroup
+                  label="VISIBILIDAD"
+                  name="scope"
+                  options={scopeOptions}
+                  values={scopeFilters}
+                  setValues={setScopeFilters}
+                  renderTrailing={scopeTrailing}
+                  disabled={!showEventFilters}
+                />
+                <FilterGroup
+                  label="CATEGORIA"
+                  name="tipo-evento"
+                  options={eventTypeOptions}
+                  values={eventTypeFilters}
+                  setValues={setEventTypeFilters}
+                  disabled={!showEventFilters}
+                />
+              </>
+            ),
+          })}
           <div className="border border-b border-[#EAEAEA]"></div>
-          {showEventFilters && (
-            <>
-              <FilterGroup
-                label="CATEGORIA"
-                name="tipo-evento"
-                options={eventTypeOptions}
-                values={eventTypeFilters}
-                setValues={setEventTypeFilters}
-              />
-              <div className="border border-b border-[#EAEAEA]"></div>
-            </>
-          )}
-          {showVacationFilters && (
-            <>
+          {renderSection({
+            focusOption: vacationFocusOption,
+            checked: isVacationChecked,
+            content: (
               <FilterGroup
                 label="ESTATUS DE VACACIONES"
                 name="vacaciones"
@@ -174,36 +226,44 @@ const CalendarFilters = ({
                 values={vacationStatusFilters}
                 setValues={setVacationStatusFilters}
                 renderTrailing={vacationTrailing}
+                disabled={!showVacationFilters}
               />
-              <div className="border border-b border-[#EAEAEA]"></div>
-            </>
-          )}
-          {showAbscenceFilters && (
-            <>
-              <FilterGroup
-                label="TIPO DE AUSENCIA"
-                name="absence-type"
-                options={absenceTypeOptions}
-                values={absenceTypeFilters}
-                setValues={setAbsenceTypeFilters}
-              />
-              <FilterGroup
-                label="ESTATUS"
-                name="absence-status"
-                options={absenceStatusOptions}
-                values={absenceStatusFilters}
-                setValues={setAbsenceStatusFilters}
-                renderTrailing={absenceStatusTrailing}
-              />
-              <FilterGroup
-                label="EVIDENCIA"
-                name="absence-evidence"
-                options={absenceEvidenceOptions}
-                values={absenceEvidenceFilters}
-                setValues={setAbsenceEvidenceFilters}
-              />
-            </>
-          )}
+            ),
+          })}
+          <div className="border border-b border-[#EAEAEA]"></div>
+          {renderSection({
+            focusOption: absenceFocusOption,
+            checked: isAbsenceChecked,
+            content: (
+              <>
+                <FilterGroup
+                  label="TIPO DE AUSENCIA"
+                  name="absence-type"
+                  options={absenceTypeOptions}
+                  values={absenceTypeFilters}
+                  setValues={setAbsenceTypeFilters}
+                  disabled={!showAbscenceFilters}
+                />
+                <FilterGroup
+                  label="ESTATUS"
+                  name="absence-status"
+                  options={absenceStatusOptions}
+                  values={absenceStatusFilters}
+                  setValues={setAbsenceStatusFilters}
+                  renderTrailing={absenceStatusTrailing}
+                  disabled={!showAbscenceFilters}
+                />
+                <FilterGroup
+                  label="EVIDENCIA"
+                  name="absence-evidence"
+                  options={absenceEvidenceOptions}
+                  values={absenceEvidenceFilters}
+                  setValues={setAbsenceEvidenceFilters}
+                  disabled={!showAbscenceFilters}
+                />
+              </>
+            ),
+          })}
         </div>
       </div>
     </div>
