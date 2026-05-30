@@ -54,7 +54,16 @@ const retryWithToken = (url, init, headers, token) => {
 export async function secureFetch(input, init = {}) {
   const headers = new Headers(init.headers || {});
   const url = buildUrl(input);
-  const initialToken = getToken();
+  let initialToken = getToken();
+
+  if (!init.skipAuthRedirect && refreshPromise) {
+    try {
+      initialToken = await getSharedRefreshPromise();
+    } catch {
+      window.dispatchEvent(new Event("auth:forced-logout"));
+      return SESSION_EXPIRED_RESPONSE();
+    }
+  }
 
   if (initialToken && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${initialToken}`);
@@ -67,11 +76,7 @@ export async function secureFetch(input, init = {}) {
   }
 
   const currentToken = getToken();
-  if (!currentToken) {
-    return response;
-  }
-
-  if (currentToken !== initialToken) {
+  if (currentToken && currentToken !== initialToken) {
     return retryWithToken(url, init, headers, currentToken);
   }
 
