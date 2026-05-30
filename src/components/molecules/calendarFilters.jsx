@@ -3,7 +3,7 @@ import SearchableCheckboxDropdown from "./searchableCheckboxDropdown";
 import Type from "../atoms/type";
 
 const focusTrailing = (opt) =>
-  opt.icon ? (
+  opt?.icon ? (
     <img
       src={`/${opt.icon}.svg`}
       alt=""
@@ -80,7 +80,7 @@ const CalendarFilters = ({
   houseName,
   focusFilters,
   setFocusFilters,
-  focusOptions,
+  focusOptions = [],
   scopeFilters,
   setScopeFilters,
   scopeOptions,
@@ -135,9 +135,21 @@ const CalendarFilters = ({
     });
   };
 
-  const eventFocusOption = focusOptions.find((option) => option.value === "eventos");
-  const vacationFocusOption = focusOptions.find((option) => option.value === "vacaciones");
-  const absenceFocusOption = focusOptions.find((option) => option.value === "ausencias");
+  const eventFocusOption = focusOptions.find((option) => option.value === "eventos") ?? {
+    value: "eventos",
+    label: "Eventos",
+    icon: "employee",
+  };
+  const vacationFocusOption = focusOptions.find((option) => option.value === "vacaciones") ?? {
+    value: "vacaciones",
+    label: "Vacaciones",
+    icon: "vacation",
+  };
+  const absenceFocusOption = focusOptions.find((option) => option.value === "ausencias") ?? {
+    value: "ausencias",
+    label: "Ausencias",
+    icon: "absences",
+  };
   const isEventChecked = focusFilters.includes("eventos");
   const isVacationChecked = focusFilters.includes("vacaciones");
   const isAbsenceChecked = focusFilters.includes("ausencias");
