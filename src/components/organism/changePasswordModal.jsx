@@ -6,6 +6,7 @@ const ChangePasswordModal = ({
   onClose,
   loading = false,
   errors = [],
+  onErrorsClose,
   onSubmit,
   currentPassword,
   setCurrentPassword,
@@ -34,6 +35,7 @@ const ChangePasswordModal = ({
         description="Llena el formulario de abajo para cambiar tu contraseña"
         loading={loading}
         errors={errors}
+        onErrorsClose={onErrorsClose}
         onSubmit={onSubmit}
         submitText="Cambiar contraseña"
         currentPassword={currentPassword}

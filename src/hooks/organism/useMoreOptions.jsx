@@ -106,6 +106,10 @@ export const useTwoFactorAuthOptions = () => {
     showConfirmPassword.setValue(false);
   };
 
+  const handleDismissChangePasswordErrors = () => {
+    setChangePasswordErrors([]);
+  };
+
   const handleSubmitChangePassword = async ({
     currentPassword,
     newPassword,
@@ -179,6 +183,7 @@ export const useTwoFactorAuthOptions = () => {
     showNewPassword,
     showConfirmPassword,
     handleCloseChangePasswordModal,
+    handleDismissChangePasswordErrors,
     handleSubmitChangePassword,
   };
 };
