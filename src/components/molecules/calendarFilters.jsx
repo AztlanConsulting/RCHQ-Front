@@ -39,15 +39,11 @@ const FilterSeparator = ({ emphasis = false, className = "" }) => (
 );
 
 const CalendarSwitchGroup = ({
-  label,
   options,
   value,
   onChange,
 }) => (
   <div className="mt-2">
-    <Type variant="metric-label" className="text-sm" as="p">
-      {label}
-    </Type>
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
       {options.map((option) => {
         const isActive = option.value === value;
@@ -125,7 +121,7 @@ const CalendarFilters = ({
   canSwitchCalendarTimeZone = false,
   className = "",
   showPageHeading = true,
-  stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-scroll",
+  stackMaxHeightClass = "max-h-[calc(100vh-40px)] overflow-y-auto overflow-x-hidden",
 }) => {
   const toggleFocusFilter = (focusValue, checked) => {
     setFocusFilters((currentValues = []) => {
@@ -181,7 +177,9 @@ const CalendarFilters = ({
   );
 
   return (
-    <div className={`p-2 flex flex-col gap-1 mb-auto ${stackMaxHeightClass} ${className}`}>
+    <div
+      className={`mb-auto flex flex-col gap-1 overflow-x-hidden p-2 ${stackMaxHeightClass} ${className}`}
+    >
       {showPageHeading ? (
         <Type variant="page-title" as="h2">
           Calendario
@@ -232,7 +230,7 @@ const CalendarFilters = ({
           </>
         ) : null}
         <div className="border border-b  border-[#1F3664]"></div>
-        <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
+        <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto scrollbar-hide">
           {renderSection({
             focusOption: eventFocusOption,
             checked: isEventChecked,
