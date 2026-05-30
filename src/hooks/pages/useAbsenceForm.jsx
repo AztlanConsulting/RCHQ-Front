@@ -99,7 +99,7 @@ export const useAbsenceForm = ({
         handleFileChange: handleEvidenceChange,
         reset: resetEvidence,
     } = useDocumentFile({
-        invalidTypeMessage: "Formato invalido de ausencias",
+        invalidTypeMessage: "Formato invalido de archivo",
         maxSizeMessage: "tamaño superior a 10mb",
     });
     const displayErrors = useMemo(

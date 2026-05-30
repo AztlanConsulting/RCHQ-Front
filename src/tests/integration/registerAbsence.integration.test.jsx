@@ -353,7 +353,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
         await submitAbsence();
 
         expect(
-            screen.getAllByText("Formato invalido de ausencias").length,
+            screen.getAllByText("Formato invalido de archivo").length,
         ).toBeGreaterThan(0);
         expect(createAbsenceService).not.toHaveBeenCalled();
     });

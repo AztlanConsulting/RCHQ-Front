@@ -288,7 +288,7 @@ describe("useAbsenceForm", () => {
         });
         await submitForm(result);
 
-        expect(result.current.errors.file).toBe("Formato invalido de ausencias");
+        expect(result.current.errors.file).toBe("Formato invalido de archivo");
         expect(createAbsenceService).not.toHaveBeenCalled();
     });
 
