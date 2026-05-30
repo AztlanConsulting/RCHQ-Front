@@ -92,6 +92,7 @@ describe("LogsFilters", () => {
 
         expect(screen.getByRole("button", { name: /mostrar filtros/i })).toBeInTheDocument();
         expect(screen.getByLabelText("Buscar trabajador")).toBeInTheDocument();
-        expect(screen.getByLabelText("ACCIONES")).toBeInTheDocument();
+        expect(screen.getByLabelText("ACCIONES inline")).toBeInTheDocument();
+        expect(screen.getAllByLabelText("ACCIONES").length).toBeGreaterThanOrEqual(1);
     });
 });
