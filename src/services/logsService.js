@@ -1,7 +1,6 @@
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const DEFAULT_LIMIT = 6;
 
 const buildQuery = ({
@@ -75,7 +74,7 @@ export const getHouseLogsService = async ({
     startDate,
     endDate,
   });
-  const response = await secureFetch(`${API_URL}/logs/house?${query}`, {
+  const response = await secureFetch(`/logs/house?${query}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -113,7 +112,7 @@ export const getHouseLogsService = async ({
 };
 
 export const getLogsActionsService = async () => {
-  const response = await secureFetch(`${API_URL}/logs/actions`, {
+  const response = await secureFetch(`/logs/actions`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -135,7 +134,7 @@ export const downloadHouseLogsReportService = async ({ currentYear, year }) => {
     year: String(year),
   });
 
-  const response = await secureFetch(`${API_URL}/logs/house/report/pdf?${params.toString()}`);
+  const response = await secureFetch(`/logs/house/report/pdf?${params.toString()}`);
 
   if (!response.ok) {
     const data = await response.json().catch(() => null);

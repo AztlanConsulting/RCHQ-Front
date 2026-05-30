@@ -118,7 +118,7 @@ export const useBaseCalendar = () => {
         return allEvents;
     }, [allEvents, calendarMode, effectiveEmployeeId]);
 
-    const getCorrespondingView = (isList, viewType) => {
+    const getCorrespondingView = useCallback((isList, viewType) => {
         let newView;
 
         if (viewType == "Month") {
@@ -130,25 +130,9 @@ export const useBaseCalendar = () => {
         }
 
         return newView;
-    };
+    }, []);
 
-    const updateView = (calendarRef, newView) => {
-        const calendarApi = calendarRef.current.getApi();
-
-        if (calendarApi.view.type == newView) return;
-
-        setSelectedDates(null);
-
-        calendarApi.changeView(newView);
-        updateButtons(newView);
-    };
-
-    const loadButtonsAtStart = () => {
-        const currentView = getCorrespondingView(isList, viewType);
-        updateButtons(currentView);
-    };
-
-    const updateButtons = (currentView) => {
+    const updateButtons = useCallback((currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
             btn.classList.remove("active-btn");
         });
@@ -173,46 +157,62 @@ export const useBaseCalendar = () => {
                 .querySelector(".fc-toggleListButton-button")
                 ?.classList.add("active-btn");
         }
-    };
+    }, []);
 
-    const toggleList = (calendarRef) => {
+    const updateView = useCallback((calendarRef, newView) => {
+        const calendarApi = calendarRef.current.getApi();
+
+        if (calendarApi.view.type == newView) return;
+
+        setSelectedDates(null);
+
+        calendarApi.changeView(newView);
+        updateButtons(newView);
+    }, [updateButtons]);
+
+    const loadButtonsAtStart = useCallback(() => {
+        const currentView = getCorrespondingView(isList, viewType);
+        updateButtons(currentView);
+    }, [getCorrespondingView, isList, updateButtons, viewType]);
+
+    const toggleList = useCallback((calendarRef) => {
         const newState = !isList;
         setIsList(newState);
 
         const newView = getCorrespondingView(newState, viewType);
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView, viewType]);
 
-    const setMonthView = (calendarRef) => {
+    const setMonthView = useCallback((calendarRef) => {
         setViewType("Month");
 
         const newView = getCorrespondingView(isList, "Month");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
-    const setWeekView = (calendarRef) => {
+    const setWeekView = useCallback((calendarRef) => {
         setViewType("Week");
 
         const newView = getCorrespondingView(isList, "Week");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
-    const setDayView = (calendarRef) => {
+    const setDayView = useCallback((calendarRef) => {
         setViewType("Day");
 
         const newView = getCorrespondingView(isList, "Day");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
     const getMonth = (monthNumber, isComplete) => {
         return isComplete ? FULL_MONTHS[monthNumber] : SHORT_MONTHS[monthNumber];
     };
 
-    const generateTitle = (currentStatus) => {
+    const generateTitle = useCallback((currentStatus) => {
         if (viewType == "Month") {
             const monthNumber = currentStatus.date.array[1];
             const isFullMonthName = true;
@@ -247,18 +247,18 @@ export const useBaseCalendar = () => {
         const title = `${startText}${endDay}${monthDescriber} ${endMonth} ${endYear}`;
 
         return title;
-    };
+    }, [getMonth, viewType]);
 
-    const getDayWidth = () => {
+    const getDayWidth = useCallback(() => {
         const tableCell = document.querySelector(".fc-day");
         if (!tableCell) return 0;
 
         const cellWidth = tableCell.clientWidth || 0;
 
         return cellWidth;
-    };
+    }, []);
 
-    const validateShortenedSize = (hasNumber) => {
+    const validateShortenedSize = useCallback((hasNumber) => {
         if (viewType == "Day") return false;
 
         const currentDayWidth = getDayWidth();
@@ -266,7 +266,7 @@ export const useBaseCalendar = () => {
         if (currentDayWidth < (hasNumber ? 106 : 96)) return true;
 
         return false;
-    };
+    }, [getDayWidth, viewType]);
 
     const getWeekDayName = (currentDay) => {
         const weekDayIndex = currentDay.date.getDay();
@@ -281,10 +281,10 @@ export const useBaseCalendar = () => {
         return `${weekDay}${dayNumber}`;
     };
 
-    const resizeHandler = (calendarRef) => {
-        const calendarApi = calendarRef.current.getApi();
-        calendarApi.render();
-    };
+    const resizeHandler = useCallback((calendarRef) => {
+        const calendarApi = calendarRef.current?.getApi?.();
+        calendarApi?.render();
+    }, []);
 
     const loadCalendarEvents = useCallback(
         async (startDate, endDate, employeeId, role) => {
@@ -372,7 +372,7 @@ export const useBaseCalendar = () => {
         return () => window.clearInterval(intervalId);
     }, []);
 
-    const handleDatesSet = async (dateInfo) => {
+    const handleDatesSet = useCallback(async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
         const currentDate = dateInfo.view.calendar.getDate();
         setCurrentCalendarDate((previousDate) =>
@@ -406,7 +406,7 @@ export const useBaseCalendar = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
     const setOwnCalendar = useCallback(async () => {
         const ownId = getOwnEmployeeId();
@@ -456,14 +456,14 @@ export const useBaseCalendar = () => {
         calendarApi.selectable = false;
     }, []);
 
-    const handleDateDragging = () => {
+    const handleDateDragging = useCallback(() => {
         setSelectedDates(null);
         return true;
-    };
+    }, []);
 
     const currentCalendarView = useMemo(
         () => getCorrespondingView(isList, viewType),
-        [isList, viewType],
+        [getCorrespondingView, isList, viewType],
     );
 
     return {

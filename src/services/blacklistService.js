@@ -1,7 +1,13 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
 import { buildApiError } from "../utils/apiErrors";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const parseJsonResponse = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    return {};
+  }
+};
 
 export const getBlacklist = async (
   page = 1,
@@ -13,11 +19,11 @@ export const getBlacklist = async (
   if (search) params.append("search", search);
   if (isBlacklisted !== undefined) params.append("isBlacklisted", isBlacklisted);
 
-  const res = await secureFetch(`${API_URL}/blacklist?${params}`, {
+  const res = await secureFetch(`/blacklist?${params}`, {
     method: "GET",
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(
@@ -38,7 +44,7 @@ export const getBlacklist = async (
 };
 
 export const addToBlacklist = async (curp, reason) => {
-  const res = await secureFetch(`${API_URL}/blacklist`, {
+  const res = await secureFetch(`/blacklist`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -46,7 +52,7 @@ export const addToBlacklist = async (curp, reason) => {
     body: JSON.stringify({ curp, reason }),
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(
@@ -60,7 +66,7 @@ export const addToBlacklist = async (curp, reason) => {
 };
 
 export const removeFromBlacklist = async (curp, reason) => {
-  const res = await secureFetch(`${API_URL}/blacklist/delete`, {
+  const res = await secureFetch(`/blacklist/delete`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +74,7 @@ export const removeFromBlacklist = async (curp, reason) => {
     body: JSON.stringify({ curp, reason }),
   });
 
-  const data = await res.json();
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
     throw buildApiError(

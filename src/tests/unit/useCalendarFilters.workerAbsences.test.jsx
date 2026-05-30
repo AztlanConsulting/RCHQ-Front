@@ -132,7 +132,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         expect(globalEvent.extendedProps.link).toBe("");
     });
 
-    it("no vuelve a cargar tipos de ausencia cuando cambia a rol administrativo", async () => {
+    it("no vuelve a cargar tipos de ausencia cuando cambia a Coordinador", async () => {
         const { rerender } = renderHook(
             ({ viewerRole }) =>
                 useCalendarFilters([], {
@@ -145,10 +145,22 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
         expect(getHouseEmployees).not.toHaveBeenCalled();
 
-        rerender({ viewerRole: "Administrador" });
+        rerender({ viewerRole: "Coordinador" });
 
         await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
         expect(getAbsenceTypes).toHaveBeenCalledTimes(1);
+    });
+
+    it("no carga empleados de casa para Administrador porque el backend restringe esa ruta a Coordinador", async () => {
+        renderHook(() =>
+            useCalendarFilters([], {
+                isList: false,
+                viewerRole: "Administrador",
+            }),
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+        expect(getHouseEmployees).not.toHaveBeenCalled();
     });
 
     it("filtra ausencias del trabajador por evidencia", async () => {

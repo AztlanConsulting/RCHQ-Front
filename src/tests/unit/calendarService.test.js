@@ -37,7 +37,7 @@ describe("calendarService", () => {
     });
 
     expect(secureFetch).toHaveBeenCalledWith(
-      "http://api.test/absence/absence-1",
+      "/absence/absence-1",
       expect.objectContaining({
         method: "PUT",
         headers: expect.objectContaining({
@@ -68,7 +68,7 @@ describe("calendarService", () => {
     });
 
     expect(secureFetch).toHaveBeenCalledWith(
-      "http://api.test/absence/absence-1",
+      "/absence/absence-1",
       expect.objectContaining({
         method: "PUT",
         body: expect.any(FormData),

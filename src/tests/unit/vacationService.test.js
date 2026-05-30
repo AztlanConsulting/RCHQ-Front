@@ -64,7 +64,7 @@ describe("vacationService", () => {
         const result = await getVacationEmployees();
 
         expect(secureFetch).toHaveBeenCalledWith(
-            "http://api.test/vacation/employees/eligible",
+            "/vacation/employees/eligible",
             {
                 method: "GET",
             },
@@ -106,7 +106,7 @@ describe("vacationService", () => {
         const result = await getRemainingVacations("emp-1");
 
         expect(secureFetch).toHaveBeenCalledWith(
-            "http://api.test/vacation/remaining/emp-1",
+            "/vacation/remaining/emp-1",
             {
                 method: "GET",
             },
@@ -157,7 +157,7 @@ describe("vacationService", () => {
         });
 
         expect(secureFetch).toHaveBeenCalledWith(
-            "http://api.test/vacation/employees/emp-1/register",
+            "/vacation/employees/emp-1/register",
             {
                 method: "POST",
                 headers: {
@@ -215,7 +215,7 @@ describe("vacationService", () => {
         });
 
         expect(secureFetch).toHaveBeenCalledWith(
-            "http://api.test/vacation/request",
+            "/vacation/request",
             {
                 method: "POST",
                 headers: {
@@ -417,7 +417,7 @@ describe("vacationService", () => {
         });
 
         expect(secureFetch).toHaveBeenCalledWith(
-            "http://api.test/vacation/request/vac-1/dates",
+            "/vacation/request/vac-1/dates",
             {
                 method: "PATCH",
                 headers: {

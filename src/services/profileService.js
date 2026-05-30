@@ -1,7 +1,5 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
   errorMessage.status = response.status;
@@ -21,7 +19,7 @@ const getReadableErrors = (err) => {
 };
 
 const getUserData = async () => {
-  const response = await secureFetch(`${API_URL}/user/profile`, {
+  const response = await secureFetch(`/user/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
