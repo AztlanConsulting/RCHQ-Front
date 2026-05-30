@@ -1,8 +1,6 @@
-import { getToken } from "../utils/authStorage";
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const DEFAULT_LIMIT = 6;
 
 const buildQuery = ({
@@ -52,6 +50,7 @@ const formatMoment = (momentValue) => {
   return new Intl.DateTimeFormat("es-MX", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "UTC",
   }).format(date);
 };
 
@@ -65,12 +64,6 @@ export const getHouseLogsService = async ({
   startDate = "",
   endDate = "",
 } = {}) => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
-
   const query = buildQuery({
     page,
     limit,
@@ -81,10 +74,9 @@ export const getHouseLogsService = async ({
     startDate,
     endDate,
   });
-  const response = await secureFetch(`${API_URL}/logs/house?${query}`, {
+  const response = await secureFetch(`/logs/house?${query}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   });
@@ -120,16 +112,9 @@ export const getHouseLogsService = async ({
 };
 
 export const getLogsActionsService = async () => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
-
-  const response = await secureFetch(`${API_URL}/logs/actions`, {
+  const response = await secureFetch(`/logs/actions`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   });
@@ -143,24 +128,13 @@ export const getLogsActionsService = async () => {
   return Array.isArray(data?.data) ? data.data : [];
 };
 
-export const downloadHouseLogsReportService = async ({ month, year }) => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("No se encontró token de sesión");
-  }
-
+export const downloadHouseLogsReportService = async ({ currentYear, year }) => {
   const params = new URLSearchParams({
-    month: String(month),
+    currentYear: String(currentYear),
     year: String(year),
   });
 
-  const response = await secureFetch(`${API_URL}/logs/house/report/pdf?${params.toString()}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await secureFetch(`/logs/house/report/pdf?${params.toString()}`);
 
   if (!response.ok) {
     const data = await response.json().catch(() => null);
@@ -175,6 +149,6 @@ export const downloadHouseLogsReportService = async ({ month, year }) => {
     blob,
     fileName:
       match?.[1]
-      || `reporte-logs-${year}-${String(month).padStart(2, "0")}.pdf`,
+      || `reporte-logs-${Math.min(currentYear, year)}-${Math.max(currentYear, year)}.pdf`,
   };
 };

@@ -1,126 +1,241 @@
-import Button from "../../components/atoms/button";
 import Alert from "../../components/atoms/alerts";
+import ModalCloseButton from "../../components/atoms/modalCloseButton";
 import TwoFactorCode from "../../components/organism/twoFactorCode";
 import { useTwoFactorAuth } from "../../hooks/organism/useTwoFactorAuth";
 
-const TwoFactorAuth = ({ onClose }) => {
+const AccordionStep = ({
+  stepId,
+  title,
+  isOpen,
+  onToggle,
+  children,
+}) => (
+  <div className="overflow-hidden border-b border-slate-200 last:border-b-0">
+    <h3>
+      <button
+        type="button"
+        onClick={() => onToggle(stepId)}
+        className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors sm:px-5 sm:py-4 ${
+          isOpen ? "bg-slate-50 text-slate-900" : "bg-white text-slate-700"
+        }`}
+        aria-expanded={isOpen}
+        aria-controls={`two-factor-step-${stepId}`}
+      >
+        <span className="min-w-0 text-[0.97rem] font-semibold leading-6 sm:pr-4 sm:text-lg">
+          {title}
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-5 w-5 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+    </h3>
+
+    <div
+      id={`two-factor-step-${stepId}`}
+      className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+        isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+      }`}
+    >
+      <div className="overflow-hidden">
+        <div className="bg-white px-4 pb-4 text-sm leading-6 text-slate-600 sm:px-5 sm:pb-5">
+          {children}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const TwoFactorAuth = ({ onClose, onDismiss }) => {
   const {
-    step,
-    handleGoToCode,
-    handleGoToQr,
+    openStep,
+    toggleStep,
     qr,
     manualCode,
     isGenerating,
     generationError,
+    clearGenerationError,
+    copySuccessMessage,
+    clearCopySuccessMessage,
+    copyManualCode,
     code,
     setCode,
     isVerifying,
     verificationError,
+    clearVerificationError,
     submitCode,
   } = useTwoFactorAuth({ onClose });
 
   return (
-    <div className="bg-white rounded-xl shadow-2xl p-8 w-[500px] max-w-full flex flex-col">
-      {step === "qr" && (
-        <>
-          <div className="text-left w-full mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Autenticación en dos pasos
-            </h2>
-            <p className="mt-2 text-sm text-slate-600 font-medium">
-              Usa una aplicación de autentificación (ej. Google auth) y escanea
-              el código QR.
-            </p>
-          </div>
+    <div className="relative flex w-full max-w-[min(100%,24rem)] max-h-[min(88vh,46rem)] flex-col rounded-xl bg-white p-4 shadow-2xl sm:max-w-[40rem] sm:p-8">
+      <ModalCloseButton
+        onClick={onDismiss}
+        className="absolute right-3 top-3 z-10 text-[2.2rem] text-slate-400 hover:text-slate-700 sm:right-5 sm:top-5"
+        ariaLabel="Cerrar"
+      />
 
-          {generationError && <Alert type="error" message={generationError} />}
+      <div className="mb-4 w-full text-left sm:mb-6">
+        <h2 className="text-[1.95rem] font-bold leading-tight text-slate-900 sm:text-2xl">
+          Autenticación en dos pasos
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm font-medium leading-5 text-slate-600">
+          Guía paso a paso para configurar Google Authenticator y activar la
+          verificación de dos pasos.
+        </p>
+      </div>
 
-          <div className="flex flex-col items-center justify-center w-full">
+      {generationError && (
+        <div className="mb-4">
+          <Alert
+            type="error"
+            message={generationError}
+            onClose={clearGenerationError}
+          />
+        </div>
+      )}
+
+      {copySuccessMessage && (
+        <div className="mb-4">
+          <Alert
+            type="success"
+            message={copySuccessMessage}
+            onClose={clearCopySuccessMessage}
+          />
+        </div>
+      )}
+
+      {verificationError && (
+        <div className="mb-4">
+          <Alert
+            type="error"
+            message={verificationError}
+            onClose={clearVerificationError}
+          />
+        </div>
+      )}
+
+      <div className="min-h-0 overflow-y-auto rounded-2xl border border-slate-200 bg-white">
+        <AccordionStep
+          stepId="install"
+          title="Paso 1. Instala Google Authenticator"
+          isOpen={openStep === "install"}
+          onToggle={toggleStep}
+        >
+          <p>
+            Entra a la App Store o Play Store. Busca y descarga{" "}
+            <strong>Google Authenticator</strong>; si ya tienes otra app
+            compatible con codigos TOTP, tambien la puedes usar.
+          </p>
+        </AccordionStep>
+
+        <AccordionStep
+          stepId="open-app"
+          title="Paso 2. Abre Google Authenticator"
+          isOpen={openStep === "open-app"}
+          onToggle={toggleStep}
+        >
+          <p>
+            Abre la aplicación, presione comenzar y seleccione la cuenta de
+            correo con la que se quiera iniciar. Busca la opción para agregar un
+            código. Normalmente aparece con un botón <strong>+</strong> o con la
+            opción
+            <strong> Agregar código</strong>.
+          </p>
+        </AccordionStep>
+
+        <AccordionStep
+          stepId="scan-qr"
+          title="Paso 3. Escanea el código QR o usa la clave manual"
+          isOpen={openStep === "scan-qr"}
+          onToggle={toggleStep}
+        >
+          <p className="mb-4">
+            Elige la opción <strong>Escanear un código QR</strong> y apunta la
+            cámara a este código.
+          </p>
+
+          <div className="flex w-full justify-center">
             {isGenerating ? (
-              <div className="h-56 w-56 flex items-center justify-center text-sm text-slate-400 border border-slate-100 rounded-lg">
+              <div className="flex h-36 w-36 items-center justify-center rounded-lg border border-slate-100 px-3 text-center text-sm text-slate-400 sm:h-56 sm:w-56">
                 Generando QR...
               </div>
             ) : qr ? (
               <img
                 src={qr}
-                alt="QR TwoFactorAuth"
-                className="h-56 w-56 object-contain"
+                alt="QR de autenticación en dos pasos"
+                className="h-36 w-36 rounded-lg object-contain sm:h-56 sm:w-56"
               />
-            ) : null}
-
-            <div className="mt-6">
-              <Button
-                text="Continuar"
-                onClick={handleGoToCode}
-                disabled={isGenerating || !qr}
-                bgColor="bg-[#1a2f5e]"
-                hoverColor="hover:opacity-85"
-                activeColor="active:opacity-70"
-                textColor="text-white"
-                width="w-56"
-                className="shadow-sm"
-              />
-            </div>
+            ) : (
+              <div className="flex h-36 w-36 items-center justify-center rounded-lg border border-dashed border-slate-200 px-3 text-center text-sm text-slate-400 sm:h-56 sm:w-56">
+                No se pudo cargar el código QR.
+              </div>
+            )}
           </div>
 
-          {manualCode && (
-            <div className="w-full mt-6">
-              <div className="flex items-center gap-3 w-full mb-2">
-                <hr className="flex-1 border-slate-200" />
-                <span className="text-xs font-semibold text-slate-400">o</span>
-                <hr className="flex-1 border-slate-200" />
-              </div>
-              <div className="text-center flex flex-col items-center w-full px-4">
-                <p className="text-sm font-medium text-slate-500 mb-2">
-                  Ingresa el siguiente código
-                </p>
-                <div className=" border-2 border-slate-100 rounded-lg px-4 py-3 w-full max-w-sm bg-slate-50 text-slate-800 font-bold tracking-[0.1em] break-all">
-                  {manualCode}
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {step === "code" && (
-        <div className="flex flex-col items-center gap-6 w-full">
-          <div className="text-center w-full">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Verifica el código
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Ingresa los 6 dígitos generados por la aplicación de
-              Autenticación:
-            </p>
+          <div className="my-5 flex w-full items-center gap-3">
+            <hr className="flex-1 border-slate-200" />
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+              o
+            </span>
+            <hr className="flex-1 border-slate-200" />
           </div>
 
-          {verificationError && (
-            <Alert type="error" message={verificationError} />
-          )}
+          <p className="mb-4">
+            Si prefieres, en la app también puedes elegir{" "}
+            <strong>Ingresar clave de config.</strong> y copiar esta clave
+            secreta en la parte de "Tu clave":
+          </p>
+
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-[inset_0px_2px_4px_#00000014]">
+            <div className="flex min-h-[56px] items-stretch">
+              <div className="flex min-w-0 flex-1 items-center px-3 py-3 sm:px-4">
+                <span className="w-full break-all text-left text-[0.95rem] font-bold tracking-[0.06em] text-slate-800">
+                  {manualCode || "Generando clave..."}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={copyManualCode}
+                disabled={!manualCode}
+                className="shrink-0 border-l border-slate-200 bg-[#24375e] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#1d2c4b] disabled:cursor-not-allowed disabled:bg-slate-300 sm:px-5"
+              >
+                Copiar
+              </button>
+            </div>
+          </div>
+        </AccordionStep>
+
+        <AccordionStep
+          stepId="verify-code"
+          title="Paso 4. Escribe el código de 6 dígitos y verifica"
+          isOpen={openStep === "verify-code"}
+          onToggle={toggleStep}
+        >
+          <p className="mb-4">
+            Cuando la app genere el código temporal, escríbelo aquí y presiona{" "}
+            <strong>Verificar</strong>.
+          </p>
 
           <TwoFactorCode
             code={code}
             setCode={setCode}
             onSubmit={submitCode}
             loading={isVerifying}
+            disabled={isGenerating || !qr}
           />
-
-          <Button
-            text="Volver al QR"
-            onClick={handleGoToQr}
-            bgColor="bg-transparent"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            textColor="text-slate-500 hover:text-slate-700"
-            width="w-auto"
-            height="h-auto"
-            textSize="text-sm"
-            fontWeight="font-medium"
-            className="mt-2 py-2 px-4"
-          />
-        </div>
-      )}
+        </AccordionStep>
+      </div>
     </div>
   );
 };

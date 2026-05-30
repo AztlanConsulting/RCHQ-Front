@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     getCalendarViewerRole,
     getEmployeeHouseName,
@@ -6,8 +6,31 @@ import {
     getHouseEventsInRange,
     getOwnEmployeeId,
 } from "../../services/calendarService";
-import { normalToUTCWithOffset } from "../../utils/dates";
-import { eventApiToDetail } from "../../utils/calendarEventDetail";
+import {
+    addDaysToInputValue,
+    dateStringToInputValue,
+    timeStringToInputValue,
+} from "../../utils/dates";
+import {
+    getBrowserTimeZone,
+    getCalendarNowValue,
+    MEXICO_TIME_ZONE,
+} from "../../utils/timeZone";
+
+const SHORT_MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+const FULL_MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const SHORT_DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const FULL_DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+const getPaddedFetchRange = (startValue, endValue) => {
+    const startDate = String(startValue ?? "").split("T")[0];
+    const endDate = String(endValue ?? "").split("T")[0];
+
+    return {
+        startDate: addDaysToInputValue(startDate, -1) || startDate,
+        endDate: addDaysToInputValue(endDate, 1) || endDate,
+    };
+};
 
 export const useBaseCalendar = () => {
     const [isList, setIsList] = useState(false);
@@ -15,9 +38,12 @@ export const useBaseCalendar = () => {
     const [viewEmployeeId, setViewEmployeeId] = useState("");
     const [viewerRole, setViewerRole] = useState("");
     const [calendarMode, setCalendarMode] = useState("personal");
+    const [calendarTimeZoneMode, setCalendarTimeZoneMode] = useState("local");
     const [employeeHouseName, setEmployeeHouseName] = useState("");
     const [allEvents, setAllEvents] = useState([]);
     const [selectedDates, setSelectedDates] = useState(null);
+    const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+    const [calendarClock, setCalendarClock] = useState(() => new Date());
     const lastFetchedRange = useRef(null);
 
     const effectiveEmployeeId = useMemo(
@@ -32,14 +58,30 @@ export const useBaseCalendar = () => {
     const canViewHouseEvents = (role) =>
         role === "Administrador" || role === "Coordinador";
 
-    const isCoordinator = useMemo(
-        () => effectiveViewerRole === "Coordinador",
-        [effectiveViewerRole],
-    );
-
     const canSwitchCalendarMode = useMemo(
         () => canViewHouseEvents(effectiveViewerRole),
         [effectiveViewerRole],
+    );
+    const browserTimeZone = useMemo(() => getBrowserTimeZone(), []);
+    const canSwitchCalendarTimeZone = browserTimeZone !== MEXICO_TIME_ZONE;
+    const calendarTimeZone = useMemo(
+        () =>
+            calendarTimeZoneMode === "mexico"
+                ? MEXICO_TIME_ZONE
+                : browserTimeZone,
+        [browserTimeZone, calendarTimeZoneMode],
+    );
+    const calendarNow = useMemo(
+        () => getCalendarNowValue(calendarTimeZone, calendarClock),
+        [calendarTimeZone, calendarClock],
+    );
+    const fullCalendarTimeZone = calendarTimeZone;
+    const calendarTimeZoneOptions = useMemo(
+        () => [
+            { value: "local", label: "Horario local" },
+            { value: "mexico", label: "Horario central de México" },
+        ],
+        [],
     );
 
     const calendarModeOptions = useMemo(
@@ -76,7 +118,7 @@ export const useBaseCalendar = () => {
         return allEvents;
     }, [allEvents, calendarMode, effectiveEmployeeId]);
 
-    const getCorrespondingView = (isList, viewType) => {
+    const getCorrespondingView = useCallback((isList, viewType) => {
         let newView;
 
         if (viewType == "Month") {
@@ -88,28 +130,15 @@ export const useBaseCalendar = () => {
         }
 
         return newView;
-    };
+    }, []);
 
-    const updateView = (calendarRef, newView) => {
-        const calendarApi = calendarRef.current.getApi();
-
-        if (calendarApi.view.type == newView) return;
-
-        setSelectedDates(null);
-
-        calendarApi.changeView(newView);
-        updateButtons(newView);
-    };
-
-    const loadButtonsAtStart = () => {
-        const currentView = getCorrespondingView(isList, viewType);
-        updateButtons(currentView);
-    };
-
-    const updateButtons = (currentView) => {
+    const updateButtons = useCallback((currentView) => {
         document.querySelectorAll(".fc-button").forEach((btn) => {
             btn.classList.remove("active-btn");
         });
+        document
+            .querySelector(".fc-toggleListButton-button")
+            ?.classList.remove("list-mode");
 
         if (currentView.includes("Month")) {
             document
@@ -129,80 +158,64 @@ export const useBaseCalendar = () => {
         if (currentView.includes("list")) {
             document
                 .querySelector(".fc-toggleListButton-button")
-                ?.classList.add("active-btn");
+                ?.classList.add("list-mode");
         }
-    };
+    }, []);
 
-    const toggleList = (calendarRef) => {
+    const updateView = useCallback((calendarRef, newView) => {
+        const calendarApi = calendarRef.current.getApi();
+
+        if (calendarApi.view.type == newView) return;
+
+        setSelectedDates(null);
+
+        calendarApi.changeView(newView);
+        updateButtons(newView);
+    }, [updateButtons]);
+
+    const loadButtonsAtStart = useCallback(() => {
+        const currentView = getCorrespondingView(isList, viewType);
+        updateButtons(currentView);
+    }, [getCorrespondingView, isList, updateButtons, viewType]);
+
+    const toggleList = useCallback((calendarRef) => {
         const newState = !isList;
         setIsList(newState);
 
         const newView = getCorrespondingView(newState, viewType);
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView, viewType]);
 
-    const setMonthView = (calendarRef) => {
+    const setMonthView = useCallback((calendarRef) => {
         setViewType("Month");
 
         const newView = getCorrespondingView(isList, "Month");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
-    const setWeekView = (calendarRef) => {
+    const setWeekView = useCallback((calendarRef) => {
         setViewType("Week");
 
         const newView = getCorrespondingView(isList, "Week");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
-    const setDayView = (calendarRef) => {
+    const setDayView = useCallback((calendarRef) => {
         setViewType("Day");
 
         const newView = getCorrespondingView(isList, "Day");
 
         updateView(calendarRef, newView);
-    };
+    }, [getCorrespondingView, isList, updateView]);
 
     const getMonth = (monthNumber, isComplete) => {
-        const shortenedMonths = [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sept",
-            "Oct",
-            "Nov",
-            "Dic",
-        ];
-        const fullMonths = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
-        ];
-        const monthText = isComplete
-            ? fullMonths[monthNumber]
-            : shortenedMonths[monthNumber];
-
-        return monthText;
+        return isComplete ? FULL_MONTHS[monthNumber] : SHORT_MONTHS[monthNumber];
     };
 
-    const generateTitle = (currentStatus) => {
+    const generateTitle = useCallback((currentStatus) => {
         if (viewType == "Month") {
             const monthNumber = currentStatus.date.array[1];
             const isFullMonthName = true;
@@ -213,6 +226,8 @@ export const useBaseCalendar = () => {
             return title;
         }
 
+        const isDay = viewType == "Day";
+
         const startDay = currentStatus.start.day;
         const startMonthNumber = currentStatus.start.month;
         const isFullStartMonthName = false;
@@ -221,9 +236,10 @@ export const useBaseCalendar = () => {
 
         const endDay = currentStatus.end.day;
         const endMonthNumber = currentStatus.end.month;
-        const isFullEndMonthName = viewType == "Day";
-        const endMonth = getMonth(endMonthNumber, isFullEndMonthName);
+        const endMonth = getMonth(endMonthNumber, isDay);
         const endYear = currentStatus.end.year;
+
+        const monthDescriber = isDay ? " de" : "";
 
         const startMonthText = startMonth != endMonth ? ` ${startMonth}` : "";
         const startYearText = startYear != endYear ? ` ${startYear}` : "";
@@ -231,52 +247,49 @@ export const useBaseCalendar = () => {
             viewType == "Week"
                 ? `${startDay}${startMonthText}${startYearText} - `
                 : "";
-        const title = `${startText}${endDay} ${endMonth} ${endYear}`;
+        const title = `${startText}${endDay}${monthDescriber} ${endMonth} ${endYear}`;
 
         return title;
-    };
+    }, [getMonth, viewType]);
 
-    const getDayWidth = () => {
+    const getDayWidth = useCallback(() => {
         const tableCell = document.querySelector(".fc-day");
         if (!tableCell) return 0;
 
         const cellWidth = tableCell.clientWidth || 0;
 
         return cellWidth;
-    };
+    }, []);
 
-    const validateShortenedSize = () => {
+    const validateShortenedSize = useCallback((hasNumber) => {
         if (viewType == "Day") return false;
 
         const currentDayWidth = getDayWidth();
 
-        if (currentDayWidth < 96) return true;
+        if (currentDayWidth < (hasNumber ? 106 : 96)) return true;
 
         return false;
-    };
+    }, [getDayWidth, viewType]);
 
     const getWeekDayName = (currentDay) => {
-        const weekDayIndex = currentDay.dow;
-        const shortenedDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-        const fullDays = [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-        ];
-        const weekDay = validateShortenedSize()
-            ? shortenedDays[weekDayIndex]
-            : fullDays[weekDayIndex];
-        return weekDay;
+        const weekDayIndex = currentDay.date.getDay();
+        const hasNumber = viewType == "Week";
+
+        const weekDay = validateShortenedSize(hasNumber)
+            ? SHORT_DAYS[weekDayIndex]
+            : FULL_DAYS[weekDayIndex];
+
+        currentDay.date.setDate(currentDay.date.getDate() + 1)
+
+        const dayNumber = hasNumber ? ` ${currentDay.date.getDate()}` : "";
+
+        return `${weekDay}${dayNumber}`;
     };
 
-    const resizeHandler = (calendarRef) => {
-        const calendarApi = calendarRef.current.getApi();
-        calendarApi.render();
-    };
+    const resizeHandler = useCallback((calendarRef) => {
+        const calendarApi = calendarRef.current?.getApi?.();
+        calendarApi?.render();
+    }, []);
 
     const loadCalendarEvents = useCallback(
         async (startDate, endDate, employeeId, role) => {
@@ -307,9 +320,10 @@ export const useBaseCalendar = () => {
             return [];
 
         const { start, end } = lastFetchedRange.current;
+        const fetchRange = getPaddedFetchRange(start, end);
         const rawEvents = await loadCalendarEvents(
-            start.split("T")[0],
-            end.split("T")[0],
+            fetchRange.startDate,
+            fetchRange.endDate,
             effectiveEmployeeId,
             effectiveViewerRole,
         );
@@ -318,8 +332,60 @@ export const useBaseCalendar = () => {
         return rawEvents ?? [];
     }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
-    const handleDatesSet = async (dateInfo) => {
+    const reloadVisibleRange = useCallback(
+        async (calendarRef) => {
+            const calendarApi = calendarRef.current?.getApi?.();
+            const currentView = calendarApi?.view;
+
+            if (!currentView) return [];
+            if (
+                effectiveEmployeeId == "" &&
+                !canViewHouseEvents(effectiveViewerRole)
+            )
+                return [];
+
+            const start = currentView.activeStart.toISOString();
+            const end = currentView.activeEnd.toISOString();
+
+            lastFetchedRange.current = { start, end };
+            const fetchRange = getPaddedFetchRange(start, end);
+
+            const rawEvents = await loadCalendarEvents(
+                fetchRange.startDate,
+                fetchRange.endDate,
+                effectiveEmployeeId,
+                effectiveViewerRole,
+            );
+
+            setAllEvents(rawEvents ?? []);
+            return rawEvents ?? [];
+        },
+        [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents],
+    );
+
+    useEffect(() => {
+        reloadCurrentRange().catch((err) => {
+            console.error(err);
+        });
+    }, [reloadCurrentRange]);
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            setCalendarClock(new Date());
+        }, 60000);
+
+        return () => window.clearInterval(intervalId);
+    }, []);
+
+    const handleDatesSet = useCallback(async (dateInfo) => {
         const { startStr, endStr } = dateInfo;
+        const currentDate = dateInfo.view.calendar.getDate();
+        setCurrentCalendarDate((previousDate) =>
+            previousDate?.getTime?.() === currentDate.getTime()
+                ? previousDate
+                : currentDate,
+        );
+
         if (
             lastFetchedRange.current?.start === startStr &&
             lastFetchedRange.current?.end === endStr
@@ -334,9 +400,10 @@ export const useBaseCalendar = () => {
             return;
 
         try {
+            const fetchRange = getPaddedFetchRange(startStr, endStr);
             const rawEvents = await loadCalendarEvents(
-                startStr.split("T")[0],
-                endStr.split("T")[0],
+                fetchRange.startDate,
+                fetchRange.endDate,
                 effectiveEmployeeId,
                 effectiveViewerRole,
             );
@@ -344,7 +411,7 @@ export const useBaseCalendar = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }, [effectiveEmployeeId, effectiveViewerRole, loadCalendarEvents]);
 
     const setOwnCalendar = useCallback(async () => {
         const ownId = getOwnEmployeeId();
@@ -368,23 +435,40 @@ export const useBaseCalendar = () => {
     }, []);
 
     const handleDateDrags = useCallback((info, calendarRef) => {
-        const startDate = normalToUTCWithOffset(info.start);
-        const endDate = normalToUTCWithOffset(info.end, { seconds: -1 });
+        const isAllDaySelection = info.allDay === true;
+        const startDate = dateStringToInputValue(info.startStr, info.start);
+        const rawEndDate = dateStringToInputValue(
+            info.endStr,
+            info.end ?? info.start,
+        );
+        const endDate = isAllDaySelection
+            ? addDaysToInputValue(rawEndDate, -1)
+            : rawEndDate;
 
-        setSelectedDates({ startDate, endDate });
+        setSelectedDates({
+            startDate,
+            endDate,
+            startTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.startStr, info.start),
+            endTime: isAllDaySelection
+                ? ""
+                : timeStringToInputValue(info.endStr, info.end),
+            allDay: isAllDaySelection,
+        });
 
         const calendarApi = calendarRef.current.getApi();
         calendarApi.selectable = false;
     }, []);
 
-    const handleDateDragging = () => {
+    const handleDateDragging = useCallback(() => {
         setSelectedDates(null);
         return true;
-    };
+    }, []);
 
     const currentCalendarView = useMemo(
         () => getCorrespondingView(isList, viewType),
-        [isList, viewType],
+        [getCorrespondingView, isList, viewType],
     );
 
     return {
@@ -393,9 +477,17 @@ export const useBaseCalendar = () => {
         isList,
         viewType,
         currentCalendarView,
+        currentCalendarDate,
         viewerRole,
         calendarMode,
         setCalendarMode,
+        calendarTimeZone,
+        calendarNow,
+        calendarTimeZoneMode,
+        setCalendarTimeZoneMode,
+        calendarTimeZoneOptions,
+        canSwitchCalendarTimeZone,
+        fullCalendarTimeZone,
         calendarModeOptions,
         canSwitchCalendarMode,
         handleDatesSet,
@@ -414,5 +506,6 @@ export const useBaseCalendar = () => {
         handleDateDrags,
         handleDateDragging,
         reloadCurrentRange,
+        reloadVisibleRange,
     };
 };

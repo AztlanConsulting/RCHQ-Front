@@ -6,6 +6,7 @@ import {
     houseEventSchema,
     buildPayload,
 } from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
 
 const DEFAULT_FORM = {
     eventTypeId: "",
@@ -25,6 +26,10 @@ export const useHouseForm = ({
     onSuccess,
     initialStartDate,
     initialEndDate,
+    initialStartTime,
+    initialEndTime,
+    initialAllDay,
+    calendarTimeZone,
     onNameError,
     onValidationAlert,
 }) => {
@@ -73,24 +78,64 @@ export const useHouseForm = ({
             return;
         }
 
-        if (initialStartDate || initialEndDate) {
+        if (
+            initialStartDate ||
+            initialEndDate ||
+            initialStartTime ||
+            initialEndTime ||
+            initialAllDay != null
+        ) {
             setForm((prev) => ({
                 ...prev,
                 startDate: initialStartDate ?? prev.startDate,
                 endDate: initialEndDate ?? prev.endDate,
+                allDay: false,
+                startTime: initialStartTime ?? prev.startTime,
+                endTime: initialEndTime ?? prev.endTime,
             }));
         }
-    }, [isOpen, initialStartDate, initialEndDate, onValidationAlert]);
+    }, [
+        isOpen,
+        initialStartDate,
+        initialEndDate,
+        initialStartTime,
+        initialEndTime,
+        initialAllDay,
+        onValidationAlert,
+    ]);
 
     const setField = useCallback((field, value) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+        setForm((prev) => {
+            if (field === "isFreeDay" && value) {
+                return {
+                    ...prev,
+                    allDay: true,
+                    startTime: "",
+                    endTime: "",
+                    [field]: value,
+                };
+            }
+
+            if (field === "allDay" && value === false) {
+                return {
+                    ...prev,
+                    isFreeDay: false,
+                    [field]: value,
+                };
+            }
+
+            return shiftDateTimeRange(prev, field, value);
+        });
 
         setErrors((prev) => ({
             ...prev,
             [field]: undefined,
+            ...(field === "isFreeDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
         }));
     }, []);
 
@@ -122,11 +167,7 @@ export const useHouseForm = ({
         setErrors(fieldErrors);
         onNameError?.(fieldErrors.name ?? "");
 
-        const messages = [
-            ...new Set(result.error.issues.map((error) => error.message)),
-        ].join("\n");
-
-        onValidationAlert?.(messages);
+        onValidationAlert?.("Revisa los campos marcados antes de continuar.");
 
         return null;
     };
@@ -172,6 +213,7 @@ export const useHouseForm = ({
             buildPayload({
                 ...validated,
                 forceOverlap: false,
+                timeZone: calendarTimeZone,
             }),
         );
     };

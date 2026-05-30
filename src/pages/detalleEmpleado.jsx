@@ -4,6 +4,7 @@ import Alert from "../components/atoms/alerts";
 import Type from "../components/atoms/type";
 import { Tabs } from "../components/molecules/tabs";
 import NativeSelect from "../components/atoms/nativeSelect";
+import BigButton from "../components/atoms/bigButton";
 import EmployeeBasicCard from "../components/organism/employeeBasicCard";
 import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
@@ -14,31 +15,37 @@ import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
 import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
+import { getStoredUser } from "@/utils/authStorage";
 
 const tabs = [
-  { id: "overview",   label: "Overview" },
+  { id: "overview",   label: "Resumen" },
   { id: "expediente", label: "Expediente" },
 ];
 
 const DetalleEmpleado = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
+  const user = getStoredUser();
+
+  const canEdit = user?.role == "Coordinador";
 
   const {
     employee, employeeAddress, employeeHouse,
-    employeeFaults, employeeWorkdays, employeeVacationRequests,
+    employeeWorkdays, employeeVacationRequests, employeeAbsenceUsedDays,
     isLoading, currentTab, setCurrentTab,
     alert, setAlert, getEmployeeDetail,
   } = useEmployeeDetail(employeeId);
 
   const {
     editSection, saving, saveError, loadingCatalogues,
+    basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
+    basicPicturePreview,
     roles,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
-    setBasicField, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime,
+    setBasicField, setBasicPicture, setContactField, setAdminField,
+    toggleWorkday, setWorkdayTime, setWorkdayAllDay,
     submitBasic, submitContact, submitAdmin,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
@@ -46,13 +53,34 @@ const DetalleEmpleado = () => {
   });
 
   const {
-    documents, documentTypes, loadingDocs, fetchError, showUploadModal,
-    modalLoading, modalError, docToDelete, deletingId,
-    successMessage, canModify, conflictDocument,
-    setDocToDelete, handleDeleteConfirm, handleOpenEdit,
-    handleOpenUpload, handleCloseModal, handleConflictConfirm,
-    handleConflictCancel, isEditing, documentType, fileName,
-    handleFileChange, displayError, handleModalSubmit,
+    documents,
+    documentTypes,
+    loadingDocs,
+    fetchError,
+    showUploadModal,
+    modalLoading,
+    modalError,
+    docToDelete,
+    deletingId,
+    successMessage,
+    canModify,
+    conflictDocument,
+    clearFetchError,
+    clearSuccessMessage,
+    clearUploadError,
+    setDocToDelete,
+    handleDeleteConfirm,
+    handleOpenEdit,
+    handleOpenUpload,
+    handleCloseModal,
+    handleConflictConfirm,
+    handleConflictCancel,
+    isEditing,
+    documentType,
+    fileName,
+    handleFileChange,
+    displayError,
+    handleModalSubmit,
   } = useDocuments(employeeId);
 
   const infoDrawer     = useDrawer();
@@ -78,17 +106,20 @@ const DetalleEmpleado = () => {
     employeeFullName,
     setAlert,
     employee?.isActive !== false,
-    getEmployeeDetail
+    getEmployeeDetail,
   );
 
   if (isLoading) return <Loader />;
 
   return (
-    <div className="flex flex-col gap-4 text-black">
-
+    <div className="flex flex-col gap-4 overflow-x-hidden text-black">
       {alert?.message && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-          <Alert type={alert.type} message={alert.message} />
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert({})}
+          />
         </div>
       )}
 
@@ -105,48 +136,106 @@ const DetalleEmpleado = () => {
         onCancel={closeModal}
       />
 
-      <div className="flex flex-nowrap items-center gap-2 min-w-0">
+      <div className="flex items-center gap-2 md:hidden">
         <button
           type="button"
           onClick={() => navigate("/app/personal")}
           className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
         >
-          <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="w-5 h-5 text-slate-600 rotate-90"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
-        <Type variant="page-title" as="h2" className="min-w-0 flex-1 truncate">
+        <Type
+          variant="page-title"
+          as="h2"
+          className="min-w-0 flex-1 truncate text-[1rem] leading-tight sm:text-[1.15rem]"
+        >
           Gestión de Empleados
         </Type>
 
-        <div className="min-w-0 shrink md:hidden max-w-[min(11rem,38%)]">
+        <div className="w-28 shrink-0">
           <NativeSelect
-            size="sm" aria-label="Tabs" value={currentTab}
+            size="sm"
+            aria-label="Tabs"
+            value={currentTab}
             onChange={(e) => setCurrentTab(e.target.value)}
             options={tabs.map((t) => ({ label: t.label, value: t.id }))}
           />
         </div>
-        <Tabs
-          selectedKey={currentTab}
-          onSelectionChange={(key) => setCurrentTab(key)}
-          className="w-max max-md:hidden shrink-0 ml-0 md:ml-6"
-        >
-          <Tabs.List type="underline">
-            {tabs.map((tab) => (
-              <Tabs.Item key={tab.id} id={tab.id} label={tab.label} />
-            ))}
-          </Tabs.List>
-        </Tabs>
 
+        {canEdit ? (
+          <BigButton
+            text="Dar de baja"
+            onClick={openModal}
+            hasNoRollback
+            className="min-w-0 shrink-0 px-3"
+          />
+        ) : null}
+      </div>
+
+      <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
         <button
           type="button"
-          onClick={openModal}
-          className="ml-auto shrink-0 rounded-lg bg-[#9b1c1c] px-4 py-2 text-sm font-semibold
-            text-white hover:bg-[#7a1616] active:bg-[#5c1010] transition-colors"
+          onClick={() => navigate("/app/personal")}
+          className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
         >
-          Dar de baja
+          <svg
+            className="w-5 h-5 text-slate-600 rotate-90"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </button>
+
+        <div className="flex min-w-0 flex-1 items-center gap-4 md:gap-8">
+          <Type
+            variant="page-title"
+            as="h2"
+            className="min-w-0 shrink-0 truncate"
+          >
+            Gestión de Empleados
+          </Type>
+
+          <Tabs
+            selectedKey={currentTab}
+            onSelectionChange={(key) => setCurrentTab(key)}
+            className="w-max shrink-0"
+          >
+            <Tabs.List type="underline">
+              {tabs.map((tab) => (
+                <Tabs.Item key={tab.id} id={tab.id} label={tab.label} />
+              ))}
+            </Tabs.List>
+          </Tabs>
+        </div>
+
+        {canEdit ? (
+          <BigButton
+            text="Dar de baja"
+            onClick={openModal}
+            hasNoRollback
+            className="ml-auto mr-2 min-w-0 shrink-0 px-5"
+          />
+        ) : null}
       </div>
 
       <EmployeeBasicCard
@@ -154,17 +243,21 @@ const DetalleEmpleado = () => {
         employeeHouse={employeeHouse}
         isEditing={editSection === "basic"}
         basicForm={basicForm}
+        basicPicturePreview={basicPicturePreview}
         setBasicField={setBasicField}
+        setBasicPicture={setBasicPicture}
         saving={saving}
         saveError={editSection === "basic" ? saveError : null}
+        errors={editSection === "basic" ? basicErrors : {}}
         infoDrawer={infoDrawer}
         onOpenEdit={() => openBasicEdit(employee)}
         onSubmit={submitBasic}
         onCancel={closeEdit}
+        canEdit={canEdit}
       />
 
       {currentTab === "overview" && (
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-4">
           <EmployeeContactCard
             employee={employee}
             employeeAddress={employeeAddress}
@@ -173,16 +266,18 @@ const DetalleEmpleado = () => {
             setContactField={setContactField}
             saving={saving}
             saveError={editSection === "contact" ? saveError : null}
+            errors={editSection === "contact" ? contactErrors : {}}
             onOpenEdit={() => openContactEdit(employee, employeeAddress)}
             onSubmit={submitContact}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
 
           <EmployeeAdminCard
             employee={employee}
             employeeWorkdays={employeeWorkdays}
             employeeVacationRequests={employeeVacationRequests}
-            employeeFaults={employeeFaults}
+            employeeAbsenceUsedDays={employeeAbsenceUsedDays}
             workdaysDrawer={workdaysDrawer}
             isEditing={editSection === "Administrador"}
             loadingCatalogues={loadingCatalogues}
@@ -192,11 +287,14 @@ const DetalleEmpleado = () => {
             setAdminField={setAdminField}
             toggleWorkday={toggleWorkday}
             setWorkdayTime={setWorkdayTime}
+            setWorkdayAllDay={setWorkdayAllDay}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
+            errors={editSection === "Administrador" ? adminErrors : {}}
             onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
+            canEdit={canEdit}
           />
         </div>
       )}
@@ -206,7 +304,9 @@ const DetalleEmpleado = () => {
           documents={documents}
           loadingDocs={loadingDocs}
           fetchError={fetchError}
+          onFetchErrorClose={clearFetchError}
           successMessage={successMessage}
+          onSuccessMessageClose={clearSuccessMessage}
           canModify={canModify}
           deletingId={deletingId}
           docToDelete={docToDelete}
@@ -217,6 +317,7 @@ const DetalleEmpleado = () => {
           documentType={documentType}
           fileName={fileName}
           displayError={displayError}
+          onUploadErrorClose={clearUploadError}
           modalError={modalError}
           modalLoading={modalLoading}
           handleOpenUpload={handleOpenUpload}

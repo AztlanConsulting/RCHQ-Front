@@ -49,8 +49,7 @@ describe("TwoFactorLogin + AuthService — flujo de validación TwoFactorAuth", 
   it("llama a login() con el token final y navega al calendario cuando el código es válido", async () => {
     validateLoginTwoFactorAuthService.mockResolvedValue({
       nextStep: "LOGIN_COMPLETE",
-      token: "final-session-token",
-      data: { id: 1, name: "Test User" },
+      data: { token: "final-session-token", id: 1, name: "Test User" },
     });
     renderPage();
 

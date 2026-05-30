@@ -1,4 +1,4 @@
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import HouseLogsFilters from "../components/molecules/houseLogsFilters";
 import HouseLogsTable from "../components/molecules/houseLogsTable";
@@ -26,42 +26,40 @@ const LogsHouse = () => {
     clearActionSelection,
     dateFilter,
     setDateFilter,
+    minLogsDate,
+    maxLogsDate,
     isReportModalOpen,
     openReportModal,
     closeReportModal,
-    reportMonth,
-    setReportMonth,
     reportYear,
     setReportYear,
+    currentYear,
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
     handleNextPage,
     handlePrevPage,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   } = useHouseLogs();
 
   return (
-    <div className="p-8 md:flex md:h-full md:flex-col">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="flex h-full flex-col p-6 md:p-8">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-4xl font-bold text-[#121212]">
             Historial de actividades en Tochan
           </h1>
         </div>
 
-        <Button
+        <BigButton
           text="Generar reporte"
           onClick={openReportModal}
-          bgColor="bg-[#24375e]"
-          hoverColor="hover:bg-[#162d4a]"
-          activeColor="active:bg-[#0f2035]"
-          textColor="text-white"
-          width="w-full md:w-56"
-          className="px-6"
+          className="w-full md:w-56"
         />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <HouseLogsFilters
           responsibleQuery={responsibleQuery}
           setResponsibleQuery={setResponsibleQuery}
@@ -76,6 +74,10 @@ const LogsHouse = () => {
           clearActionSelection={clearActionSelection}
           dateFilter={dateFilter}
           setDateFilter={setDateFilter}
+          minDate={minLogsDate}
+          maxDate={maxLogsDate}
+          isMobileExpanded={isMobileFiltersExpanded}
+          onToggleMobileFilters={toggleMobileFilters}
         />
       </div>
 
@@ -97,10 +99,9 @@ const LogsHouse = () => {
       <LogReportModal
         open={isReportModalOpen}
         onClose={closeReportModal}
-        month={reportMonth}
-        onMonthChange={setReportMonth}
         year={reportYear}
         onYearChange={setReportYear}
+        currentYear={currentYear}
         yearOptions={yearOptions}
         onConfirm={handleDownloadReport}
         loading={isDownloadingReport}

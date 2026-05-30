@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Button from "../components/atoms/button";
 import Pagination from "../components/molecules/pagination";
 import VacationRequestFilters from "../components/molecules/vacationRequestFilters";
 import VacationRequestTable from "../components/molecules/vacationRequestTable";
@@ -7,6 +6,8 @@ import ConfirmApproveVacationModal from "../components/molecules/confirmApproveV
 import ConfirmRejectVacationModal from "../components/molecules/confirmRejectVacationModal";
 import { useVacationRequests } from "../hooks/pages/useVacationRequests";
 import Alert from "../components/atoms/alerts";
+import Modal from "../components/atoms/modal";
+import VacationDetail from "../components/molecules/calendarCards/vacationDetail";
 
 const VacationRequests = () => {
     const {
@@ -23,7 +24,6 @@ const VacationRequests = () => {
         setEndDate,
         statusFilter,
         setStatusFilter,
-        setSelectedRequest,
         loading,
         error,
         clearError,
@@ -34,6 +34,11 @@ const VacationRequests = () => {
         handleNextPage,
         handlePrevPage,
         clearFilters,
+        onViewDetail,
+        viewingRequest,
+        closeViewingRequest,
+        isMobileFiltersExpanded,
+        toggleMobileFilters,
     } = useVacationRequests();
 
     const [requestToApprove, setRequestToApprove] = useState(null);
@@ -41,8 +46,6 @@ const VacationRequests = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [requestToReject, setRequestToReject] = useState(null);
     const [rejectModalError, setRejectModalError] = useState("");
-
-    const isPendingView = view === "pending";
 
     const handleOpenApproveModal = (request) => {
         clearError();
@@ -71,7 +74,9 @@ const VacationRequests = () => {
             setSuccessMessage("Solicitud de vacaciones aprobada con éxito");
         } catch (err) {
             clearError();
-            setApproveModalError(err.message || "No se pudo aprobar la solicitud");
+            setApproveModalError(
+                err.message || "No se pudo aprobar la solicitud",
+            );
         }
     };
 
@@ -90,19 +95,24 @@ const VacationRequests = () => {
         setRequestToReject(null);
     };
 
-    const handleConfirmReject = async () => {
+    const handleConfirmReject = async (feedback) => {
         if (!requestToReject?.vacationRequestId) return;
 
         setRejectModalError("");
         setSuccessMessage("");
 
         try {
-            await handleRejectRequest(requestToReject.vacationRequestId);
+            await handleRejectRequest(
+                requestToReject.vacationRequestId,
+                feedback,
+            );
             setRequestToReject(null);
             setSuccessMessage("Solicitud de vacaciones rechazada con éxito");
         } catch (err) {
             clearError();
-            setRejectModalError(err.message || "No se pudo rechazar la solicitud");
+            setRejectModalError(
+                err.message || "No se pudo rechazar la solicitud",
+            );
         }
     };
 
@@ -117,31 +127,15 @@ const VacationRequests = () => {
                     />
                 </div>
             )}
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
                 <h1 className="font-bold text-4xl text-[#121212]">
-                    {isPendingView
-                        ? "Solicitudes de vacaciones pendientes"
-                        : "Solicitudes de vacaciones revisadas"}
+                    Solicitud de vacaciones
                 </h1>
-
-                <Button
-                    text={
-                        isPendingView
-                            ? "Solicitudes revisadas"
-                            : "Regresar a pendientes"
-                    }
-                    onClick={() => setView(isPendingView ? "reviewed" : "pending")}
-                    bgColor="bg-[#24375e]"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f2035]"
-                    textColor="text-white"
-                    width="w-auto"
-                    className="px-6"
-                />
             </div>
 
             <VacationRequestFilters
                 view={view}
+                setView={setView}
                 searchQuery={searchInput}
                 setSearchQuery={setSearchInput}
                 startDate={startDate}
@@ -151,30 +145,28 @@ const VacationRequests = () => {
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
                 clearFilters={clearFilters}
+                isMobileExpanded={isMobileFiltersExpanded}
+                onToggleMobileFilters={toggleMobileFilters}
             />
 
             {error && !requestToApprove && !requestToReject && (
                 <div className="mb-5">
-                    <Alert
-                        type="error"
-                        message={error}
-                        onClose={clearError}
-                    />
+                    <Alert type="error" message={error} onClose={clearError} />
                 </div>
             )}
 
-            <VacationRequestTable
-                requests={requests}
-                view={view}
-                loading={loading}
-                approvingRequestId={approvingRequestId}
-                rejectingRequestId={rejectingRequestId}
-                onViewDetail={(request) => {
-                    setSelectedRequest(request);
-                }}
-                onOpenApproveModal={handleOpenApproveModal}
-                onOpenRejectModal={handleOpenRejectModal}
-            />
+            <div className="md:flex-1 md:min-h-0 md:overflow-y-auto">
+                <VacationRequestTable
+                    requests={requests}
+                    view={view}
+                    loading={loading}
+                    approvingRequestId={approvingRequestId}
+                    rejectingRequestId={rejectingRequestId}
+                    onViewDetail={onViewDetail}
+                    onOpenApproveModal={handleOpenApproveModal}
+                    onOpenRejectModal={handleOpenRejectModal}
+                />
+            </div>
 
             <Pagination
                 page={page}
@@ -183,7 +175,7 @@ const VacationRequests = () => {
                 onPrevPage={handlePrevPage}
                 onNextPage={handleNextPage}
                 loading={loading}
-                hasEmployees={requests.length > 0}
+                hasItems={requests.length > 0}
                 itemLabel="solicitudes"
             />
 
@@ -202,6 +194,15 @@ const VacationRequests = () => {
                 onCancel={handleCloseRejectModal}
                 onConfirm={handleConfirmReject}
             />
+
+            <Modal
+                open={viewingRequest != null}
+                onClose={closeViewingRequest}
+                scrollable
+                className={"w-[92vw] max-w-[32rem] sm:max-w-[34rem] lg:max-w-[32rem] max-h-[80vh]"}
+            >
+                <VacationDetail event={viewingRequest ?? {}} />
+            </Modal>
         </div>
     );
 };

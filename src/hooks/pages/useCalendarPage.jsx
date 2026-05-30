@@ -6,9 +6,23 @@ import {
 import {
   deleteAbsenceService,
   buildAbsenceEvidenceUrl,
+  getEmployeeDateRules,
   updateAbsenceService,
 } from "../../services/calendarService";
+import { deleteVacationRequest } from "../../services/vacationService";
+import {
+  approveVacationRequest,
+  rejectVacationRequest,
+} from "../../services/vacationRequestService";
+import { deleteHouseEvent, deletePersonalEvent } from "../../services/deleteEventService";
 import { useDocumentFile } from "../atoms/useDocumentFile";
+import { useVacationFormEdit } from "./useVacationFormEdit";
+import {
+  buildAbsenceDateLimits,
+  buildAbsenceFormSchema,
+} from "../../utils/schema/evento/absence.schema";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
 
@@ -60,6 +74,7 @@ export const useCalendarPage = ({
   reloadCurrentRange,
   viewerRole = "",
 } = {}) => {
+  const absenceDateLimits = useMemo(() => buildAbsenceDateLimits(), []);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const selectedEventRef = useRef(null);
   const [isAbsenceEditing, setIsAbsenceEditing] = useState(false);
@@ -69,12 +84,51 @@ export const useCalendarPage = ({
     endDate: "",
     description: "",
   });
+  const [absenceDateRules, setAbsenceDateRules] = useState(null);
+  const [isLoadingAbsenceDateRules, setIsLoadingAbsenceDateRules] = useState(false);
   const [absenceEditError, setAbsenceEditError] = useState("");
   const [isSavingAbsence, setIsSavingAbsence] = useState(false);
   const [isDeleteAbsenceOpen, setIsDeleteAbsenceOpen] = useState(false);
   const [absenceDeleteError, setAbsenceDeleteError] = useState("");
   const [isLoadingWhileDeleting, setIsLoadingWhileDeleting] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [editingHouseEvent, setEditingHouseEvent] = useState(null);
+  const [editingPersonalEvent, setEditingPersonalEvent] = useState(null);
+  const [isDeleteHouseEventOpen, setIsDeleteHouseEventOpen] = useState(false);
+  const [isDeletingHouseEvent, setIsDeletingHouseEvent] = useState(false);
+  const [deleteHouseEventError, setDeleteHouseEventError] = useState("");
+  const [isDeletePersonalEventOpen, setIsDeletePersonalEventOpen] = useState(false);
+  const [isDeletingPersonalEvent, setIsDeletingPersonalEvent] = useState(false);
+  const [deletePersonalEventError, setDeletePersonalEventError] = useState("");
+  const [isDeleteVacationOpen, setIsDeleteVacationOpen] = useState(false);
+  const [isDeletingVacation, setIsDeletingVacation] = useState(false);
+  const [deleteVacationError, setDeleteVacationError] = useState("");
+  const [approveVacationRequestModal, setApproveVacationRequestModal] = useState(null);
+  const [rejectVacationRequestModal, setRejectVacationRequestModal] = useState(null);
+  const [isApprovingVacation, setIsApprovingVacation] = useState(false);
+  const [isRejectingVacation, setIsRejectingVacation] = useState(false);
+  const [approveVacationError, setApproveVacationError] = useState("");
+  const [rejectVacationError, setRejectVacationError] = useState("");
+  const {
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    vacationRemainingInfo,
+    vacationDateRules,
+    isLoadingVacationRemaining,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    resetVacationEdit,
+  } = useVacationFormEdit({
+    selectedEvent,
+    selectedEventRef,
+    reloadCurrentRange,
+    setSelectedEvent,
+    setAlert,
+  });
   const {
     file: absenceEvidenceFile,
     fileName: absenceEvidenceFileName,
@@ -89,9 +143,49 @@ export const useCalendarPage = ({
     setIsAbsenceEditing(false);
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
     setAbsenceDeleteError("");
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
     resetAbsenceEvidence();
-  }, [resetAbsenceEvidence]);
+    resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
+  }, [resetAbsenceEvidence, resetVacationEdit]);
+
+  const showEventDetail = useCallback((detail) => {
+    selectedEventRef.current = detail;
+    setSelectedEvent(detail);
+    setIsAbsenceEditing(false);
+    setIsDeleteAbsenceOpen(false);
+    setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
+    setAbsenceDeleteError("");
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
+    resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
+  }, [resetVacationEdit]);
+
+  const openCalendarItemDetail = useCallback((item) => {
+    const detail = calendarItemToDetail(item);
+    showEventDetail(detail);
+  }, [showEventDetail]);
 
   const showCalendarAlert = useCallback((nextAlert) => {
     setAlert(nextAlert);
@@ -109,7 +203,18 @@ export const useCalendarPage = ({
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
     setAbsenceDeleteError("");
-  }, []);
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
+    resetVacationEdit();
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
+    setApproveVacationRequestModal(null);
+    setRejectVacationRequestModal(null);
+    setApproveVacationError("");
+    setRejectVacationError("");
+  }, [resetVacationEdit]);
 
   const absenceEvidenceLabel = useMemo(
     () => getAbsenceEvidenceLabel(selectedEvent, viewerRole),
@@ -139,11 +244,24 @@ export const useCalendarPage = ({
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
     resetAbsenceEvidence();
+
+    const employeeId = currentSelectedEvent.employeeId ?? currentSelectedEvent.id;
+
+    if (employeeId) {
+      setIsLoadingAbsenceDateRules(true);
+
+      getEmployeeDateRules(employeeId, "absence")
+        .then(setAbsenceDateRules)
+        .catch(() => setAbsenceDateRules(null))
+        .finally(() => setIsLoadingAbsenceDateRules(false));
+    }
   }, [absenceTypeOptions, resetAbsenceEvidence, selectedEvent]);
 
   const cancelAbsenceEdit = useCallback(() => {
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
@@ -161,13 +279,19 @@ export const useCalendarPage = ({
   }, []);
 
   const setAbsenceField = useCallback((field, value) => {
-    setAbsenceForm((prev) => ({
-      ...prev,
-      [field]:
-        field === "description"
-          ? sanitizeAbsenceDescription(value)
-          : value,
-    }));
+    setAbsenceForm((prev) => {
+      if (field === "startDate") {
+        return shiftDateOnlyRange(prev, value);
+      }
+
+      return {
+        ...prev,
+        [field]:
+          field === "description"
+            ? sanitizeAbsenceDescription(value)
+            : value,
+      };
+    });
   }, []);
 
   const submitAbsenceEdit = useCallback(async () => {
@@ -185,22 +309,48 @@ export const useCalendarPage = ({
       description: sanitizeAbsenceDescription(currentSelectedEvent.description ?? "").trim(),
     };
 
-    if (!absenceForm.startDate || !absenceForm.endDate) {
-      setAbsenceEditError("Debes ingresar fecha de inicio y fecha de fin.");
-      return;
-    }
+    const validationResult = buildAbsenceFormSchema(absenceDateLimits).safeParse({
+      employeeId: String(
+        currentSelectedEvent.employeeId ?? currentSelectedEvent.id ?? "employee",
+      ),
+      absenceTypeId: String(absenceForm.absenceTypeId ?? ""),
+      startDate: absenceForm.startDate,
+      endDate: absenceForm.endDate,
+      description: normalizedDescription,
+    });
 
-    if (absenceForm.endDate < absenceForm.startDate) {
+    const schemaErrors = validationResult.success
+      ? {}
+      : validationResult.error.issues.reduce((acc, issue) => {
+        const key = issue.path[issue.path.length - 1];
+
+        if (key && !acc[key]) {
+          acc[key] = issue.message;
+        }
+
+        return acc;
+      }, {});
+    const fieldErrors = mergeDateRuleErrors(schemaErrors, {
+      startDate: absenceForm.startDate,
+      endDate: absenceForm.endDate,
+    }, absenceDateRules);
+
+    if (!validationResult.success || Object.values(fieldErrors).some(Boolean)) {
       setAbsenceEditError(
-        "La fecha de fin no puede ser menor a la fecha de inicio.",
+        fieldErrors.startDate ||
+          fieldErrors.endDate ||
+          validationResult.error?.issues?.[0]?.message ||
+          "Revisa los datos de la ausencia.",
       );
       return;
     }
 
+    const validatedAbsence = validationResult.data;
+
     if (
-      absenceForm.absenceTypeId &&
+      validatedAbsence.absenceTypeId &&
       !absenceTypeOptions.some(
-        (option) => String(option.value) === String(absenceForm.absenceTypeId),
+        (option) => String(option.value) === String(validatedAbsence.absenceTypeId),
       )
     ) {
       setAbsenceEditError("Tipo de ausencia inválido.");
@@ -214,17 +364,17 @@ export const useCalendarPage = ({
 
     const payload = {};
 
-    if (String(absenceForm.absenceTypeId) !== original.absenceTypeId) {
-      payload.absenceTypeId = absenceForm.absenceTypeId;
+    if (String(validatedAbsence.absenceTypeId) !== original.absenceTypeId) {
+      payload.absenceTypeId = validatedAbsence.absenceTypeId;
     }
-    if (absenceForm.startDate !== original.startDate) {
-      payload.startDate = absenceForm.startDate;
+    if (validatedAbsence.startDate !== original.startDate) {
+      payload.startDate = validatedAbsence.startDate;
     }
-    if (absenceForm.endDate !== original.endDate) {
-      payload.endDate = absenceForm.endDate;
+    if (validatedAbsence.endDate !== original.endDate) {
+      payload.endDate = validatedAbsence.endDate;
     }
-    if (normalizedDescription !== original.description) {
-      payload.description = normalizedDescription;
+    if (validatedAbsence.description !== original.description) {
+      payload.description = validatedAbsence.description;
     }
 
     if (absenceEvidenceFile) {
@@ -261,15 +411,15 @@ export const useCalendarPage = ({
               ...currentSelectedEvent,
               absenceId: updatedAbsence?.absenceId ?? currentSelectedEvent.absenceId,
               absenceTypeId:
-                updatedAbsence?.absenceTypeId ?? absenceForm.absenceTypeId,
+                updatedAbsence?.absenceTypeId ?? validatedAbsence.absenceTypeId,
               employeeName: updatedAbsence?.name ?? currentSelectedEvent.employeeName,
               curp: updatedAbsence?.curp ?? currentSelectedEvent.curp,
               eventType: updatedAbsence?.type ?? currentSelectedEvent.eventType,
               description:
-                updatedAbsence?.description ?? normalizedDescription,
+                updatedAbsence?.description ?? validatedAbsence.description,
               link: updatedAbsence?.link ?? currentSelectedEvent.link,
-              startDate: updatedAbsence?.startDate ?? absenceForm.startDate,
-              endDate: updatedAbsence?.endDate ?? absenceForm.endDate,
+              startDate: updatedAbsence?.startDate ?? validatedAbsence.startDate,
+              endDate: updatedAbsence?.endDate ?? validatedAbsence.endDate,
               isDeleted: updatedAbsence?.isDeleted ?? currentSelectedEvent.isDeleted,
             };
 
@@ -292,7 +442,9 @@ export const useCalendarPage = ({
   }, [
     absenceEvidenceError,
     absenceEvidenceFile,
+    absenceDateLimits,
     absenceForm,
+    absenceDateRules,
     absenceTypeOptions,
     reloadCurrentRange,
     resetAbsenceEvidence,
@@ -328,6 +480,364 @@ export const useCalendarPage = ({
     }
   }, [closeDetail, reloadCurrentRange, selectedEvent]);
 
+  const openEventEdit = useCallback(() => {
+    if (!selectedEvent) return;
+    const { focus, scope } = selectedEvent;
+
+    if (focus === "eventos" && scope === "house") {
+      setEditingHouseEvent(selectedEvent);
+      closeDetail();
+      return;
+    }
+
+    if (focus === "eventos" && scope === "personal") {
+      setEditingPersonalEvent(selectedEvent);
+      closeDetail();
+      return;
+    }
+
+    setAlert({
+      type: "error",
+      message: "No se puede editar este tipo de evento.",
+    });
+  }, [closeDetail, selectedEvent]);
+
+  const openEventDelete = useCallback(() => {
+    if (!selectedEvent) return;
+    const { focus, scope } = selectedEvent;
+
+    if (focus === "eventos" && scope === "house") {
+      setDeleteHouseEventError("");
+      setIsDeleteHouseEventOpen(true);
+      return;
+    }
+
+    if (focus === "eventos" && scope === "personal") {
+      setDeletePersonalEventError("");
+      setIsDeletePersonalEventOpen(true);
+      return;
+    }
+
+  }, [selectedEvent]);
+
+  const cancelDeleteHouseEvent = useCallback(() => {
+    setIsDeleteHouseEventOpen(false);
+    setDeleteHouseEventError("");
+  }, []);
+
+  const cancelDeletePersonalEvent = useCallback(() => {
+    setIsDeletePersonalEventOpen(false);
+    setDeletePersonalEventError("");
+  }, []);
+
+  const confirmDeleteHouseEvent = useCallback(async () => {
+    const houseEventId =
+      selectedEvent?.houseEventId ?? selectedEvent?.eventId;
+    if (!houseEventId) return;
+
+    setIsDeletingHouseEvent(true);
+    setDeleteHouseEventError("");
+
+    try {
+      await deleteHouseEvent(houseEventId);
+      setIsDeleteHouseEventOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar el evento.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Evento eliminado exitosamente",
+      });
+    } catch (err) {
+      setDeleteHouseEventError(
+        err?.message ?? "Error al eliminar el evento",
+      );
+    } finally {
+      setIsDeletingHouseEvent(false);
+    }
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
+
+  const confirmDeletePersonalEvent = useCallback(async () => {
+    const personalEventId = selectedEvent?.eventId;
+    if (!personalEventId) return;
+
+    setIsDeletingPersonalEvent(true);
+    setDeletePersonalEventError("");
+
+    try {
+      await deletePersonalEvent(personalEventId);
+      setIsDeletePersonalEventOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar el evento.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Evento eliminado exitosamente",
+      });
+    } catch (err) {
+      setDeletePersonalEventError(
+        err?.message ?? "Error al eliminar el evento",
+      );
+    } finally {
+      setIsDeletingPersonalEvent(false);
+    }
+  }, [closeDetail, reloadCurrentRange, selectedEvent]);
+
+  const onHouseEventEditSuccess = useCallback(async () => {
+    const houseEventId = editingHouseEvent?.houseEventId;
+    setEditingHouseEvent(null);
+
+    const rawEvents = await reloadCurrentRange?.();
+
+    const refreshedEvent = rawEvents?.find(
+      (ev) =>
+        ev.focus === "eventos" &&
+        ev.scope === "house" &&
+        String(ev.houseEventId) === String(houseEventId),
+    );
+
+    if (refreshedEvent) {
+      showEventDetail(calendarItemToDetail(refreshedEvent));
+    }
+
+    setAlert({
+      type: "success",
+      message: "Evento editado exitosamente",
+    });
+  }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
+
+  const onPersonalEventEditSuccess = useCallback(async () => {
+    const personalEventId = editingPersonalEvent?.eventId;
+    setEditingPersonalEvent(null);
+
+    const rawEvents = await reloadCurrentRange?.();
+
+    const refreshedEvent = rawEvents?.find(
+      (ev) =>
+        ev.focus === "eventos" &&
+        ev.scope === "personal" &&
+        String(ev.eventId) === String(personalEventId),
+    );
+
+    if (refreshedEvent) {
+      showEventDetail(calendarItemToDetail(refreshedEvent));
+    }
+
+    setAlert({
+      type: "success",
+      message: "Evento editado exitosamente",
+    });
+  }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
+  const getVacationRequestId = useCallback((event) =>
+    event?.vacationRequestId ??
+    event?.vacationId ??
+    "",
+    [],);
+
+  const buildVacationRequestFromEvent = useCallback((event) => {
+    const vacationRequestId = getVacationRequestId(event);
+
+    if (!event || !vacationRequestId) return null;
+
+    return {
+      vacationRequestId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      usedDays: event.usedDays,
+      status: event.status,
+      statusLabel: event.statusLabel,
+      feedback: event.feedback ?? event.vacationFeedback ?? "",
+      employeeId: event.employeeId,
+      employee: {
+        employeeId: event.employeeId,
+        fullName: event.employeeName,
+        curp: event.curp,
+        picture: event.picture,
+      },
+    };
+  }, [getVacationRequestId]);
+  
+    const openDeleteVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const vacationRequestId = getVacationRequestId(currentSelectedEvent);
+
+    if (!vacationRequestId) return;
+
+    resetVacationEdit();
+    setDeleteVacationError("");
+    setIsDeleteVacationOpen(true);
+  }, [getVacationRequestId, resetVacationEdit, selectedEvent]);
+
+  const cancelDeleteVacation = useCallback(() => {
+    setIsDeleteVacationOpen(false);
+    setDeleteVacationError("");
+  }, []);
+
+  const confirmDeleteVacation = useCallback(async () => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const vacationRequestId = getVacationRequestId(currentSelectedEvent);
+
+    if (!vacationRequestId) return;
+
+    setIsDeletingVacation(true);
+    setDeleteVacationError("");
+
+    try {
+      await deleteVacationRequest(vacationRequestId);
+
+      setIsDeleteVacationOpen(false);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras eliminar las vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Vacaciones eliminadas correctamente",
+      });
+    } catch (error) {
+      setDeleteVacationError(
+        error?.message || "No se pudieron eliminar las vacaciones.",
+      );
+    } finally {
+      setIsDeletingVacation(false);
+    }
+  }, [
+    closeDetail,
+    getVacationRequestId,
+    reloadCurrentRange,
+    selectedEvent,
+    selectedEventRef,
+  ]);
+
+  const openApproveVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const request = buildVacationRequestFromEvent(currentSelectedEvent);
+
+    if (!request) return;
+
+    resetVacationEdit();
+    setApproveVacationError("");
+    setRejectVacationError("");
+    setApproveVacationRequestModal(request);
+  }, [buildVacationRequestFromEvent, resetVacationEdit, selectedEvent]);
+
+  const cancelApproveVacation = useCallback(() => {
+    setApproveVacationRequestModal(null);
+    setApproveVacationError("");
+  }, []);
+
+  const confirmApproveVacation = useCallback(async () => {
+    const vacationRequestId = approveVacationRequestModal?.vacationRequestId;
+
+    if (!vacationRequestId) return;
+
+    setIsApprovingVacation(true);
+    setApproveVacationError("");
+
+    try {
+      await approveVacationRequest(vacationRequestId);
+
+      setApproveVacationRequestModal(null);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras aprobar la solicitud de vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Solicitud de vacaciones aprobada correctamente",
+      });
+    } catch (error) {
+      setApproveVacationError(
+        error?.message || "No se pudo aprobar la solicitud de vacaciones.",
+      );
+    } finally {
+      setIsApprovingVacation(false);
+    }
+  }, [approveVacationRequestModal, closeDetail, reloadCurrentRange]);
+
+  const openRejectVacation = useCallback(() => {
+    const currentSelectedEvent = selectedEventRef.current ?? selectedEvent;
+    const request = buildVacationRequestFromEvent(currentSelectedEvent);
+
+    if (!request) return;
+
+    resetVacationEdit();
+    setApproveVacationError("");
+    setRejectVacationError("");
+    setRejectVacationRequestModal(request);
+  }, [buildVacationRequestFromEvent, resetVacationEdit, selectedEvent]);
+
+  const cancelRejectVacation = useCallback(() => {
+    setRejectVacationRequestModal(null);
+    setRejectVacationError("");
+  }, []);
+
+  const confirmRejectVacation = useCallback(async (feedback) => {
+    const vacationRequestId = rejectVacationRequestModal?.vacationRequestId;
+
+    if (!vacationRequestId) return;
+
+    setIsRejectingVacation(true);
+    setRejectVacationError("");
+
+    try {
+      await rejectVacationRequest(vacationRequestId, feedback);
+
+      setRejectVacationRequestModal(null);
+      closeDetail();
+
+      try {
+        await reloadCurrentRange?.();
+      } catch (reloadError) {
+        console.warn(
+          "No se pudo recargar el calendario tras rechazar la solicitud de vacaciones.",
+          reloadError,
+        );
+      }
+
+      setAlert({
+        type: "success",
+        message: "Solicitud de vacaciones rechazada correctamente",
+      });
+    } catch (error) {
+      setRejectVacationError(
+        error?.message || "No se pudo rechazar la solicitud de vacaciones.",
+      );
+    } finally {
+      setIsRejectingVacation(false);
+    }
+  }, [closeDetail, rejectVacationRequestModal, reloadCurrentRange]);
+
   return {
     selectedEvent,
     isAbsenceEditing,
@@ -341,7 +851,12 @@ export const useCalendarPage = ({
     setAlert,
     absenceEvidenceFileName,
     absenceEvidenceError,
+    absenceMinStartDate: absenceDateLimits.minStartDate,
+    absenceMaxEndDate: absenceDateLimits.maxEndDate,
+    absenceDateRules,
+    isLoadingAbsenceDateRules,
     closeDetail,
+    showEventDetail,
     handleEventClick,
     absenceEvidenceLabel,
     openAbsenceEvidence,
@@ -355,5 +870,53 @@ export const useCalendarPage = ({
     submitAbsenceEdit,
     showCalendarAlert,
     clearCalendarAlert,
+    editingHouseEvent,
+    setEditingHouseEvent,
+    editingPersonalEvent,
+    setEditingPersonalEvent,
+    onPersonalEventEditSuccess,
+    isDeleteHouseEventOpen,
+    isDeletingHouseEvent,
+    deleteHouseEventError,
+    isDeletePersonalEventOpen,
+    isDeletingPersonalEvent,
+    deletePersonalEventError,
+    openEventEdit,
+    openEventDelete,
+    cancelDeleteHouseEvent,
+    confirmDeleteHouseEvent,
+    cancelDeletePersonalEvent,
+    confirmDeletePersonalEvent,
+    onHouseEventEditSuccess,
+    isVacationEditing,
+    vacationForm,
+    vacationEditError,
+    isSavingVacation,
+    startVacationEdit,
+    cancelVacationEdit,
+    setVacationField,
+    submitVacationEdit,
+    vacationRemainingInfo,
+    vacationDateRules,
+    isLoadingVacationRemaining,
+    openCalendarItemDetail,
+    isDeleteVacationOpen,
+    isDeletingVacation,
+    deleteVacationError,
+    openDeleteVacation,
+    cancelDeleteVacation,
+    confirmDeleteVacation,
+    approveVacationRequestModal,
+    rejectVacationRequestModal,
+    isApprovingVacation,
+    isRejectingVacation,
+    approveVacationError,
+    rejectVacationError,
+    openApproveVacation,
+    cancelApproveVacation,
+    confirmApproveVacation,
+    openRejectVacation,
+    cancelRejectVacation,
+    confirmRejectVacation,
   };
 };

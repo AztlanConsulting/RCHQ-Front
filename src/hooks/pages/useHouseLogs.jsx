@@ -36,12 +36,14 @@ export const formatLogMoment = (momentValue) => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   }).format(date);
 
   const timePart = new Intl.DateTimeFormat("es-MX", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
+    timeZone: "UTC",
   })
     .format(date)
     .replace(/\s+/g, " ")
@@ -53,6 +55,7 @@ export const formatLogMoment = (momentValue) => {
 
 export const useHouseLogs = () => {
   const [serverLogs, setServerLogs] = useState([]);
+  const [isMobileFiltersExpanded, setIsMobileFiltersExpanded] = useState(false);
   const [limit, setLimit] = useState(() => getResponsiveLimit());
   const [pagination, setPagination] = useState(() =>
     buildDefaultPagination(getResponsiveLimit()),
@@ -86,13 +89,14 @@ export const useHouseLogs = () => {
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
 
   const now = useMemo(() => new Date(), []);
-  const [reportMonth, setReportMonth] = useState(now.getMonth() + 1);
+  const currentYear = now.getFullYear();
+  const minLogsDate = useMemo(() => new Date(currentYear - 5, 0, 1), [currentYear]);
+  const maxLogsDate = useMemo(() => new Date(currentYear, 11, 31), [currentYear]);
   const [reportYear, setReportYear] = useState(now.getFullYear());
 
   const yearOptions = useMemo(() => {
-    const currentYear = now.getFullYear();
-    return Array.from({ length: 11 }, (_, index) => currentYear - 5 + index);
-  }, [now]);
+    return Array.from({ length: 6 }, (_, index) => currentYear - index);
+  }, [currentYear]);
 
   const filteredActionOptions = useMemo(() => {
     const normalizedSearch = actionSearch.trim().toLowerCase();
@@ -186,7 +190,9 @@ export const useHouseLogs = () => {
 
   useEffect(() => {
     fetchLogs(page);
-  }, [page, limit, responsibleSearch, affectedSearch, selectedActionIds, effectiveStartDate, effectiveEndDate]);
+  }, [page, limit, responsibleSearch, 
+    affectedSearch, selectedActionIds, 
+    effectiveStartDate, effectiveEndDate]);
 
   useEffect(() => {
     setPage(1);
@@ -232,13 +238,17 @@ export const useHouseLogs = () => {
     setIsReportModalOpen(false);
   };
 
+  const toggleMobileFilters = () => {
+    setIsMobileFiltersExpanded((current) => !current);
+  };
+
   const handleDownloadReport = async () => {
     setIsDownloadingReport(true);
     setError("");
 
     try {
       const { blob, fileName } = await downloadHouseLogsReportService({
-        month: reportMonth,
+        currentYear: now.getFullYear(),
         year: reportYear,
       });
       const url = window.URL.createObjectURL(blob);
@@ -278,10 +288,11 @@ export const useHouseLogs = () => {
     isReportModalOpen,
     openReportModal,
     closeReportModal,
-    reportMonth,
-    setReportMonth,
     reportYear,
     setReportYear,
+    currentYear: now.getFullYear(),
+    minLogsDate,
+    maxLogsDate,
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
@@ -292,5 +303,7 @@ export const useHouseLogs = () => {
     dateFilter,
     setDateFilter,
     actionOptions,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   };
 };

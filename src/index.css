@@ -12,7 +12,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* FullCalendar custom CSS */
     --fc-border-color: #a3a3a3;
 
     --fc-button-bg-color: #1f3664;
@@ -27,6 +26,7 @@ html,
 body {
     margin: 0;
     min-height: 100%;
+    scrollbar-gutter: stable;
 }
 
 #root {
@@ -51,7 +51,6 @@ input:-webkit-autofill:active {
     transition: background-color 9999s ease-in-out 0s;
 }
 
-/* Full Calendar CSS */
 .fc * {
     color: #121212;
 }
@@ -79,11 +78,6 @@ svg {
     min-width: 0;
 }
 
-/*
- * <768px: title on row 1; chunks 1 & 3 flex-wrap on row 2.
- * 493–767px: space-between (nav left, actions right) while they share a row.
- * ≤492px: flex-start so when chunk 3 wraps, the new row is flush left.
- */
 @media (max-width: 767px) {
     .fc .fc-header-toolbar {
         display: flex !important;
@@ -175,7 +169,6 @@ svg {
     padding-inline: 0.35rem;
 }
 
-/* Calendar “filtros” toolbar button (custom icon, left chunk after “Hoy”) */
 .fc .fc-icon-calendar-filter {
     font-family: inherit;
     font-size: 1em;
@@ -198,7 +191,6 @@ svg {
     padding-inline: 0.45rem;
 }
 
-/* Lista — icon-only; match size/padding to calendar filter button */
 .fc .fc-toggleListButton-button {
     display: inline-flex;
     align-items: center;
@@ -231,6 +223,23 @@ svg {
     background-color: #fafafa;
     mask: url("/list.svg") no-repeat center / contain;
     -webkit-mask: url("/list.svg") no-repeat center / contain;
+}
+
+.fc .fc-toggleListButton-button {
+    background-color: var(--fc-button-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button:hover {
+    background-color: var(--fc-button-hover-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button:active {
+    background-color: var(--fc-button-active-bg-color) !important;
+}
+
+.fc .fc-toggleListButton-button.list-mode .fc-icon-list::before {
+    mask: url("/calendar.svg") no-repeat center / contain;
+    -webkit-mask: url("/calendar.svg") no-repeat center / contain;
 }
 
 @media (min-width: 1024px) {
@@ -271,7 +280,6 @@ svg {
 }
 
 .fc-button span {
-    /*cloudflare ssl certificates*/
 }
 
 .fc .fc-toolbar-chunk .fc-button-primary:focus,
@@ -350,11 +358,28 @@ svg {
 }
 
 .fc .fc-scroller .fc-col-header {
-    height: 52px;
+    min-height: 52px;
+    height: auto;
 }
 
 .fc .fc-col-header-cell {
     vertical-align: middle;
+}
+
+.fc-timeGridWeek-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-title,
+.fc-timeGridDay-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-title {
+    -webkit-line-clamp: 1;
+}
+
+.fc-timeGridWeek-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-subtitle,
+.fc-timeGridDay-view .fc-daygrid-event .fc-weekTimeCard--allday .fc-weekTimeCard-subtitle {
+    -webkit-line-clamp: 1;
+}
+
+.fc-timeGridWeek-view .fc-timegrid-slot-minor,
+.fc-timeGridDay-view .fc-timegrid-slot-minor {
+    border-top-color: transparent !important;
+    box-shadow: none !important;
 }
 
 .fc-dayGridCard {
@@ -371,6 +396,241 @@ svg {
 }
 
 .fc-dayGridCard span {
+    color: #fff;
+}
+
+.fc-weekTimeCard {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    cursor: pointer;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.125rem;
+    color: #fff;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.fc-weekTimeCard-fixed {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.125rem;
+    min-width: 0;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.fc-weekTimeCard-description {
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.92;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+.fc-weekTimeCard-titleRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.fc-weekTimeCard-title {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.fc .fc-list-event-title {
+    white-space: normal;
+}
+
+.fc-timeGridWeek-view .fc-timegrid-event,
+.fc-timeGridDay-view .fc-timegrid-event {
+    overflow: hidden;
+}
+
+.fc-timeGridWeek-view .fc-timegrid-event .fc-event-main,
+.fc-timeGridDay-view .fc-timegrid-event .fc-event-main {
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.fc-timeGridWeek-view .fc-v-event .fc-event-main-frame,
+.fc-timeGridDay-view .fc-v-event .fc-event-main-frame {
+    min-height: 0;
+    height: 100%;
+}
+
+.fc-weekTimeCard-meta {
+    font-weight: 500;
+    opacity: 0.9;
+    min-width: 0;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+}
+
+.fc-weekTimeCard-subtitle {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    opacity: 0.85;
+    min-width: 0;
+    flex-shrink: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.fc-weekTimeCard span,
+.fc-weekTimeCard .fc-weekTimeCard-meta,
+.fc-weekTimeCard .fc-weekTimeCard-subtitle,
+.fc-weekTimeCard .fc-weekTimeCard-description {
+    color: #fff;
+}
+
+.fc-dayTimeCard {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    cursor: pointer;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    color: #fff;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.fc-dayTimeCard-titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 0.125rem;
+    flex-shrink: 0;
+}
+
+.fc-dayTimeCard-titleTrail {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.fc-dayTimeCard-time {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    opacity: 0.9;
+    white-space: nowrap;
+    color: #fff;
+    max-width: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fc-dayTimeCard--allday .fc-dayTimeCard-title {
+    -webkit-line-clamp: 1;
+}
+
+.fc-dayTimeCard--allday .fc-dayTimeCard-titleRow {
+    margin-bottom: 0;
+}
+
+.fc-dayTimeCard-title {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.fc-dayTimeCard-meta {
+    font-weight: 500;
+    opacity: 0.9;
+    min-width: 0;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+}
+
+.fc-dayTimeCard-subtitle {
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    opacity: 0.85;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.fc-dayTimeCard-description {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.92;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+}
+
+.fc-dayTimeCard span,
+.fc-dayTimeCard .fc-dayTimeCard-meta,
+.fc-dayTimeCard .fc-dayTimeCard-subtitle,
+.fc-dayTimeCard .fc-dayTimeCard-description {
     color: #fff;
 }
 
@@ -411,6 +671,98 @@ svg {
     color: inherit;
 }
 
+/* Overflow popover — align with Modal / event detail cards */
+.fc .fc-popover {
+    border: none !important;
+    border-radius: 0.75rem;
+    background: #fff !important;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-width: 14rem;
+    max-width: min(92vw, 40rem);
+}
+
+.fc .fc-popover-header {
+    background: #fff !important;
+    padding: 1.875rem 1.875rem 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: none;
+}
+
+.fc .fc-popover-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #0f172a;
+    flex: 1;
+    min-width: 0;
+}
+
+.fc .fc-popover-close {
+    cursor: pointer;
+    opacity: 1;
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    line-height: 1;
+    font-weight: 400;
+    color: #94a3b8;
+    padding: 0;
+    border: none;
+    background: transparent;
+    transition: color 0.15s ease;
+}
+
+.fc .fc-popover-close.fc-icon-x::before {
+    content: "×";
+    font-family: inherit;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.fc .fc-popover-close:hover,
+.fc .fc-popover-close:focus-visible {
+    color: #334155;
+    background: transparent;
+}
+
+.fc .fc-popover-body {
+    background: #fff;
+    padding: 0.75rem 1.875rem 1.875rem;
+    color: #121212;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    max-height: min(56vh, 28rem);
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fc .fc-popover-body::-webkit-scrollbar {
+    display: none;
+}
+
+.fc .fc-popover .fc-daygrid-day-events {
+    margin: 0;
+}
+
+.fc .fc-popover .fc-daygrid-event-harness {
+    margin-top: 0.375rem;
+}
+
+.fc .fc-popover .fc-daygrid-event-harness:first-child {
+    margin-top: 0;
+}
+
+.fc .fc-popover .fc-daygrid-event {
+    border-radius: 0.25rem;
+    margin: 0;
+}
+
 .fc-dayGridMonth-view .fc-daygrid-day-number {
     padding: 1px 3px 0;
     font-size: 0.8em;
@@ -429,7 +781,10 @@ svg {
     height: 10px !important; 
 }
 
-/* Thin (100) */
+.fc .fc-list-table th{
+    z-index: 2;
+}
+
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Thin.ttf") format("truetype");
@@ -446,7 +801,6 @@ svg {
     font-display: swap;
 }
 
-/* ExtraLight (200) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-ExtraLight.ttf") format("truetype");
@@ -463,7 +817,6 @@ svg {
     font-display: swap;
 }
 
-/* Light (300) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Light.ttf") format("truetype");
@@ -480,7 +833,6 @@ svg {
     font-display: swap;
 }
 
-/* Regular (400) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Regular.ttf") format("truetype");
@@ -497,7 +849,6 @@ svg {
     font-display: swap;
 }
 
-/* Medium (500) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Medium.ttf") format("truetype");
@@ -514,7 +865,6 @@ svg {
     font-display: swap;
 }
 
-/* SemiBold (600) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-SemiBold.ttf") format("truetype");
@@ -531,7 +881,6 @@ svg {
     font-display: swap;
 }
 
-/* Bold (700) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Bold.ttf") format("truetype");
@@ -548,7 +897,6 @@ svg {
     font-display: swap;
 }
 
-/* ExtraBold (800) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-ExtraBold.ttf") format("truetype");
@@ -565,7 +913,6 @@ svg {
     font-display: swap;
 }
 
-/* Black (900) */
 @font-face {
     font-family: "Public Sans";
     src: url("/fonts/PublicSans-Black.ttf") format("truetype");
@@ -582,7 +929,6 @@ svg {
     font-display: swap;
 }
 
-/* DATEPICKER */
 
 .bg-primary-700 {
     background-color: #24375e !important;
@@ -594,42 +940,30 @@ svg {
     background-color: #162d4a !important;
 }
 
-button.outside-month-day {
-    color: #999999 !important;
-
-    opacity: 0.5 !important;
-
-    cursor: not-allowed !important;
+.date-field-wrapper button.outside-month-day {
+    opacity: 0.5;
 }
 
-button.outside-month-day:hover {
-    background-color: #f3f4f6 !important;
+.dark .date-field-wrapper .bg-primary-700 {
+    background-color: #24375e;
 
-    opacity: 0.5 !important;
+    color: white;
 }
 
-.dark .bg-primary-700 {
-    background-color: #24375e !important;
-
-    color: white !important;
+.dark .date-field-wrapper .bg-primary-700:hover {
+    background-color: #162d4a;
 }
 
-.dark .bg-primary-700:hover {
-    background-color: #162d4a !important;
+.dark .date-field-wrapper button.outside-month-day {
+    color: #999999;
+
+    opacity: 0.5;
 }
 
-.dark button.outside-month-day {
-    color: #999999 !important;
+.dark .date-field-wrapper button.outside-month-day:hover {
+    background-color: #374151;
 
-    opacity: 0.5 !important;
-
-    cursor: not-allowed !important;
-}
-
-.dark button.outside-month-day:hover {
-    background-color: #374151 !important;
-
-    opacity: 0.5 !important;
+    opacity: 0.5;
 }
 
 @keyframes fadeSlideIn {

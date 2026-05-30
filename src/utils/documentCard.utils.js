@@ -1,7 +1,5 @@
-import { DOCUMENT_TYPES } from "../services/documentService";
-
-export const getDocumentLabel = (typeValue) => {
-  const found = DOCUMENT_TYPES.find((dt) => dt.value === typeValue);
+export const getDocumentLabel = (typeValue, documentTypes = []) => {
+  const found = documentTypes.find((dt) => dt.value === typeValue);
   return found ? found.label : typeValue;
 };
 
@@ -15,6 +13,18 @@ export const formatDocumentDate = (dateString) => {
 };
 
 export const getDocumentFileUrl = (doc) => doc.fileUrl || doc.url || null;
+
+export const getDocumentFileNameFromLink = (link = "") => {
+  const path = String(link).split(/[?#]/)[0];
+  const parts = path.split(/[\\/]/).filter(Boolean);
+  const fileName = parts[parts.length - 1] ?? "";
+
+  try {
+    return decodeURIComponent(fileName);
+  } catch {
+    return fileName;
+  }
+};
 
 export const isDocumentPdf = (doc) => {
   const url = doc?.fileUrl || doc?.url || "";

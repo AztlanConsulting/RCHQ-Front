@@ -12,28 +12,60 @@ const CATEGORY_OPTIONS = [
 const DEFAULT_CATEGORY = "personal";
 
 const sanitizeName = (value) =>
-    value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, "");
+    value
+        .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g, "")
+        .slice(0, 70);
 
 const normalizeRole = (role) =>
     String(role ?? "")
         .trim()
         .toLowerCase();
 
-const canViewCategory = (option, role) => {
-    const normalizedRole = normalizeRole(role);
+const canViewCategory = (option, role, startDate) => {
+    if (!startDate) return true;
 
-    if (option.value === "casa" || option.value === "ausencias") {
-        return normalizedRole === "coordinador";
+    const normalizedRole = normalizeRole(role);
+    const todayMX = new Date().toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
+
+    const addTime = (dateStr, months = 0, years = 0) => {
+        const d = new Date(dateStr + "T12:00:00");
+        d.setMonth(d.getMonth() + months);
+        d.setFullYear(d.getFullYear() + years);
+        return d.toISOString().split('T')[0];
+    };
+
+    const oneYearFromTodayMX = addTime(todayMX, 0, 1);
+    const oneMonthAgoMX = addTime(todayMX, -1, 0);
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = `${currentYear}-01-01`;
+    const houseDateMax = `${currentYear + 2}-12-31`;
+
+    if (option.value === "vacaciones") {
+        if (normalizedRole === "coordinador") {
+            return startDate >= todayMX && startDate <= oneYearFromTodayMX;
+        }
+        if (normalizedRole !== "administrador") {
+            return startDate > todayMX && startDate <= oneYearFromTodayMX;
+        }
+        return false;
+    }
+
+    if (option.value === "casa") {
+        return normalizedRole === "coordinador" && startDate >= houseDateMin && startDate <= houseDateMax;
+    }
+
+    if (option.value === "ausencias") {
+        return normalizedRole === "coordinador" && startDate >= oneMonthAgoMX && startDate <= oneYearFromTodayMX;
     }
 
     if (option.value === "global") {
-        return normalizedRole === "Administrador";
+        return normalizedRole === "administrador" && startDate >= todayMX;
     }
 
-    return true;
+    return startDate >= todayMX;
 };
 
-export const useRegisterEventModal = (isOpen, categoryForms) => {
+export const useRegisterEventModal = (isOpen, categoryForms, initialStartDate) => {
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
     const [categoryKey, setCategoryKey] = useState(DEFAULT_CATEGORY);
@@ -46,9 +78,9 @@ export const useRegisterEventModal = (isOpen, categoryForms) => {
         return CATEGORY_OPTIONS.filter(
             (option) =>
                 categoryForms?.[option.value] &&
-                canViewCategory(option, viewerRole),
+                canViewCategory(option, viewerRole, initialStartDate),
         );
-    }, [categoryForms, viewerRole]);
+    }, [categoryForms, viewerRole, initialStartDate]);
 
     const visibleCategoryValues = visibleCategoryOptions.map(
         ({ value }) => value,

@@ -1,10 +1,9 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
 import { hasRole } from "../../utils/auth/getRoleName";
 
-// ─── Icon component ───────────────────────────────────────────────────────────
 const Icon = ({ name, className }) => (
   <img
     src={`/${name}.svg`}
@@ -14,15 +13,50 @@ const Icon = ({ name, className }) => (
   />
 );
 
+const isProfileNavActive = (pathname, linkActive = false) => {
+  if (linkActive) return true;
+
+  if (
+    pathname === "/app/opciones" ||
+    pathname.startsWith("/app/opciones/") ||
+    pathname === "/app/certificaciones" ||
+    pathname.startsWith("/app/certificaciones/")
+  ) {
+    return true;
+  }
+
+  return (
+    matchPath({ path: "/app/:employeeId/documentos", end: true }, pathname) != null
+  );
+};
+
 const getNavItems = (user) => {
   const isCoordinator = hasRole(user, "coordinador");
+  const isAdministrator = hasRole(user, "administrador");
+  const vacationPath = isCoordinator
+    ? "/app/vacaciones/solicitudes"
+    : "/app/vacaciones";
   const navItems = [
     { to: "/app/calendario", label: "Calendario", icon: "calendar" },
-    { to: "/app/personal", label: "Personal", icon: "employee" },
-    { to: "/app/casas", label: "Casas Hogares", icon: "home" },
-    { to: "/app/vacaciones", label: "Vacaciones", icon: "vacation" },
-    { to: "/app/donaciones", label: "Donaciones", icon: "donations" },
   ];
+
+  if (isCoordinator || isAdministrator) {
+    navItems.push({ to: "/app/personal", label: "Personal", icon: "employee" });
+  }
+
+  if (isAdministrator) {
+    navItems.push({ to: "/app/casas", label: "Casas Hogares", icon: "home" });
+  }
+
+  navItems.push({ to: vacationPath, label: "Vacaciones", icon: "vacation" });
+
+  if (isAdministrator) {
+    navItems.push({
+      to: "/app/donaciones",
+      label: "Donaciones",
+      icon: "donations",
+    });
+  }
 
   if (isCoordinator) {
     navItems.push({
@@ -35,7 +69,6 @@ const getNavItems = (user) => {
   return navItems;
 };
 
-// ─── Desktop NavItem ──────────────────────────────────────────────────────────
 const NavItem = ({ to, label, icon, expanded }) => (
   <NavLink
     to={to}
@@ -70,7 +103,17 @@ const NavItem = ({ to, label, icon, expanded }) => (
 );
 
 // ─── Desktop BottomItem ───────────────────────────────────────────────────────
-const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
+const BottomItem = ({
+  to,
+  label,
+  icon,
+  expanded,
+  isButton,
+  onButtonClick,
+  isGroupActive,
+}) => {
+  const { pathname } = useLocation();
+
   const content = (isActive = false) => (
     <>
       <span className="flex items-center justify-center w-10 h-10 shrink-0">
@@ -110,17 +153,25 @@ const BottomItem = ({ to, label, icon, expanded, isButton, onButtonClick }) => {
     <NavLink
       to={to}
       aria-label={label}
-      className={({ isActive }) =>
-        `flex items-center rounded-lg h-10 w-full shrink-0 transition-colors overflow-hidden
-        ${isActive ? "bg-[#1F5ACD] hover:bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`
-      }
+      className={({ isActive }) => {
+        const active =
+          typeof isGroupActive === "function"
+            ? isGroupActive(pathname, isActive)
+            : isActive;
+        return `flex items-center rounded-lg h-10 w-full shrink-0 transition-colors overflow-hidden
+        ${active ? "bg-[#1F5ACD] hover:bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`;
+      }}
     >
-      {({ isActive }) => content(isActive)}
+      {({ isActive }) =>
+        content(
+          typeof isGroupActive === "function"
+            ? isGroupActive(pathname, isActive)
+            : isActive,
+        )}
     </NavLink>
   );
 };
 
-// ─── Desktop SidebarContent ───────────────────────────────────────────────────
 const SideBarContent = ({ expanded, toggle }) => {
   const sideBarRef = useRef(null);
   const navigate = useNavigate();
@@ -199,6 +250,7 @@ const SideBarContent = ({ expanded, toggle }) => {
           label="Perfil"
           icon="profile"
           expanded={expanded}
+          isGroupActive={isProfileNavActive}
         />
         <div className="h-px bg-[#FAFAFA]/25 my-1 shrink-0" />
         <BottomItem
@@ -213,9 +265,9 @@ const SideBarContent = ({ expanded, toggle }) => {
   );
 };
 
-// ─── Mobile Navbar + Dropdown ─────────────────────────────────────────────────
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { logout, user } = useAuth();
   const navItems = getNavItems(user);
 
@@ -294,22 +346,26 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
               to="/app/perfil"
               onClick={closeMobile}
               aria-label="Perfil"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg h-12 px-3 shrink-0 transition-colors
-                ${isActive ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`
-              }
+              className={({ isActive }) => {
+                const active = isProfileNavActive(pathname, isActive);
+                return `flex items-center gap-3 rounded-lg h-12 px-3 shrink-0 transition-colors
+                ${active ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`;
+              }}
             >
-              {({ isActive }) => (
+              {({ isActive }) => {
+                const active = isProfileNavActive(pathname, isActive);
+                return (
                 <>
                   <Icon
                     name="profile"
-                    className={`h-5 w-5 shrink-0 ${isActive ? "opacity-100" : "opacity-70"}`}
+                    className={`h-5 w-5 shrink-0 ${active ? "opacity-100" : "opacity-70"}`}
                   />
                   <span aria-hidden="true" className="font-['Public_Sans'] font-bold text-base text-[#FAFAFA]">
                     Perfil
                   </span>
                 </>
-              )}
+                );
+              }}
             </NavLink>
 
             <div className="h-px bg-[#FAFAFA]/25 my-1" />
@@ -332,7 +388,6 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   );
 };
 
-// ─── Root SideBar ─────────────────────────────────────────────────────────────
 const SideBar = () => {
   const { expanded, toggle, mobileOpen, openMobile, closeMobile } = useSideBar();
 

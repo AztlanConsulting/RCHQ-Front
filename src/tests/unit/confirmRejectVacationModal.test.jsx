@@ -23,7 +23,7 @@ describe("ConfirmRejectVacationModal", () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it("muestra la información de confirmación", () => {
+    it("muestra la información de confirmación y el campo de retroalimentación", () => {
         render(
             <ConfirmRejectVacationModal
                 request={request}
@@ -40,6 +40,10 @@ describe("ConfirmRejectVacationModal", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("0/500")).toBeInTheDocument();
     });
 
     it("llama onCancel al presionar Cancelar", () => {
@@ -58,7 +62,7 @@ describe("ConfirmRejectVacationModal", () => {
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
-    it("llama onConfirm al presionar Rechazar", () => {
+    it("llama onConfirm con feedback vacío al presionar Rechazar sin escribir retroalimentación", () => {
         const onConfirm = vi.fn();
 
         render(
@@ -72,9 +76,104 @@ describe("ConfirmRejectVacationModal", () => {
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onConfirm).toHaveBeenCalledWith("");
     });
 
-    it("muestra estado loading y deshabilita botones", () => {
+    it("llama onConfirm con la retroalimentación escrita", () => {
+        const onConfirm = vi.fn();
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onConfirm).toHaveBeenCalledWith(
+            "No hay disponibilidad para esas fechas",
+        );
+    });
+
+    it("actualiza el contador de caracteres de la retroalimentación", () => {
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={vi.fn()}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "Motivo" },
+        });
+
+        expect(screen.getByText("6/500")).toBeInTheDocument();
+    });
+
+    it("permite escribir acentos, signos permitidos y emojis en la retroalimentación", () => {
+        const onConfirm = vi.fn();
+        const feedback =
+            'No procede por días: razón #1 ¿ok? 50% + ajuste_2 ~= "sí" ° 🙂👩🏽‍💻🇲🇽';
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: feedback },
+        });
+
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toHaveValue(feedback);
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).toHaveBeenCalledWith(feedback);
+    });
+
+    it("muestra error al confirmar si la retroalimentación tiene caracteres no permitidos", () => {
+        const onConfirm = vi.fn();
+
+        render(
+            <ConfirmRejectVacationModal
+                request={request}
+                onCancel={vi.fn()}
+                onConfirm={onConfirm}
+            />,
+        );
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No procede @ por fechas" },
+        });
+
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toHaveValue("No procede @ por fechas");
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        expect(onConfirm).not.toHaveBeenCalled();
+        expect(
+            screen.getByText(
+                "La retroalimentación solo puede contener letras, números, emojis, espacios y signos permitidos",
+            ),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra estado loading y deshabilita botones y textarea", () => {
         render(
             <ConfirmRejectVacationModal
                 request={request}
@@ -86,6 +185,9 @@ describe("ConfirmRejectVacationModal", () => {
 
         expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
         expect(screen.getByRole("button", { name: "Rechazando..." })).toBeDisabled();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeDisabled();
     });
 
     it("muestra error si se recibe error", () => {

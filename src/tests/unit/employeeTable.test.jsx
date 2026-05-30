@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import EmployeeTable from "../../components/molecules/employeeTable";
@@ -10,12 +10,13 @@ vi.mock("react-router-dom", async () => {
 
 describe("EmployeeTable Component", () => {
   const mockEmployees = [
-    { employeeId: "1", fullName: "Alice Smith", role: "Dev", status: true },
+    { employeeId: "1", fullName: "Alice Smith", role: "Dev", status: true, isBlacklisted: false },
     {
       employeeId: "2",
       fullName: "Bob Jones",
       role: "Design",
       status: false,
+      isBlacklisted: true,
     },
   ];
 
@@ -44,6 +45,16 @@ describe("EmployeeTable Component", () => {
     ).toBeInTheDocument();
   });
 
+  it('debe mostrar mensaje en gris de lista negra vacía cuando está en modo lista negra', () => {
+    renderWithRouter(
+      <EmployeeTable employees={[]} loading={false} isBlacklistMode={true} />,
+    );
+
+    const message = screen.getByText(/no hay personas en la lista negra/i);
+    expect(message).toBeInTheDocument();
+    expect(message).toHaveClass("text-gray-500");
+  });
+
   it("debe renderizar los encabezados de la tabla correctamente", () => {
     renderWithRouter(
       <EmployeeTable employees={mockEmployees} loading={false} />,
@@ -66,5 +77,28 @@ describe("EmployeeTable Component", () => {
 
     expect(screen.getByText("Alice Smith")).toBeInTheDocument();
     expect(screen.getByText("Bob Jones")).toBeInTheDocument();
+  });
+
+  it("debe pasar las propiedades de blacklist a las filas y ejecutar las funciones al hacer clic", () => {
+    const mockAdd = vi.fn();
+    const mockRemove = vi.fn();
+
+    renderWithRouter(
+      <EmployeeTable 
+        employees={mockEmployees} 
+        loading={false} 
+        isBlacklistMode={true}
+        onAddToBlacklist={mockAdd}
+        onRemoveFromBlacklist={mockRemove}
+      />
+    );
+
+    const addButton = screen.getByRole("button", { name: /agregar a lista negra/i });
+    fireEvent.click(addButton);
+    expect(mockAdd).toHaveBeenCalledWith(mockEmployees[0]);
+
+    const removeButton = screen.getByRole("button", { name: /quitar de lista negra/i });
+    fireEvent.click(removeButton);
+    expect(mockRemove).toHaveBeenCalledWith(mockEmployees[1]);
   });
 });

@@ -6,7 +6,6 @@ import {
   countWorkdaysHours,
 } from "../../utils/detalle-empleado.utils";
 
-// ─── totalWorkDaysFromApprovedVacationRequests ────────────────────────────────
 describe("totalWorkDaysFromApprovedVacationRequests", () => {
   it("retorna 0 para entradas no array", () => {
     expect(totalWorkDaysFromApprovedVacationRequests(null)).toBe(0);
@@ -21,7 +20,6 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
   });
 
   it("suma días laborables (fallback Lun–Vie) sin employeeWorkdays", () => {
-    // 2024-01-01 (lun) – 2024-01-02 (mar) = 2; 2024-01-08 (lun) = 1 → 3
     const sum = totalWorkDaysFromApprovedVacationRequests([
       { status: 1, start: "2024-01-01T00:00:00.000Z", end: "2024-01-02T00:00:00.000Z" },
       { status: 1, start: "2024-01-08T00:00:00.000Z", end: "2024-01-08T00:00:00.000Z" },
@@ -30,8 +28,6 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
   });
 
   it("usa los días del empleado cuando se proveen", () => {
-    // 2024-01-01 (lun) – 2024-01-05 (vie) = 5 días Lun–Vie
-    // pero el empleado solo trabaja Lun, Mar, Jue, Vie (sin Miércoles) → 4
     const workdays = [
       { name: "Lunes" },
       { name: "Martes" },
@@ -55,7 +51,6 @@ describe("totalWorkDaysFromApprovedVacationRequests", () => {
   });
 });
 
-// ─── parseUTCDateToHours ──────────────────────────────────────────────────────
 describe("parseUTCDateToHours", () => {
   it("retorna N/A para valores falsy", () => {
     expect(parseUTCDateToHours(null)).toBe("N/A");
@@ -73,7 +68,6 @@ describe("parseUTCDateToHours", () => {
   });
 });
 
-// ─── countWorkdayDays ─────────────────────────────────────────────────────────
 describe("countWorkdayDays", () => {
   it("retorna 0 para entradas no array", () => {
     expect(countWorkdayDays(null)).toBe(0);
@@ -86,7 +80,6 @@ describe("countWorkdayDays", () => {
   });
 });
 
-// ─── countWorkdaysHours ───────────────────────────────────────────────────────
 describe("countWorkdaysHours", () => {
   it("retorna 0 para entradas no array", () => {
     expect(countWorkdaysHours(null)).toBe(0);
@@ -99,5 +92,57 @@ describe("countWorkdaysHours", () => {
 
   it("retorna 0 para un array vacío", () => {
     expect(countWorkdaysHours([])).toBe(0);
+  });
+
+  it("suma correctamente horas con minutos", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T06:00:00.000Z",
+          end: "1970-01-01T23:30:00.000Z",
+        },
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T17:00:00.000Z",
+        },
+      ]),
+    ).toBe(34.5);
+  });
+
+  it("conserva enteros cuando no hay fracciones", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T08:00:00.000Z",
+          end: "1970-01-01T17:00:00.000Z",
+        },
+      ]),
+    ).toBe(9);
+  });
+
+  it("cuenta 24 horas cuando inicio y fin son la misma hora", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T00:00:00.000Z",
+        },
+        {
+          start: "1970-01-01T00:00:00.000Z",
+          end: "1970-01-01T00:00:00.000Z",
+        },
+      ]),
+    ).toBe(48);
+  });
+
+  it("cuenta correctamente turnos que cruzan medianoche", () => {
+    expect(
+      countWorkdaysHours([
+        {
+          start: "1970-01-01T22:00:00.000Z",
+          end: "1970-01-01T06:00:00.000Z",
+        },
+      ]),
+    ).toBe(8);
   });
 });

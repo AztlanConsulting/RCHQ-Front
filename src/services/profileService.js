@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { secureFetch } from "../utils/secureFetchWrapper";
 
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
@@ -18,12 +18,11 @@ const getReadableErrors = (err) => {
   return ["Ocurrió un error inesperado"];
 };
 
-const getUserData = async (token) => {
-  const response = await fetch(`${API_URL}/user/profile`, {
+const getUserData = async () => {
+  const response = await secureFetch(`/user/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 

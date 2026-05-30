@@ -1,5 +1,5 @@
 import TextField from "../atoms/textField";
-import Button from "../atoms/button";
+import BigButton from "../atoms/bigButton";
 
 const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   const handleChange = (value) => {
@@ -8,7 +8,7 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex w-full flex-col items-center gap-4 sm:gap-6">
       <TextField
         id="two-factor-code"
         label="Código de autenticación"
@@ -20,15 +20,14 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
         text="Código de autenticación"
         disabled={disabled}
         maxLength={6}
+        wrapperClassName="w-full max-w-none sm:max-w-sm"
+        containerClassName="min-h-[50px] px-3.5 sm:min-h-[50px] sm:px-4"
       />
-      <Button
+      <BigButton
         text={loading ? "Verificando..." : "Verificar"}
         onClick={onSubmit}
         disabled={loading || disabled}
-        bgColor="bg-[#1a2f5e]"
-        hoverColor="hover:opacity-85"
-        activeColor="active:opacity-70"
-        textColor="text-white"
+        className="w-full  max-w-[19rem] sm:w-[206px]"
       />
     </div>
   );

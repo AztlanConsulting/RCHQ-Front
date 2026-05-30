@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Alert from "../../../atoms/alerts";
-import Button from "../../../atoms/button";
+import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import DocumentFileField from "../../../molecules/documentFileField";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useAbsenceForm } from "../../../../hooks/pages/useAbsenceForm";
+import {
+    buildDateRuleFilter,
+    parseDateOnly,
+} from "../../../../utils/dateRules";
 
 const AusenciaForm = (props) => {
     const {
@@ -17,11 +22,13 @@ const AusenciaForm = (props) => {
         employeeOptions,
         absenceTypeOptions,
         isLoadingOptions,
+        isLoadingDateRules,
         isSubmitting,
         evidenceFileName,
         evidenceError,
         minStartDate,
         maxEndDate,
+        dateRules,
         setField,
         setServerError,
         handleEvidenceChange,
@@ -29,6 +36,15 @@ const AusenciaForm = (props) => {
     } = useAbsenceForm(props);
     const [openDropdown, setOpenDropdown] = useState(null);
     const descriptionLength = String(form.description ?? "").length;
+    const ruleMinDate = parseDateOnly(dateRules?.minDate) ?? minStartDate;
+    const ruleMaxDate = parseDateOnly(dateRules?.maxDate) ?? maxEndDate;
+    const dateRuleFilter = useMemo(
+        () => buildDateRuleFilter(dateRules),
+        [dateRules],
+    );
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? "Las ausencias se guardan con base en horario central de México porque se contabilizan contra días laborales y días libres mexicanos."
+        : "";
 
     return (
         <>
@@ -102,8 +118,9 @@ const AusenciaForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.startDate}
                         placeholder="dd / mm / yyyy"
-                        minDate={minStartDate}
-                        maxDate={maxEndDate}
+                        minDate={ruleMinDate}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupSize="compact"
                         onChange={(e) => setField("startDate", e.target.value)}
                     />
@@ -118,8 +135,9 @@ const AusenciaForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.endDate}
                         placeholder="dd / mm / yyyy"
-                        minDate={minStartDate}
-                        maxDate={maxEndDate}
+                        minDate={ruleMinDate}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupAlign="right"
                         popupSize="compact"
                         onChange={(e) => setField("endDate", e.target.value)}
@@ -129,6 +147,8 @@ const AusenciaForm = (props) => {
                     )}
                 </div>
             </div>
+
+            <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
             <div className="flex w-full flex-col gap-1.5">
                 <label className="text-sm font-bold text-[#374151]">
@@ -173,19 +193,10 @@ const AusenciaForm = (props) => {
             )}
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
+                <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
-                    disabled={isSubmitting || isLoadingOptions}
-                    bgColor="bg-[#1E3A5F]"
-                    textColor="text-white"
-                    hoverColor="hover:bg-[#162d4a]"
-                    activeColor="active:bg-[#0f1f33]"
-                    width="w-auto"
-                    height="h-[38px]"
-                    textSize="text-sm"
-                    fontWeight="font-semibold"
-                    className="px-5"
+                    disabled={isSubmitting || isLoadingOptions || isLoadingDateRules}
                 />
             </div>
         </>

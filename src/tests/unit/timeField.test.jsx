@@ -1,4 +1,3 @@
-// tests/unit/timeField.test.jsx
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -152,6 +151,7 @@ describe("TimeField", () => {
             value: "09:00",
             minTime: "08:00",
             disabled: false,
+            stepMinutes: 15,
             onChange,
         });
     });

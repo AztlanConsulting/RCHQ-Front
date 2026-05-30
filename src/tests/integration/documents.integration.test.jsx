@@ -10,7 +10,6 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Documents from "../../pages/documents";
 
-// ─── Mocks ────────────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
   getDocumentsService:     vi.fn(),
   uploadDocumentService:   vi.fn(),
@@ -35,14 +34,14 @@ import {
 } from "../../services/documentService";
 
 // ─── Helpers ──────────────────────────────────────────────
-const makeToken = (role = "Administrador") => {
+const makeToken = (role = "Coordinador") => {
   const payload = btoa(JSON.stringify({ id: "emp-123", role }));
   return `header.${payload}.signature`;
 };
 
 const TEST_EMPLOYEE_ID = "emp-123";
 
-const renderPage = (role = "Administrador") => {
+const renderPage = (role = "Coordinador") => {
   localStorage.setItem("token", makeToken(role));
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
@@ -53,7 +52,6 @@ const renderPage = (role = "Administrador") => {
   );
 };
 
-// ─── Respuestas mock ──────────────────────────────────────
 const mockDocumentsResponse = {
   success: true,
   data: [
@@ -78,16 +76,13 @@ const mockEmptyResponse = {
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getDocumentsService.mockResolvedValue({ success: true, body: { documents: {} } });
+  getDocumentsService.mockResolvedValue({ success: true, data: [] });
   getDocumentTypesService.mockResolvedValue([
     { value: "cv",  label: "CV" },
     { value: "nss", label: "NSS" },
   ]);
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Carga inicial
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — carga inicial", () => {
   it("muestra los documentos del empleado cuando la carga es exitosa", async () => {
@@ -116,22 +111,19 @@ describe("Documents — carga inicial", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Permisos por rol
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — permisos por rol", () => {
-  it("muestra el botón 'Subir documento' cuando el rol es Administrador", async () => {
+  it("no muestra el botón Subir cuando el rol es Administrador (canModify Coordinador sólo)", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage("Administrador");
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /subir documento/i }),
-      ).toBeInTheDocument();
+        screen.queryByRole("button", { name: /subir documento/i }),
+      ).toBeNull();
     });
   });
 
-  it("muestra el botón 'Subir documento' cuando el rol es Coordinador", async () => {
+  it("muestra el botón Subir cuando el rol es Coordinador", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage("Coordinador");
     await waitFor(() => {
@@ -152,9 +144,6 @@ describe("Documents — permisos por rol", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Subir documento
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — subir documento", () => {
   it("abre el modal al hacer click en 'Subir documento'", async () => {
@@ -236,9 +225,6 @@ describe("Documents — subir documento", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Editar documento
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("Documents — editar documento", () => {
   it("abre el modal en modo edición al hacer click en el botón editar", async () => {
@@ -284,9 +270,6 @@ describe("Documents — editar documento", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Eliminar documento
-// ══════════════════════════════════════════════════════════════════════════════
 describe("Documents — eliminar documento", () => {
   const getConfirmButton = () => {
     const modal = screen.getByRole("dialog", { name: /eliminar documento/i });
@@ -335,7 +318,6 @@ describe("Documents — eliminar documento", () => {
     await waitFor(() => {
       expect(screen.getByText("CV")).toBeInTheDocument();
     });
-    // Un solo documento → getByTitle no falla
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument(),

@@ -1,4 +1,5 @@
-import { Checkbox, Dropdown } from "flowbite-react";
+import { Dropdown } from "flowbite-react";
+import SmallButton from "../atoms/smallButton";
 import Type from "../atoms/type";
 
 const SearchableCheckboxDropdown = ({
@@ -11,13 +12,15 @@ const SearchableCheckboxDropdown = ({
   onSearchChange,
   onToggleValue,
   onClearSelection,
+  onResetSelection,
   searchPlaceholder = "Buscar",
   labelClassName = "",
   triggerClassName = "",
   menuClassName = "",
+  wrapperClassName = "",
 }) => {
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className={`flex w-full min-w-0 flex-col gap-1.5 ${wrapperClassName}`}>
       {labelClassName ? (
         <label className={labelClassName}>{label}</label>
       ) : (
@@ -32,37 +35,39 @@ const SearchableCheckboxDropdown = ({
         </div>
       )}
 
-      <Dropdown
-        inline
-        arrowIcon={false}
-        dismissOnClick={false}
-        enableTypeAhead={false}
-        placement="bottom-start"
-        renderTrigger={() => (
-          <button
-            type="button"
-            className={`inline-flex min-h-[50px] w-full items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
-          >
-            <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
-            <svg
-              className="h-4 w-4 shrink-0 text-[#6b7280]"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
+      <div className="w-full min-w-0 [&_[data-testid=flowbite-dropdown]]:!min-w-0 [&_[data-testid=flowbite-dropdown]]:!w-[min(22rem,calc(100vw-2rem))]">
+        <Dropdown
+          inline
+          arrowIcon={false}
+          dismissOnClick={false}
+          enableTypeAhead={false}
+          placement="bottom-start"
+          className="z-[9999] block w-full min-w-0"
+          renderTrigger={() => (
+            <button
+              type="button"
+              className={`inline-flex min-h-[50px] w-full min-w-0 items-center justify-between rounded-lg bg-neutral-50 px-4 py-2 text-left text-sm font-medium text-[#222] shadow-[inset_0px_4px_4px_#00000040] transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-[#1F3664]/20 sm:text-base ${triggerClassName}`}
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 9-7 7-7-7"
-              />
-            </svg>
-          </button>
-        )}
-      >
-        <div className={`w-[min(22rem,calc(100vw-2rem))] max-w-full sm:min-w-[17rem] ${menuClassName}`}>
+              <span className="min-w-0 flex-1 truncate pr-3">{selectedLabel}</span>
+              <svg
+                className="h-4 w-4 shrink-0 text-[#6b7280]"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 9-7 7-7-7"
+                />
+              </svg>
+            </button>
+          )}
+        >
+          <div className={`w-full ${menuClassName}`}>
           <div className="px-2 pt-2">
             <label htmlFor={`${name}-search`} className="sr-only">
               {searchPlaceholder}
@@ -107,12 +112,16 @@ const SearchableCheckboxDropdown = ({
                     htmlFor={inputId}
                     className="inline-flex w-full cursor-pointer items-center rounded-md p-2 hover:bg-slate-100"
                   >
-                    <Checkbox
+                    <input
                       id={inputId}
+                      type="checkbox"
+                      name={name}
+                      value={String(option.value)}
                       checked={values.includes(option.value)}
                       onChange={(event) =>
                         onToggleValue?.(option.value, event.target.checked)
                       }
+                      className="h-4 w-4 rounded border-slate-300 accent-slate-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
                     />
                     <span className="ms-2 w-full text-sm font-medium text-slate-800">
                       {option.label}
@@ -129,17 +138,24 @@ const SearchableCheckboxDropdown = ({
             ) : null}
           </ul>
 
-          <div className="p-2">
-            <button
-              type="button"
+          <div className="flex flex-col gap-2 p-2">
+            {onResetSelection ? (
+              <SmallButton
+                text="Seleccionar todo"
+                onClick={onResetSelection}
+                className="h-8 w-full min-w-0 rounded-md px-3 text-xs shadow-none"
+              />
+            ) : null}
+            <SmallButton
+              text="Limpiar selección"
               onClick={onClearSelection}
-              className="inline-flex w-full items-center justify-center rounded-md bg-[#C20000] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#930000] focus:outline-none focus:ring-2 focus:ring-[#C20000]/25"
-            >
-              Limpiar selección
-            </button>
+              hasNoRollback
+              className="h-8 w-full min-w-0 rounded-md px-3 text-xs shadow-none"
+            />
           </div>
         </div>
       </Dropdown>
+      </div>
     </div>
   );
 };

@@ -1,13 +1,18 @@
 import Alert from "../../atoms/alerts";
+import ModalCloseButton from "../../atoms/modalCloseButton";
 import TextField from "../../atoms/textField";
+import Type from "../../atoms/type";
 import ButtonGroup from "../../molecules/buttonGroup";
 import AusenciaForm from "./forms/absenceForm";
 import CasaForm from "./forms/houseForm";
 import PersonalForm from "./forms/personalForm";
+import VacationForm from "./forms/vacationForm";
 import { useRegisterEventModal } from "../../../hooks/organism/useRegisterEventModal";
+import { getCalendarViewerRole } from "../../../services/calendarService";
 
 const CATEGORY_FORMS = {
     ausencias: AusenciaForm,
+    vacaciones: VacationForm,
     casa: CasaForm,
     personal: PersonalForm,
 };
@@ -19,6 +24,12 @@ const RegisterEventModal = ({
     onFeedback,
     initialStartDate,
     initialEndDate,
+    initialStartTime,
+    initialEndTime,
+    initialAllDay,
+    calendarTimeZone,
+    calendarTimeZoneMode,
+    canSwitchCalendarTimeZone,
 }) => {
     const {
         name,
@@ -32,11 +43,17 @@ const RegisterEventModal = ({
         visibleCategoryOptions,
         effectiveCategoryKey,
         SubForm,
-    } = useRegisterEventModal(isOpen, CATEGORY_FORMS);
+    } = useRegisterEventModal(isOpen, CATEGORY_FORMS, initialStartDate);
 
     if (!isOpen) return null;
 
-    const shouldShowNameField = effectiveCategoryKey !== "ausencias";
+    const viewerRole = getCalendarViewerRole();
+
+    const shouldShowNameField =
+        effectiveCategoryKey !== "ausencias" &&
+        effectiveCategoryKey !== "vacaciones";
+    
+    const shouldAllowFloatingPicker = effectiveCategoryKey === "vacaciones";
 
     return (
         <>
@@ -78,87 +95,129 @@ const RegisterEventModal = ({
                         width: "100%",
                         maxWidth: "560px",
                         boxSizing: "border-box",
-                        maxHeight: "90vh",
-                        overflow: "hidden",
+                        maxHeight: shouldAllowFloatingPicker ? "none" : "90vh",
+                        minHeight: 0,
+                        overflow: shouldAllowFloatingPicker ? "visible" : "hidden",
                         display: "flex",
                         flexDirection: "column",
                         gap: "16px",
                     }}
                 >
-                    {shouldShowNameField ? (
-                        <div>
-                            <TextField
-                                id="event-name"
-                                placeholder="Agregar título"
-                                value={name}
-                                setValue={handleNameChange}
-                                maxLength={70}
-                            />
-
-                            {nameError && (
-                                <p
-                                    style={{
-                                        margin: "4px 0 0",
-                                        fontSize: "12px",
-                                        color: "#dc2626",
-                                    }}
-                                >
-                                    {nameError}
-                                </p>
-                            )}
-                        </div>
-                    ) : (
-                        <h2
-                            style={{
-                                margin: 0,
-                                color: "#121212",
-                                fontSize: "28px",
-                                fontWeight: 800,
-                                lineHeight: 1.15,
-                            }}
-                        >
-                            Ausencias
-                        </h2>
-                    )}
-
-                    <div style={{ flexShrink: 0 }}>
-                        <ButtonGroup
-                            options={visibleCategoryOptions}
-                            value={effectiveCategoryKey}
-                            onChange={handleCategoryChange}
+                    <div className="flex justify-end">
+                        <ModalCloseButton
+                            onClick={onClose}
+                            className="shrink-0"
                         />
                     </div>
 
-                    <div
-                        style={{
-                            flex: 1,
-                            overflowY: "auto",
-                            minHeight: 0,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "16px",
-                        }}
-                    >
-                        <div
-                            key={animationKey}
-                            className="animate-[fadeSlideIn_220ms_ease-in-out]"
-                            style={{ paddingBottom: "4px" }}
-                        >
-                            {SubForm && (
-                                <SubForm
-                                    name={name}
-                                    isOpen={isOpen}
-                                    onClose={onClose}
-                                    onSuccess={onSuccess}
-                                    onFeedback={onFeedback}
-                                    initialStartDate={initialStartDate}
-                                    initialEndDate={initialEndDate}
-                                    onNameError={setNameError}
-                                    onValidationAlert={setValidationAlert}
-                                />
+                    {visibleCategoryOptions.length > 0 ? (
+                        <>
+                            {shouldShowNameField ? (
+                                <div className="min-w-0">
+                                    <Type
+                                        variant="page-title"
+                                        as="h2"
+                                        className="mb-3 min-w-0 text-[2rem] leading-none"
+                                    >
+                                        Registro de Evento
+                                    </Type>
+
+                                    <TextField
+                                        id="event-name"
+                                        placeholder="Agregar título"
+                                        value={name}
+                                        setValue={handleNameChange}
+                                        maxLength={70}
+                                    />
+
+                                    {nameError && (
+                                        <p
+                                            style={{
+                                                margin: "4px 0 0",
+                                                fontSize: "12px",
+                                                color: "#dc2626",
+                                            }}
+                                        >
+                                            {nameError}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                <Type
+                                    variant="page-title"
+                                    as="h2"
+                                    className="mb-0 min-w-0 text-[2rem] leading-none"
+                                    style={{
+                                        margin: 0,
+                                    }}
+                                >
+                                    {(() => {
+                                        if (effectiveCategoryKey == "ausencias") return "Ausencias"
+                                        const verb = viewerRole === "Coordinador" ? "Registro" : "Solicitud";
+                                        return `${verb} de Vacaciones`
+                                    })()}
+                                </Type>
                             )}
+
+                            <div style={{ flexShrink: 0 }}>
+                                <ButtonGroup
+                                    options={visibleCategoryOptions}
+                                    value={effectiveCategoryKey}
+                                    onChange={handleCategoryChange}
+                                />
+                            </div>
+
+                            <div
+                                style={{
+                                    flex: shouldAllowFloatingPicker ? "initial" : 1,
+                                    overflowY: shouldAllowFloatingPicker ? "visible" : "auto",
+                                    minHeight: 0,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "16px",
+                                }}
+                            >
+                                <div
+                                    key={animationKey}
+                                    className="animate-[fadeSlideIn_220ms_ease-in-out]"
+                                    style={{
+                                        paddingBottom: shouldAllowFloatingPicker ? "0" : "24px",
+                                    }}
+                                >
+                                    {SubForm && (
+                                        <SubForm
+                                            name={name}
+                                            isOpen={isOpen}
+                                            onClose={onClose}
+                                            onSuccess={onSuccess}
+                                            onFeedback={onFeedback}
+                                            initialStartDate={initialStartDate}
+                                            initialEndDate={initialEndDate}
+                                            initialStartTime={initialStartTime}
+                                            initialEndTime={initialEndTime}
+                                            initialAllDay={initialAllDay}
+                                            calendarTimeZone={calendarTimeZone}
+                                            calendarTimeZoneMode={calendarTimeZoneMode}
+                                            canSwitchCalendarTimeZone={
+                                                canSwitchCalendarTimeZone
+                                            }
+                                            onNameError={setNameError}
+                                            onValidationAlert={setValidationAlert}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
+                            <p className="font-black text-3xl">
+                                No puede añadir eventos en el calendario en esta fecha.
+                            </p>
+                            <p className="max-w-[18rem] font-medium text-slate-500 pb-4">
+                                Seleccione un rango de fechas distinto para poder añadir eventos.
+                            </p>
                         </div>
-                    </div>
+                    )}
 
                     {validationAlert && (
                         <div

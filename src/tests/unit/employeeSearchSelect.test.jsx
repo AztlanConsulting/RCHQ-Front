@@ -17,6 +17,10 @@ const mockHookReturn = {
     containerRef: { current: null },
     dropdownRef: { current: null },
     filteredEmployees: [],
+    visibleSelected: [],
+    hiddenSelectedCount: 0,
+    isSelectedListExpanded: false,
+    toggleSelectedList: vi.fn(),
     handleInputChange: vi.fn(),
     openDropdown: vi.fn(),
     handleSelect: vi.fn(),
@@ -62,6 +66,10 @@ describe("EmployeeSearchSelect", () => {
             query: "",
             isOpen: false,
             filteredEmployees: [],
+            visibleSelected: selected,
+            hiddenSelectedCount: 0,
+            isSelectedListExpanded: false,
+            toggleSelectedList: vi.fn(),
             handleInputChange: vi.fn(),
             openDropdown: vi.fn(),
             handleSelect: vi.fn(),
@@ -301,7 +309,8 @@ describe("EmployeeSearchSelect", () => {
         expect(onRemove).toHaveBeenCalledWith("emp-3");
     });
 
-    it("aplica scroll cuando hay más de 3 empleados seleccionados", () => {
+    it("muestra 4 empleados seleccionados y permite ver el resto", () => {
+        const toggleSelectedList = vi.fn();
         const manySelected = [
             {
                 employeeId: "emp-1",
@@ -323,9 +332,22 @@ describe("EmployeeSearchSelect", () => {
                 fullName: "Ana Martínez",
                 picture: null,
             },
+            {
+                employeeId: "emp-5",
+                fullName: "Luis Perez",
+                picture: null,
+            },
         ];
 
-        const { container } = render(
+        useEmployeeSearchSelect.mockReturnValue({
+            ...mockHookReturn,
+            visibleSelected: manySelected.slice(0, 4),
+            hiddenSelectedCount: 1,
+            isSelectedListExpanded: false,
+            toggleSelectedList,
+        });
+
+        render(
             <EmployeeSearchSelect
                 employees={employees}
                 selected={manySelected}
@@ -335,14 +357,47 @@ describe("EmployeeSearchSelect", () => {
             />,
         );
 
-        const selectedContainer = container.querySelector(
-            ".flex.flex-col.gap-1\\.5",
+        expect(screen.getByText(/^Juan/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Mar/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Pedro/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Ana/i)).toBeInTheDocument();
+        expect(screen.queryByText(/^Luis/i)).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: /ver 1/i }));
+
+        expect(toggleSelectedList).toHaveBeenCalledTimes(1);
+    });
+
+    it("muestra Ver menos cuando la lista seleccionada esta expandida", () => {
+        const manySelected = [
+            ...selected,
+            { employeeId: "emp-4", fullName: "Ana MartÃ­nez", picture: null },
+            { employeeId: "emp-5", fullName: "Luis Perez", picture: null },
+            { employeeId: "emp-6", fullName: "Sofia Ruiz", picture: null },
+            { employeeId: "emp-7", fullName: "Mario Diaz", picture: null },
+        ];
+
+        useEmployeeSearchSelect.mockReturnValue({
+            ...mockHookReturn,
+            visibleSelected: manySelected,
+            hiddenSelectedCount: 1,
+            isSelectedListExpanded: true,
+            toggleSelectedList: vi.fn(),
+        });
+
+        render(
+            <EmployeeSearchSelect
+                employees={employees}
+                selected={manySelected}
+                onSelect={onSelect}
+                onRemove={onRemove}
+                onSearch={onSearch}
+            />,
         );
 
-        expect(selectedContainer).toHaveStyle({
-            maxHeight: "162px",
-            overflowY: "auto",
-        });
+        expect(
+            screen.getByRole("button", { name: /ver menos/i }),
+        ).toBeInTheDocument();
     });
 
     it("pasa las props correctas al hook", () => {
@@ -361,6 +416,7 @@ describe("EmployeeSearchSelect", () => {
             selected,
             onSearch,
             onSelect,
+            selectedPreviewLimit: 4,
         });
     });
 });

@@ -1,5 +1,5 @@
 import Alert from "../components/atoms/alerts";
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import Pagination from "../components/molecules/pagination";
 import LogsFilters from "../components/molecules/logsFilters";
 import LogsTable from "../components/molecules/logsTable";
@@ -32,13 +32,14 @@ const Logs = () => {
     isReportModalOpen,
     openReportModal,
     closeReportModal,
-    reportMonth,
-    setReportMonth,
     reportYear,
     setReportYear,
+    currentYear,
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   } = useHouseLogs();
 
   return (
@@ -51,15 +52,10 @@ const Logs = () => {
           </p>
         </div>
 
-        <Button
+        <BigButton
           text="Generar reporte"
           onClick={openReportModal}
-          bgColor="bg-[#24375e]"
-          hoverColor="hover:bg-[#162d4a]"
-          activeColor="active:bg-[#0f2035]"
-          textColor="text-white"
-          width="w-full md:w-56"
-          className="px-6"
+          className="w-full md:w-56"
         />
       </div>
 
@@ -77,6 +73,8 @@ const Logs = () => {
         selectedActionLabel={selectedActionLabel}
         toggleActionValue={toggleActionValue}
         clearActionSelection={clearActionSelection}
+        isMobileExpanded={isMobileFiltersExpanded}
+        onToggleMobileFilters={toggleMobileFilters}
       />
 
       {error ? (
@@ -101,10 +99,9 @@ const Logs = () => {
       <LogReportModal
         open={isReportModalOpen}
         onClose={closeReportModal}
-        month={reportMonth}
-        onMonthChange={setReportMonth}
         year={reportYear}
         onYearChange={setReportYear}
+        currentYear={currentYear}
         yearOptions={yearOptions}
         onConfirm={handleDownloadReport}
         loading={isDownloadingReport}

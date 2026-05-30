@@ -11,7 +11,24 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 
-const MONTH_DAY_EVENT_CAP = 3;
+const DAY_GRID_EVENT_CAP = 3;
+const LIST_EVENT_TIME_FORMAT = {
+    hour: "numeric",
+    minute: "2-digit",
+    meridiem: "short",
+    hour12: true,
+};
+
+function formatUtcSlotLabel12h(date) {
+    if (!date || !(date instanceof Date) || Number.isNaN(date.getTime()))
+        return "";
+    const h = date.getUTCHours();
+    const m = date.getUTCMinutes();
+    const isPm = h >= 12;
+    const hour12 = h % 12 || 12;
+    const minutePart = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+    return `${hour12}${minutePart} ${isPm ? "pm" : "am"}`;
+}
 
 const renderEventContent = (arg) => {
     const viewType = arg.view.type;
@@ -36,8 +53,29 @@ const renderEventContent = (arg) => {
     return <DayGridCard arg={arg} />;
 };
 
+const closeDayGrid = (eventTarget) => {
+    const clickedInsidePopover = eventTarget?.closest?.(".fc-popover");
+    if (!clickedInsidePopover) return;
+
+    const closeControls = document.querySelectorAll(
+        ".fc-popover .fc-popover-close",
+    );
+
+    if (closeControls.length > 0) {
+        closeControls.forEach((button) => {
+            button.click();
+        });
+        return;
+    }
+
+    document.querySelectorAll(".fc-popover").forEach((popover) => {
+        popover.remove();
+    });
+};
+
 const BaseCalendar = ({
     initialView,
+    initialDate,
     loadButtonsAtStart,
     calendarRef,
     toggleList,
@@ -54,6 +92,8 @@ const BaseCalendar = ({
     onDateDrag,
     onDateDragging,
     onOpenCalendarFilters,
+    timeZone = "local",
+    now,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -122,12 +162,13 @@ const BaseCalendar = ({
     useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
-    });
+    }, [calendarRef, loadButtonsAtStart, resizeHandler]);
 
     return (
         <FullCalendar
             ref={calendarRef}
             initialView={initialView}
+            initialDate={initialDate}
             plugins={[
                 dayGridPlugin,
                 interactionPlugin,
@@ -136,6 +177,8 @@ const BaseCalendar = ({
             ]}
             locales={[esLocale]}
             locale="es"
+            timeZone={timeZone}
+            now={now}
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}
@@ -143,13 +186,28 @@ const BaseCalendar = ({
             views={{
                 timeGridDay: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
+                    slotLabelContent: (arg) =>
+                        formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
-                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
+                },
+                listDay: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listWeek: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listMonth: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}
@@ -158,7 +216,10 @@ const BaseCalendar = ({
             datesSet={handleDatesSet}
             eventContent={eventContent}
             moreLinkContent={moreLinkContent}
-            eventClick={(info) => onEventClick?.(info)}
+            eventClick={(info) => {
+                closeDayGrid(info?.jsEvent?.target);
+                onEventClick?.(info);
+            }}
             selectable={true}
             select={(info) => onDateDrag?.(info, calendarRef)}
             selectAllow={() => onDateDragging?.()}

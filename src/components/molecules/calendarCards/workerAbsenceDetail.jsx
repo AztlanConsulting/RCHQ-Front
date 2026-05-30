@@ -1,6 +1,10 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+  formatEventDate,
+  formatEventTime,
+} from "../../../utils/calendarEventDetail";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const DetailLabel = ({ children, className = "" }) => (
   <Type
@@ -33,7 +37,7 @@ const EvidenceButtonIcon = () => (
   <img
     src="/document.svg"
     alt=""
-    className="mr-1.5 h-4 w-4 shrink-0 brightness-0 invert"
+    className="mr-1.5 h-4.5 w-4.5 shrink-0 brightness-0 invert"
     aria-hidden
   />
 );
@@ -42,11 +46,15 @@ const WorkerAbsenceDetail = ({
   event,
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
-  onClose,
+  showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
   const descriptionPreview = getDescriptionPreview(fullDescription);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
 
   return (
     <div className="px-1 text-left sm:px-2">
@@ -58,6 +66,8 @@ const WorkerAbsenceDetail = ({
         Ausencia
       </Type>
 
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
+
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <DetailLabel>Tipo de ausencia:</DetailLabel>
@@ -65,7 +75,12 @@ const WorkerAbsenceDetail = ({
         </div>
 
         <div>
-          <DetailLabel>Días hábiles:</DetailLabel>
+          <DetailLabel>Días totales{mexicoDaysSuffix}:</DetailLabel>
+          <DetailValue>{event?.totalDays}</DetailValue>
+        </div>
+
+        <div>
+          <DetailLabel>Días hábiles{mexicoDaysSuffix}:</DetailLabel>
           <DetailValue>{event?.usedDays}</DetailValue>
         </div>
 
@@ -74,10 +89,35 @@ const WorkerAbsenceDetail = ({
           <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
-        <div>
-          <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <DetailLabel>Hora de inicio:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.start, { timeZone: calendarTimeZone })}
+              </DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Fecha de término:</DetailLabel>
+              <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Hora de término:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.end, {
+                  timeZone: calendarTimeZone
+                })}
+              </DetailValue>
+            </div>
+          </>
+        ) : (
+          <div>
+            <DetailLabel>Fecha de término:</DetailLabel>
+            <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+          </div>
+        )}
 
         <div className="sm:col-span-2">
           <DetailLabel>Descripción:</DetailLabel>
@@ -89,43 +129,24 @@ const WorkerAbsenceDetail = ({
           </DetailValue>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+        <div
+          className={`flex flex-wrap gap-3 sm:col-span-2 ${
+            hasEvidence ? "items-center" : "items-baseline"
+          }`}
+        >
           <DetailLabel className="mb-0">Evidencia:</DetailLabel>
           {hasEvidence ? (
-            <Button
+            <SmallButton
               type="button"
               text={evidenceLabel}
-              width="w-auto min-w-[7.25rem]"
-              height="h-7"
-              textSize="text-xs"
-              bgColor="bg-[#1F3664]"
-              textColor="text-white"
-              hoverColor="hover:bg-[#15284A]"
-              activeColor="active:bg-[#0E1B33]"
               onClick={onOpenEvidence}
-              icon={<EvidenceButtonIcon />}
-              className="rounded-md px-3 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
+              leadingIcon={<EvidenceButtonIcon />}
+              className="h-7 min-w-[7.25rem] rounded-md px-3"
             />
           ) : (
             <DetailValue>Sin evidencia</DetailValue>
           )}
         </div>
-      </div>
-
-      <div className="mt-12 flex justify-center">
-        <Button
-          type="button"
-          text="Cerrar"
-          width="w-full sm:w-[7.2rem]"
-          height="h-10"
-          textSize="text-base"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
-          onClick={onClose}
-        />
       </div>
     </div>
   );

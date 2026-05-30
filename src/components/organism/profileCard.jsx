@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import BigButton from "../atoms/bigButton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -72,15 +73,11 @@ const ProfileCard = ({ user }) => {
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3 justify-end">
-        <button className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors">
-          Modificar Perfil
-        </button>
-        <button 
+        <BigButton
+          text="Otras Opciones"
           onClick={() => navigate("/app/opciones")}
-          className="h-[38px] px-6 rounded-lg bg-[#1e3a5f] text-white text-sm font-semibold hover:bg-[#16304f] active:bg-[#0f2540] transition-colors"
-        >
-          Otras Opciones
-        </button>
+          className="min-w-0"
+        />
       </div>
     </div>
   );

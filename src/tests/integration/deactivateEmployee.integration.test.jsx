@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useDeactivateEmployee } from "../../hooks/organism/useDeactivateEmployee";
 import ReasonCard from "../../components/organism/reasonCard";
@@ -154,6 +154,29 @@ describe("Integración: Dar de baja a un empleado", () => {
     expect(setAlertMock).toHaveBeenCalledWith({
       type: "error",
       message: "No puedes darte de baja a ti mismo",
+    });
+  });
+
+  it("muestra un mensaje más claro si falla el agregado a lista negra por la razón", async () => {
+    const error = new Error('El campo "Razón" es obligatorio.');
+    error.status = 400;
+    error.errors = [{ message: 'El campo "Razón" es obligatorio.' }];
+    deactivateEmployeeService.mockRejectedValueOnce(error);
+
+    await renderAndOpenModal();
+
+    fireEvent.change(screen.getByPlaceholderText("Escribe la razón de la baja..."), {
+      target: { value: "Razón de prueba" },
+    });
+    fireEvent.click(screen.getByRole("checkbox"));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Dar de baja" }));
+    });
+
+    expect(setAlertMock).toHaveBeenCalledWith({
+      type: "error",
+      message: 'El campo "Razón" es obligatorio.',
     });
   });
 });

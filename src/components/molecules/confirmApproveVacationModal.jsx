@@ -1,4 +1,4 @@
-import Button from "../atoms/button";
+import SmallButton from "../atoms/smallButton";
 
 const ConfirmApproveVacationModal = ({
     request,
@@ -14,16 +14,16 @@ const ConfirmApproveVacationModal = ({
     const curp = employee.curp;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/50 p-4">
             <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="confirm-approve-vacation-title"
-                className="relative flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-8 shadow-xl"
+                className="relative flex w-full max-w-sm flex-col gap-4 rounded-xl bg-white p-6 shadow-xl"
             >
                 <h3
                     id="confirm-approve-vacation-title"
-                    className="text-lg font-semibold text-slate-900"
+                    className="text-2xl font-bold text-[#121212]"
                 >
                     Aprobar solicitud
                 </h3>
@@ -43,35 +43,18 @@ const ConfirmApproveVacationModal = ({
                     ) : null}
                 </div>
 
-                <div className="flex justify-end gap-3">
-                    <Button
+                <div className="flex justify-center gap-3 pt-1">
+                    <SmallButton
                         text="Cancelar"
                         onClick={onCancel}
                         disabled={loading}
-                        bgColor="bg-transparent"
-                        hoverColor="hover:bg-slate-100"
-                        activeColor="active:bg-slate-200"
-                        textColor="text-slate-600"
-                        width="w-auto"
-                        height="h-[42px]"
-                        textSize="text-sm"
-                        fontWeight="font-medium"
-                        className="px-4"
+                        cancel
                     />
 
-                    <Button
+                    <SmallButton
                         text={loading ? "Aprobando..." : "Aprobar"}
                         onClick={onConfirm}
                         disabled={loading}
-                        bgColor="bg-[#1F3664]"
-                        hoverColor="hover:bg-[#15284A]"
-                        activeColor="active:bg-[#0E1B33]"
-                        textColor="text-white"
-                        width="w-auto"
-                        height="h-[42px]"
-                        textSize="text-sm"
-                        fontWeight="font-semibold"
-                        className="px-4"
                     />
                 </div>
             </div>

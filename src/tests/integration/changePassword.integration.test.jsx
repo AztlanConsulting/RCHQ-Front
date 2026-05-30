@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ChangePassword from "../../pages/auth/changePassword";
 
@@ -52,7 +52,9 @@ const fillAndSubmit = async (newPassword, confirmPassword) => {
   const inputs = screen.getAllByDisplayValue("");
   fireEvent.change(inputs[0], { target: { value: newPassword } });
   fireEvent.change(inputs[1], { target: { value: confirmPassword } });
-  fireEvent.click(screen.getByRole("button", { name: /cambiar contraseña/i }));
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /cambiar contraseña/i }));
+  });
 };
 
 beforeEach(() => {

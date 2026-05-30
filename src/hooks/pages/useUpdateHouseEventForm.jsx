@@ -1,0 +1,338 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { updateHouseEvent } from "../../services/updateEventService";
+import { getEventTypes } from "../../services/eventService";
+import {
+    addDaysToDateOnly,
+    normalizeDateOnly,
+} from "../../utils/calendarEventDetail";
+import {
+    buildPayload,
+    houseEventSchema,
+} from "../../utils/schema/evento/houseEvent.schema";
+import { shiftDateTimeRange } from "../../utils/dateRangeShift";
+import {
+     dateInTimeZoneToInputValue,
+     timeInTimeZoneToInputValue,
+} from "../../utils/timeZone";
+
+const DEFAULT_FORM = {
+    name: "",
+    eventTypeId: "",
+    description: "",
+    allDay: false,
+    isFreeDay: false,
+    startDate: "",
+    endDate: "",
+    startTime: "",
+    endTime: "",
+};
+
+const TEXT_SANITIZER = /[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g;
+
+const getEventId = (event) => {
+    const candidateId = event?.houseEventId ?? event?.eventId;
+    if (candidateId) return candidateId;
+
+    const fallbackId = String(event?.id ?? "");
+    return /^\d+$/.test(fallbackId) ? "" : fallbackId;
+};
+
+const getInitialForm = (event, calendarTimeZone) => {
+    if (!event) return DEFAULT_FORM;
+
+    const startDate =
+        normalizeDateOnly(event.startDate) ||
+        dateInTimeZoneToInputValue(event.start, calendarTimeZone);
+    const rawEndDate =
+        normalizeDateOnly(event.endDate) ||
+        dateInTimeZoneToInputValue(event.end ?? event.start, calendarTimeZone);
+    const endDate =
+        event.allDay && rawEndDate > startDate
+            ? addDaysToDateOnly(rawEndDate, -1)
+            : rawEndDate;
+
+    return {
+        name: event.title ?? "",
+        eventTypeId: event.eventTypeId ?? "",
+        description: event.description ?? "",
+        allDay: Boolean(event.allDay),
+        isFreeDay: Boolean(event.isFreeDay),
+        startDate,
+        endDate,
+        startTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(
+                  event.start ?? event.startStr,
+                  calendarTimeZone,
+              ),
+        endTime: event.allDay
+            ? ""
+            : timeInTimeZoneToInputValue(
+                  event.end ?? event.endStr,
+                  calendarTimeZone,
+              ),
+    };
+};
+
+const getTimeContainerStyle = (isVisible) => ({
+    flex: isVisible ? 0.9 : "0 0 0px",
+    maxWidth: isVisible ? "100%" : "0px",
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible
+        ? "translateX(0) scale(1)"
+        : "translateX(12px) scale(0.96)",
+    pointerEvents: isVisible ? "auto" : "none",
+    overflow: isVisible ? "visible" : "hidden",
+    transition:
+        "max-width 280ms ease, opacity 220ms ease, transform 260ms ease, flex 280ms ease",
+});
+
+export const useUpdateHouseEventForm = ({
+    event,
+    isOpen,
+    onClose,
+    onSuccess,
+    calendarTimeZone,
+}) => {
+    const [form, setForm] = useState(DEFAULT_FORM);
+    const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState(null);
+    const [validationAlert, setValidationAlert] = useState(null);
+    const [eventTypes, setEventTypes] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [overlapState, setOverlapState] = useState({
+        show: false,
+        collisions: [],
+        pendingPayload: null,
+        isForcing: false,
+    });
+
+    const houseEventId = useMemo(() => getEventId(event), [event]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        setForm(getInitialForm(event, calendarTimeZone));
+        setErrors({});
+        setServerError(null);
+        setValidationAlert(null);
+        setOverlapState({
+            show: false,
+            collisions: [],
+            pendingPayload: null,
+            isForcing: false,
+        });
+    }, [calendarTimeZone, event, isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        getEventTypes()
+            .then((types) => {
+                const options = types.map((type) => ({
+                    value: type.eventTypeId,
+                    label: type.name,
+                }));
+
+                setEventTypes(options);
+
+                setForm((prev) => {
+                    if (prev.eventTypeId) return prev;
+
+                    const matchedType = options.find(
+                        (option) =>
+                            option.label?.toLowerCase() ===
+                            event?.eventType?.toLowerCase(),
+                    );
+
+                    return {
+                        ...prev,
+                        eventTypeId: matchedType?.value ?? "",
+                    };
+                });
+            })
+            .catch(() => {
+                setEventTypes([]);
+            });
+    }, [event?.eventType, isOpen]);
+
+    const setField = useCallback((field, value) => {
+        setForm((prev) => {
+            const nextValue =
+                field === "name" || field === "description"
+                    ? String(value).replace(TEXT_SANITIZER, "")
+                    : value;
+
+            if (field === "allDay" && value) {
+                return {
+                    ...prev,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            if (field === "isFreeDay" && value) {
+                return {
+                    ...prev,
+                    allDay: true,
+                    startTime: "",
+                    endTime: "",
+                    [field]: nextValue,
+                };
+            }
+
+            if (field === "allDay" && value === false) {
+                return {
+                    ...prev,
+                    isFreeDay: false,
+                    [field]: nextValue,
+                };
+            }
+
+            return shiftDateTimeRange(prev, field, nextValue);
+        });
+
+        setErrors((prev) => ({
+            ...prev,
+            [field]: undefined,
+            ...(field === "allDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
+            ...(field === "isFreeDay" && value
+                ? {
+                      startTime: undefined,
+                      endTime: undefined,
+                  }
+                : {}),
+        }));
+    }, []);
+
+    const validate = () => {
+        if (!houseEventId) {
+            setServerError("No se encontró el identificador del evento.");
+            return null;
+        }
+
+        const result = houseEventSchema.safeParse({
+            ...form,
+            categoryKey: "casa",
+            forceOverlap: false,
+        });
+
+        if (result.success) {
+            setErrors({});
+            return result.data;
+        }
+
+        const fieldErrors = {};
+
+        result.error.issues.forEach((error) => {
+            const key = error.path[error.path.length - 1];
+            if (key && !fieldErrors[key]) fieldErrors[key] = error.message;
+        });
+
+        setErrors(fieldErrors);
+        setValidationAlert("Revisa los campos marcados antes de continuar.");
+        return null;
+    };
+
+    const submitPayload = async (payload) => {
+        setIsSubmitting(true);
+        setServerError(null);
+
+        try {
+            const response = await updateHouseEvent(houseEventId, payload);
+
+            if (!response.success && response.data?.collisions?.length) {
+                setOverlapState({
+                    show: true,
+                    collisions: response.data.collisions,
+                    pendingPayload: payload,
+                    isForcing: false,
+                });
+                return;
+            }
+
+            onSuccess?.(response.data);
+            onClose?.();
+        } catch (error) {
+            setServerError(
+                error?.message ?? "Error inesperado al editar el evento",
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSubmit = async () => {
+        const validated = validate();
+        if (!validated) return;
+
+        await submitPayload(
+            buildPayload({
+                ...validated,
+                forceOverlap: false,
+                timeZone: calendarTimeZone,
+            }),
+        );
+    };
+
+    const handleForceOverlap = async () => {
+        setOverlapState((prev) => ({ ...prev, isForcing: true }));
+
+        try {
+            const response = await updateHouseEvent(houseEventId, {
+                ...overlapState.pendingPayload,
+                forceOverlap: true,
+            });
+
+            onClose?.();
+            setOverlapState({
+                show: false,
+                collisions: [],
+                pendingPayload: null,
+                isForcing: false,
+            });
+            await onSuccess?.(response.data);
+        } catch (error) {
+            setOverlapState({
+                show: false,
+                collisions: [],
+                pendingPayload: null,
+                isForcing: false,
+            });
+            setServerError(error?.message ?? "Error al forzar la edición");
+        }
+    };
+
+    const handleCancelOverlap = () => {
+        setOverlapState({
+            show: false,
+            collisions: [],
+            pendingPayload: null,
+            isForcing: false,
+        });
+    };
+
+    return {
+        form,
+        errors,
+        serverError,
+        validationAlert,
+        eventTypes,
+        isSubmitting,
+        overlapState,
+        setField,
+        setServerError,
+        setValidationAlert,
+        handleSubmit,
+        handleForceOverlap,
+        handleCancelOverlap,
+        getTimeContainerStyle,
+    };
+};

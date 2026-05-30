@@ -1,9 +1,7 @@
-// tests/unit/useDocuments.modal.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useDocuments } from "../../hooks/organism/useDocuments";
 
-// ── Mocks de servicios ──────────────────────────────────────────
 vi.mock("../../services/documentService", () => ({
   getDocumentsService: vi.fn().mockResolvedValue({ data: { documents: {} } }),
   getDocumentTypesService: vi.fn().mockResolvedValue([
@@ -15,10 +13,9 @@ vi.mock("../../services/documentService", () => ({
   deleteDocumentService: vi.fn().mockResolvedValue({}),
 }));
 
-// ── Mock token con rol administrador ────────────────────────────
 beforeEach(() => {
   vi.clearAllMocks();
-  const payload = btoa(JSON.stringify({ role: "admin", id: "1" }));
+  const payload = btoa(JSON.stringify({ role: "Coordinador", id: "1" }));
   localStorage.setItem("token", `header.${payload}.sig`);
 });
 
@@ -27,14 +24,12 @@ const makeFile = (name = "doc.pdf", type = "application/pdf") =>
 
 const EMPLOYEE_ID = "emp-123";
 
-// ── Helper: abre el modal de subida ────────────────────────────
 const openUploadModal = async (result) => {
   await act(async () => {
     result.current.handleOpenUpload();
   });
 };
 
-// ── Helper: abre el modal en modo edición ──────────────────────
 const openEditModal = async (result, doc = { documentId: "cv" }) => {
   await act(async () => {
     result.current.handleOpenEdit(doc);

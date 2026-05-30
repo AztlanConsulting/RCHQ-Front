@@ -1,37 +1,27 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import DateField from "../../atoms/dateField";
 import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import DocumentFileField from "../documentFileField";
+import {
+  buildDateRuleFilter,
+  parseDateOnly,
+} from "../../../utils/dateRules";
+import { formatEventDate, formatEventTime } from "../../../utils/calendarEventDetail";
+import { getDocumentFileNameFromLink } from "../../../utils/documentCard.utils";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import documentIcon from "/document.svg";
-
-const PlusIcon = () => (
-  <span aria-hidden="true" 
-  className="mr-1.5 inline-flex text-[1rem] leading-none text-white">
-    +
-  </span>
-);
 
 const DocumentWhiteIcon = () => (
   <img
     src={documentIcon}
     alt=""
     aria-hidden="true"
-    className="mr-1.5 h-3.5 w-3.5 shrink-0 brightness-0 invert"
+    className="mr-1.5 h-4.5 w-4.5 shrink-0 brightness-0 invert"
   />
 );
 
-const ReadOnlyField = ({ label, value, fullWidth = false }) => (
-    <div className={fullWidth ? "col-span-2" : ""}>
-        <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
-            {label}
-        </Type>
-        <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-            {value || "-"}
-        </div>
-    </div>
-);
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
   const shouldTruncate = displayValue.length > 200;
@@ -91,6 +81,10 @@ const AbsenceDetail = ({
   absenceDeleteError = "",
   absenceEvidenceFileName = "",
   absenceEvidenceError = "",
+  absenceMinStartDate,
+  absenceMaxEndDate,
+  absenceDateRules = null,
+  isLoadingAbsenceDateRules = false,
   isSaving = false,
   isDeleteOpen = false,
   isLoadingWhileDeleting = false,
@@ -104,21 +98,71 @@ const AbsenceDetail = ({
   onConfirmDelete,
   onAbsenceFieldChange,
   onAbsenceEvidenceChange,
+  showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   if (!event) return null;
 
   const canModifyAbsence = canManageAbsence && !event.isDeleted;
+  const hasEvidence = Boolean(event.link);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
+  const fileName = hasEvidence
+    ? getDocumentFileNameFromLink(event.link)
+    : "";
+  const displayedFileName =
+    absenceEvidenceFileName || fileName;
+  const evidencePlaceholder = hasEvidence
+    ? "Selecciona un nuevo archivo para reemplazar la evidencia"
+    : "Selecciona un archivo de evidencia";
+  const selectedStartDate = absenceForm?.startDate
+    ? new Date(`${absenceForm.startDate}T00:00:00`)
+    : null;
+  const ruleMinDate = parseDateOnly(absenceDateRules?.minDate) ?? absenceMinStartDate;
+  const ruleMaxDate = parseDateOnly(absenceDateRules?.maxDate) ?? absenceMaxEndDate;
+  const absenceEndMinDate =
+    selectedStartDate && ruleMinDate && selectedStartDate < ruleMinDate
+      ? ruleMinDate
+      : selectedStartDate ?? ruleMinDate;
+  const dateRuleFilter = buildDateRuleFilter(absenceDateRules);
 
   if (isEditing) {
     return (
       <div className="px-2 text-left sm:px-3">
-        <Type variant="page-title" className="mb-3" as="h2">
+        <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
           Ausencia
         </Type>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ReadOnlyField label="Nombre del trabajador" value={event.employeeName} />
-          <ReadOnlyField label="CURP" value={event.curp} />
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              Nombre del trabajador
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.employeeName || "-"}
+            </Type>
+          </div>
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              CURP
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.curp || "-"}
+            </Type>
+          </div>
           <div className="sm:col-span-2">
             <SelectField
               label="Tipo de ausencia"
@@ -142,6 +186,9 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("startDate", editEvent.target.value)
             }
+            minDate={ruleMinDate}
+            maxDate={ruleMaxDate}
+            filterDate={dateRuleFilter}
             labelColor="text-[#121212]"
             popupAlign="left"
             popupSize="compact"
@@ -153,11 +200,9 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("endDate", editEvent.target.value)
             }
-            minDate={
-              absenceForm?.startDate
-                ? new Date(`${absenceForm.startDate}T12:00:00`)
-                : undefined
-            }
+            minDate={absenceEndMinDate && ruleMinDate && absenceEndMinDate > ruleMinDate ? absenceEndMinDate : ruleMinDate}
+            maxDate={ruleMaxDate}
+            filterDate={dateRuleFilter}
             labelColor="text-[#121212]"
             popupAlign="right"
             popupSize="compact"
@@ -170,39 +215,14 @@ const AbsenceDetail = ({
         </div>
 
         <div className="sm:col-span-2">
-          <Type variant="metric-label" className="mb-1.5 block font-bold text-[#121212]">
-            Evidencia
-          </Type>
-          <label
-            htmlFor="absence-evidence-file"
-            className={`flex min-h-[50px] w-full cursor-pointer items-center justify-between rounded-lg border-2 border-dashed bg-neutral-50 px-4 transition-colors ${
-              absenceEvidenceFileName
-                ? "border-[#1F3664]"
-                : "border-slate-300 hover:border-slate-400"
-            }`}
-          >
-            <span
-              className={`truncate text-sm font-medium ${
-                absenceEvidenceFileName ? "text-[#222]" : "text-[#aaaaaa]"
-              }`}
-            >
-              {absenceEvidenceFileName ||
-                (event.link
-                  ? "Selecciona un nuevo archivo para reemplazar la evidencia"
-                  : "Selecciona un archivo de evidencia")}
-            </span>
-            <span className="ml-3 shrink-0 rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-[#1F3664]">
-              Examinar
-            </span>
-          </label>
-          <input
+          <DocumentFileField
             id="absence-evidence-file"
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg"
-            onChange={onAbsenceEvidenceChange}
-            className="hidden"
+            label="Evidencia"
+            labelColor="text-[#121212]"
+            fileName={displayedFileName}
+            handleFileChange={onAbsenceEvidenceChange}
+            placeholder={evidencePlaceholder}
           />
-          <p className="mt-1 text-xs text-slate-400">Máximo 10 MB · PDF, PNG o JPG</p>
         </div>
 
         {absenceEditError || absenceEvidenceError ? (
@@ -211,34 +231,19 @@ const AbsenceDetail = ({
           </p>
         ) : null}
 
-        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-5">
-          <Button
+        <div className="mt-8 flex justify-center gap-3">
+          <SmallButton
             type="button"
             text="Cancelar"
-            width="w-full sm:w-[10rem]"
-            height="h-11"
-            textSize="text-base"
-            bgColor="bg-white"
-            textColor="text-[#121212]"
-            hoverColor="hover:bg-slate-50"
-            activeColor="active:bg-slate-100"
-            className="border border-slate-200 shadow-md"
             onClick={onCancelEdit}
             disabled={isSaving}
+            cancel
           />
-          <Button
+          <SmallButton
             type="button"
             text="Guardar"
-            width="w-full sm:w-[10rem]"
-            height="h-11"
-            textSize="text-base"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="shadow-md"
             onClick={onSubmitEdit}
-            disabled={isSaving}
+            disabled={isSaving || isLoadingAbsenceDateRules}
           />
         </div>
       </div>
@@ -250,6 +255,7 @@ const AbsenceDetail = ({
       <Type variant="page-title" className="mb-5 text-[2rem] leading-none" as="h2">
         Ausencia
       </Type>
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
@@ -277,7 +283,15 @@ const AbsenceDetail = ({
         </div>
         <div>
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Días hábiles:
+            Días totales{mexicoDaysSuffix}:
+          </Type>
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            {event.totalDays ?? "—"}
+          </Type>
+        </div>
+        <div>
+          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+            Días hábiles{mexicoDaysSuffix}:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
             {event.usedDays ?? "—"}
@@ -288,17 +302,50 @@ const AbsenceDetail = ({
             Fecha de inicio:
           </Type>
           <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableStart)}
+            {formatEventDate(
+              event.readableStart ?? event.startDate ?? event.start,
+            )}
           </Type>
         </div>
-        <div>
-          <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
-            Fecha de fin:
-          </Type>
-          <Type variant="body" className="text-[1.05rem] leading-snug">
-            {formatEventDate(event.readableEnd)}
-          </Type>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de inicio:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.start, { timeZone: calendarTimeZone })}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Fecha de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+              </Type>
+            </div>
+            <div>
+              <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+                Hora de término:
+              </Type>
+              <Type variant="body" className="text-[1.05rem] leading-snug">
+                {formatEventTime(event.end, {
+                  timeZone: calendarTimeZone
+                })}
+              </Type>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
+              Fecha de término:
+            </Type>
+            <Type variant="body" className="text-[1.05rem] leading-snug">
+              {formatEventDate(event.readableEnd ?? event.endDate ?? event.end)}
+            </Type>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <Type variant="metric-label" className="mb-1 block text-[0.9rem] font-bold text-[#121212]">
             Descripción:
@@ -307,53 +354,47 @@ const AbsenceDetail = ({
         </div>
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-2.5">
-        <Type variant="metric-label" className="text-[0.9rem] font-bold text-[#121212]">
+      <div
+        className={`mt-7 flex flex-wrap gap-2.5 ${
+          hasEvidence ? "items-center" : "items-baseline"
+        }`}
+      >
+        <Type
+          variant="metric-label"
+          className="text-[0.9rem] font-bold text-[#121212]"
+        >
           Evidencia:
         </Type>
-        <Button
-          type="button"
-          text={evidenceLabel}
-          width="w-auto"
-          height="h-8"
-          textSize="text-[0.72rem]"
-          bgColor="bg-[#1F3664]"
-          textColor="text-white"
-          hoverColor="hover:bg-[#15284A]"
-          activeColor="active:bg-[#0E1B33]"
-          onClick={onOpenEvidence}
-          disabled={!event.link}
-          icon={event.link ? <DocumentWhiteIcon /> : <PlusIcon />}
-          className="rounded-md px-2.5 shadow-[0_3px_8px_rgba(31,54,100,0.28)]"
-        />
+        {hasEvidence ? (
+          <SmallButton
+            type="button"
+            text={evidenceLabel}
+            onClick={onOpenEvidence}
+            leadingIcon={<DocumentWhiteIcon />}
+            className="h-8 min-w-0 rounded-md px-2.5"
+          />
+        ) : (
+          <Type variant="body" className="text-[1.05rem] leading-snug">
+            Sin evidencia
+          </Type>
+        )}
       </div>
 
       {canModifyAbsence ? (
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-          <Button
+          <SmallButton
             type="button"
             text="Eliminar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#A20000]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#870000]"
-            activeColor="active:bg-[#6B0000]"
-            className="rounded-md shadow-[0_4px_10px_rgba(166,0,0,0.32)]"
+            hasNoRollback
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onOpenDelete}
           />
-          <Button
+          <SmallButton
             type="button"
             text="Editar"
-            width="w-full sm:w-[7.2rem]"
-            height="h-8"
-            textSize="text-[0.95rem]"
-            bgColor="bg-[#1F3664]"
-            textColor="text-white"
-            hoverColor="hover:bg-[#15284A]"
-            activeColor="active:bg-[#0E1B33]"
-            className="rounded-md shadow-[0_4px_10px_rgba(31,54,100,0.28)]"
+            hasAdjustableWidth
+            className="h-8 rounded-md sm:w-[7.2rem]"
             onClick={onStartEdit}
           />
         </div>

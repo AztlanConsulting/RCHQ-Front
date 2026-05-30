@@ -1,9 +1,5 @@
-// src/tests/unit/employeeUpdate.unit.test.jsx
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-
-// ── Mocks globales ─────────────────────────────────────────────────────────────
 
 vi.mock("../../utils/authStorage", () => ({
   getToken: vi.fn(() => "mock-token"),
@@ -17,7 +13,11 @@ vi.mock("../utils/apiErrors", () => ({
   buildApiError: vi.fn((res, data, msg) => new Error(data?.message ?? msg)),
 }));
 
-// ── Imports después de los mocks ───────────────────────────────────────────────
+vi.mock("../../components/atoms/timeField", () => ({
+  default: ({ value, onChange }) => (
+    <input type="time" value={value || ""} onChange={(e) => onChange(e.target.value)} />
+  ),
+}));
 
 import { getToken } from "../../utils/authStorage";
 import { secureFetch } from "@/utils/secureFetchWrapper";
@@ -32,8 +32,6 @@ import EmployeeContactCard from "../../components/organism/employeeContactCard";
 import EmployeeBasicCard   from "../../components/organism/employeeBasicCard";
 import EmployeeAdminCard   from "../../components/organism/employeeAdminCard";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const mockFetch = (ok, data, status = 200) => {
   secureFetch.mockResolvedValue({
     ok,
@@ -42,10 +40,6 @@ const mockFetch = (ok, data, status = 200) => {
   });
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
-// SERVICE: employeeUpdateService
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("employeeUpdateService", () => {
 
   beforeEach(() => {
@@ -53,24 +47,11 @@ describe("employeeUpdateService", () => {
     getToken.mockReturnValue("mock-token");
   });
 
-  // ── getUpdateFormService ───────────────────────────────────────────────────
-
   describe("getUpdateFormService", () => {
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(getUpdateFormService()).rejects.toThrow("No se encontró token de sesión");
-      expect(secureFetch).not.toHaveBeenCalled();
-    });
-
-    it("llama al endpoint correcto con el token", async () => {
+    it("llama al endpoint correcto", async () => {
       mockFetch(true, { roles: [], houses: [], workdays: [] });
       await getUpdateFormService();
-      expect(secureFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/employee/update-form"),
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: "Bearer mock-token" }),
-        }),
-      );
+      expect(secureFetch).toHaveBeenCalledWith(expect.stringContaining("/employee/update-form"));
     });
 
     it("retorna los datos cuando la respuesta es ok", async () => {
@@ -86,16 +67,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateBasicInfoService ─────────────────────────────────────────────────
-
   describe("updateBasicInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { name: "Juan", surname: "Pérez" };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateBasicInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT correcto", async () => {
       mockFetch(true, { success: true });
@@ -114,6 +88,19 @@ describe("employeeUpdateService", () => {
       await updateBasicInfoService(EMP_ID, body);
       const call = secureFetch.mock.calls[0][1];
       expect(JSON.parse(call.body)).toEqual(body);
+    });
+
+    it("envía FormData sin Content-Type manual cuando se actualiza foto", async () => {
+      mockFetch(true, { success: true });
+      const formData = new FormData();
+      formData.append("name", "Juan");
+      formData.append("picture", new Blob(["avatar"], { type: "image/jpeg" }), "avatar.jpg");
+
+      await updateBasicInfoService(EMP_ID, formData);
+
+      const call = secureFetch.mock.calls[0][1];
+      expect(call.body).toBe(formData);
+      expect(call.headers["Content-Type"]).toBeUndefined();
     });
 
     it("retorna los datos si la respuesta es ok", async () => {
@@ -139,16 +126,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateContactInfoService ───────────────────────────────────────────────
-
   describe("updateContactInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { email: "juan@mail.com", phoneNumber: "4421234567" };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateContactInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT de contact-info", async () => {
       mockFetch(true, { success: true });
@@ -172,16 +152,9 @@ describe("employeeUpdateService", () => {
     });
   });
 
-  // ── updateAdminInfoService ─────────────────────────────────────────────────
-
   describe("updateAdminInfoService", () => {
     const EMP_ID = "emp-001";
     const body   = { type: "tiempo_completo", salary: 15000 };
-
-    it("lanza error si no hay token", async () => {
-      getToken.mockReturnValue(null);
-      await expect(updateAdminInfoService(EMP_ID, body)).rejects.toThrow("No se encontró token de sesión");
-    });
 
     it("llama al endpoint PUT de admin-info", async () => {
       mockFetch(true, { success: true });
@@ -212,10 +185,6 @@ describe("employeeUpdateService", () => {
     });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeContactCard
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("EmployeeContactCard", () => {
 
@@ -252,8 +221,6 @@ describe("EmployeeContactCard", () => {
   };
 
   beforeEach(() => vi.clearAllMocks());
-
-  // ── Modo lectura ───────────────────────────────────────────────────────────
 
   describe("Modo lectura (isEditing=false)", () => {
     it("muestra el título 'Contacto'", () => {
@@ -319,8 +286,6 @@ describe("EmployeeContactCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición (isEditing=true)", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -385,15 +350,10 @@ describe("EmployeeContactCard", () => {
 
     it("no muestra los valores de lectura en modo edición", () => {
       render(<EmployeeContactCard {...editingProps} />);
-      // Los labels de lectura sí están, pero los valores en divs inset no
       expect(screen.queryByText("N/A")).toBeNull();
     });
   });
 });
-
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeBasicCard
-// ══════════════════════════════════════════════════════════════════════════════
 
 describe("EmployeeBasicCard", () => {
 
@@ -434,8 +394,6 @@ describe("EmployeeBasicCard", () => {
   };
 
   beforeEach(() => vi.clearAllMocks());
-
-  // ── Modo lectura ───────────────────────────────────────────────────────────
 
   describe("Modo lectura", () => {
     it("muestra el nombre completo del empleado", () => {
@@ -491,8 +449,6 @@ describe("EmployeeBasicCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -545,10 +501,6 @@ describe("EmployeeBasicCard", () => {
   });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENTE: EmployeeAdminCard
-// ══════════════════════════════════════════════════════════════════════════════
-
 describe("EmployeeAdminCard", () => {
 
   const mockEmployee = { type: "tiempo_completo", salary: "15000", houseId: "h1", roleId: "r1" };
@@ -562,10 +514,10 @@ describe("EmployeeAdminCard", () => {
     houseId: "h1",
     roleId:  "r1",
     type:    "tiempo_completo",
-    salary:  "15000",
+    salary:  15000,
     selectedWorkdays: [
-      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00" },
-      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00" },
+      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00", allDay: false },
+      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00", allDay: false },
     ],
   };
 
@@ -575,7 +527,7 @@ describe("EmployeeAdminCard", () => {
     employee:                mockEmployee,
     employeeWorkdays:        mockWorkdays,
     employeeVacationRequests: [],
-    employeeFaults:          [],
+    employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
     isEditing:               false,
     loadingCatalogues:       false,
@@ -584,6 +536,7 @@ describe("EmployeeAdminCard", () => {
     houses:  [{ houseId: "h1", name: "Casa Test" }],
     setAdminField:  vi.fn(),
     toggleWorkday:  vi.fn(),
+    setWorkdayAllDay: vi.fn(),
     setWorkdayTime: vi.fn(),
     saving:         false,
     saveError:      null,
@@ -594,17 +547,15 @@ describe("EmployeeAdminCard", () => {
 
   beforeEach(() => vi.clearAllMocks());
 
-  // ── Modo lectura ───────────────────────────────────────────────────────────
-
   describe("Modo lectura", () => {
     it("muestra el título", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
       expect(screen.getByText("Información Administrativa")).toBeInTheDocument();
     });
 
-    it("muestra el tipo de contrato", () => {
+    it("muestra el tipo de contrato con la primera letra en mayúscula", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("tiempo_completo")).toBeInTheDocument();
+      expect(screen.getByText("Tiempo_completo")).toBeInTheDocument();
     });
 
     it("muestra el salario con signo de pesos", () => {
@@ -619,12 +570,13 @@ describe("EmployeeAdminCard", () => {
 
     it("muestra el número de días trabajados", () => {
       render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("2")).toBeInTheDocument(); // 2 workdays
+      expect(screen.getByText(/2 días trabajados/i)).toBeInTheDocument();
     });
 
-    it("muestra 0 faltas", () => {
-      render(<EmployeeAdminCard {...defaultProps} />);
-      expect(screen.getByText("0")).toBeInTheDocument();
+    it("muestra los días hábiles de ausencias", () => {
+      render(<EmployeeAdminCard {...defaultProps} employeeAbsenceUsedDays={5} />);
+      expect(screen.getByText("Ausencias justificadas")).toBeInTheDocument();
+      expect(screen.getByText("5")).toBeInTheDocument();
     });
 
     it("muestra 0 solicitudes de vacaciones", () => {
@@ -650,8 +602,6 @@ describe("EmployeeAdminCard", () => {
     });
   });
 
-  // ── Modo edición ───────────────────────────────────────────────────────────
-
   describe("Modo edición", () => {
     const editingProps = { ...defaultProps, isEditing: true };
 
@@ -661,14 +611,14 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Cancelar")).toBeInTheDocument();
     });
 
-    it("muestra el select de Casa con la opción correcta", () => {
+    it("muestra el select de Frecuencia de pago con la opción por defecto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Casa Test")).toBeInTheDocument();
+      expect(screen.getByText("Sin asignar")).toBeInTheDocument();
     });
 
     it("muestra el select de Puesto", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Administrador")).toBeInTheDocument();
+      expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
     it("muestra los checkboxes de días de trabajo", () => {
@@ -680,19 +630,19 @@ describe("EmployeeAdminCard", () => {
     it("el checkbox de Lunes está marcado (selected=true)", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[0]).toBeChecked(); // Lunes
+      expect(checkboxes[0]).toBeChecked();
     });
 
     it("el checkbox de Martes NO está marcado (selected=false)", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[1]).not.toBeChecked(); // Martes
+      expect(checkboxes[1]).not.toBeChecked();
     });
 
     it("llama a toggleWorkday al hacer click en un checkbox", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[1]); // Martes
+      fireEvent.click(checkboxes[2]);
       expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
     });
 

@@ -1,16 +1,8 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
-const API_URL = import.meta.env.VITE_API_URL;
-
-const getToken = () => localStorage.getItem("token");
 
 export const getEmployeeFormData = async () => {
-  const token = getToken();
-
-  const res = await fetch(`${API_URL}/employee/add`, {
+  const res = await secureFetch(`/employee/add`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
 
   const data = await res.json();
@@ -26,8 +18,6 @@ export const getEmployeeFormData = async () => {
 };
 
 export const createEmployee = async (data) => {
-  const token = getToken();
-
   const formData = new FormData();
 
   Object.keys(data).forEach((key) => {
@@ -36,11 +26,8 @@ export const createEmployee = async (data) => {
     }
   });
 
-  const res = await fetch(`${API_URL}/employee/add`, {
+  const res = await secureFetch(`/employee/add`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
     body: formData,
   });
 
@@ -75,8 +62,6 @@ export const getEmployees = async (
   search = "",
   active = "true",
 ) => {
-  const token = getToken();
-
   const params = new URLSearchParams({
     page,
     limit,
@@ -84,11 +69,8 @@ export const getEmployees = async (
     active,
   });
 
-  const res = await secureFetch(`${API_URL}/employee/getAll?${params}`, {
+  const res = await secureFetch(`/employee/getAll?${params}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
 
   const data = await res.json();
@@ -108,13 +90,8 @@ export const getEmployees = async (
 };
 
 export const getEmployeeById = async (employeeId) => {
-  const token = getToken();
-
-  const res = await fetch(`${API_URL}/employee/${employeeId}`, {
+  const res = await secureFetch(`/employee/${employeeId}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
 
   const data = await res.json();

@@ -1,14 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
 } from "../../services/calendarService";
 import {
+    buildAbsenceDateLimits,
     buildAbsenceFormSchema,
     sanitizeAbsenceDescription,
 } from "../../utils/schema/evento/absence.schema";
+import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { useDocumentFile } from "../atoms/useDocumentFile";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
 
 const DEFAULT_FORM = {
     employeeId: "",
@@ -20,38 +24,6 @@ const DEFAULT_FORM = {
 
 const normalizeInitialDate = (value) =>
     value ? String(value).slice(0, 10) : "";
-
-const toDateInputValue = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-};
-
-const buildAbsenceDateLimits = () => {
-    const today = new Date();
-    const minStartDate = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        today.getDate(),
-    );
-    const maxEndDate = new Date(
-        today.getFullYear() + 1,
-        today.getMonth(),
-        today.getDate(),
-    );
-
-    minStartDate.setHours(0, 0, 0, 0);
-    maxEndDate.setHours(23, 59, 59, 999);
-
-    return {
-        minStartDate,
-        maxEndDate,
-        minStartDateValue: toDateInputValue(minStartDate),
-        maxEndDateValue: toDateInputValue(maxEndDate),
-    };
-};
 
 const getSubmitErrorMessage = (error) => {
     const detailedErrors = Array.isArray(error?.errors)
@@ -75,7 +47,7 @@ const getSubmitErrorMessage = (error) => {
     if (error?.status === 404) {
         if (message) return message;
 
-        return "usuario no encontrado";
+        return "Usuario no encontrado";
     }
 
     if (error?.status === 406) {
@@ -112,8 +84,10 @@ export const useAbsenceForm = ({
     const [employeeOptions, setEmployeeOptions] = useState([]);
     const [absenceTypeOptions, setAbsenceTypeOptions] = useState([]);
     const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+    const [isLoadingDateRules, setIsLoadingDateRules] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [dateLimits] = useState(buildAbsenceDateLimits);
+    const [dateRules, setDateRules] = useState(null);
     const lastInitialDatesRef = useRef({
         startDate: normalizeInitialDate(initialStartDate),
         endDate: normalizeInitialDate(initialEndDate),
@@ -126,8 +100,12 @@ export const useAbsenceForm = ({
         reset: resetEvidence,
     } = useDocumentFile({
         invalidTypeMessage: "Formato invalido de ausencias",
-        maxSizeMessage: "tamaño superior a 10mb",
+        maxSizeMessage: "Tamaño superior a 10mb",
     });
+    const displayErrors = useMemo(
+        () => mergeDateRuleErrors(errors, form, dateRules),
+        [dateRules, errors, form],
+    );
 
     useEffect(() => {
         if (!isOpen) return;
@@ -173,6 +151,42 @@ export const useAbsenceForm = ({
     }, [isOpen]);
 
     useEffect(() => {
+        if (!isOpen || !form.employeeId) {
+            setDateRules(null);
+            setIsLoadingDateRules(false);
+            return undefined;
+        }
+
+        let isEffectActive = true;
+
+        setIsLoadingDateRules(true);
+        getEmployeeDateRules(form.employeeId, "absence")
+            .then((rules) => {
+                if (isEffectActive) {
+                    setDateRules(rules);
+                }
+            })
+            .catch((error) => {
+                if (isEffectActive) {
+                    setDateRules(null);
+                    setServerError(
+                        error?.message ||
+                            "No se pudieron consultar las fechas disponibles",
+                    );
+                }
+            })
+            .finally(() => {
+                if (isEffectActive) {
+                    setIsLoadingDateRules(false);
+                }
+            });
+
+        return () => {
+            isEffectActive = false;
+        };
+    }, [form.employeeId, isOpen]);
+
+    useEffect(() => {
         const nextInitialDates = {
             startDate: normalizeInitialDate(initialStartDate),
             endDate: normalizeInitialDate(initialEndDate),
@@ -204,13 +218,22 @@ export const useAbsenceForm = ({
 
     const setField = useCallback(
         (field, value) => {
-            setForm((prev) => ({
-                ...prev,
-                [field]:
-                    field === "description"
-                        ? sanitizeAbsenceDescription(value, prev.description)
-                        : value,
-            }));
+            setForm((prev) => {
+                if (field === "startDate") {
+                    return shiftDateOnlyRange(prev, value);
+                }
+
+                return {
+                    ...prev,
+                    [field]:
+                        field === "description"
+                            ? sanitizeAbsenceDescription(
+                                value,
+                                prev.description,
+                            )
+                            : value,
+                };
+            });
 
             setErrors((prev) => ({
                 ...prev,
@@ -242,9 +265,15 @@ export const useAbsenceForm = ({
             });
         }
 
-        setErrors(fieldErrors);
+        const nextFieldErrors = mergeDateRuleErrors(
+            fieldErrors,
+            form,
+            dateRules,
+        );
 
-        const messages = Object.values(fieldErrors).filter(Boolean);
+        setErrors(nextFieldErrors);
+
+        const messages = Object.values(nextFieldErrors).filter(Boolean);
         onValidationAlert?.(
             messages.length > 0 ? [...new Set(messages)].join("\n") : null,
         );
@@ -252,7 +281,7 @@ export const useAbsenceForm = ({
         if (messages.length > 0) return null;
 
         return result.data;
-    }, [dateLimits, evidenceError, form, onValidationAlert]);
+    }, [dateLimits, dateRules, evidenceError, form, onValidationAlert]);
 
     const handleSubmit = useCallback(async () => {
         const validated = validate();
@@ -287,16 +316,18 @@ export const useAbsenceForm = ({
 
     return {
         form,
-        errors,
+        errors: displayErrors,
         serverError,
         employeeOptions,
         absenceTypeOptions,
         isLoadingOptions,
+        isLoadingDateRules,
         isSubmitting,
         evidenceFileName,
         evidenceError,
         minStartDate: dateLimits.minStartDate,
         maxEndDate: dateLimits.maxEndDate,
+        dateRules,
         setField,
         setServerError,
         handleEvidenceChange,

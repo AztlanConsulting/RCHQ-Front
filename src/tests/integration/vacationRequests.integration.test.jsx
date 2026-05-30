@@ -5,7 +5,9 @@ import {
     fireEvent,
     waitFor,
     act,
+    within,
 } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import VacationRequests from "../../pages/vacationRequests";
 import {
     getPendingVacationRequests,
@@ -115,9 +117,22 @@ const singlePendingResponse = {
     },
 };
 
+const renderComponent = async () => {
+    await act(async () => {
+        render(
+            <MemoryRouter>
+                <VacationRequests />
+            </MemoryRouter>,
+        );
+    });
+};
+
+const getField = (label, index = 0) => screen.getAllByLabelText(label)[index];
+const getButton = (name, index = 0) => screen.getAllByRole("button", { name })[index];
+
 describe("Integración: VacationRequests", () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
         vi.useRealTimers();
 
         getPendingVacationRequests.mockResolvedValue(pendingResponse);
@@ -139,10 +154,10 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("carga y muestra solicitudes pendientes al entrar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(
-            screen.getByText("Solicitudes de vacaciones pendientes"),
+            screen.getByRole("heading", { name: "Solicitud de vacaciones" }),
         ).toBeInTheDocument();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
@@ -161,6 +176,8 @@ describe("Integración: VacationRequests", () => {
                 status: "all",
             }),
         );
+
+        expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
     });
 
     it("mantiene la tabla visible mientras carga una nueva búsqueda", async () => {
@@ -175,11 +192,11 @@ describe("Integración: VacationRequests", () => {
                     }),
             );
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
+        fireEvent.change(getField("Buscar empleado"), {
             target: { value: "ana" },
         });
 
@@ -204,11 +221,11 @@ describe("Integración: VacationRequests", () => {
             .mockResolvedValueOnce(pendingResponse)
             .mockResolvedValueOnce(singlePendingResponse);
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Buscar empleado"), {
+        fireEvent.change(getField("Buscar empleado"), {
             target: { value: "  ana    pendiente  " },
         });
 
@@ -227,11 +244,11 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("limpia la búsqueda si el usuario borra de us9 a us y usa el último valor", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar empleado");
+        const input = getField("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "us9" },
@@ -259,16 +276,16 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("cambia a vista revisadas y carga solicitudes revisadas", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.click(
-            screen.getByRole("button", { name: "Solicitudes revisadas" }),
-        );
+        fireEvent.change(getField("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
 
         expect(
-            await screen.findByText("Solicitudes de vacaciones revisadas"),
+            screen.getByRole("heading", { name: "Solicitud de vacaciones" }),
         ).toBeInTheDocument();
 
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
@@ -281,20 +298,22 @@ describe("Integración: VacationRequests", () => {
                 status: "all",
             }),
         );
+
+        expect(getField("Filtrar por estado")).toHaveValue("all");
     });
 
     it("manda status approved al servicio cuando se filtra revisadas por aprobadas", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.click(
-            screen.getByRole("button", { name: "Solicitudes revisadas" }),
-        );
+        fireEvent.change(getField("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
 
         expect(await screen.findByText("Marta Revisada")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Filtrar por estado"), {
+        fireEvent.change(getField("Filtrar por estado"), {
             target: { value: "approved" },
         });
 
@@ -308,16 +327,40 @@ describe("Integración: VacationRequests", () => {
         });
     });
 
+    it("oculta el filtro de estado en pendientes y muestra solo aprobadas o rechazadas en revisadas", async () => {
+        await renderComponent();
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+        expect(screen.queryByLabelText("Filtrar por estado")).toBeNull();
+
+        fireEvent.change(getField("Vista de solicitudes"), {
+            target: { value: "reviewed" },
+        });
+
+        const statusSelect = getField("Filtrar por estado");
+
+        expect(
+            within(statusSelect).getByRole("option", { name: "Aprobadas" }),
+        ).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Rechazadas" }),
+        ).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Todas" }),
+        ).toBeInTheDocument();
+        expect(statusSelect).toHaveValue("all");
+    });
+
     it("muestra error local si la fecha de inicio es posterior a la fecha de término", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Fecha de inicio"), {
+        fireEvent.change(getField("Fecha de inicio"), {
             target: { value: "2026-06-10" },
         });
 
-        fireEvent.change(screen.getByLabelText("Fecha de término"), {
+        fireEvent.change(getField("Fecha de término"), {
             target: { value: "2026-06-01" },
         });
 
@@ -333,7 +376,7 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudieron cargar las solicitudes"),
         );
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(
             await screen.findByText("No se pudieron cargar las solicitudes"),
@@ -345,11 +388,11 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("limpia filtros al presionar Limpiar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
-        const input = screen.getByLabelText("Buscar empleado");
+        const input = getField("Buscar empleado");
 
         fireEvent.change(input, {
             target: { value: "ana" },
@@ -361,23 +404,23 @@ describe("Integración: VacationRequests", () => {
 
         expect(input).toHaveValue("ana");
 
-        fireEvent.change(screen.getByLabelText("Fecha de inicio"), {
+        fireEvent.change(getField("Fecha de inicio"), {
             target: { value: "2026-05-01" },
         });
 
-        fireEvent.change(screen.getByLabelText("Fecha de término"), {
+        fireEvent.change(getField("Fecha de término"), {
             target: { value: "2026-05-10" },
         });
 
-        fireEvent.click(screen.getByRole("button", { name: "Limpiar" }));
+        fireEvent.click(getButton("Limpiar"));
 
         expect(input).toHaveValue("");
-        expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("");
-        expect(screen.getByLabelText("Fecha de término")).toHaveValue("");
+        expect(getField("Fecha de inicio")).toHaveValue("");
+        expect(getField("Fecha de término")).toHaveValue("");
     });
 
     it("abre modal de confirmación al presionar aprobar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -395,7 +438,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("cierra modal de aprobación al presionar cancelar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -425,7 +468,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -457,7 +500,7 @@ describe("Integración: VacationRequests", () => {
             new Error("La solicitud ya fue revisada"),
         );
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -479,7 +522,7 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudo aprobar la solicitud"),
         );
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -510,7 +553,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -525,7 +568,7 @@ describe("Integración: VacationRequests", () => {
     });
 
     it("abre modal de confirmación al presionar rechazar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -538,12 +581,16 @@ describe("Integración: VacationRequests", () => {
         expect(
             screen.getByText(/Esta acción moverá la solicitud a revisadas/),
         ).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("Motivo del rechazo (opcional)"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("0/500")).toBeInTheDocument();
 
         expect(rejectVacationRequest).not.toHaveBeenCalled();
     });
 
     it("cierra modal de rechazo al presionar cancelar", async () => {
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -573,7 +620,7 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
@@ -583,10 +630,17 @@ describe("Integración: VacationRequests", () => {
             screen.getByRole("dialog", { name: "Rechazar solicitud" }),
         ).toBeInTheDocument();
 
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         await waitFor(() => {
-            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No hay disponibilidad para esas fechas",
+            );
         });
 
         await waitFor(() => {
@@ -600,18 +654,59 @@ describe("Integración: VacationRequests", () => {
         expect(screen.queryByText("Ana Pendiente")).toBeNull();
     });
 
-    it("muestra error dentro del modal si falla el rechazo", async () => {
-        rejectVacationRequest.mockRejectedValueOnce(
-            new Error("La solicitud ya fue revisada"),
-        );
+    it("permite rechazar una solicitud sin retroalimentación", async () => {
+        getPendingVacationRequests
+            .mockResolvedValueOnce(pendingResponse)
+            .mockResolvedValueOnce({
+                data: [pendingRequests[1]],
+                pagination: {
+                    page: 1,
+                    limit: 6,
+                    total: 1,
+                    totalPages: 1,
+                },
+            });
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
 
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001", "");
+        });
+
+        expect(
+            await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra error dentro del modal si falla el rechazo", async () => {
+        rejectVacationRequest.mockRejectedValueOnce(
+            new Error("La solicitud ya fue revisada"),
+        );
+
+        await renderComponent();
+
+        expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No procede por empalme de fechas" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No procede por empalme de fechas",
+            );
+        });
 
         expect(
             await screen.findByText("La solicitud ya fue revisada"),
@@ -627,12 +722,24 @@ describe("Integración: VacationRequests", () => {
             new Error("No se pudo rechazar la solicitud"),
         );
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No se puede aprobar en estas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+        await waitFor(() => {
+            expect(rejectVacationRequest).toHaveBeenCalledWith(
+                "vac-001",
+                "No se puede aprobar en estas fechas",
+            );
+        });
 
         expect(
             await screen.findByText("No se pudo rechazar la solicitud"),
@@ -658,17 +765,25 @@ describe("Integración: VacationRequests", () => {
                 },
             });
 
-        render(<VacationRequests />);
+        await renderComponent();
 
         expect(await screen.findByText("Ana Pendiente")).toBeInTheDocument();
 
         fireEvent.click(screen.getAllByTitle("Rechazar solicitud")[0]);
+
+        fireEvent.change(screen.getByLabelText("Motivo del rechazo (opcional)"), {
+            target: { value: "No hay disponibilidad para esas fechas" },
+        });
+
         fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
 
         expect(
             await screen.findByText("Solicitud de vacaciones rechazada con éxito"),
         ).toBeInTheDocument();
 
-        expect(rejectVacationRequest).toHaveBeenCalledWith("vac-001");
+        expect(rejectVacationRequest).toHaveBeenCalledWith(
+            "vac-001",
+            "No hay disponibilidad para esas fechas",
+        );
     });
 });

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import OptionCard from "../components/molecules/optionCard";
-import Button from "../components/atoms/button";
+import BigButton from "../components/atoms/bigButton";
 import TextField from "../components/atoms/textField";
 import Alert from "../components/atoms/alerts";
 import TwoFactorAuth from "./auth/twoFactorAuth";
@@ -23,6 +23,7 @@ const MoreOptions = () => {
     error,
     setError,
     successMessage,
+    setSuccessMessage,
     handleDisable,
     handleEnableSuccess,
     handleCancelDisable,
@@ -40,36 +41,42 @@ const MoreOptions = () => {
     showNewPassword,
     showConfirmPassword,
     handleCloseChangePasswordModal,
+    handleDismissChangePasswordErrors,
     handleSubmitChangePassword,
   } = useTwoFactorAuthOptions();
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">Otras opciones</h1>
+    <div className="p-4 sm:p-6 md:p-8">
+      <h1 className="mb-5 text-2xl font-bold text-slate-900 sm:mb-6">
+        Otras Opciones
+      </h1>
 
       {successMessage && (
         <div className="mb-4">
-          <Alert type="success" message={successMessage} />
+          <Alert
+            type="success"
+            message={successMessage}
+            onClose={() => setSuccessMessage("")}
+          />
         </div>
       )}
 
-      <div className="bg-transparent rounded-2xl border border-slate-200 p-8 min-h-96">
-        <Button
-          text="Regresar a mi perfil"
-          onClick={() => navigate("/app/perfil")}
-          bgColor="bg-[#1e2b4d]"
-          hoverColor="hover:bg-[#15203b]"
-          activeColor="active:bg-[#0f172a]"
-          textColor="text-white"
-        />
+      <div className="min-h-96 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-6 md:min-h-[30rem] md:p-8">
+        <div className="flex justify-center md:justify-start">
+          <BigButton
+            text="Regresar a mi perfil"
+            onClick={() => navigate("/app/perfil")}
+            className="w-full max-w-[18rem] md:w-auto"
+          />
+        </div>
 
-        <div className="flex gap-6 justify-center flex-wrap pt-4">
+        <div className="flex flex-wrap justify-center gap-4 pt-5 sm:gap-6 md:gap-14 md:pt-24">
           <OptionCard
             icon={
               <img
                 src="/certificate.svg"
                 alt="Certificaciones"
-                className="w-9 h-9 invert opacity-90"
+                className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"
               />
             }
             label="Certificaciones"
@@ -80,7 +87,7 @@ const MoreOptions = () => {
               <img
                 src="/document.svg"
                 alt="Documentos"
-                className="w-9 h-9 invert opacity-90"
+                className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"
               />
             }
             label="Documentos"
@@ -91,11 +98,11 @@ const MoreOptions = () => {
               <img
                 src="/key.svg"
                 alt="TwoFactorAuth"
-                className="w-9 h-9 invert opacity-90"
+                className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"
               />
             }
             label={
-              <span className="whitespace-pre-line text-center block text-sm">
+              <span className="block whitespace-pre-line text-center text-sm md:text-[0.8rem]">
                 {isTwoFactorAuthActive
                   ? "Desactivar doble\nverificación"
                   : "Activar doble\nverificación"}
@@ -115,7 +122,7 @@ const MoreOptions = () => {
               <img
                 src="/lock.svg"
                 alt="Cambiar contraseña"
-                className="w-9 h-9 invert opacity-90"
+                className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"
               />
             }
             label="Cambiar contraseña"
@@ -128,22 +135,19 @@ const MoreOptions = () => {
       </div>
 
       {showTwoFactorAuthModal.value && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="relative">
-            <button
-              onClick={() => showTwoFactorAuthModal.toggle()}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 text-xl font-bold z-10"
-            >
-              ✕
-            </button>
-            <TwoFactorAuth onClose={handleEnableSuccess} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:p-4">
+          <div className="my-3 sm:my-0">
+            <TwoFactorAuth
+              onClose={handleEnableSuccess}
+              onDismiss={() => showTwoFactorAuthModal.toggle()}
+            />
           </div>
         </div>
       )}
 
       {showDisableModal.value && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:p-4">
+          <div className="my-3 w-full max-w-sm space-y-4 rounded-2xl bg-white p-5 shadow-xl sm:my-0 sm:p-8">
             <h3 className="text-lg font-semibold text-slate-900">
               Desactivar autenticación en dos pasos
             </h3>
@@ -151,7 +155,13 @@ const MoreOptions = () => {
               Ingresa tu contraseña para confirmar.
             </p>
 
-            {error && <Alert type="error" message={error} />}
+            {error && (
+              <Alert
+                type="error"
+                message={error}
+                onClose={() => setError("")}
+              />
+            )}
 
             <TextField
               id="disable-password"
@@ -195,6 +205,7 @@ const MoreOptions = () => {
         onClose={handleCloseChangePasswordModal}
         loading={changePasswordLoading}
         errors={changePasswordErrors}
+        onErrorsClose={handleDismissChangePasswordErrors}
         onSubmit={handleSubmitChangePassword}
         currentPassword={currentPassword}
         setCurrentPassword={setCurrentPassword}

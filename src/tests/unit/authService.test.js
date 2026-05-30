@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { secureFetch } from "../../utils/secureFetchWrapper";
 import {
   loginService,
   getToken,
@@ -10,12 +11,15 @@ import {
   validateLoginTwoFactorAuthService,
   getTwoFactorAuthStatus,
   deactivateTwoFactorAuthService,
+  refreshSessionService,
 } from "../../services/authService";
 
-// ─── Factories ────────────────────────────────────────────────────────────────
+vi.mock("../../utils/secureFetchWrapper", () => ({
+  secureFetch: vi.fn(),
+}));
 
 const makeLoginSuccess = (overrides = {}) => ({
-  isActiveTwoFactorAuth: false, // ← campo real del servicio
+  isActiveTwoFactorAuth: false,
   data: { token: "session-token", user: { id: 1, name: "Test" } },
   ...overrides,
 });
@@ -35,8 +39,6 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
 });
-
-// ─── getReadableErrors ────────────────────────────────────────────────────────
 
 describe("getReadableErrors", () => {
   it("extrae los mensajes del array errors cuando está presente", () => {
@@ -66,8 +68,6 @@ describe("getReadableErrors", () => {
   });
 });
 
-// ─── getToken ─────────────────────────────────────────────────────────────────
-
 describe("getToken", () => {
   it("retorna null cuando no existe ningún token en localStorage", () => {
     expect(getToken()).toBeNull();
@@ -78,8 +78,6 @@ describe("getToken", () => {
     expect(getToken()).toBe("abc123");
   });
 });
-
-// ─── getPreTwoFactorToken ─────────────────────────────────────────────────────
 
 describe("getPreTwoFactorAuthToken", () => {
   it("retorna null cuando no existe el token pre-TwoFactorAuth en localStorage", () => {
@@ -92,23 +90,24 @@ describe("getPreTwoFactorAuthToken", () => {
   });
 });
 
-// ─── logoutService ────────────────────────────────────────────────────────────
-
 describe("logoutService", () => {
-  it("elimina token, preTwoFactorToken y user del localStorage al cerrar sesión", () => {
+  it("elimina token, preTwoFactorToken y user del localStorage y llama al API", async () => {
     seedLocalStorage({
       token: "session-abc",
       preTwoFactorAuth: "pre-token",
       user: JSON.stringify({ id: 1 }),
     });
-    logoutService();
+    mockFetch({ success: true });
+    await logoutService();
     expect(localStorage.getItem("token")).toBeNull();
     expect(localStorage.getItem("preTwoFactorAuth")).toBeNull();
     expect(localStorage.getItem("user")).toBeNull();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/logout"),
+      expect.objectContaining({ method: "POST", credentials: "include" })
+    );
   });
 });
-
-// ─── loginService ─────────────────────────────────────────────────────────────
 
 describe("loginService", () => {
   it("guarda el token de sesión en localStorage cuando el login es exitoso sin TwoFactorAuth", async () => {
@@ -153,6 +152,7 @@ describe("loginService", () => {
       expect.stringContaining("/auth/login"),
       expect.objectContaining({
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({
           email: "user@test.com",
           password: "mypassword",
@@ -162,7 +162,35 @@ describe("loginService", () => {
   });
 });
 
-// ─── activateTwoFactorAuthService ─────────────────────────────────────────────
+describe("refreshSessionService", () => {
+  it("llama al endpoint con credentials 'include' y actualiza el token en localStorage", async () => {
+    const apiResponse = {
+      success: true,
+      data: { token: "new-refresh-token-123" },
+    };
+    mockFetch(apiResponse);
+    
+    const result = await refreshSessionService();
+    
+    expect(result).toEqual(apiResponse);
+    expect(localStorage.getItem("token")).toBe("new-refresh-token-123");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/refresh"),
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
+  });
+
+  it("lanza un error si el refresh falla (ej. 401)", async () => {
+    mockFetch({ message: "Refresh token inválido" }, false, 401);
+    await expect(refreshSessionService()).rejects.toMatchObject({
+      message: "Refresh token inválido",
+      status: 401,
+    });
+  });
+});
 
 describe("activateTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
@@ -179,27 +207,33 @@ describe("activateTwoFactorAuthService", () => {
         otpauthUrl: "otpauth://totp?secret=ABC123",
       },
     };
-    mockFetch(apiResponse);
+    secureFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue(apiResponse),
+    });
     const result = await activateTwoFactorAuthService();
     expect(result).toEqual(apiResponse);
   });
 
-  it("incluye el Bearer token en el header Authorization", async () => {
+  it("usa secureFetch para permitir refresh si expira el token", async () => {
     seedLocalStorage({ token: "my-session-token" });
-    mockFetch({ data: {} });
+    secureFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ data: {} }),
+    });
     await activateTwoFactorAuthService();
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/auth/2fa/setup"),
+    expect(secureFetch).toHaveBeenCalledWith(
+      "/auth/2fa/setup",
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: "Bearer my-session-token",
+          "Content-Type": "application/json",
         }),
       }),
     );
   });
 });
-
-// ─── verifyTwoFactorAuthService ───────────────────────────────────────────────
 
 describe("verifyTwoFactorAuthService", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
@@ -210,22 +244,30 @@ describe("verifyTwoFactorAuthService", () => {
 
   it("retorna nextStep=TwoFactorAuth_SETUP_COMPLETE cuando el código es válido", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
+    secureFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({
+        nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE",
+      }),
+    });
     const result = await verifyTwoFactorAuthService("123456");
     expect(result).toEqual({ nextStep: "TWO_FACTOR_AUTH_SETUP_COMPLETE" });
   });
 
   it("lanza error con status 401 cuando el código TwoFactorAuth es inválido", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ message: "Código inválido" }, false, 401);
+    secureFetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: vi.fn().mockResolvedValue({ message: "Código inválido" }),
+    });
     await expect(verifyTwoFactorAuthService("000000")).rejects.toMatchObject({
       message: "Código inválido",
       status: 401,
     });
   });
 });
-
-// ─── validateLoginTwoFactorAuthService ───────────────────────────────────────
 
 describe("validateLoginTwoFactorAuthService", () => {
   it("lanza error cuando no hay preTwoFactorToken en localStorage", async () => {
@@ -235,11 +277,10 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 
   it("retorna LOGIN_COMPLETE y el token final cuando el código es correcto", async () => {
-    seedLocalStorage({ preTwoFactorAuth: "pre-token" }); // ← clave real
+    seedLocalStorage({ preTwoFactorAuth: "pre-token" });
     const apiResponse = {
       nextStep: "LOGIN_COMPLETE",
-      token: "final-token",
-      data: { id: 1 },
+      data: { token: "final-token", id: 1 },
     };
     mockFetch(apiResponse);
     const result = await validateLoginTwoFactorAuthService("123456");
@@ -255,8 +296,6 @@ describe("validateLoginTwoFactorAuthService", () => {
   });
 });
 
-// ─── getStatusTwoFactorAuth ───────────────────────────────────────────────────
-
 describe("getStatusTwoFactorAuth", () => {
   it("lanza error cuando no hay token de sesión en localStorage", async () => {
     await expect(getTwoFactorAuthStatus()).rejects.toThrow(
@@ -266,21 +305,27 @@ describe("getStatusTwoFactorAuth", () => {
 
   it("retorna el estado TwoFactorAuth del usuario cuando la petición es exitosa", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ isActive: true });
+    secureFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ isActive: true }),
+    });
     const result = await getTwoFactorAuthStatus();
     expect(result).toEqual({ isActive: true });
   });
 });
 
-// ─── desactivateTwoFactorAuthService ─────────────────────────────────────────
-
 describe("desactivateTwoFactorAuthService", () => {
   it("envía la password en el body POST al endpoint de desactivación", async () => {
     seedLocalStorage({ token: "valid-token" });
-    mockFetch({ success: true });
+    secureFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue({ success: true }),
+    });
     await deactivateTwoFactorAuthService("myPassword");
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/auth/2fa/disable"),
+    expect(secureFetch).toHaveBeenCalledWith(
+      "/auth/2fa/disable",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ password: "myPassword" }),

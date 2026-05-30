@@ -1,6 +1,17 @@
 import EmployeeRow from "./employeeRow";
 
-const EmployeeTable = ({ employees, loading, error }) => {
+const EmployeeTable = ({ 
+  employees, 
+  loading, 
+  error, 
+  isBlacklistMode = false, 
+  onAddToBlacklist = () => {}, 
+  onRemoveFromBlacklist = () => {} 
+}) => {
+  const emptyMessage = isBlacklistMode
+    ? "No hay personas en la lista negra"
+    : "No hay empleados disponibles";
+
   if (loading) {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
@@ -23,7 +34,7 @@ const EmployeeTable = ({ employees, loading, error }) => {
     return (
       <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-8 text-center text-gray-500">
-          No hay empleados disponibles
+          {emptyMessage}
         </div>
       </div>
     );
@@ -53,7 +64,13 @@ const EmployeeTable = ({ employees, loading, error }) => {
         </thead>
         <tbody>
           {employees.map((employee, index) => (
-            <EmployeeRow key={index} employee={employee} />
+            <EmployeeRow
+              key={index}
+              employee={employee}
+              isBlacklistMode={isBlacklistMode}
+              onAddToBlacklist={onAddToBlacklist}
+              onRemoveFromBlacklist={onRemoveFromBlacklist}
+            />
           ))}
         </tbody>
       </table>

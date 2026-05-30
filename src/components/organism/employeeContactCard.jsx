@@ -1,6 +1,8 @@
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
+import ErrorText from "../atoms/errorText";
+import SmallButton from "../atoms/smallButton";
 
 const EmployeeContactCard = ({
   employee,
@@ -10,34 +12,32 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
+  errors = {},
   onOpenEdit,
   onSubmit,
   onCancel,
+  canEdit = true,
 }) => {
 
   const EMPTY_LABEL = "N/A";
   return (
-    <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-1/3 md:shrink-0">
+    <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:flex md:basis-1/3 md:shrink-0 md:flex-col">
       <div className="flex justify-between items-start">
         <Type variant="section-title" as="h3">Contacto</Type>
 
         {isEditing ? (
           <div className="flex gap-2 shrink-0">
-            <button
-              type="button" onClick={onCancel} disabled={saving}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#24375e] hover:bg-[#eef3fb] disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button" onClick={onSubmit} disabled={saving}
-              className="flex items-center gap-1.5 rounded-lg bg-[#24375e] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#162d4a] active:bg-[#0f2035] disabled:opacity-50"
-            >
-              {saving && <Loader size="sm" />}
-              Guardar
-            </button>
+            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            {canEdit ? (
+              <SmallButton
+                text="Guardar"
+                onClick={onSubmit}
+                disabled={saving}
+                leadingIcon={saving ? <Loader size="sm" /> : null}
+              />
+            ) : null}
           </div>
-        ) : (
+        ) : canEdit ? (
           <button
             type="button" aria-label="Editar contacto"
             className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
@@ -45,15 +45,15 @@ const EmployeeContactCard = ({
           >
             <img src="/edit.svg" alt="" className="h-5 w-5" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {saveError && isEditing && (
+      {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
       {!isEditing && (
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-between">
           {[
             { label: "Correo Electrónico",  value: employee?.email },
             { label: "Número de Teléfono",  value: employee?.phoneNumber },
@@ -66,17 +66,23 @@ const EmployeeContactCard = ({
             { label: "Código Postal",       value: employeeAddress?.postalCode },
           ].map(({ label, value }) => (
             <div key={label} className="min-w-0 w-full">
-              <Type variant="metric-label" as="p" className="mb-1.5">{label}</Type>
-              <div className="flex items-center rounded-lg bg-neutral-50 px-4 py-2 shadow-[inset_0px_4px_4px_#00000040]">
-                <Type variant="metric-value" as="p">{value ?? EMPTY_LABEL}</Type>
+              <Type variant="metric-label" as="p" className="mb-2">{label}</Type>
+              <div className="flex min-h-[50px] items-center rounded-lg bg-neutral-50 px-4 py-3 shadow-[inset_0px_4px_4px_#00000040]">
+                <Type
+                  variant="metric-value"
+                  as="p"
+                  className="min-w-0 w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+                >
+                  {value ?? EMPTY_LABEL}
+                </Type>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {isEditing && (
-        <div className="mt-4 flex flex-col gap-4">
+      {isEditing && canEdit && (
+        <div className="mt-6 flex flex-col gap-5 md:flex-1">
           {[
             { label: "Correo Electrónico",  field: "email" },
             { label: "Número de Teléfono",  field: "phoneNumber" },
@@ -94,6 +100,9 @@ const EmployeeContactCard = ({
                 labelClassName="hidden"
                 text=""
               />
+              <div className="min-h-5">
+                {errors[field] && <ErrorText>{errors[field]}</ErrorText>}
+              </div>
             </div>
           ))}
         </div>

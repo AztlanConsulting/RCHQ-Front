@@ -1,79 +1,260 @@
-import Button from "../../atoms/button";
+import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDateTime } from "../../../utils/calendarEventDetail";
+import ConfirmDeleteModal from "../confirmDeleteModal";
+import {
+    formatEventDateRange,
+    formatEventTime,
+} from "../../../utils/calendarEventDetail";
+import { useExpandableList } from "../../../hooks/atoms/useExpandableList";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
-const EventDetail = ({ event }) => {
-  if (!event) return null;
+const canDelete = (scope, role) => {
+    if (scope === "global") return role === "Administrador";
+    if (scope === "house" || scope === "personal") return role === "Coordinador";
+    return true;
+};
 
-  return (
-    <div className="text-left">
-      <Type variant="page-title" className="mb-2" as="h2">
-        {event.title ?? "—"}
-      </Type>
+const canEdit = (scope, role) => {
+    if (scope === "global") return role === "Administrador";
+    if (scope === "house" || scope === "personal") return role === "Coordinador";
+    return true;
+};
 
-      <div className="flex items-center gap-2 mb-2">
-        <span
-          className="inline-block size-3 rounded-full shrink-0"
-          style={{
-            backgroundColor: event.borderColor || event.backgroundColor || "#ccc",
-          }}
-          aria-hidden
-        />
-        <Type variant="subtitle" as="span">
-          {event.scopeLabel || event.scope || "—"}
-        </Type>
-      </div>
+const EventDetail = ({
+    event,
+    onEdit,
+    onDelete,
+    isDeleteOpen = false,
+    onCancelDelete,
+    onConfirmDelete,
+    isDeleting = false,
+    deleteError = "",
+    viewerRole = "",
+    calendarTimeZone,
+    showMexicoReferenceNotice = false,
+}) => {
+    const {
+        visibleItems: visiblePeople,
+        hiddenCount: hiddenPeopleCount,
+        isExpanded: isPeopleListExpanded,
+        toggleExpanded: togglePeopleList,
+    } = useExpandableList(
+        event?.peopleInsideEvent,
+        5,
+        event?.eventId ?? event?.houseEventId ?? event?.id ?? "",
+    );
 
-      <div className="mb-4">
-        <Type variant="subtitle" as="span">
-          {event.focusLabel || event.focus || "—"}
-          {event.eventType ? ` · ${event.eventType}` : ""}
-        </Type>
-      </div>
+    if (!event) return null;
 
-      {event.subtitle ? (
-        <Type variant="body" className="mb-4 block">
-          {event.subtitle}
-        </Type>
-      ) : null}
+    const showDelete = canDelete(event.scope, viewerRole);
+    const showEdit = canEdit(event.scope, viewerRole);
 
-      <div className="w-full flex items-center justify-between gap-4 mb-2">
-        <Type variant="metric-label" className="font-bold">
-          Día (calendario):
-        </Type>
-        <p className="text-sm">
-          {event.date ? formatEventDateTime(event.date) : "—"}
-        </p>
-      </div>
-      <div className="w-full flex items-center justify-between gap-4 mb-2">
-        <Type variant="metric-label" className="font-bold">
-          Inicio:
-        </Type>
-        <p className="text-sm">{formatEventDateTime(event.start ?? event.startStr)}</p>
-      </div>
-      <div className="w-full flex items-center justify-between gap-4 mb-4">
-        <Type variant="metric-label" className="font-bold">
-          Fin:
-        </Type>
-        <p className="text-sm">{formatEventDateTime(event.end ?? event.endStr)}</p>
-      </div>
+    const isMultiDay = Boolean(event.multiDay);
+    const rangeStart =
+        event.readableStart ||
+        event.startDate ||
+        event.date ||
+        event.startStr ||
+        event.start;
+    const rangeEnd =
+        event.readableEnd ||
+        event.endDate ||
+        event.date ||
+        event.endStr ||
+        event.end;
+    const dayText = formatEventDateRange(rangeStart, rangeEnd, {
+        endExclusive:
+            Boolean(event.allDay) &&
+            !event.date &&
+            !isMultiDay &&
+            !event.readableEnd,
+    });
+    const showTimes = !event.allDay || isMultiDay;
 
-      {event.description ? (
-        <Type variant="body" className="mb-4 block whitespace-pre-wrap">
-          {event.description}
-        </Type>
-      ) : null}
+    return (
+        <div className="relative min-w-0 max-w-full overflow-x-hidden text-left">
+            <Type
+                variant="page-title"
+                as="h2"
+                className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+            >
+                {event.title ?? "—"}
+            </Type>
 
-      {event.peopleInsideEvent ? event.peopleInsideEvent.map((person, idx) => (
-        <p key={idx}>{person?.name} - {person?.id}</p>
-      )) : null}
+            <div className="flex items-center gap-2">
+                <span
+                    className="inline-block size-3 rounded-full shrink-0"
+                    style={{
+                        backgroundColor:
+                            event.borderColor ||
+                            event.backgroundColor ||
+                            "#ccc",
+                    }}
+                    aria-hidden
+                />
+                <Type
+                    variant="subtitle"
+                    as="span"
+                    className="min-w-0 break-words [overflow-wrap:anywhere]"
+                >
+                    {event.scopeLabel || event.scope || "—"}
+                </Type>
+            </div>
 
-      <div className="w-full flex justify-around items-center gap-4 pt-2">
-        <Button type="button">Eliminar</Button>
-        <Button type="button">Modificar</Button>
-      </div>
-    </div>
-  );
+            <div className="mb-4">
+                <Type
+                    variant="subtitle"
+                    as="span"
+                    className="block max-w-full break-words [overflow-wrap:anywhere]"
+                >
+                    {event.focusLabel || event.focus || "—"}
+                    {event.eventType ? ` · ${event.eventType}` : ""}
+                </Type>
+            </div>
+
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
+
+            {event.subtitle ? (
+                <Type
+                    variant="body"
+                    className="mb-6 block max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+                >
+                    {event.subtitle}
+                </Type>
+            ) : null}
+
+            <div className="w-full flex items-center justify-between gap-4 mb-2">
+                <Type variant="metric-label" className="font-bold">
+                    {isMultiDay ? "Días (calendario):" : "Día (calendario):"}
+                </Type>
+                <p className="text-sm">{dayText}</p>
+            </div>
+            {showTimes ? (
+                <>
+                    <div className="w-full flex items-center justify-between gap-4 mb-2">
+                        <Type variant="metric-label" className="font-bold">
+                            Inicio:
+                        </Type>
+                        <p className="text-sm">
+                            {formatEventTime(event.start ?? event.startStr, {
+                                timeZone: calendarTimeZone,
+                            })}
+                        </p>
+                    </div>
+                    <div className="w-full flex items-center justify-between gap-4 mb-4">
+                        <Type variant="metric-label" className="font-bold">
+                            Fin:
+                        </Type>
+                        <p className="text-sm">
+                            {formatEventTime(event.end ?? event.endStr, {
+                                timeZone: calendarTimeZone
+                            })}
+                        </p>
+                    </div>
+                </>
+            ) : null}
+
+            {event.description ? (
+                <div className="mb-6">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Descripción:
+                    </Type>
+                    <Type
+                        variant="body"
+                        className="block max-w-full whitespace-pre-wrap break-words text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
+                    >
+                        {event.description}
+                    </Type>
+                </div>
+            ) : null}
+
+            {visiblePeople.length > 0 ? (
+                <div className="mb-4">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Empleados ligados al evento:
+                    </Type>
+                    <div className="space-y-1">
+                        {visiblePeople.map((person, idx) => (
+                            <Type
+                                key={person?.id ?? idx}
+                                variant="body"
+                                className="block max-w-full break-words text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
+                                as="p"
+                            >
+                                {person?.name || "-"}
+                            </Type>
+                        ))}
+                        {hiddenPeopleCount > 0 ? (
+                            <button
+                                type="button"
+                                onClick={togglePeopleList}
+                                className="text-sm font-bold text-[#1F3664] hover:underline"
+                            >
+                                {isPeopleListExpanded
+                                    ? "Ver menos"
+                                    : `Ver ${hiddenPeopleCount} más`}
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
+
+            {(showDelete || showEdit) ? (
+                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                    {showDelete ? (
+                        <SmallButton
+                            type="button"
+                            text="Eliminar"
+                            hasNoRollback
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onDelete}
+                        />
+                    ) : null}
+                    {showEdit ? (
+                        <SmallButton
+                            type="button"
+                            text="Editar"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onEdit}
+                        />
+                    ) : null}
+                </div>
+            ) : null}
+            {isDeleteOpen ? (
+                <ConfirmDeleteModal
+                    label={event?.title ?? "este evento"}
+                    mode="delete"
+                    inline
+                    loading={isDeleting}
+                    title="Eliminar evento"
+                    body={
+                        <>
+                            ¿Estás seguro que deseas eliminar el evento{" "}
+                            <span className="font-semibold break-words text-slate-700 [overflow-wrap:anywhere]">
+                                {event?.title ?? "este evento"}
+                            </span>
+                            ? Esta acción no se puede deshacer.
+                            {deleteError ? (
+                                <span className="mt-2 block rounded-md bg-red-50 px-3 py-2 text-red-600">
+                                    {deleteError}
+                                </span>
+                            ) : null}
+                        </>
+                    }
+                    onCancel={onCancelDelete}
+                    onConfirm={onConfirmDelete}
+                />
+            ) : null}
+        </div>
+    );
 };
 
 export default EventDetail;

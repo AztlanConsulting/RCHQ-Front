@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
     getPendingVacationRequests,
     getReviewedVacationRequests,
+    getFutureVacationRequests,
+    getPastVacationRequests,
     approveVacationRequest,
     rejectVacationRequest,
 } from "../../services/vacationRequestService";
@@ -68,6 +70,48 @@ describe("vacationRequestService", () => {
         const url = secureFetch.mock.calls[0][0];
 
         expect(url).toContain("/vacation/requests/reviewed?");
+        expect(url).toContain("status=approved");
+    });
+
+    it("getFutureVacationRequests usa endpoint de futuras e incluye filtros", async () => {
+        secureFetch.mockResolvedValue(mockOkResponse);
+
+        await getFutureVacationRequests({
+            page: 2,
+            limit: 6,
+            startDate: "2026-06-01",
+            endDate: "2026-06-30",
+            status: "pending",
+        });
+
+        const url = secureFetch.mock.calls[0][0];
+
+        expect(url).toContain("/vacation/requests/future?");
+        expect(url).toContain("page=2");
+        expect(url).toContain("limit=6");
+        expect(url).toContain("startDate=2026-06-01");
+        expect(url).toContain("endDate=2026-06-30");
+        expect(url).toContain("status=pending");
+    });
+
+    it("getPastVacationRequests usa endpoint de pasadas e incluye filtros", async () => {
+        secureFetch.mockResolvedValue(mockOkResponse);
+
+        await getPastVacationRequests({
+            page: 1,
+            limit: 6,
+            startDate: "2026-05-01",
+            endDate: "2026-05-22",
+            status: "approved",
+        });
+
+        const url = secureFetch.mock.calls[0][0];
+
+        expect(url).toContain("/vacation/requests/past?");
+        expect(url).toContain("page=1");
+        expect(url).toContain("limit=6");
+        expect(url).toContain("startDate=2026-05-01");
+        expect(url).toContain("endDate=2026-05-22");
         expect(url).toContain("status=approved");
     });
 
@@ -209,7 +253,7 @@ describe("vacationRequestService", () => {
         );
     });
 
-    it("rejectVacationRequest llama al endpoint correcto con PATCH", async () => {
+    it("rejectVacationRequest llama al endpoint correcto con PATCH y feedback", async () => {
         secureFetch.mockResolvedValue({
             ok: true,
             json: vi.fn().mockResolvedValue({
@@ -219,12 +263,16 @@ describe("vacationRequestService", () => {
                     vacationRequest: {
                         vacationRequestId: "vac-001",
                         status: 2,
+                        feedback: "No hay disponibilidad para esas fechas",
                     },
                 },
             }),
         });
 
-        const result = await rejectVacationRequest("vac-001");
+        const result = await rejectVacationRequest(
+            "vac-001",
+            "No hay disponibilidad para esas fechas",
+        );
 
         expect(secureFetch).toHaveBeenCalledWith(
             expect.stringContaining("/vacation/request/vac-001/reject"),
@@ -233,7 +281,9 @@ describe("vacationRequestService", () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({}),
+                body: JSON.stringify({
+                    feedback: "No hay disponibilidad para esas fechas",
+                }),
             },
         );
 
@@ -242,6 +292,7 @@ describe("vacationRequestService", () => {
             vacationRequest: {
                 vacationRequestId: "vac-001",
                 status: 2,
+                feedback: "No hay disponibilidad para esas fechas",
             },
         });
     });
