@@ -940,42 +940,30 @@ svg {
     background-color: #162d4a !important;
 }
 
-button.outside-month-day {
-    color: #999999 !important;
-
-    opacity: 0.5 !important;
-
-    cursor: not-allowed !important;
+.date-field-wrapper button.outside-month-day {
+    opacity: 0.5;
 }
 
-button.outside-month-day:hover {
-    background-color: #f3f4f6 !important;
+.dark .date-field-wrapper .bg-primary-700 {
+    background-color: #24375e;
 
-    opacity: 0.5 !important;
+    color: white;
 }
 
-.dark .bg-primary-700 {
-    background-color: #24375e !important;
-
-    color: white !important;
+.dark .date-field-wrapper .bg-primary-700:hover {
+    background-color: #162d4a;
 }
 
-.dark .bg-primary-700:hover {
-    background-color: #162d4a !important;
+.dark .date-field-wrapper button.outside-month-day {
+    color: #999999;
+
+    opacity: 0.5;
 }
 
-.dark button.outside-month-day {
-    color: #999999 !important;
+.dark .date-field-wrapper button.outside-month-day:hover {
+    background-color: #374151;
 
-    opacity: 0.5 !important;
-
-    cursor: not-allowed !important;
-}
-
-.dark button.outside-month-day:hover {
-    background-color: #374151 !important;
-
-    opacity: 0.5 !important;
+    opacity: 0.5;
 }
 
 @keyframes fadeSlideIn {

@@ -24,7 +24,10 @@ import {
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
-import { getEventsInRange } from "../../services/calendarService";
+import { 
+    getEventsInRange, 
+    getEmployeeDateRules 
+} from "../../services/calendarService";
 
 vi.mock("../../services/vacationRequestService", () => ({
     getFutureVacationRequests: vi.fn(),
@@ -41,6 +44,7 @@ vi.mock("../../services/calendarService", () => ({
     getEventsInRange: vi.fn(),
     getOwnEmployeeId: vi.fn(() => "own-employee"),
     getCalendarViewerRole: vi.fn(() => "Trabajador"),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
@@ -244,13 +248,15 @@ describe("Integración: VacationList", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        getEmployeeDateRules.mockResolvedValue({
+            remainingVacations: 10,
+            vacationPeriod: {
+                startDate: "2026-01-01",
+                endDate: "2026-12-31",
+            },
+        });
         getFutureVacationRequests.mockResolvedValue(futureResponse);
         getPastVacationRequests.mockResolvedValue(pastResponse);
-        getRemainingVacations.mockResolvedValue({
-            remainingVacations: 10,
-            startDate: "2026-01-01",
-            endDate: "2026-12-31",
-        });
         updateVacationRequestDates.mockResolvedValue({
             vacationRequestId: "123e4567-e89b-12d3-a456-426614174000",
             startDate: "2026-06-16",
@@ -470,7 +476,7 @@ describe("Integración: VacationList", () => {
         expect(within(dialog).getByLabelText("Fecha de fin")).toHaveValue(
             "2026-06-16",
         );
-        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+        expect(getEmployeeDateRules).toHaveBeenCalledWith("own-employee", "vacation");
     });
 
     it("abre el modal de borrado y elimina una vacación futura sin mostrar datos del empleado", async () => {

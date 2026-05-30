@@ -11,6 +11,7 @@ import RegisterEventModal from "../../components/organism/evento/registerEventMo
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
     getCalendarViewerRole,
 } from "../../services/calendarService";
 import { getEventTypes } from "../../services/eventService";
@@ -19,6 +20,7 @@ vi.mock("../../services/calendarService", () => ({
     createAbsenceService: vi.fn(),
     getAbsenceAddData: vi.fn(),
     getCalendarViewerRole: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 vi.mock("../../services/eventService", () => ({
@@ -192,6 +194,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
         createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
+        getEmployeeDateRules.mockResolvedValue(null);
     });
 
     it("muestra la opcion de ausencias y carga empleados/tipos para el coordinador", async () => {

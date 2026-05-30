@@ -126,6 +126,42 @@ export const getHouseEmployees = async () => {
     return response?.data?.employees ?? [];
 };
 
+export const getEmployeeDateRules = async (employeeId, mode = "absence") => {
+    const token = getToken();
+
+    if (!token) {
+        throw new Error("No se encontró token de sesión");
+    }
+
+    if (!employeeId) {
+        return null;
+    }
+
+    const params = new URLSearchParams({ mode });
+    const rawResponse = await secureFetch(
+        `${API_URL}/event/employee/${employeeId}/date-rules?${params.toString()}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudieron obtener las fechas disponibles",
+        );
+    }
+
+    return response?.data ?? null;
+};
+
 const getEventsInRange = async (employeeId, startDate, endDate) => {
 
     if (employeeId == "") {

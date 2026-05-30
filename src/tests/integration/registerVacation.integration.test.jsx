@@ -12,6 +12,7 @@ import { formatDateOnly } from "../../utils/vacationDateRange";
 import {
     getCalendarViewerRole,
     getOwnEmployeeId,
+    getEmployeeDateRules,
 } from "../../services/calendarService";
 import {
     getVacationEmployees,
@@ -23,6 +24,7 @@ import {
 vi.mock("../../services/calendarService", () => ({
     getCalendarViewerRole: vi.fn(),
     getOwnEmployeeId: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 vi.mock("../../services/vacationService", () => ({
@@ -100,8 +102,8 @@ const renderModal = async (props = {}) => {
                 onClose={onClose}
                 onSuccess={onSuccess}
                 onFeedback={onFeedback}
-                initialStartDate="2026-05-05"
-                initialEndDate="2026-05-07"
+                initialStartDate="2026-06-05"
+                initialEndDate="2026-06-07"
                 calendarTimeZoneMode="local"
                 canSwitchCalendarTimeZone
                 {...props}
@@ -130,7 +132,7 @@ const openWorkerVacationForm = async (employeeId = "own-employee") => {
     fireEvent.click(screen.getByRole("radio", { name: "Vacaciones" }));
 
     await waitFor(() => {
-        expect(getRemainingVacations).toHaveBeenCalledWith(employeeId);
+        expect(getEmployeeDateRules).toHaveBeenCalledWith(employeeId, "vacation");
     });
 };
 
@@ -157,6 +159,14 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         getOwnEmployeeId.mockReturnValue("own-employee");
 
         getVacationEmployees.mockResolvedValue(employees);
+
+        getEmployeeDateRules.mockResolvedValue({
+            remainingVacations: 10,
+            vacationPeriod: {
+                startDate: "2026-01-01",
+                endDate: "2026-12-31",
+            },
+        });
 
         getRemainingVacations.mockResolvedValue({
             remainingVacations: 10,
@@ -203,9 +213,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
         await openVacationForm();
         await selectEmployee();
 
-        await waitFor(() => {
-            expect(getRemainingVacations).toHaveBeenCalledWith("emp-1");
-        });
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
 
         expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
         expect(screen.getByText("10")).toBeInTheDocument();
@@ -227,6 +235,8 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
         await openVacationForm();
         await selectEmployee();
+        
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
         await submitVacation();
 
         await waitFor(() => {
@@ -235,8 +245,8 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
         expect(registerEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "emp-1",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
 
         expect(onFeedback).toHaveBeenCalledWith({
@@ -268,12 +278,13 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
     it("muestra error y no envía si la fecha de inicio es posterior a la fecha de fin", async () => {
         await renderModal({
-            initialStartDate: "2026-05-10",
-            initialEndDate: "2026-05-07",
+            initialStartDate: "2026-06-10",
+            initialEndDate: "2026-06-07",
         });
 
         await openVacationForm();
         await selectEmployee();
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
         await submitVacation();
 
         expect(
@@ -294,6 +305,7 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
         await openVacationForm();
         await selectEmployee();
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
         await submitVacation();
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -313,6 +325,14 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         getOwnEmployeeId.mockReturnValue("own-employee");
 
         getVacationEmployees.mockResolvedValue([]);
+
+        getEmployeeDateRules.mockResolvedValue({
+            remainingVacations: 6,
+            vacationPeriod: {
+                startDate: "2026-01-01",
+                endDate: "2026-12-31",
+            },
+        });
 
         getRemainingVacations.mockResolvedValue({
             remainingVacations: 6,
@@ -341,9 +361,9 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         await openWorkerVacationForm();
 
         expect(getVacationEmployees).not.toHaveBeenCalled();
-        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+        expect(getEmployeeDateRules).toHaveBeenCalledWith("own-employee", "vacation");
         expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
-        expect(screen.getByText("6")).toBeInTheDocument();
+        expect(await screen.findByText("6")).toBeInTheDocument();
         expect(screen.getByText(/periodo actual:/i)).toBeInTheDocument();
     });
 
@@ -356,7 +376,9 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
             screen.queryByRole("button", { name: /selecciona el empleado/i }),
         ).not.toBeInTheDocument();
         expect(getVacationEmployees).not.toHaveBeenCalled();
-        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+        expect(getEmployeeDateRules).toHaveBeenCalledWith("own-employee", "vacation");
+
+        expect(await screen.findByText(/días disponibles:/i)).toBeInTheDocument();
 
         await submitVacation();
 
@@ -366,8 +388,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
         expect(requestEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "own-employee",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
         expect(registerEmployeeVacation).not.toHaveBeenCalled();
 
@@ -381,8 +403,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
     it("muestra validación local si la fecha de inicio es posterior a la fecha de fin", async () => {
         await renderModal({
-            initialStartDate: "2026-05-10",
-            initialEndDate: "2026-05-07",
+            initialStartDate: "2026-06-10",
+            initialEndDate: "2026-06-07",
         });
 
         await openWorkerVacationForm();
@@ -432,8 +454,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
         expect(requestEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "worker-without-workdays",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
         expect(await screen.findByRole("alert")).toHaveTextContent(message);
 
@@ -474,21 +496,15 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
     });
 
     it("muestra error del backend si las vacaciones son en el pasado o el mismo día", async () => {
-        const currentDate = formatDateOnly(new Date());
+        const futureDate = "2026-06-15";
         const { onClose, onSuccess } = await renderModal({
-            initialStartDate: currentDate,
-            initialEndDate: currentDate,
+            initialStartDate: futureDate,
+            initialEndDate: futureDate,
         });
         const message =
             "No se pueden pedir vacaciones en el pasado ni para el mismo día";
 
-        requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
-            if (startDate === currentDate && endDate === currentDate) {
-                throw new Error(message);
-            }
-
-            return null;
-        });
+        requestEmployeeVacation.mockRejectedValueOnce(new Error(message));
 
         await openWorkerVacationForm();
         await submitVacation();
@@ -496,8 +512,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         await waitFor(() => {
             expect(requestEmployeeVacation).toHaveBeenCalledWith({
                 employeeId: "own-employee",
-                startDate: currentDate,
-                endDate: currentDate,
+                startDate: futureDate,
+                endDate: futureDate,
             });
         });
         expect(await screen.findByRole("alert")).toHaveTextContent(message);

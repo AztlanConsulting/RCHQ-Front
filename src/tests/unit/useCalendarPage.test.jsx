@@ -1,16 +1,17 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useCalendarPage } from "../../hooks/pages/useCalendarPage";
-import { deleteAbsenceService, updateAbsenceService } from "../../services/calendarService";
+import { deleteAbsenceService, updateAbsenceService, getEmployeeDateRules } from "../../services/calendarService";
 import { deleteVacationRequest, getRemainingVacations, updateVacationRequestDates } from "../../services/vacationService";
 import { approveVacationRequest, rejectVacationRequest } from "../../services/vacationRequestService";
 
 vi.mock("../../services/calendarService", () => ({
     deleteAbsenceService: vi.fn(),
     updateAbsenceService: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
     buildAbsenceEvidenceUrl: vi.fn((link) => `http://api.test/${link}`),
+    getOwnEmployeeId: vi.fn(),
 }));
-
 vi.mock("../../services/vacationService");
 
 vi.mock("../../services/vacationRequestService", () => ({
@@ -76,6 +77,8 @@ describe("useCalendarPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.stubGlobal("open", vi.fn());
+
+        getEmployeeDateRules.mockResolvedValue(null);
 
         vi.mocked(getRemainingVacations).mockResolvedValue({
             remainingVacations: 8,

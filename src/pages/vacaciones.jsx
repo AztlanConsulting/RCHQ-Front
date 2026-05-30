@@ -38,6 +38,7 @@ const VacationList = () => {
         vacationEditError,
         isSavingVacation,
         vacationRemainingInfo,
+        vacationDateRules,
         isLoadingVacationRemaining,
         handleEditVacation,
         cancelVacationEdit,
@@ -123,6 +124,7 @@ const VacationList = () => {
                     vacationForm={vacationForm}
                     vacationEditError={vacationEditError}
                     vacationRemainingInfo={vacationRemainingInfo}
+                    vacationDateRules={vacationDateRules}
                     isLoadingVacationRemaining={isLoadingVacationRemaining}
                     isSaving={isSavingVacation}
                     onCancelEdit={cancelVacationEdit}

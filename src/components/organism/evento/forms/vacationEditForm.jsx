@@ -6,6 +6,11 @@ import {
     getVacationDateRange,
     getVacationEndDateMin,
 } from "../../../../utils/vacationDateRange";
+import {
+    buildDateRuleFilter,
+    parseDateOnly,
+} from "../../../../utils/dateRules";
+import { useMemo } from "react";
 
 const VacationEditForm = ({
     title,
@@ -13,6 +18,7 @@ const VacationEditForm = ({
     vacationForm,
     vacationEditError = "",
     vacationRemainingInfo = null,
+    vacationDateRules = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
     onCancelEdit,
@@ -23,10 +29,16 @@ const VacationEditForm = ({
     const showMexicoTimeZoneMessage = !isMexicoTimeZone();
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
+    const ruleMinDate = parseDateOnly(vacationDateRules?.minDate) ?? vacationDateMin;
+    const ruleMaxDate = parseDateOnly(vacationDateRules?.maxDate) ?? vacationDateMax;
     const vacationEndDateMin = getVacationEndDateMin(
         vacationForm?.startDate,
-        vacationDateMin,
-        vacationDateMax,
+        ruleMinDate,
+        ruleMaxDate,
+    );
+    const dateRuleFilter = useMemo(
+        () => buildDateRuleFilter(vacationDateRules),
+        [vacationDateRules],
     );
 
     return (
@@ -99,45 +111,43 @@ const VacationEditForm = ({
                     )}
                 </div>
 
-                <div className="col-span-1 mt-2 grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 sm:mt-4">
-                    <DateField
-                        label="Fecha de inicio"
-                        name="startDate"
-                        value={vacationForm?.startDate ?? ""}
-                        minDate={vacationDateMin}
-                        maxDate={vacationDateMax}
-                        onChange={(editEvent) =>
-                            onVacationFieldChange?.(
-                                "startDate",
-                                editEvent.target.value,
-                            )
-                        }
-                        labelColor="text-[#121212]"
-                        popupAlign="left"
-                        popupPlacement="bottom"
-                        popupSize="compact"
-                        popupStrategy="fixed"
-                    />
+                <DateField
+                    label="Fecha de inicio"
+                    name="startDate"
+                    value={vacationForm?.startDate ?? ""}
+                    minDate={ruleMinDate}
+                    maxDate={ruleMaxDate}
+                    filterDate={dateRuleFilter}
+                    onChange={(editEvent) =>
+                        onVacationFieldChange?.(
+                            "startDate",
+                            editEvent.target.value,
+                        )
+                    }
+                    labelColor="text-[#121212]"
+                    popupAlign="left"
+                    popupPlacement="top"
+                    popupSize="compact"
+                />
 
-                    <DateField
-                        label="Fecha de fin"
-                        name="endDate"
-                        value={vacationForm?.endDate ?? ""}
-                        onChange={(editEvent) =>
-                            onVacationFieldChange?.(
-                                "endDate",
-                                editEvent.target.value,
-                            )
-                        }
-                        minDate={vacationEndDateMin}
-                        maxDate={vacationDateMax}
-                        labelColor="text-[#121212]"
-                        popupAlign="right"
-                        popupPlacement="bottom"
-                        popupSize="compact"
-                        popupStrategy="fixed"
-                    />
-                </div>
+                <DateField
+                    label="Fecha de fin"
+                    name="endDate"
+                    value={vacationForm?.endDate ?? ""}
+                    onChange={(editEvent) =>
+                        onVacationFieldChange?.(
+                            "endDate",
+                            editEvent.target.value,
+                        )
+                    }
+                    minDate={vacationEndDateMin}
+                    maxDate={ruleMaxDate}
+                    filterDate={dateRuleFilter}
+                    labelColor="text-[#121212]"
+                    popupAlign="right"
+                    popupPlacement="top"
+                    popupSize="compact"
+                />
             </div>
 
             {showMexicoTimeZoneMessage ? (

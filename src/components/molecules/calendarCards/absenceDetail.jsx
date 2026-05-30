@@ -4,6 +4,10 @@ import SelectField from "../../atoms/selectField";
 import Type from "../../atoms/type";
 import ConfirmDeleteModal from "../confirmDeleteModal";
 import DocumentFileField from "../documentFileField";
+import {
+  buildDateRuleFilter,
+  parseDateOnly,
+} from "../../../utils/dateRules";
 import { formatEventDate, formatEventTime } from "../../../utils/calendarEventDetail";
 import { getDocumentFileNameFromLink } from "../../../utils/documentCard.utils";
 import MexicoReferenceNotice from "./mexicoReferenceNotice";
@@ -79,6 +83,8 @@ const AbsenceDetail = ({
   absenceEvidenceError = "",
   absenceMinStartDate,
   absenceMaxEndDate,
+  absenceDateRules = null,
+  isLoadingAbsenceDateRules = false,
   isSaving = false,
   isDeleteOpen = false,
   isLoadingWhileDeleting = false,
@@ -113,10 +119,13 @@ const AbsenceDetail = ({
   const selectedStartDate = absenceForm?.startDate
     ? new Date(`${absenceForm.startDate}T00:00:00`)
     : null;
+  const ruleMinDate = parseDateOnly(absenceDateRules?.minDate) ?? absenceMinStartDate;
+  const ruleMaxDate = parseDateOnly(absenceDateRules?.maxDate) ?? absenceMaxEndDate;
   const absenceEndMinDate =
-    selectedStartDate && absenceMinStartDate && selectedStartDate < absenceMinStartDate
-      ? absenceMinStartDate
-      : selectedStartDate ?? absenceMinStartDate;
+    selectedStartDate && ruleMinDate && selectedStartDate < ruleMinDate
+      ? ruleMinDate
+      : selectedStartDate ?? ruleMinDate;
+  const dateRuleFilter = buildDateRuleFilter(absenceDateRules);
 
   if (isEditing) {
     return (
@@ -177,8 +186,9 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("startDate", editEvent.target.value)
             }
-            minDate={absenceMinStartDate}
-            maxDate={absenceMaxEndDate}
+            minDate={ruleMinDate}
+            maxDate={ruleMaxDate}
+            filterDate={dateRuleFilter}
             labelColor="text-[#121212]"
             popupAlign="left"
             popupSize="compact"
@@ -190,8 +200,9 @@ const AbsenceDetail = ({
             onChange={(editEvent) =>
               onAbsenceFieldChange?.("endDate", editEvent.target.value)
             }
-            minDate={absenceEndMinDate}
-            maxDate={absenceMaxEndDate}
+            minDate={absenceEndMinDate && ruleMinDate && absenceEndMinDate > ruleMinDate ? absenceEndMinDate : ruleMinDate}
+            maxDate={ruleMaxDate}
+            filterDate={dateRuleFilter}
             labelColor="text-[#121212]"
             popupAlign="right"
             popupSize="compact"
@@ -232,7 +243,7 @@ const AbsenceDetail = ({
             type="button"
             text="Guardar"
             onClick={onSubmitEdit}
-            disabled={isSaving}
+            disabled={isSaving || isLoadingAbsenceDateRules}
           />
         </div>
       </div>

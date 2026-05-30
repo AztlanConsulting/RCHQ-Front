@@ -5,11 +5,13 @@ import { useAbsenceForm } from "../../hooks/pages/useAbsenceForm";
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
 } from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
     createAbsenceService: vi.fn(),
     getAbsenceAddData: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 const employees = [
@@ -117,6 +119,7 @@ describe("useAbsenceForm", () => {
         createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
+        getEmployeeDateRules.mockResolvedValue(null);
     });
 
     it("carga empleados y tipos de ausencia para registrar", async () => {
