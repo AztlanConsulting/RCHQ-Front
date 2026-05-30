@@ -1,6 +1,6 @@
 import SmallButton from "../atoms/smallButton";
 import Modal from "../atoms/modal";
-import NativeSelect from "../atoms/nativeSelect";
+import SelectField from "../atoms/selectField";
 
 const LogReportModal = ({
   open,
@@ -28,16 +28,16 @@ const LogReportModal = ({
 
         <div className="grid gap-4">
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Año
-            </label>
-            <NativeSelect
+            <SelectField
+              id="log-report-year"
+              label="Año"
               value={year}
               onChange={(event) => onYearChange(Number(event.target.value))}
               options={yearOptions.map((optionYear) => ({
                 value: optionYear,
                 label: String(optionYear),
               }))}
+              labelColor="text-slate-700"
             />
           </div>
         </div>
