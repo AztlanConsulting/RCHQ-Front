@@ -64,9 +64,12 @@ const VacationEditForm = ({
                             >
                                 Nombre del trabajador
                             </Type>
-                            <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <Type
+                                variant="body"
+                                className="text-[1.05rem] leading-snug wrap-break-word"
+                            >
                                 {event.employeeName || "-"}
-                            </div>
+                            </Type>
                         </div>
 
                         <div>
@@ -76,9 +79,12 @@ const VacationEditForm = ({
                             >
                                 CURP
                             </Type>
-                            <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                            <Type
+                                variant="body"
+                                className="break-all text-[1.05rem] leading-snug sm:break-normal"
+                            >
                                 {event.curp || "-"}
-                            </div>
+                            </Type>
                         </div>
                     </>
                 ) : null}

@@ -102,8 +102,8 @@ const renderModal = async (props = {}) => {
                 onClose={onClose}
                 onSuccess={onSuccess}
                 onFeedback={onFeedback}
-                initialStartDate="2026-05-05"
-                initialEndDate="2026-05-07"
+                initialStartDate="2026-06-05"
+                initialEndDate="2026-06-07"
                 calendarTimeZoneMode="local"
                 canSwitchCalendarTimeZone
                 {...props}
@@ -245,8 +245,8 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
         expect(registerEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "emp-1",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
 
         expect(onFeedback).toHaveBeenCalledWith({
@@ -278,8 +278,8 @@ describe("Integración: coordinador registra vacaciones desde calendario", () =>
 
     it("muestra error y no envía si la fecha de inicio es posterior a la fecha de fin", async () => {
         await renderModal({
-            initialStartDate: "2026-05-10",
-            initialEndDate: "2026-05-07",
+            initialStartDate: "2026-06-10",
+            initialEndDate: "2026-06-07",
         });
 
         await openVacationForm();
@@ -388,8 +388,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
         expect(requestEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "own-employee",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
         expect(registerEmployeeVacation).not.toHaveBeenCalled();
 
@@ -403,8 +403,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
     it("muestra validación local si la fecha de inicio es posterior a la fecha de fin", async () => {
         await renderModal({
-            initialStartDate: "2026-05-10",
-            initialEndDate: "2026-05-07",
+            initialStartDate: "2026-06-10",
+            initialEndDate: "2026-06-07",
         });
 
         await openWorkerVacationForm();
@@ -454,8 +454,8 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
         expect(requestEmployeeVacation).toHaveBeenCalledWith({
             employeeId: "worker-without-workdays",
-            startDate: "2026-05-05",
-            endDate: "2026-05-07",
+            startDate: "2026-06-05",
+            endDate: "2026-06-07",
         });
         expect(await screen.findByRole("alert")).toHaveTextContent(message);
 

@@ -22,16 +22,6 @@ const DocumentWhiteIcon = () => (
   />
 );
 
-const ReadOnlyField = ({ label, value, fullWidth = false }) => (
-  <div className={fullWidth ? "col-span-2" : ""}>
-    <Type variant="metric-label" className="mb-1.5 font-bold text-[#121212] block">
-      {label}
-    </Type>
-    <div className="min-h-[48px] w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-      {value || "-"}
-    </div>
-  </div>
-);
 const TruncatedReadOnlyText = ({ value, lines = 10 }) => {
   const displayValue = value || "—";
   const shouldTruncate = displayValue.length > 200;
@@ -145,8 +135,34 @@ const AbsenceDetail = ({
         </Type>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ReadOnlyField label="Nombre del trabajador" value={event.employeeName} />
-          <ReadOnlyField label="CURP" value={event.curp} />
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              Nombre del trabajador
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.employeeName || "-"}
+            </Type>
+          </div>
+          <div>
+            <Type
+              variant="metric-label"
+              className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+            >
+              CURP
+            </Type>
+            <Type
+              variant="body"
+              className="text-[1.05rem] leading-snug wrap-break-word"
+            >
+              {event.curp || "-"}
+            </Type>
+          </div>
           <div className="sm:col-span-2">
             <SelectField
               label="Tipo de ausencia"

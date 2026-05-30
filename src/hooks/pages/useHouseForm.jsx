@@ -89,7 +89,7 @@ export const useHouseForm = ({
                 ...prev,
                 startDate: initialStartDate ?? prev.startDate,
                 endDate: initialEndDate ?? prev.endDate,
-                allDay: initialAllDay ?? prev.allDay,
+                allDay: false,
                 startTime: initialStartTime ?? prev.startTime,
                 endTime: initialEndTime ?? prev.endTime,
             }));

@@ -136,7 +136,7 @@ export const usePersonalForm = ({
                     initialEndDate ??
                     initialStartDate ??
                     prev.endDate,
-                allDay: initialAllDay ?? prev.allDay,
+                allDay: false,
                 startTime: initialStartTime ?? prev.startTime,
                 endTime: initialEndTime ?? prev.endTime,
             }));
