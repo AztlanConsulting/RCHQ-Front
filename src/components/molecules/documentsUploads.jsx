@@ -16,6 +16,7 @@ const DocumentUploadModal = ({
   handleFileChange,
   handleSubmit,
   displayError,
+  onDisplayErrorClose,
   loading,
 }) => {
   if (!isOpen) return null;
@@ -33,13 +34,16 @@ const DocumentUploadModal = ({
           <h2 className="text-xl font-bold text-slate-900">
             {isEditing ? "Editar documento" : "Subir documento"}
           </h2>
-          <ModalCloseButton
-            onClick={onClose}
-            ariaLabel="Cerrar"
-          />
+          <ModalCloseButton onClick={onClose} ariaLabel="Cerrar" />
         </div>
 
-        {displayError && <Alert type="error" message={displayError} />}
+        {displayError && (
+          <Alert
+            type="error"
+            message={displayError}
+            onClose={onDisplayErrorClose}
+          />
+        )}
 
         <SelectField
           label="Tipo de documento"
@@ -58,11 +62,7 @@ const DocumentUploadModal = ({
         />
 
         <div className="flex gap-3 justify-end pt-2">
-          <SmallButton
-            text="Cancelar"
-            onClick={onClose}
-            cancel
-          />
+          <SmallButton text="Cancelar" onClick={onClose} cancel />
           <SmallButton
             text={
               loading ? "Guardando..." : isEditing ? "Guardar cambios" : "Subir"

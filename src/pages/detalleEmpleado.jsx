@@ -53,13 +53,34 @@ const DetalleEmpleado = () => {
   });
 
   const {
-    documents, documentTypes, loadingDocs, fetchError, showUploadModal,
-    modalLoading, modalError, docToDelete, deletingId,
-    successMessage, canModify, conflictDocument,
-    setDocToDelete, handleDeleteConfirm, handleOpenEdit,
-    handleOpenUpload, handleCloseModal, handleConflictConfirm,
-    handleConflictCancel, isEditing, documentType, fileName,
-    handleFileChange, displayError, handleModalSubmit,
+    documents,
+    documentTypes,
+    loadingDocs,
+    fetchError,
+    showUploadModal,
+    modalLoading,
+    modalError,
+    docToDelete,
+    deletingId,
+    successMessage,
+    canModify,
+    conflictDocument,
+    clearFetchError,
+    clearSuccessMessage,
+    clearUploadError,
+    setDocToDelete,
+    handleDeleteConfirm,
+    handleOpenEdit,
+    handleOpenUpload,
+    handleCloseModal,
+    handleConflictConfirm,
+    handleConflictCancel,
+    isEditing,
+    documentType,
+    fileName,
+    handleFileChange,
+    displayError,
+    handleModalSubmit,
   } = useDocuments(employeeId);
 
   const infoDrawer     = useDrawer();
@@ -85,17 +106,20 @@ const DetalleEmpleado = () => {
     employeeFullName,
     setAlert,
     employee?.isActive !== false,
-    getEmployeeDetail
+    getEmployeeDetail,
   );
 
   if (isLoading) return <Loader />;
 
   return (
     <div className="flex flex-col gap-4 overflow-x-hidden text-black">
-
       {alert?.message && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-          <Alert type={alert.type} message={alert.message} />
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert({})}
+          />
         </div>
       )}
 
@@ -118,18 +142,34 @@ const DetalleEmpleado = () => {
           onClick={() => navigate("/app/personal")}
           className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
         >
-          <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="w-5 h-5 text-slate-600 rotate-90"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
-        <Type variant="page-title" as="h2" className="min-w-0 flex-1 truncate text-[1rem] leading-tight sm:text-[1.15rem]">
+        <Type
+          variant="page-title"
+          as="h2"
+          className="min-w-0 flex-1 truncate text-[1rem] leading-tight sm:text-[1.15rem]"
+        >
           Gestión de Empleados
         </Type>
 
         <div className="w-28 shrink-0">
           <NativeSelect
-            size="sm" aria-label="Tabs" value={currentTab}
+            size="sm"
+            aria-label="Tabs"
+            value={currentTab}
             onChange={(e) => setCurrentTab(e.target.value)}
             options={tabs.map((t) => ({ label: t.label, value: t.id }))}
           />
@@ -151,13 +191,27 @@ const DetalleEmpleado = () => {
           onClick={() => navigate("/app/personal")}
           className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
         >
-          <svg className="w-5 h-5 text-slate-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="w-5 h-5 text-slate-600 rotate-90"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
         <div className="flex min-w-0 flex-1 items-center gap-4 md:gap-8">
-          <Type variant="page-title" as="h2" className="min-w-0 shrink-0 truncate">
+          <Type
+            variant="page-title"
+            as="h2"
+            className="min-w-0 shrink-0 truncate"
+          >
             Gestión de Empleados
           </Type>
 
@@ -250,7 +304,9 @@ const DetalleEmpleado = () => {
           documents={documents}
           loadingDocs={loadingDocs}
           fetchError={fetchError}
+          onFetchErrorClose={clearFetchError}
           successMessage={successMessage}
+          onSuccessMessageClose={clearSuccessMessage}
           canModify={canModify}
           deletingId={deletingId}
           docToDelete={docToDelete}
@@ -261,6 +317,7 @@ const DetalleEmpleado = () => {
           documentType={documentType}
           fileName={fileName}
           displayError={displayError}
+          onUploadErrorClose={clearUploadError}
           modalError={modalError}
           modalLoading={modalLoading}
           handleOpenUpload={handleOpenUpload}

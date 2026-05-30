@@ -5,8 +5,15 @@ import hideEye from "/hideEye.svg";
 import { useLogin } from "../../hooks/organism/useLogin";
 
 const LoginPage = () => {
-  const { email, password, showPassword, errors, loading, handleSubmit } =
-    useLogin();
+  const {
+    email,
+    password,
+    showPassword,
+    errors,
+    loading,
+    clearErrors,
+    handleSubmit,
+  } = useLogin();
 
   const fields = [
     {
@@ -66,6 +73,7 @@ const LoginPage = () => {
             <div className="mb-4">
               <Alert
                 type="error"
+                onClose={clearErrors}
                 message={
                   <ul className="list-disc pl-5">
                     {errors.map((item, index) => (
