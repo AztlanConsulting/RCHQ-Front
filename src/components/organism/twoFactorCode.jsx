@@ -8,7 +8,7 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-5 sm:gap-6">
+    <div className="flex w-full flex-col items-center gap-4 sm:gap-6">
       <TextField
         id="two-factor-code"
         label="Código de autenticación"
@@ -20,14 +20,14 @@ const TwoFactorCode = ({ code, setCode, onSubmit, loading, disabled }) => {
         text="Código de autenticación"
         disabled={disabled}
         maxLength={6}
-        wrapperClassName="w-full max-w-[19rem] sm:max-w-sm"
-        containerClassName="min-h-[52px] px-4 sm:min-h-[50px]"
+        wrapperClassName="w-full max-w-none sm:max-w-sm"
+        containerClassName="min-h-[50px] px-3.5 sm:min-h-[50px] sm:px-4"
       />
       <BigButton
         text={loading ? "Verificando..." : "Verificar"}
         onClick={onSubmit}
         disabled={loading || disabled}
-        className="w-full max-w-[19rem] sm:w-[206px]"
+        className="w-full  max-w-[19rem] sm:w-[206px]"
       />
     </div>
   );
