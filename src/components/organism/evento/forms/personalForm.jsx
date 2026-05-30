@@ -46,8 +46,8 @@ const PersonalForm = (props) => {
     const descriptionLength = String(form.description ?? "").length;
 
     const today = new Date();
-    const personalDateMin = new Date();
-    personalDateMin.setDate(personalDateMin.getDate() + 1);
+
+    const minDateLimit = props.minDate || today;
     const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
 
     return (
@@ -75,7 +75,7 @@ const PersonalForm = (props) => {
                             value={form.date}
                             placeholder="dd / mm / yyyy"
                             onChange={(e) => setField("date", e.target.value)}
-                            minDate={personalDateMin}
+                            minDate={minDateLimit}
                             maxDate={personalDateMax}
                             error={!!errors.date}
                         />
@@ -92,7 +92,7 @@ const PersonalForm = (props) => {
                                 onChange={(e) =>
                                     setField("endDate", e.target.value)
                                 }
-                                minDate={form.date ? new Date(`${form.date}T12:00:00`) : personalDateMin}
+                                minDate={form.date ? new Date(`${form.date}T12:00:00`) : minDateLimit}
                                 maxDate={personalDateMax}
                                 error={!!errors.endDate}
                             />

@@ -36,6 +36,9 @@ const canViewCategory = (option, role, startDate) => {
 
     const oneYearFromTodayMX = addTime(todayMX, 0, 1);
     const oneMonthAgoMX = addTime(todayMX, -1, 0);
+    const currentYear = new Date().getFullYear();
+    const houseDateMin = `${currentYear}-01-01`;
+    const houseDateMax = `${currentYear + 2}-12-31`;
 
     if (option.value === "vacaciones") {
         if (normalizedRole === "coordinador") {
@@ -48,7 +51,7 @@ const canViewCategory = (option, role, startDate) => {
     }
 
     if (option.value === "casa") {
-        return normalizedRole === "coordinador" && startDate >= todayMX;
+        return normalizedRole === "coordinador" && startDate >= houseDateMin && startDate <= houseDateMax;
     }
 
     if (option.value === "ausencias") {
