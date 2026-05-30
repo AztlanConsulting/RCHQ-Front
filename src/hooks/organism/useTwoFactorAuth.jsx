@@ -11,6 +11,7 @@ const useGeneration = () => {
   const [manualCode, setManualCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copySuccess, setCopySuccess] = useState("");
 
   const generateQR = useCallback(async () => {
     setLoading(true);
@@ -34,7 +35,47 @@ const useGeneration = () => {
     }
   }, []);
 
-  return { qr, manualCode, loading, error, setError, generateQR };
+  useEffect(() => {
+    if (!error) return;
+
+    const timer = setTimeout(() => {
+      setError("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [error]);
+
+  useEffect(() => {
+    if (!copySuccess) return;
+
+    const timer = setTimeout(() => {
+      setCopySuccess("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [copySuccess]);
+
+  const copyManualCode = useCallback(async () => {
+    if (!manualCode) return;
+
+    try {
+      await navigator.clipboard.writeText(manualCode);
+      setCopySuccess("Clave copiada correctamente.");
+    } catch {
+      setError("No se pudo copiar la clave.");
+    }
+  }, [manualCode]);
+
+  return {
+    qr,
+    manualCode,
+    loading,
+    error,
+    copySuccess,
+    setError,
+    generateQR,
+    copyManualCode,
+  };
 };
 
 const useVerification = (onSuccess) => {
@@ -69,11 +110,22 @@ const useVerification = (onSuccess) => {
     }
   };
 
+  useEffect(() => {
+    if (!error) return;
+
+    const timer = setTimeout(() => {
+      setError("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [error]);
+
   return { code, setCode, loading, error, setError, verifyCode };
 };
 
 export const useTwoFactorAuth = ({ onClose }) => {
   const navigate = useNavigate();
+  const [openStep, setOpenStep] = useState("install");
 
   const generation = useGeneration();
   const verification = useVerification(() => {
@@ -81,16 +133,23 @@ export const useTwoFactorAuth = ({ onClose }) => {
     else navigate("app/opciones");
   });
   const { generateQR } = generation;
+  const toggleStep = useCallback((stepId) => {
+    setOpenStep((currentStep) => (currentStep === stepId ? "" : stepId));
+  }, []);
 
   useEffect(() => {
     generateQR();
   }, [generateQR]);
 
   return {
+    openStep,
+    toggleStep,
     qr: generation.qr,
     manualCode: generation.manualCode,
     isGenerating: generation.loading,
     generationError: generation.error,
+    copySuccessMessage: generation.copySuccess,
+    copyManualCode: generation.copyManualCode,
     code: verification.code,
     setCode: verification.setCode,
     isVerifying: verification.loading,
