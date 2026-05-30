@@ -1,8 +1,12 @@
 import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+    formatEventDate,
+    formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import { getStoredUser } from "../../../utils/authStorage";
 
 const VacationDetail = ({
@@ -20,6 +24,8 @@ const VacationDetail = ({
     onDelete,
     onApprove,
     onReject,
+    showMexicoReferenceNotice = false,
+    calendarTimeZone,
 }) => {
     const user = getStoredUser()
     const role = user?.role || null;
@@ -51,6 +57,9 @@ const VacationDetail = ({
 
     const feedback = event.feedback || event.vacationFeedback || "";
     const shouldShowFeedback = Boolean(feedback);
+    const mexicoDaysSuffix = showMexicoReferenceNotice
+        ? " (horario cdmx)"
+        : "";
 
     if (isEditing) {
         return (
@@ -78,6 +87,8 @@ const VacationDetail = ({
             >
                 {title}
             </Type>
+
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
 
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
@@ -129,12 +140,31 @@ const VacationDetail = ({
                     </Type>
                 </div>
 
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de inicio:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.start, {
+                                timeZone: calendarTimeZone,
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
+
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de fin:
+                        Fecha de término:
                     </Type>
                     <Type
                         variant="body"
@@ -146,12 +176,31 @@ const VacationDetail = ({
                     </Type>
                 </div>
 
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de término:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.end, {
+                                timeZone: calendarTimeZone
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
+
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días totales:
+                        Días totales{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -168,7 +217,7 @@ const VacationDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días hábiles:
+                        Días hábiles{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"

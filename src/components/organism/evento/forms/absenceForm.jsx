@@ -4,6 +4,7 @@ import Alert from "../../../atoms/alerts";
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import DocumentFileField from "../../../molecules/documentFileField";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
@@ -29,6 +30,9 @@ const AusenciaForm = (props) => {
     } = useAbsenceForm(props);
     const [openDropdown, setOpenDropdown] = useState(null);
     const descriptionLength = String(form.description ?? "").length;
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? "Las ausencias se guardan con base en horario central de México porque se contabilizan contra días laborales y días libres mexicanos."
+        : "";
 
     return (
         <>
@@ -129,6 +133,8 @@ const AusenciaForm = (props) => {
                     )}
                 </div>
             </div>
+
+            <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
             <div className="flex w-full flex-col gap-1.5">
                 <label className="text-sm font-bold text-[#374151]">

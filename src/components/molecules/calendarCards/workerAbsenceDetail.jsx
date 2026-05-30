@@ -1,6 +1,10 @@
 import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+  formatEventDate,
+  formatEventTime,
+} from "../../../utils/calendarEventDetail";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 
 const DetailLabel = ({ children, className = "" }) => (
   <Type
@@ -42,10 +46,15 @@ const WorkerAbsenceDetail = ({
   event,
   evidenceLabel = "Ver evidencia",
   onOpenEvidence,
+  showMexicoReferenceNotice = false,
+  calendarTimeZone,
 }) => {
   const hasEvidence = Boolean(event?.link);
   const fullDescription = String(event?.description ?? "");
   const descriptionPreview = getDescriptionPreview(fullDescription);
+  const mexicoDaysSuffix = showMexicoReferenceNotice
+    ? " (horario cdmx)"
+    : "";
 
   return (
     <div className="px-1 text-left sm:px-2">
@@ -57,6 +66,8 @@ const WorkerAbsenceDetail = ({
         Ausencia
       </Type>
 
+      <MexicoReferenceNotice show={showMexicoReferenceNotice} />
+
       <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
         <div>
           <DetailLabel>Tipo de ausencia:</DetailLabel>
@@ -64,7 +75,12 @@ const WorkerAbsenceDetail = ({
         </div>
 
         <div>
-          <DetailLabel>Días hábiles:</DetailLabel>
+          <DetailLabel>Días totales{mexicoDaysSuffix}:</DetailLabel>
+          <DetailValue>{event?.totalDays}</DetailValue>
+        </div>
+
+        <div>
+          <DetailLabel>Días hábiles{mexicoDaysSuffix}:</DetailLabel>
           <DetailValue>{event?.usedDays}</DetailValue>
         </div>
 
@@ -73,10 +89,35 @@ const WorkerAbsenceDetail = ({
           <DetailValue>{formatEventDate(event?.readableStart)}</DetailValue>
         </div>
 
-        <div>
-          <DetailLabel>Fecha de fin:</DetailLabel>
-          <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
-        </div>
+        {showMexicoReferenceNotice ? (
+          <>
+            <div>
+              <DetailLabel>Hora de inicio:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.start, { timeZone: calendarTimeZone })}
+              </DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Fecha de término:</DetailLabel>
+              <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+            </div>
+
+            <div>
+              <DetailLabel>Hora de término:</DetailLabel>
+              <DetailValue>
+                {formatEventTime(event?.end, {
+                  timeZone: calendarTimeZone
+                })}
+              </DetailValue>
+            </div>
+          </>
+        ) : (
+          <div>
+            <DetailLabel>Fecha de término:</DetailLabel>
+            <DetailValue>{formatEventDate(event?.readableEnd)}</DetailValue>
+          </div>
+        )}
 
         <div className="sm:col-span-2">
           <DetailLabel>Descripción:</DetailLabel>

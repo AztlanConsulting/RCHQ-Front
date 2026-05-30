@@ -28,7 +28,7 @@ const TextField = ({
   };
 
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
+    <div className={`flex w-full flex-col gap-1 ${wrapperClassName}`}>
       <label htmlFor={htmlFor} className={labelClassName}>
         {text}
       </label>

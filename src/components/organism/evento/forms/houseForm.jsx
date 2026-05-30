@@ -5,6 +5,7 @@ import DateField from "../../../atoms/dateField";
 import ErrorText from "../../../atoms/errorText";
 import SelectField from "../../../atoms/selectField";
 import TimeField from "../../../atoms/timeField";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import OverlapModal from "../../overlapModal";
 
 import { useHouseForm } from "../../../../hooks/pages/useHouseForm";
@@ -26,6 +27,16 @@ const CasaForm = (props) => {
     } = useHouseForm(props);
 
     const isTimeVisible = !form.allDay;
+    const timeZoneSaveNotice = (() => {
+        if (!props.canSwitchCalendarTimeZone) return "";
+        if (form.isFreeDay) {
+            return "Los días libres se guardan a las 00:00 en horario central de México porque afectan el cálculo de vacaciones y ausencias.";
+        }
+        if (props.calendarTimeZoneMode === "mexico") {
+            return "Este evento se guardará con base en horario central de México.";
+        }
+        return "Este evento se guardará con base en tu horario local.";
+    })();
     const descriptionLength = String(form.description ?? "").length;
 
     const currentYear = new Date().getFullYear();
@@ -162,6 +173,8 @@ const CasaForm = (props) => {
                         onChange={(value) => setField("isFreeDay", value)}
                     />
                 </div>
+
+                <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
             </div>
 
             <SelectField

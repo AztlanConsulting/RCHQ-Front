@@ -51,8 +51,8 @@ export const calculateDateRangeDays = (startDate, endDate) => {
 export const eventApiToDetail = (ev) => {
     if (!ev) return null;
     const x = ev.extendedProps ?? {};
-    const start = ev.start;
-    const end = ev.end;
+    const start = x.utcStart ? new Date(x.utcStart) : ev.start;
+    const end = x.utcEnd ? new Date(x.utcEnd) : ev.end;
     return {
         id: ev.id,
         houseEventId: x.houseEventId,
@@ -74,7 +74,7 @@ export const eventApiToDetail = (ev) => {
         readableEnd: x.endReadableDate,
         startStr: start != null ? (start.toISOString?.() ?? String(start)) : "",
         endStr: end != null ? (end.toISOString?.() ?? String(end)) : "",
-        allDay: ev.allDay,
+        allDay: x.detailAllDay ?? ev.allDay,
         backgroundColor: ev.backgroundColor || ev.color,
         borderColor: ev.borderColor || ev.backgroundColor || ev.color,
         subtitle: x.subtitle,
@@ -172,11 +172,10 @@ export const formatEventDateTime = (value) => {
     return d.toLocaleString("es-MX", {
         dateStyle: "medium",
         timeStyle: "short",
-        timeZone: "UTC",
     });
 };
 
-export const formatEventTime = (value) => {
+export const formatEventTime = (value, { timeZone } = {}) => {
     if (value == null || value === "") return "—";
     const d = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(d.getTime())) return String(value);
@@ -184,7 +183,7 @@ export const formatEventTime = (value) => {
     return d.toLocaleTimeString("es-MX", {
         hour: "numeric",
         minute: "2-digit",
-        timeZone: "UTC",
+        ...(timeZone ? { timeZone } : {}),
     });
 };
 
@@ -263,6 +262,5 @@ export const formatEventDate = (value) => {
 
     return parsedDate.toLocaleDateString("es-MX", {
         dateStyle: "long",
-        timeZone: "UTC",
     });
 };

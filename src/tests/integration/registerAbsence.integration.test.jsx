@@ -26,6 +26,15 @@ vi.mock("../../services/eventService", () => ({
     getEventTypes: vi.fn(),
 }));
 
+vi.mock("../../utils/timeZone", async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        isMexicoTimeZone: vi.fn(() => false),
+    };
+});
+
 vi.mock("../../components/atoms/alerts", () => ({
     default: ({ message }) => <div role="alert">{message}</div>,
 }));
@@ -118,6 +127,8 @@ const renderModal = async (props = {}) => {
                 onFeedback={onFeedback}
                 initialStartDate={dates.startDate}
                 initialEndDate={dates.endDate}
+                calendarTimeZoneMode="local"
+                canSwitchCalendarTimeZone
                 {...props}
             />,
         );
@@ -204,6 +215,16 @@ describe("Integracion: coordinador registra una ausencia", () => {
         );
         expect(
             await screen.findByRole("option", { name: "Medica" }),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra el mensaje de horario central de México al crear ausencias desde zona foránea", async () => {
+        await renderModal();
+
+        await openAbsenceForm();
+
+        expect(
+            screen.getByText(/las ausencias se guardan con base en horario central de/i),
         ).toBeInTheDocument();
     });
 
