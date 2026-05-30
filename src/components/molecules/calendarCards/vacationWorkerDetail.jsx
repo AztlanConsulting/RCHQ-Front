@@ -32,8 +32,11 @@ const VacationWorkerDetail = ({
     const isRejected = status === 2;
     const canDelete = !isApproved || !isPast;
     const canEdit = !isPast && isPending;
-    const title =
-        isRejected ? "Vacaciones Rechazadas" : "Solicitud de Vacaciones";
+    const title = isPending
+        ? "Solicitud de Vacaciones"
+        : isRejected
+          ? "Vacaciones Rechazadas"
+          : "Vacaciones";
     const statusLabel =
         isApproved ? "Aceptado" : (isRejected ? "Rechazado" : "Pendiente");
     const mexicoDaysSuffix = showMexicoReferenceNotice

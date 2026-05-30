@@ -92,6 +92,7 @@ describe("VacationWorkerDetail", () => {
             },
         });
 
+        expect(screen.getByText("Vacaciones")).toBeInTheDocument();
         expect(screen.getByText("Aceptado")).toBeInTheDocument();
         expect(screen.getByText("Disfruta tus vacaciones!!")).toBeInTheDocument();
         expect(
