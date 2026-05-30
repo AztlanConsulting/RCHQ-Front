@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useSideBar from "../../hooks/organism/useSideBar";
@@ -12,6 +12,23 @@ const Icon = ({ name, className }) => (
     className={`${className} ${name === "document" ? "brightness-0 invert" : ""}`}
   />
 );
+
+const isProfileNavActive = (pathname, linkActive = false) => {
+  if (linkActive) return true;
+
+  if (
+    pathname === "/app/opciones" ||
+    pathname.startsWith("/app/opciones/") ||
+    pathname === "/app/certificaciones" ||
+    pathname.startsWith("/app/certificaciones/")
+  ) {
+    return true;
+  }
+
+  return (
+    matchPath({ path: "/app/:employeeId/documentos", end: true }, pathname) != null
+  );
+};
 
 const getNavItems = (user) => {
   const isCoordinator = hasRole(user, "coordinador");
@@ -233,11 +250,7 @@ const SideBarContent = ({ expanded, toggle }) => {
           label="Perfil"
           icon="profile"
           expanded={expanded}
-          isGroupActive={(pathname, linkActive) =>
-            linkActive ||
-            pathname === "/app/opciones" ||
-            pathname.startsWith("/app/opciones/")
-          }
+          isGroupActive={isProfileNavActive}
         />
         <div className="h-px bg-[#FAFAFA]/25 my-1 shrink-0" />
         <BottomItem
@@ -254,6 +267,7 @@ const SideBarContent = ({ expanded, toggle }) => {
 
 const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { logout, user } = useAuth();
   const navItems = getNavItems(user);
 
@@ -332,22 +346,26 @@ const MobileNav = ({ mobileOpen, openMobile, closeMobile }) => {
               to="/app/perfil"
               onClick={closeMobile}
               aria-label="Perfil"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg h-12 px-3 shrink-0 transition-colors
-                ${isActive ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`
-              }
+              className={({ isActive }) => {
+                const active = isProfileNavActive(pathname, isActive);
+                return `flex items-center gap-3 rounded-lg h-12 px-3 shrink-0 transition-colors
+                ${active ? "bg-[#1F5ACD]" : "hover:bg-[#FAFAFA]/10"}`;
+              }}
             >
-              {({ isActive }) => (
+              {({ isActive }) => {
+                const active = isProfileNavActive(pathname, isActive);
+                return (
                 <>
                   <Icon
                     name="profile"
-                    className={`h-5 w-5 shrink-0 ${isActive ? "opacity-100" : "opacity-70"}`}
+                    className={`h-5 w-5 shrink-0 ${active ? "opacity-100" : "opacity-70"}`}
                   />
                   <span aria-hidden="true" className="font-['Public_Sans'] font-bold text-base text-[#FAFAFA]">
                     Perfil
                   </span>
                 </>
-              )}
+                );
+              }}
             </NavLink>
 
             <div className="h-px bg-[#FAFAFA]/25 my-1" />
