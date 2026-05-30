@@ -14,7 +14,7 @@
 
 <!-- Explicar alguna funcionalidad compleja que se haya implementado -->
 
-## Imagenes
+## Imágenes
 
 <!-- Poner imagen del cambio de la vista -->
 
