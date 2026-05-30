@@ -3,7 +3,6 @@ import OptionCard from "../components/molecules/optionCard";
 import BigButton from "../components/atoms/bigButton";
 import TextField from "../components/atoms/textField";
 import Alert from "../components/atoms/alerts";
-import ModalCloseButton from "../components/atoms/modalCloseButton";
 import TwoFactorAuth from "./auth/twoFactorAuth";
 import ChangePasswordModal from "../components/organism/changePasswordModal";
 import eye from "/showEye.svg";
@@ -131,13 +130,11 @@ const MoreOptions = () => {
 
       {showTwoFactorAuthModal.value && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:p-4">
-          <div className="relative my-3 sm:my-0">
-            <ModalCloseButton
-              onClick={() => showTwoFactorAuthModal.toggle()}
-              className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6"
-              ariaLabel="Cerrar"
+          <div className="my-3 sm:my-0">
+            <TwoFactorAuth
+              onClose={handleEnableSuccess}
+              onDismiss={() => showTwoFactorAuthModal.toggle()}
             />
-            <TwoFactorAuth onClose={handleEnableSuccess} />
           </div>
         </div>
       )}
