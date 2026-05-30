@@ -26,6 +26,7 @@ import Vacaciones from "./pages/vacaciones";
 import Donaciones from "./pages/donaciones";
 import Certificaciones from "./pages/certificaciones";
 import Alert from "./components/atoms/alerts";
+import NotFound from "./pages/notFound";
 import warningSvg from "/error.svg";
 
 function App() {
@@ -93,8 +94,14 @@ function App() {
               <Route path="vacaciones/solicitudes" element={<VacationRequests />} />
               <Route path="logs" element={<Logs />} />
             </Route>
+            
+            <Route path="*" element={<Navigate to="/pages/notFound" replace />} />
           </Route>
         </Route>
+
+        <Route path="/pages/notFound" element={<NotFound />} />
+
+        <Route path="*" element={<Navigate to="/pages/notFound" replace />} />
       </Routes>
     </BrowserRouter>
   );
