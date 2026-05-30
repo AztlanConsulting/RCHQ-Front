@@ -81,6 +81,7 @@ const toDateOnly = (value) => {
 
 const isEventMultiDay = (rawEvent) => {
     if (rawEvent.focus !== "eventos") return false;
+    if (rawEvent.allDay === true) return false;
     const startDay = normalizeDateOnly(rawEvent.start ?? rawEvent.startDate);
     const endDay = normalizeDateOnly(rawEvent.end ?? rawEvent.endDate);
     if (!startDay || !endDay) return false;
