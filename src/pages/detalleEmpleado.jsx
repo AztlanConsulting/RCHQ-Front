@@ -257,7 +257,7 @@ const DetalleEmpleado = () => {
       />
 
       {currentTab === "overview" && (
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-4">
           <EmployeeContactCard
             employee={employee}
             employeeAddress={employeeAddress}
