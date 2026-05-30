@@ -21,24 +21,48 @@ const normalizeRole = (role) =>
         .trim()
         .toLowerCase();
 
-const canViewCategory = (option, role) => {
+const canViewCategory = (option, role, startDate) => {
+    if (!startDate) return true;
+
     const normalizedRole = normalizeRole(role);
+    const todayMX = new Date().toLocaleDateString("en-CA", { timeZone: "America/Mexico_City" });
 
-    if (option.value === "vacaciones")
-        return true;
+    const addTime = (dateStr, months = 0, years = 0) => {
+        const d = new Date(dateStr + "T12:00:00");
+        d.setMonth(d.getMonth() + months);
+        d.setFullYear(d.getFullYear() + years);
+        return d.toISOString().split('T')[0];
+    };
 
-    if (option.value === "casa" || option.value === "ausencias") {
-        return normalizedRole === "coordinador";
+    const oneYearFromTodayMX = addTime(todayMX, 0, 1);
+    const oneMonthAgoMX = addTime(todayMX, -1, 0);
+
+    if (option.value === "vacaciones") {
+        if (normalizedRole === "coordinador") {
+            return startDate >= todayMX && startDate <= oneYearFromTodayMX;
+        }
+        if (normalizedRole !== "administrador") {
+            return startDate > todayMX && startDate <= oneYearFromTodayMX;
+        }
+        return false;
+    }
+
+    if (option.value === "casa") {
+        return normalizedRole === "coordinador" && startDate >= todayMX;
+    }
+
+    if (option.value === "ausencias") {
+        return normalizedRole === "coordinador" && startDate >= oneMonthAgoMX && startDate <= oneYearFromTodayMX;
     }
 
     if (option.value === "global") {
-        return normalizedRole === "administrador";
+        return normalizedRole === "administrador" && startDate >= todayMX;
     }
 
-    return true;
+    return startDate >= todayMX;
 };
 
-export const useRegisterEventModal = (isOpen, categoryForms) => {
+export const useRegisterEventModal = (isOpen, categoryForms, initialStartDate) => {
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
     const [categoryKey, setCategoryKey] = useState(DEFAULT_CATEGORY);
@@ -51,9 +75,9 @@ export const useRegisterEventModal = (isOpen, categoryForms) => {
         return CATEGORY_OPTIONS.filter(
             (option) =>
                 categoryForms?.[option.value] &&
-                canViewCategory(option, viewerRole),
+                canViewCategory(option, viewerRole, initialStartDate),
         );
-    }, [categoryForms, viewerRole]);
+    }, [categoryForms, viewerRole, initialStartDate]);
 
     const visibleCategoryValues = visibleCategoryOptions.map(
         ({ value }) => value,

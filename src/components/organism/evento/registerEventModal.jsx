@@ -43,7 +43,7 @@ const RegisterEventModal = ({
         visibleCategoryOptions,
         effectiveCategoryKey,
         SubForm,
-    } = useRegisterEventModal(isOpen, CATEGORY_FORMS);
+    } = useRegisterEventModal(isOpen, CATEGORY_FORMS, initialStartDate);
 
     if (!isOpen) return null;
 
@@ -110,101 +110,114 @@ const RegisterEventModal = ({
                         />
                     </div>
 
-                    {shouldShowNameField ? (
-                        <div className="min-w-0">
-                            <Type
-                                variant="page-title"
-                                as="h2"
-                                className="mb-3 min-w-0 text-[2rem] leading-none"
-                            >
-                                Registro de Evento
-                            </Type>
+                    {visibleCategoryOptions.length > 0 ? (
+                        <>
+                            {shouldShowNameField ? (
+                                <div className="min-w-0">
+                                    <Type
+                                        variant="page-title"
+                                        as="h2"
+                                        className="mb-3 min-w-0 text-[2rem] leading-none"
+                                    >
+                                        Registro de Evento
+                                    </Type>
 
-                            <TextField
-                                id="event-name"
-                                placeholder="Agregar título"
-                                value={name}
-                                setValue={handleNameChange}
-                                maxLength={70}
-                            />
+                                    <TextField
+                                        id="event-name"
+                                        placeholder="Agregar título"
+                                        value={name}
+                                        setValue={handleNameChange}
+                                        maxLength={70}
+                                    />
 
-                            {nameError && (
-                                <p
+                                    {nameError && (
+                                        <p
+                                            style={{
+                                                margin: "4px 0 0",
+                                                fontSize: "12px",
+                                                color: "#dc2626",
+                                            }}
+                                        >
+                                            {nameError}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                <Type
+                                    variant="page-title"
+                                    as="h2"
+                                    className="mb-0 min-w-0 text-[2rem] leading-none"
                                     style={{
-                                        margin: "4px 0 0",
-                                        fontSize: "12px",
-                                        color: "#dc2626",
+                                        margin: 0,
                                     }}
                                 >
-                                    {nameError}
-                                </p>
+                                    {(() => {
+                                        if (effectiveCategoryKey == "ausencias") return "Ausencias"
+                                        const verb = viewerRole === "Coordinador" ? "Registro" : "Solicitud";
+                                        return `${verb} de Vacaciones`
+                                    })()}
+                                </Type>
                             )}
-                        </div>
-                    ) : (
-                        <Type
-                            variant="page-title"
-                            as="h2"
-                            className="mb-0 min-w-0 text-[2rem] leading-none"
-                            style={{
-                                margin: 0,
-                            }}
-                        >
-                            {(() => {
-                                if (effectiveCategoryKey == "ausencias") return "Ausencias"
-                                const verb = viewerRole === "Coordinador" ? "Registro" : "Solicitud";
-                                return `${verb} de Vacaciones`
-                            })()}
-                        </Type>
-                    )}
 
-                    <div style={{ flexShrink: 0 }}>
-                        <ButtonGroup
-                            options={visibleCategoryOptions}
-                            value={effectiveCategoryKey}
-                            onChange={handleCategoryChange}
-                        />
-                    </div>
-
-                    <div
-                        style={{
-                            flex: shouldAllowFloatingPicker ? "initial" : 1,
-                            overflowY: shouldAllowFloatingPicker ? "visible" : "auto",
-                            minHeight: 0,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "16px",
-                        }}
-                    >
-                        <div
-                            key={animationKey}
-                            className="animate-[fadeSlideIn_220ms_ease-in-out]"
-                            style={{
-                                paddingBottom: shouldAllowFloatingPicker ? "0" : "24px",
-                            }}
-                        >
-                            {SubForm && (
-                                <SubForm
-                                    name={name}
-                                    isOpen={isOpen}
-                                    onClose={onClose}
-                                    onSuccess={onSuccess}
-                                    onFeedback={onFeedback}
-                                    initialStartDate={initialStartDate}
-                                    initialEndDate={initialEndDate}
-                                    initialStartTime={initialStartTime}
-                                    initialEndTime={initialEndTime}
-                                    initialAllDay={initialAllDay}
-                                    calendarTimeZone={calendarTimeZone}
-                                    calendarTimeZoneMode={calendarTimeZoneMode}
-                                    canSwitchCalendarTimeZone={
-                                        canSwitchCalendarTimeZone
-                                    }
-                                    onNameError={setNameError}
-                                    onValidationAlert={setValidationAlert}
+                            <div style={{ flexShrink: 0 }}>
+                                <ButtonGroup
+                                    options={visibleCategoryOptions}
+                                    value={effectiveCategoryKey}
+                                    onChange={handleCategoryChange}
                                 />
-                            )}
+                            </div>
+
+                            <div
+                                style={{
+                                    flex: shouldAllowFloatingPicker ? "initial" : 1,
+                                    overflowY: shouldAllowFloatingPicker ? "visible" : "auto",
+                                    minHeight: 0,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "16px",
+                                }}
+                            >
+                                <div
+                                    key={animationKey}
+                                    className="animate-[fadeSlideIn_220ms_ease-in-out]"
+                                    style={{
+                                        paddingBottom: shouldAllowFloatingPicker ? "0" : "24px",
+                                    }}
+                                >
+                                    {SubForm && (
+                                        <SubForm
+                                            name={name}
+                                            isOpen={isOpen}
+                                            onClose={onClose}
+                                            onSuccess={onSuccess}
+                                            onFeedback={onFeedback}
+                                            initialStartDate={initialStartDate}
+                                            initialEndDate={initialEndDate}
+                                            initialStartTime={initialStartTime}
+                                            initialEndTime={initialEndTime}
+                                            initialAllDay={initialAllDay}
+                                            calendarTimeZone={calendarTimeZone}
+                                            calendarTimeZoneMode={calendarTimeZoneMode}
+                                            canSwitchCalendarTimeZone={
+                                                canSwitchCalendarTimeZone
+                                            }
+                                            onNameError={setNameError}
+                                            onValidationAlert={setValidationAlert}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
+                            <p className="font-black text-3xl">
+                                No puede añadir eventos en el calendario en esta fecha.
+                            </p>
+                            <p className="max-w-[18rem] font-medium text-slate-500 pb-4">
+                                Seleccione un rango de fechas distinto para poder añadir eventos.
+                            </p>
                         </div>
-                    </div>
+                    )}
 
                     {validationAlert && (
                         <div
