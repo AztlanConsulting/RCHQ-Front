@@ -152,7 +152,7 @@ export const usePersonalForm = ({
         onValidationAlert,
     ]);
 
-    const isCapacitaciones = useMemo(
+    const isTraining = useMemo(
         () =>
             eventTypes.find((t) => t.value === form.eventTypeId)?.label?.toLowerCase() ===
             "capacitaciones",
@@ -256,7 +256,7 @@ export const usePersonalForm = ({
         const result = personalEventSchema.safeParse(input);
 
         const capacitorError =
-            isCapacitaciones && !form.trainer?.trim()
+            isTraining && !form.trainer?.trim()
                 ? "El instructor es obligatorio para eventos de capacitación."
                 : null;
 
@@ -342,7 +342,7 @@ export const usePersonalForm = ({
         await submitPayload(
             buildPersonalPayload({
                 ...validated,
-                trainer: isCapacitaciones ? form.trainer?.trim() || null : null,
+                trainer: isTraining ? form.trainer?.trim() || null : null,
                 endDate: effectiveEndDate,
                 forceOverlap: false,
                 timeZone: calendarTimeZone,
@@ -390,7 +390,7 @@ export const usePersonalForm = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
-        isCapacitaciones,
+        isTraining,
         overlapState,
         showEndDateField,
         setField,
