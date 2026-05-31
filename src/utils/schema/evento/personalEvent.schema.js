@@ -83,7 +83,7 @@ export const baseSchema = z.object({
         )
         .optional(),
 
-    isCapacitaciones: z.boolean().optional(),
+    isTraining: z.boolean().optional(),
 });
 
 export const allDaySchema = baseSchema.extend({
@@ -119,7 +119,7 @@ export const timedSchema = baseSchema
 export const personalEventSchema = z
     .discriminatedUnion("allDay", [allDaySchema, timedSchema])
     .superRefine((data, ctx) => {
-        if (data.isCapacitaciones && !data.trainer?.trim()) {
+        if (data.isTraining && !data.trainer?.trim()) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message:

@@ -35,7 +35,7 @@ const UpdatePersonalEventModal = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
-        isCapacitaciones,
+        isTraining,
         overlapState,
         showEndDateField,
         setField,
@@ -250,9 +250,9 @@ const UpdatePersonalEventModal = ({
 
                     <div
                         style={{
-                            maxHeight: isCapacitaciones ? "100px" : "0px",
+                            maxHeight: isTraining ? "100px" : "0px",
                             overflow: "hidden",
-                            opacity: isCapacitaciones ? 1 : 0,
+                            opacity: isTraining ? 1 : 0,
                             transition: "max-height 300ms ease, opacity 250ms ease",
                         }}
                     >

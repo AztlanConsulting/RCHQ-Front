@@ -107,7 +107,7 @@ export const useUpdatePersonalEventForm = ({
         eventDayStart.setHours(0, 0, 0, 0);
         return eventDayStart < todayStart;
     }, [event?.start]);
-    const isCapacitaciones = useMemo(() => {
+    const isTraining = useMemo(() => {
         if (eventTypes.length > 0) {
             return (
                 eventTypes.find((t) => t.value === form.eventTypeId)?.label?.toLowerCase() ===
@@ -228,7 +228,7 @@ export const useUpdatePersonalEventForm = ({
             categoryKey: "personal",
             forceOverlap: false,
             employeeIds: selectedEmployees.map((e) => e.employeeId),
-            isCapacitaciones,
+            isTraining,
         };
         const mexicoRangeError = isPastEvent ? null : getPersonalEventMexicoRangeError({
             startDate: form.date,
@@ -311,7 +311,7 @@ export const useUpdatePersonalEventForm = ({
                 ...validated,
                 date: form.date,
                 endDate: effectiveEndDate,
-                trainer: isCapacitaciones ? form.trainer?.trim() || null : null,
+                trainer: isTraining ? form.trainer?.trim() || null : null,
                 forceOverlap: false,
                 timeZone: calendarTimeZone,
             }),
@@ -364,7 +364,7 @@ export const useUpdatePersonalEventForm = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
-        isCapacitaciones,
+        isTraining,
         overlapState,
         showEndDateField,
         setField,
