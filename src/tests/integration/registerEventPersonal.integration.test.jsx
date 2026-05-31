@@ -82,11 +82,13 @@ const addDaysToLocalDateOnly = (dateValue, days) => {
 
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
+const EVENT_TYPE_ID_CAP = "33333333-3333-4333-8333-333333333333";
 const EMP_ID_1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
 const mockEventTypes = [
     { eventTypeId: EVENT_TYPE_ID, name: "Cita médica" },
     { eventTypeId: EVENT_TYPE_ID_2, name: "Permiso personal" },
+    { eventTypeId: EVENT_TYPE_ID_CAP, name: "Capacitaciones" },
 ];
 
 const mockOverlappedEmployees = [
@@ -656,5 +658,70 @@ describe("Integración: agregar evento de personal", () => {
         expect(screen.getByRole("alert")).toHaveTextContent(
             "Error al registrar evento personal",
         );
+    });
+
+    it("muestra error de validación cuando se selecciona Capacitaciones sin instructor", async () => {
+        renderModal();
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        fireEvent.change(screen.getByPlaceholderText("Agregar título"), {
+            target: { value: "Capacitación React" },
+        });
+
+        fireEvent.change(screen.getByRole("combobox"), {
+            target: { value: EVENT_TYPE_ID_CAP },
+        });
+
+        await selectStartTime("9:00 AM");
+        await selectEndTime("10:00 AM");
+
+        await clickFormConfirm();
+
+        expect(
+            screen.getByText("El instructor es obligatorio para eventos de capacitación."),
+        ).toBeInTheDocument();
+        expect(createPersonalEvent).not.toHaveBeenCalled();
+    });
+
+    it("crea un evento de Capacitaciones con el instructor incluido en el payload", async () => {
+        const { onClose, onSuccess } = renderModal();
+
+        await waitFor(() => {
+            expect(getEventTypes).toHaveBeenCalledTimes(1);
+        });
+
+        fireEvent.change(screen.getByPlaceholderText("Agregar título"), {
+            target: { value: "Capacitación React" },
+        });
+
+        fireEvent.change(screen.getByRole("combobox"), {
+            target: { value: EVENT_TYPE_ID_CAP },
+        });
+
+        fireEvent.change(screen.getByPlaceholderText("Nombre del instructor"), {
+            target: { value: "Ana García" },
+        });
+
+        await selectStartTime("9:00 AM");
+        await selectEndTime("10:00 AM");
+
+        await clickFormConfirm();
+
+        await waitFor(() => {
+            expect(createPersonalEvent).toHaveBeenCalledTimes(1);
+        });
+
+        expect(createPersonalEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+                eventTypeId: EVENT_TYPE_ID_CAP,
+                trainer: "Ana García",
+            }),
+        );
+
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });
