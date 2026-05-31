@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+    addDaysToDateOnly,
+    getBrowserTimeZone,
+    MEXICO_TIME_ZONE,
+    zonedDateTimeToIso,
+} from "./dateTime";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -103,8 +109,6 @@ export const globalEventSchema = z.discriminatedUnion("allDay", [
     timedSchema,
 ]);
 
-const TIMEZONE_OFFSET = "-06:00";
-
 export function buildPayload(formData) {
     const {
         name,
@@ -117,28 +121,60 @@ export function buildPayload(formData) {
         forceOverlap,
         startDate,
         endDate,
+        timeZone = getBrowserTimeZone(),
     } = formData;
 
-    const base = {
-        eventTypeId,
-        name,
-        allDay,
-        isFreeDay,
+    const recurringFields = {
         isRecurring,
         recurrenceType: isRecurring ? (recurrenceType ?? null) : null,
-        ...(description?.trim() ? { description: description.trim() } : {}),
-        forceOverlap,
     };
 
+    const descriptionField = description?.trim()
+        ? { description: description.trim() }
+        : {};
+
+    if (isFreeDay) {
+        return {
+            eventTypeId,
+            name,
+            start: startDate,
+            end: endDate,
+            allDay: true,
+            isFreeDay,
+            timeZone: MEXICO_TIME_ZONE,
+            ...recurringFields,
+            ...descriptionField,
+            forceOverlap,
+        };
+    }
+
     if (allDay) {
-        return { ...base, start: startDate, end: endDate };
+        return {
+            eventTypeId,
+            name,
+            start: zonedDateTimeToIso(startDate, "00:00", timeZone),
+            end: zonedDateTimeToIso(addDaysToDateOnly(endDate, 1), "00:00", timeZone),
+            allDay: true,
+            isFreeDay: false,
+            timeZone,
+            ...recurringFields,
+            ...descriptionField,
+            forceOverlap,
+        };
     }
 
     const { startTime, endTime } = formData;
 
     return {
-        ...base,
-        start: `${startDate}T${startTime}:00.000${TIMEZONE_OFFSET}`,
-        end: `${endDate}T${endTime}:00.000${TIMEZONE_OFFSET}`,
+        eventTypeId,
+        name,
+        start: zonedDateTimeToIso(startDate, startTime, timeZone),
+        end: zonedDateTimeToIso(endDate, endTime, timeZone),
+        allDay: false,
+        isFreeDay,
+        timeZone,
+        ...recurringFields,
+        ...descriptionField,
+        forceOverlap,
     };
 }
