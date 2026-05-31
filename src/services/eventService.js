@@ -22,8 +22,9 @@ export async function createHouseEvent(payload) {
     return json;
 }
 
-export async function getEventTypes() {
-    const response = await secureFetch(`/event/getAllTypes`);
+export async function getEventTypes(scope) {
+    const url = scope ? `/event/getAllTypes?scope=${scope}` : `/event/getAllTypes`;
+    const response = await secureFetch(url);
 
     if (!response.ok) {
         throw new APIError("Error al cargar tipos de evento", response.status);
