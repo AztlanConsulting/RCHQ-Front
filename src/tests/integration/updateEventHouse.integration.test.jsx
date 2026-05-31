@@ -10,6 +10,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import UpdateHouseEventModal from "../../components/organism/evento/updateHouseEventModal";
 import { updateHouseEvent } from "../../services/updateEventService";
 import { getEventTypes } from "../../services/eventService";
+import {
+    getBrowserTimeZone,
+    zonedDateTimeToIso,
+} from "../../utils/timeZone";
 
 vi.mock("../../services/updateEventService", () => ({
     updateHouseEvent: vi.fn(),
@@ -91,7 +95,7 @@ const waitForForm = async () => {
 
 const clickSubmit = async () => {
     await act(async () => {
-        fireEvent.click(screen.getByRole("button", { name: /^modificar$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^Editar$/i }));
     });
 };
 
@@ -105,7 +109,7 @@ const clickLastConfirm = async () => {
     });
 };
 
-describe("Integración: modificar evento de casa", () => {
+describe("Integración: editar evento de casa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
@@ -178,10 +182,11 @@ describe("Integración: modificar evento de casa", () => {
         expect(updateHouseEvent).toHaveBeenCalledWith("evt-existing", {
             eventTypeId: EVENT_TYPE_ID,
             name: "Limpieza inicial",
-            start: "2026-05-05T09:00:00.000-06:00",
-            end: "2026-05-05T10:00:00.000-06:00",
+            start: mockEvent.start,
+            end: mockEvent.end,
             allDay: false,
             isFreeDay: false,
+            timeZone: getBrowserTimeZone(),
             description: "Descripción inicial.",
             forceOverlap: false,
         });
@@ -194,7 +199,7 @@ describe("Integración: modificar evento de casa", () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it("muestra error si se intenta modificar sin nombre", async () => {
+    it("muestra error si se intenta editar sin nombre", async () => {
         await renderModal();
         await waitForForm();
 
@@ -226,8 +231,17 @@ describe("Integración: modificar evento de casa", () => {
             "evt-existing",
             expect.objectContaining({
                 allDay: true,
-                start: "2026-05-05",
-                end: "2026-05-05",
+                start: zonedDateTimeToIso(
+                    "2026-05-05",
+                    "00:00",
+                    getBrowserTimeZone(),
+                ),
+                end: zonedDateTimeToIso(
+                    "2026-05-06",
+                    "00:00",
+                    getBrowserTimeZone(),
+                ),
+                timeZone: getBrowserTimeZone(),
             }),
         );
     });
@@ -312,7 +326,7 @@ describe("Integración: modificar evento de casa", () => {
 
     it("muestra error del servidor si falla updateHouseEvent", async () => {
         updateHouseEvent.mockRejectedValueOnce(
-            new Error("Error al modificar evento"),
+            new Error("Error al editar evento"),
         );
 
         await renderModal();
@@ -325,7 +339,7 @@ describe("Integración: modificar evento de casa", () => {
         });
 
         expect(
-            await screen.findByText("Error al modificar evento"),
+            await screen.findByText("Error al editar evento"),
         ).toBeInTheDocument();
     });
 });

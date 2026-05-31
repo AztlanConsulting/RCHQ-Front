@@ -1,10 +1,8 @@
 import { buildApiError } from "../utils/apiErrors";
 import { secureFetch } from "@/utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 export const getUpdateFormService = async () => {
-  const response = await secureFetch(`${API_URL}/employee/update-form`);
+  const response = await secureFetch(`/employee/update-form`);
   const data = await response.json();
   if (!response.ok) throw buildApiError(response, data, "Error al obtener catálogos");
   return data;
@@ -12,7 +10,7 @@ export const getUpdateFormService = async () => {
 
 export const updateBasicInfoService = async (employeeId, body) => {
   const isFormData = body instanceof FormData;
-  const response = await secureFetch(`${API_URL}/employee/${employeeId}/basic-info`, {
+  const response = await secureFetch(`/employee/${employeeId}/basic-info`, {
     method: "PUT",
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
@@ -25,7 +23,7 @@ export const updateBasicInfoService = async (employeeId, body) => {
 };
 
 export const updateContactInfoService = async (employeeId, body) => {
-  const response = await secureFetch(`${API_URL}/employee/${employeeId}/contact-info`, {
+  const response = await secureFetch(`/employee/${employeeId}/contact-info`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -38,7 +36,7 @@ export const updateContactInfoService = async (employeeId, body) => {
 };
 
 export const updateAdminInfoService = async (employeeId, body) => {
-  const response = await secureFetch(`${API_URL}/employee/${employeeId}/admin-info`, {
+  const response = await secureFetch(`/employee/${employeeId}/admin-info`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

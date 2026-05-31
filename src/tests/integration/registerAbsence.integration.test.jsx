@@ -11,6 +11,7 @@ import RegisterEventModal from "../../components/organism/evento/registerEventMo
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
     getCalendarViewerRole,
 } from "../../services/calendarService";
 import { getEventTypes } from "../../services/eventService";
@@ -19,12 +20,22 @@ vi.mock("../../services/calendarService", () => ({
     createAbsenceService: vi.fn(),
     getAbsenceAddData: vi.fn(),
     getCalendarViewerRole: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 vi.mock("../../services/eventService", () => ({
     createHouseEvent: vi.fn(),
     getEventTypes: vi.fn(),
 }));
+
+vi.mock("../../utils/timeZone", async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        isMexicoTimeZone: vi.fn(() => false),
+    };
+});
 
 vi.mock("../../components/atoms/alerts", () => ({
     default: ({ message }) => <div role="alert">{message}</div>,
@@ -118,6 +129,8 @@ const renderModal = async (props = {}) => {
                 onFeedback={onFeedback}
                 initialStartDate={dates.startDate}
                 initialEndDate={dates.endDate}
+                calendarTimeZoneMode="local"
+                canSwitchCalendarTimeZone
                 {...props}
             />,
         );
@@ -181,6 +194,7 @@ describe("Integracion: coordinador registra una ausencia", () => {
         createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
+        getEmployeeDateRules.mockResolvedValue(null);
     });
 
     it("muestra la opcion de ausencias y carga empleados/tipos para el coordinador", async () => {
@@ -204,6 +218,16 @@ describe("Integracion: coordinador registra una ausencia", () => {
         );
         expect(
             await screen.findByRole("option", { name: "Medica" }),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra el mensaje de horario central de México al crear ausencias desde zona foránea", async () => {
+        await renderModal();
+
+        await openAbsenceForm();
+
+        expect(
+            screen.getByText(/las ausencias se guardan con base en horario central de/i),
         ).toBeInTheDocument();
     });
 

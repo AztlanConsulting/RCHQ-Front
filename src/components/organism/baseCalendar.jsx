@@ -11,7 +11,13 @@ import WeekTimeCard from "../molecules/calendarCards/weekTimeCard";
 import DayTimeCard from "../molecules/calendarCards/dayTimeCard";
 import ListEventCard from "../molecules/calendarCards/listEventCard";
 
-const MONTH_DAY_EVENT_CAP = 3;
+const DAY_GRID_EVENT_CAP = 3;
+const LIST_EVENT_TIME_FORMAT = {
+    hour: "numeric",
+    minute: "2-digit",
+    meridiem: "short",
+    hour12: true,
+};
 
 function formatUtcSlotLabel12h(date) {
     if (!date || !(date instanceof Date) || Number.isNaN(date.getTime()))
@@ -86,6 +92,8 @@ const BaseCalendar = ({
     onDateDrag,
     onDateDragging,
     onOpenCalendarFilters,
+    timeZone = "local",
+    now,
 }) => {
     const eventContent = useCallback((arg) => renderEventContent(arg), []);
 
@@ -154,7 +162,7 @@ const BaseCalendar = ({
     useEffect(() => {
         loadButtonsAtStart();
         resizeHandler(calendarRef);
-    });
+    }, [calendarRef, loadButtonsAtStart, resizeHandler]);
 
     return (
         <FullCalendar
@@ -169,7 +177,8 @@ const BaseCalendar = ({
             ]}
             locales={[esLocale]}
             locale="es"
-            timeZone="UTC"
+            timeZone={timeZone}
+            now={now}
             windowResizeDelay="10"
             height="calc(100vh - 40px)"
             headerToolbar={headerToolbar}
@@ -179,15 +188,26 @@ const BaseCalendar = ({
                     dayHeaderContent: (arg) => getWeekDayName(arg),
                     slotLabelContent: (arg) =>
                         formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 timeGridWeek: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
                     slotLabelContent: (arg) =>
                         formatUtcSlotLabel12h(arg.date),
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
                 },
                 dayGridMonth: {
                     dayHeaderContent: (arg) => getWeekDayName(arg),
-                    dayMaxEvents: MONTH_DAY_EVENT_CAP,
+                    dayMaxEvents: DAY_GRID_EVENT_CAP,
+                },
+                listDay: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listWeek: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
+                },
+                listMonth: {
+                    eventTimeFormat: LIST_EVENT_TIME_FORMAT,
                 },
             }}
             windowResize={() => resizeHandler(calendarRef)}

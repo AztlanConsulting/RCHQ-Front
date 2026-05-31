@@ -6,6 +6,7 @@ import {
 import {
   deleteAbsenceService,
   buildAbsenceEvidenceUrl,
+  getEmployeeDateRules,
   updateAbsenceService,
 } from "../../services/calendarService";
 import { deleteVacationRequest } from "../../services/vacationService";
@@ -20,6 +21,7 @@ import {
   buildAbsenceDateLimits,
   buildAbsenceFormSchema,
 } from "../../utils/schema/evento/absence.schema";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
 import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 
 const ABSENCE_DESCRIPTION_PATTERN = /^[\p{L}\p{N}\s¿?¡!]+$/u;
@@ -82,6 +84,8 @@ export const useCalendarPage = ({
     endDate: "",
     description: "",
   });
+  const [absenceDateRules, setAbsenceDateRules] = useState(null);
+  const [isLoadingAbsenceDateRules, setIsLoadingAbsenceDateRules] = useState(false);
   const [absenceEditError, setAbsenceEditError] = useState("");
   const [isSavingAbsence, setIsSavingAbsence] = useState(false);
   const [isDeleteAbsenceOpen, setIsDeleteAbsenceOpen] = useState(false);
@@ -111,6 +115,7 @@ export const useCalendarPage = ({
     vacationEditError,
     isSavingVacation,
     vacationRemainingInfo,
+    vacationDateRules,
     isLoadingVacationRemaining,
     startVacationEdit,
     cancelVacationEdit,
@@ -138,6 +143,8 @@ export const useCalendarPage = ({
     setIsAbsenceEditing(false);
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
@@ -159,6 +166,8 @@ export const useCalendarPage = ({
     setIsAbsenceEditing(false);
     setIsDeleteAbsenceOpen(false);
     setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
     setAbsenceDeleteError("");
     setIsDeleteHouseEventOpen(false);
     setDeleteHouseEventError("");
@@ -235,11 +244,24 @@ export const useCalendarPage = ({
     setAbsenceEditError("");
     setIsAbsenceEditing(true);
     resetAbsenceEvidence();
+
+    const employeeId = currentSelectedEvent.employeeId ?? currentSelectedEvent.id;
+
+    if (employeeId) {
+      setIsLoadingAbsenceDateRules(true);
+
+      getEmployeeDateRules(employeeId, "absence")
+        .then(setAbsenceDateRules)
+        .catch(() => setAbsenceDateRules(null))
+        .finally(() => setIsLoadingAbsenceDateRules(false));
+    }
   }, [absenceTypeOptions, resetAbsenceEvidence, selectedEvent]);
 
   const cancelAbsenceEdit = useCallback(() => {
     setIsAbsenceEditing(false);
     setAbsenceEditError("");
+    setAbsenceDateRules(null);
+    setIsLoadingAbsenceDateRules(false);
     resetAbsenceEvidence();
   }, [resetAbsenceEvidence]);
 
@@ -297,9 +319,27 @@ export const useCalendarPage = ({
       description: normalizedDescription,
     });
 
-    if (!validationResult.success) {
+    const schemaErrors = validationResult.success
+      ? {}
+      : validationResult.error.issues.reduce((acc, issue) => {
+        const key = issue.path[issue.path.length - 1];
+
+        if (key && !acc[key]) {
+          acc[key] = issue.message;
+        }
+
+        return acc;
+      }, {});
+    const fieldErrors = mergeDateRuleErrors(schemaErrors, {
+      startDate: absenceForm.startDate,
+      endDate: absenceForm.endDate,
+    }, absenceDateRules);
+
+    if (!validationResult.success || Object.values(fieldErrors).some(Boolean)) {
       setAbsenceEditError(
-        validationResult.error.issues[0]?.message ||
+        fieldErrors.startDate ||
+          fieldErrors.endDate ||
+          validationResult.error?.issues?.[0]?.message ||
           "Revisa los datos de la ausencia.",
       );
       return;
@@ -404,6 +444,7 @@ export const useCalendarPage = ({
     absenceEvidenceFile,
     absenceDateLimits,
     absenceForm,
+    absenceDateRules,
     absenceTypeOptions,
     reloadCurrentRange,
     resetAbsenceEvidence,
@@ -457,7 +498,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "error",
-      message: "No se puede modificar este tipo de evento.",
+      message: "No se puede editar este tipo de evento.",
     });
   }, [closeDetail, selectedEvent]);
 
@@ -577,7 +618,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingHouseEvent, reloadCurrentRange, showEventDetail]);
 
@@ -600,7 +641,7 @@ export const useCalendarPage = ({
 
     setAlert({
       type: "success",
-      message: "Evento modificado exitosamente",
+      message: "Evento editado exitosamente",
     });
   }, [editingPersonalEvent, reloadCurrentRange, showEventDetail]);
   const getVacationRequestId = useCallback((event) =>
@@ -812,6 +853,8 @@ export const useCalendarPage = ({
     absenceEvidenceError,
     absenceMinStartDate: absenceDateLimits.minStartDate,
     absenceMaxEndDate: absenceDateLimits.maxEndDate,
+    absenceDateRules,
+    isLoadingAbsenceDateRules,
     closeDetail,
     showEventDetail,
     handleEventClick,
@@ -854,6 +897,7 @@ export const useCalendarPage = ({
     setVacationField,
     submitVacationEdit,
     vacationRemainingInfo,
+    vacationDateRules,
     isLoadingVacationRemaining,
     openCalendarItemDetail,
     isDeleteVacationOpen,

@@ -15,6 +15,15 @@ vi.mock("../../services/eventService", () => ({
     getEventTypes: vi.fn(),
 }));
 
+vi.mock("../../utils/timeZone", async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        isMexicoTimeZone: vi.fn(() => false),
+    };
+});
+
 vi.mock("../../components/atoms/alerts", () => ({
     default: ({ message }) => <div role="alert">{message}</div>,
 }));
@@ -63,14 +72,17 @@ const renderModal = async (props = {}) => {
     const onSuccess = vi.fn();
 
     render(
-        <RegisterEventModal
-            isOpen
-            onClose={onClose}
-            onSuccess={onSuccess}
-            initialStartDate="2026-05-05"
-            initialEndDate="2026-05-05"
-            {...props}
-        />,
+            <RegisterEventModal
+                isOpen
+                onClose={onClose}
+                onSuccess={onSuccess}
+                initialStartDate="2026-05-05"
+                initialEndDate="2026-05-05"
+                calendarTimeZone="America/Mexico_City"
+                calendarTimeZoneMode="mexico"
+                canSwitchCalendarTimeZone
+                {...props}
+            />,
     );
     await act(async () => {
         fireEvent.click(screen.getByRole("radio", { name: "Casa" }));
@@ -186,10 +198,11 @@ describe("Integración: agregar evento de casa", () => {
         expect(createHouseEvent).toHaveBeenCalledWith({
             eventTypeId: EVENT_TYPE_ID,
             name: "Limpieza profunda",
-            start: "2026-05-05T09:00:00.000-06:00",
-            end: "2026-05-05T10:00:00.000-06:00",
+            start: "2026-05-05T15:00:00.000Z",
+            end: "2026-05-05T16:00:00.000Z",
             allDay: false,
             isFreeDay: false,
+            timeZone: "America/Mexico_City",
             description: "Preparar la casa para visita.",
             forceOverlap: false,
         });
@@ -235,10 +248,34 @@ describe("Integración: agregar evento de casa", () => {
         expect(createHouseEvent).toHaveBeenCalledWith(
             expect.objectContaining({
                 allDay: true,
-                start: "2026-05-05",
-                end: "2026-05-05",
+                start: "2026-05-05T06:00:00.000Z",
+                end: "2026-05-06T06:00:00.000Z",
+                timeZone: "America/Mexico_City",
             }),
         );
+    });
+
+    it("muestra el mensaje de horario central de México al crear un día libre desde zona foránea", async () => {
+        await renderModal();
+        await waitForHouseForm();
+
+        fireEvent.click(screen.getByLabelText(/día libre/i));
+
+        expect(
+            screen.getByText(/los días libres se guardan a las 00:00 en horario central de/i),
+        ).toBeInTheDocument();
+    });
+
+    it("muestra el mensaje de horario local al crear evento normal en modo local", async () => {
+        await renderModal({
+            calendarTimeZone: "America/Matamoros",
+            calendarTimeZoneMode: "local",
+        });
+        await waitForHouseForm();
+
+        expect(
+            screen.getByText(/este evento se guardará con base en tu horario local/i),
+        ).toBeInTheDocument();
     });
 
     it("muestra el modal de empalme cuando el backend regresa colisiones", async () => {

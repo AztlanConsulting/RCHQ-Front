@@ -3,7 +3,7 @@ import Alert from "../../components/atoms/alerts";
 import { useTwoFactorLogin } from "../../hooks/organism/useTwoFactorLogin";
 
 const TwoFactorLogin = () => {
-  const { code, setCode, error, loading, isBlocked, handleSubmit } =
+  const { code, setCode, error, loading, isBlocked, clearError, handleSubmit } =
     useTwoFactorLogin();
 
   return (
@@ -19,7 +19,7 @@ const TwoFactorLogin = () => {
           </p>
         </div>
 
-        {error && <Alert type="error" message={error} />}
+        {error && <Alert type="error" message={error} onClose={clearError} />}
 
         <TwoFactorCode
           code={code}

@@ -38,6 +38,8 @@ const Logs = () => {
     yearOptions,
     isDownloadingReport,
     handleDownloadReport,
+    isMobileFiltersExpanded,
+    toggleMobileFilters,
   } = useHouseLogs();
 
   return (
@@ -71,6 +73,8 @@ const Logs = () => {
         selectedActionLabel={selectedActionLabel}
         toggleActionValue={toggleActionValue}
         clearActionSelection={clearActionSelection}
+        isMobileExpanded={isMobileFiltersExpanded}
+        onToggleMobileFilters={toggleMobileFilters}
       />
 
       {error ? (

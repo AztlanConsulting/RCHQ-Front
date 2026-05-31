@@ -1,8 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
 import { secureFetch } from "../utils/secureFetchWrapper";
 
 export async function createHouseEvent(payload) {
-    const response = await secureFetch(`${BASE_URL}/event/house/add`, {
+    const response = await secureFetch(`/event/house/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -24,7 +23,7 @@ export async function createHouseEvent(payload) {
 }
 
 export async function getEventTypes() {
-    const response = await secureFetch(`${BASE_URL}/event/getAllTypes`);
+    const response = await secureFetch(`/event/getAllTypes`);
 
     if (!response.ok) {
         throw new APIError("Error al cargar tipos de evento", response.status);
@@ -36,7 +35,7 @@ export async function getEventTypes() {
 
 export async function getEmployeesForSelector(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const url = `${BASE_URL}/event/personal/employees${query ? `?${query}` : ""}`;
+    const url = `/event/personal/employees${query ? `?${query}` : ""}`;
 
     const response = await secureFetch(url);
 
@@ -76,7 +75,7 @@ export async function createGlobalEvent(payload) {
 }
 
 export async function createPersonalEvent(payload) {
-    const response = await secureFetch(`${BASE_URL}/event/personal/add`, {
+    const response = await secureFetch(`/event/personal/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

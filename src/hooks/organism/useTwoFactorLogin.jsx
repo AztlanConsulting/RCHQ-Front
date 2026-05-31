@@ -15,6 +15,7 @@ export const useTwoFactorLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { value: isBlocked, toggle: blockToggle } = useToggle(false);
+  const clearError = () => setError("");
 
   useEffect(() => {
     const sessionToken = getToken();
@@ -38,8 +39,16 @@ export const useTwoFactorLogin = () => {
       const response = await validateLoginTwoFactorAuthService(codeField.value);
 
       if (response.nextStep === "LOGIN_COMPLETE") {
+        const responseData = response?.data || {};
+        const { token, ...user } = responseData;
+
+        if (!token) {
+          setError("No se recibió un token de sesión válido");
+          return;
+        }
+
         localStorage.removeItem("preTwoFactorAuth");
-        login({ token: response.token, user: response.data });
+        login({ token, user });
         navigate("/app/calendario", { replace: true });
       }
     } catch (err) {
@@ -65,6 +74,7 @@ export const useTwoFactorLogin = () => {
     error,
     loading,
     isBlocked,
+    clearError,
     handleSubmit,
   };
 };

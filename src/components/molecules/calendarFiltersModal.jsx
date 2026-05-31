@@ -8,13 +8,15 @@ const CalendarFiltersModal = ({ open, onClose, ...filterProps }) => (
     title="Filtros"
     grayBackground
     placement="center"
-    className="max-w-lg !max-h-[90vh] sm:max-w-xl"
+    scrollable
+    className="max-w-lg !max-h-[90dvh] sm:max-w-xl"
   >
     <CalendarFilters
       {...filterProps}
       showPageHeading={false}
-      stackMaxHeightClass="max-h-none"
-      className="!mb-0 !p-0"
+      stackMaxHeightClass="max-h-none overflow-visible"
+      className="!mb-0 !min-h-0 !p-0"
+      useInlineEmployeeDropdown
     />
   </Modal>
 );

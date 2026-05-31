@@ -4,11 +4,12 @@ import {
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
 import {
-    getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
+import { getEmployeeDateRules } from "../../services/calendarService";
 import { shiftDateOnlyRange } from "../../utils/dateRangeShift";
 import { getVacationEditDatesErrors } from "../../utils/schema/vacation/vacation.schema";
+import { mergeDateRuleErrors } from "../../utils/dateRules";
 
 const getVacationRequestId = (event) =>
     event?.vacationRequestId ??
@@ -24,6 +25,7 @@ export const useVacationFormEdit = ({
 }) => {
     const [isVacationEditing, setIsVacationEditing] = useState(false);
     const [vacationRemainingInfo, setVacationRemainingInfo] = useState(null);
+    const [vacationDateRules, setVacationDateRules] = useState(null);
     const [isLoadingVacationRemaining, setIsLoadingVacationRemaining] =
         useState(false);
     const [vacationForm, setVacationForm] = useState({
@@ -38,6 +40,7 @@ export const useVacationFormEdit = ({
         setIsVacationEditing(false);
         setVacationEditError("");
         setVacationRemainingInfo(null);
+        setVacationDateRules(null);
         setIsLoadingVacationRemaining(false);
     }, []);
 
@@ -56,7 +59,7 @@ export const useVacationFormEdit = ({
         if (status === 2) {
             setAlert({
                 type: "error",
-                message: "No se pueden modificar vacaciones rechazadas",
+                message: "No se pueden editar vacaciones rechazadas",
             });
             return;
         }
@@ -84,9 +87,19 @@ export const useVacationFormEdit = ({
         if (employeeId) {
             setIsLoadingVacationRemaining(true);
 
-            getRemainingVacations(employeeId)
-                .then(setVacationRemainingInfo)
-                .catch(() => setVacationRemainingInfo(null))
+            getEmployeeDateRules(employeeId, "vacation")
+                .then((rules) => {
+                    setVacationDateRules(rules);
+                    setVacationRemainingInfo({
+                        remainingVacations: rules?.remainingVacations ?? 0,
+                        startDate: rules?.vacationPeriod?.startDate ?? "",
+                        endDate: rules?.vacationPeriod?.endDate ?? "",
+                    });
+                })
+                .catch(() => {
+                    setVacationDateRules(null);
+                    setVacationRemainingInfo(null);
+                })
                 .finally(() => setIsLoadingVacationRemaining(false));
         }
     }, [selectedEvent, selectedEventRef, setAlert]);
@@ -126,11 +139,17 @@ export const useVacationFormEdit = ({
             vacationRequestId,
         });
 
-        if (!validation.success) {
+        const fieldErrors = mergeDateRuleErrors(
+            validation.errors,
+            vacationForm,
+            vacationDateRules,
+        );
+
+        if (!validation.success || Object.values(fieldErrors).some(Boolean)) {
             setVacationEditError(
-                validation.errors.vacationRequestId ||
-                validation.errors.startDate ||
-                validation.errors.endDate ||
+                fieldErrors.vacationRequestId ||
+                fieldErrors.startDate ||
+                fieldErrors.endDate ||
                 "Revisa las fechas antes de continuar.",
             );
             return;
@@ -204,13 +223,13 @@ export const useVacationFormEdit = ({
 
             setAlert({
                 type: "success",
-                message: "Vacaciones modificadas correctamente",
+                message: "Vacaciones editadas correctamente",
             });
 
             resetVacationEdit();
         } catch (error) {
             setVacationEditError(
-                error?.message || "No se pudieron modificar las vacaciones.",
+                error?.message || "No se pudieron editar las vacaciones.",
             );
         } finally {
             setIsSavingVacation(false);
@@ -219,6 +238,7 @@ export const useVacationFormEdit = ({
         selectedEvent,
         selectedEventRef,
         vacationForm,
+        vacationDateRules,
         reloadCurrentRange,
         setSelectedEvent,
         setAlert,
@@ -231,6 +251,7 @@ export const useVacationFormEdit = ({
         vacationEditError,
         isSavingVacation,
         vacationRemainingInfo,
+        vacationDateRules,
         isLoadingVacationRemaining,
         startVacationEdit,
         cancelVacationEdit,

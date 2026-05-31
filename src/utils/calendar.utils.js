@@ -16,8 +16,8 @@ export const STATUS_OPTIONS = [
 ];
 
 export const ABSENCE_STATUS_OPTIONS = [
-    { value: "no_eliminadas", label: "No eliminadas" },
-    { value: "eliminadas", label: "Eliminadas" },
+    { value: "no_eliminadas", label: "No eliminadas", color: "#A8201A" },
+    { value: "eliminadas", label: "Eliminadas", color: "#3E000C" },
 ];
 
 export const ABSENCE_EVIDENCE_OPTIONS = [

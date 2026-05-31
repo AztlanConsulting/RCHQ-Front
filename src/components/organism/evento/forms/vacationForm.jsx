@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getCalendarViewerRole } from "../../../../services/calendarService";
 
 import Alert from "../../../atoms/alerts";
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
 import FormErrorText from "../../../atoms/formErrorText";
+import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import EmployeeSelectOption from "../../../molecules/employeeSelectOption";
 import SingleSelectDropdown from "../../../molecules/singleSelectDropdown";
 import { useVacationForm } from "../../../../hooks/pages/useVacationForm";
@@ -12,6 +13,10 @@ import {
     getVacationDateRange,
     getVacationEndDateMin,
 } from "../../../../utils/vacationDateRange";
+import {
+    buildDateRuleFilter,
+    parseDateOnly,
+} from "../../../../utils/dateRules";
 
 const VacationForm = (props) => {
     const {
@@ -23,6 +28,7 @@ const VacationForm = (props) => {
         isSubmitting,
         remainingInfo,
         isLoadingRemaining,
+        dateRules,
         setField,
         setServerError,
         handleSubmit,
@@ -31,12 +37,21 @@ const VacationForm = (props) => {
     const [openDropdown, setOpenDropdown] = useState(null);
 
     const viewerRole = getCalendarViewerRole();
+    const timeZoneSaveNotice = props.canSwitchCalendarTimeZone
+        ? "Las vacaciones se guardan con base en horario central de México porque se contabilizan contra días laborales y días libres mexicanos."
+        : "";
     const { minDate: vacationDateMin, maxDate: vacationDateMax } =
         getVacationDateRange();
+    const ruleMinDate = parseDateOnly(dateRules?.minDate) ?? vacationDateMin;
+    const ruleMaxDate = parseDateOnly(dateRules?.maxDate) ?? vacationDateMax;
     const vacationEndDateMin = getVacationEndDateMin(
         form.startDate,
-        vacationDateMin,
-        vacationDateMax,
+        ruleMinDate,
+        ruleMaxDate,
+    );
+    const dateRuleFilter = useMemo(
+        () => buildDateRuleFilter(dateRules),
+        [dateRules],
     );
 
     return (
@@ -111,8 +126,9 @@ const VacationForm = (props) => {
                         labelColor="text-[#374151]"
                         value={form.startDate}
                         placeholder="dd / mm / yyyy"
-                        minDate={vacationDateMin}
-                        maxDate={vacationDateMax}
+                        minDate={ruleMinDate}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupSize="compact"
                         popupStrategy="fixed"
                         onChange={(e) => setField("startDate", e.target.value)}
@@ -130,7 +146,8 @@ const VacationForm = (props) => {
                         value={form.endDate}
                         placeholder="dd / mm / yyyy"
                         minDate={vacationEndDateMin}
-                        maxDate={vacationDateMax}
+                        maxDate={ruleMaxDate}
+                        filterDate={dateRuleFilter}
                         popupAlign="right"
                         popupSize="compact"
                         popupStrategy="fixed"
@@ -142,6 +159,8 @@ const VacationForm = (props) => {
                     )}
                 </div>
             </div>
+
+            <TimeZoneSaveNotice>{timeZoneSaveNotice}</TimeZoneSaveNotice>
 
             {viewerRole === "Coordinador" ? (
                 <p className="mb-10 mt-2 text-xs text-slate-400">
@@ -164,7 +183,7 @@ const VacationForm = (props) => {
                 <SmallButton
                     text={isSubmitting ? "Registrando..." : "Confirmar"}
                     onClick={handleSubmit}
-                    disabled={isSubmitting || isLoadingOptions}
+                    disabled={isSubmitting || isLoadingOptions || isLoadingRemaining}
                 />
             </div>
         </>

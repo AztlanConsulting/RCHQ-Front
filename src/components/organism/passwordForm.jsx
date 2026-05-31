@@ -9,6 +9,7 @@ const PasswordForm = ({
   description,
   loading = false,
   errors = [],
+  onErrorsClose,
   onSubmit,
   onCancel,
   submitText,
@@ -151,6 +152,7 @@ const PasswordForm = ({
       {errors.length > 0 && (
         <Alert
           type="error"
+          onClose={onErrorsClose}
           message={
             <ul className="list-disc pl-5">
               {errors.map((item, index) => (

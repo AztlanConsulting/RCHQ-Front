@@ -1,8 +1,12 @@
 import SmallButton from "../../atoms/smallButton";
 import Type from "../../atoms/type";
-import { formatEventDate } from "../../../utils/calendarEventDetail";
+import {
+    formatEventDate,
+    formatEventTime,
+} from "../../../utils/calendarEventDetail";
 import { isPastDate } from "../../../utils/dates";
 import VacationEditForm from "../../organism/evento/forms/vacationEditForm";
+import MexicoReferenceNotice from "./mexicoReferenceNotice";
 import { getStoredUser } from "../../../utils/authStorage";
 
 const VacationDetail = ({
@@ -11,6 +15,7 @@ const VacationDetail = ({
     vacationForm,
     vacationEditError = "",
     vacationRemainingInfo = null,
+    vacationDateRules = null,
     isLoadingVacationRemaining = false,
     isSaving = false,
     onEdit,
@@ -20,6 +25,8 @@ const VacationDetail = ({
     onDelete,
     onApprove,
     onReject,
+    showMexicoReferenceNotice = false,
+    calendarTimeZone,
 }) => {
     const user = getStoredUser()
     const role = user?.role || null;
@@ -36,6 +43,7 @@ const VacationDetail = ({
     const canDelete = Boolean(onDelete) && role == "Coordinador" && (!isApproved || !isPast);
     const canEdit = Boolean(onEdit) && (role == "Coordinador" || userId === subjectId ) && !isPast && !isRejected;
     const canReview = Boolean(onApprove && onReject) && role == "Coordinador" && !isPast && isPending;
+    const showEditInReviewRow = canReview && canEdit;
 
     const title = isPending
         ? "Solicitud de Vacaciones"
@@ -51,6 +59,9 @@ const VacationDetail = ({
 
     const feedback = event.feedback || event.vacationFeedback || "";
     const shouldShowFeedback = Boolean(feedback);
+    const mexicoDaysSuffix = showMexicoReferenceNotice
+        ? " (horario cdmx)"
+        : "";
 
     if (isEditing) {
         return (
@@ -60,6 +71,7 @@ const VacationDetail = ({
                 vacationForm={vacationForm}
                 vacationEditError={vacationEditError}
                 vacationRemainingInfo={vacationRemainingInfo}
+                vacationDateRules={vacationDateRules}
                 isLoadingVacationRemaining={isLoadingVacationRemaining}
                 isSaving={isSaving}
                 onCancelEdit={onCancelEdit}
@@ -79,6 +91,8 @@ const VacationDetail = ({
                 {title}
             </Type>
 
+            <MexicoReferenceNotice show={showMexicoReferenceNotice} />
+
             <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2">
                 <div>
                     <Type
@@ -89,7 +103,7 @@ const VacationDetail = ({
                     </Type>
                     <Type
                         variant="body"
-                        className="text-[1.05rem] leading-snug"
+                        className="text-[1.05rem] leading-snug wrap-break-word"
                     >
                         {event.employeeName || "—"}
                     </Type>
@@ -129,12 +143,31 @@ const VacationDetail = ({
                     </Type>
                 </div>
 
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de inicio:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.start, {
+                                timeZone: calendarTimeZone,
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
+
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Fecha de fin:
+                        Fecha de término:
                     </Type>
                     <Type
                         variant="body"
@@ -146,12 +179,31 @@ const VacationDetail = ({
                     </Type>
                 </div>
 
+                {showMexicoReferenceNotice ? (
+                    <div>
+                        <Type
+                            variant="metric-label"
+                            className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                        >
+                            Hora de término:
+                        </Type>
+                        <Type
+                            variant="body"
+                            className="text-[1.05rem] leading-snug"
+                        >
+                            {formatEventTime(event.end, {
+                                timeZone: calendarTimeZone
+                            })}
+                        </Type>
+                    </div>
+                ) : null}
+
                 <div>
                     <Type
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días totales:
+                        Días totales{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -168,7 +220,7 @@ const VacationDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Días hábiles:
+                        Días hábiles{mexicoDaysSuffix}:
                     </Type>
                     <Type
                         variant="body"
@@ -205,7 +257,7 @@ const VacationDetail = ({
                         </Type>
                         <Type
                             variant="body"
-                            className="text-[1.05rem] leading-snug"
+                            className="text-[1.05rem] leading-snug wrap-break-word"
                         >
                             {feedback}
                         </Type>
@@ -213,7 +265,37 @@ const VacationDetail = ({
                 ) : null}
             </div>
 
-            {canDelete || canEdit ? (
+            {canReview ? (
+                <div>
+                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
+                        <SmallButton
+                            type="button"
+                            text="Aprobar"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onApprove}
+                        />
+                        <SmallButton
+                            type="button"
+                            text="Rechazar"
+                            hasAdjustableWidth
+                            className="h-8 rounded-md sm:w-[7.2rem]"
+                            onClick={onReject}
+                        />
+                        {showEditInReviewRow ? (
+                            <SmallButton
+                                type="button"
+                                text="Editar"
+                                hasAdjustableWidth
+                                className="h-8 rounded-md sm:w-[7.2rem]"
+                                onClick={onEdit}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
+
+            {canDelete || (canEdit && !showEditInReviewRow) ? (
                 <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
                     {canDelete ? (
                         <SmallButton
@@ -226,7 +308,7 @@ const VacationDetail = ({
                         />
                     ) : null}
 
-                    {canEdit ? (
+                    {canEdit && !showEditInReviewRow ? (
                         <SmallButton
                             type="button"
                             text="Editar"
@@ -235,30 +317,6 @@ const VacationDetail = ({
                             onClick={onEdit}
                         />
                     ) : null}
-                </div>
-            ) : null}
-
-            {canReview ? (
-                <div>
-                    <div className="mt-4 border border-b border-[#EAEAEA]"></div>
-
-                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-8">
-                        <SmallButton
-                            type="button"
-                            text="Aprobar"
-                            hasAdjustableWidth
-                            className="h-8 rounded-md sm:w-[7.2rem]"
-                            onClick={onApprove}
-                        />
-                        <SmallButton
-                            type="button"
-                            text="Rechazar"
-                            hasNoRollback
-                            hasAdjustableWidth
-                            className="h-8 rounded-md sm:w-[7.2rem]"
-                            onClick={onReject}
-                        />
-                    </div>
                 </div>
             ) : null}
         </div>

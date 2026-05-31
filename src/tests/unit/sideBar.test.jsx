@@ -26,9 +26,9 @@ const defaultAuthState = {
   logout: vi.fn(),
 };
 
-const renderSideBar = () =>
+const renderSideBar = (initialEntries = ["/app/calendario"]) =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <SideBar />
     </MemoryRouter>,
   );
@@ -178,6 +178,18 @@ describe("SideBar", () => {
     expect(screen.queryByRole("link", { name: "Casas Hogares" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Donaciones" })).toBeNull();
   });
+
+  it.each([
+    ["/app/opciones"],
+    ["/app/certificaciones"],
+    ["/app/emp-123/documentos"],
+  ])("mantiene Perfil activo en %s", (route) => {
+    renderSideBar([route]);
+
+    expect(screen.getAllByRole("link", { name: "Perfil" })[0]).toHaveClass(
+      "bg-[#1F5ACD]",
+    );
+  });
 });
 
 describe("SideBar expandida", () => {
@@ -231,5 +243,13 @@ describe("SideBar mobile abierta", () => {
     const btn = screen.getByRole("button", { name: "Cerrar menú" });
 
     expect(btn).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("mantiene Perfil activo en certificaciones dentro del menú mobile", () => {
+    renderSideBar(["/app/certificaciones"]);
+
+    expect(screen.getAllByRole("link", { name: "Perfil" })[0]).toHaveClass(
+      "bg-[#1F5ACD]",
+    );
   });
 });

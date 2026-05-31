@@ -21,8 +21,8 @@ const buildAbsence = (overrides = {}) => ({
     name: "John Smith",
     type: "Médica",
     description: "Reposo indicado",
-    start: "2026-05-05T00:00:00.000Z",
-    end: "2026-05-10T00:00:00.000Z",
+    start: "2026-05-05T06:00:00.000Z",
+    end: "2026-05-10T06:00:00.000Z",
     startDate: "2026-05-05",
     endDate: "2026-05-09",
     allDay: true,
@@ -44,6 +44,41 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         ]);
     });
 
+    it("usa el color de eliminadas cuando se activa el filtro de ausencias eliminadas", async () => {
+        const events = [
+            buildAbsence({
+                absenceId: "deleted-absence",
+                isDeleted: true,
+            }),
+        ];
+
+        const { result } = renderHook(() =>
+            useCalendarFilters(events, {
+                isList: false,
+                viewerRole: "Psicóloga",
+            }),
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+
+        act(() => {
+            result.current.setAbsenceStatusFilters(["eliminadas"]);
+        });
+
+        await waitFor(() => {
+            expect(result.current.visibleEvents).toHaveLength(1);
+        });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            backgroundColor: "#3E000C",
+            borderColor: "#3E000C",
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            absenceId: "deleted-absence",
+            isDeleted: true,
+        });
+    });
+
     it("no carga el catálogo de empleados de casa para un trabajador", async () => {
         const events = [
             buildAbsence({ link: "http://localhost:3000/uploads/absence.pdf" }),
@@ -63,6 +98,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             useCalendarFilters(events, {
                 isList: false,
                 viewerRole: "Mantenimiento",
+                calendarTimeZone: "America/Mexico_City",
             }),
         );
 
@@ -84,7 +120,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         expect(absenceEvent).toMatchObject({
             title: "Ausencia Médica",
             backgroundColor: "#A8201A",
-            borderColor: "#DC2626",
+            borderColor: "#A8201A",
             allDay: true,
         });
         expect(absenceEvent.extendedProps).toMatchObject({
@@ -96,7 +132,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         expect(globalEvent.extendedProps.link).toBe("");
     });
 
-    it("no vuelve a cargar tipos de ausencia cuando cambia a rol administrativo", async () => {
+    it("no vuelve a cargar tipos de ausencia cuando cambia a Coordinador", async () => {
         const { rerender } = renderHook(
             ({ viewerRole }) =>
                 useCalendarFilters([], {
@@ -109,10 +145,22 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
         expect(getHouseEmployees).not.toHaveBeenCalled();
 
-        rerender({ viewerRole: "Administrador" });
+        rerender({ viewerRole: "Coordinador" });
 
         await waitFor(() => expect(getHouseEmployees).toHaveBeenCalledTimes(1));
         expect(getAbsenceTypes).toHaveBeenCalledTimes(1);
+    });
+
+    it("no carga empleados de casa para Administrador porque el backend restringe esa ruta a Coordinador", async () => {
+        renderHook(() =>
+            useCalendarFilters([], {
+                isList: false,
+                viewerRole: "Administrador",
+            }),
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+        expect(getHouseEmployees).not.toHaveBeenCalled();
     });
 
     it("filtra ausencias del trabajador por evidencia", async () => {
@@ -154,6 +202,310 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         expect(result.current.visibleEvents).toHaveLength(1);
         expect(result.current.visibleEvents[0].extendedProps.absenceId).toBe(
             "with-evidence",
+        );
+    });
+
+    it("adapta ausencias all-day entre horario central de México y horario foráneo", async () => {
+        const absence = buildAbsence({
+            absenceId: "timezone-absence",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            startDate: "2026-05-05",
+            endDate: "2026-05-05",
+            totalDays: 1,
+            usedDays: 1,
+        });
+
+        const { result, rerender } = renderHook(
+            ({ calendarTimeZone }) =>
+                useCalendarFilters([absence], {
+                    isList: false,
+                    viewerRole: "Psicóloga",
+                    calendarTimeZone,
+                }),
+            {
+                initialProps: {
+                    calendarTimeZone: "America/Mexico_City",
+                },
+            },
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05",
+            end: "2026-05-06",
+            allDay: true,
+        });
+
+        rerender({ calendarTimeZone: "America/Matamoros" });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T01:00:00",
+            end: "2026-05-06T01:00:00",
+            allDay: false,
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            startDate: "2026-05-05",
+            endDate: "2026-05-06",
+            totalDays: 1,
+            usedDays: 1,
+        });
+    });
+
+    it("adapta eventos con hora entre horario central de México y horario foráneo", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Taller",
+            scope: "global",
+            type: "General",
+            start: "2026-05-05T15:00:00.000Z",
+            end: "2026-05-05T16:30:00.000Z",
+            allDay: false,
+            isFreeDay: false,
+        };
+
+        const { result, rerender } = renderHook(
+            ({ calendarTimeZone }) =>
+                useCalendarFilters([event], {
+                    isList: false,
+                    viewerRole: "Psicóloga",
+                    calendarTimeZone,
+                }),
+            {
+                initialProps: {
+                    calendarTimeZone: "America/Mexico_City",
+                },
+            },
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(1),
+        );
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T09:00:00",
+            end: "2026-05-05T10:30:00",
+            allDay: false,
+        });
+
+        rerender({ calendarTimeZone: "America/Matamoros" });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T10:00:00",
+            end: "2026-05-05T11:30:00",
+            allDay: false,
+        });
+    });
+
+    it("mantiene eventos all-day 00:00 a 00:00 como all-day en su horario base", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Retiro",
+            scope: "global",
+            type: "General",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            allDay: true,
+            isFreeDay: false,
+        };
+
+        const { result, rerender } = renderHook(
+            ({ calendarTimeZone }) =>
+                useCalendarFilters([event], {
+                    isList: false,
+                    viewerRole: "Psicóloga",
+                    calendarTimeZone,
+                }),
+            {
+                initialProps: {
+                    calendarTimeZone: "America/Mexico_City",
+                },
+            },
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(1),
+        );
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05",
+            end: "2026-05-06",
+            allDay: true,
+        });
+
+        rerender({ calendarTimeZone: "America/Matamoros" });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T01:00:00",
+            end: "2026-05-06T01:00:00",
+            allDay: false,
+        });
+    });
+
+    it("expande en lista los eventos all-day con desfase y agrega Día x/x", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Retiro",
+            scope: "global",
+            type: "General",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            allDay: true,
+            isFreeDay: true,
+        };
+
+        const { result } = renderHook(() =>
+            useCalendarFilters([event], {
+                isList: true,
+                viewerRole: "Psicóloga",
+                calendarTimeZone: "America/Matamoros",
+            }),
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(2),
+        );
+
+        expect(result.current.visibleEvents.map((visibleEvent) => ({
+            start: visibleEvent.start,
+            end: visibleEvent.end,
+            currentDayIndex: visibleEvent.extendedProps.currentDayIndex,
+            totalDays: visibleEvent.extendedProps.totalDays,
+        }))).toEqual([
+            {
+                start: "2026-05-05T01:00:00",
+                end: "2026-05-06T00:00:00",
+                currentDayIndex: 1,
+                totalDays: 2,
+            },
+            {
+                start: "2026-05-06T00:00:00",
+                end: "2026-05-06T01:00:00",
+                currentDayIndex: 2,
+                totalDays: 2,
+            },
+        ]);
+    });
+
+    it("marca como Todo el día solo el segmento completo en lista y mantiene el rango real para detalle", async () => {
+        const event = {
+            focus: "vacaciones",
+            vacationId: "vacation-list-detail",
+            employeeId: "employee-worker",
+            name: "John Smith",
+            type: "Vacaciones",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-07T06:00:00.000Z",
+            startDate: "2026-05-05",
+            endDate: "2026-05-07",
+            allDay: true,
+            status: 1,
+            usedDays: 2,
+            totalDays: 3,
+        };
+
+        const { result } = renderHook(() =>
+            useCalendarFilters([event], {
+                isList: true,
+                viewerRole: "Psicóloga",
+                calendarTimeZone: "America/Matamoros",
+            }),
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(3),
+        );
+
+        expect(result.current.visibleEvents.map((visibleEvent) => ({
+            start: visibleEvent.start,
+            end: visibleEvent.end,
+            allDay: visibleEvent.allDay,
+            currentDayIndex: visibleEvent.extendedProps.currentDayIndex,
+            startDate: visibleEvent.extendedProps.startDate,
+            endDate: visibleEvent.extendedProps.endDate,
+            detailAllDay: visibleEvent.extendedProps.detailAllDay,
+        }))).toEqual([
+            {
+                start: "2026-05-05T01:00:00",
+                end: "2026-05-06T00:00:00",
+                allDay: false,
+                currentDayIndex: 1,
+                startDate: "2026-05-05",
+                endDate: "2026-05-07",
+                detailAllDay: false,
+            },
+            {
+                start: "2026-05-06",
+                end: "2026-05-07",
+                allDay: true,
+                currentDayIndex: 2,
+                startDate: "2026-05-05",
+                endDate: "2026-05-07",
+                detailAllDay: false,
+            },
+            {
+                start: "2026-05-07T00:00:00",
+                end: "2026-05-07T01:00:00",
+                allDay: false,
+                currentDayIndex: 3,
+                startDate: "2026-05-05",
+                endDate: "2026-05-07",
+                detailAllDay: false,
+            },
+        ]);
+    });
+
+    it("adapta eventos freeDay al cambiar entre horario central de México y horario foráneo", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Día libre",
+            scope: "global",
+            type: "General",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            allDay: true,
+            isFreeDay: true,
+        };
+
+        const { result, rerender } = renderHook(
+            ({ calendarTimeZone }) =>
+                useCalendarFilters([event], {
+                    isList: false,
+                    viewerRole: "Psicóloga",
+                    calendarTimeZone,
+                }),
+            {
+                initialProps: {
+                    calendarTimeZone: "America/Mexico_City",
+                },
+            },
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(1),
+        );
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05",
+            end: "2026-05-06",
+            allDay: true,
+        });
+
+        rerender({ calendarTimeZone: "America/Matamoros" });
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T01:00:00",
+            end: "2026-05-06T01:00:00",
+            allDay: false,
+        });
+        expect(result.current.visibleEvents[0].extendedProps.isFreeDay).toBe(
+            true,
         );
     });
 

@@ -143,4 +143,19 @@ describe("LoginPage + AuthService — flujo de login", () => {
       );
     });
   });
+
+  it("muestra mensaje claro cuando ya hay una sesion activa", async () => {
+    const error = new Error("Sesion activa");
+    error.status = 409;
+    error.code = "SESSION_ALREADY_ACTIVE";
+    error.errors = [];
+    loginService.mockRejectedValue(error);
+    renderLogin();
+
+    await fillAndSubmit("usuario@test.com", "Password123!");
+
+    await waitFor(() =>
+      expect(screen.getByText(/ya hay una sesi/i)).toBeInTheDocument(),
+    );
+  });
 });

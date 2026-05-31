@@ -5,11 +5,13 @@ import { useAbsenceForm } from "../../hooks/pages/useAbsenceForm";
 import {
     createAbsenceService,
     getAbsenceAddData,
+    getEmployeeDateRules,
 } from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
     createAbsenceService: vi.fn(),
     getAbsenceAddData: vi.fn(),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 const employees = [
@@ -117,6 +119,7 @@ describe("useAbsenceForm", () => {
         createAbsenceService.mockResolvedValue({
             absenceId: "absence-1",
         });
+        getEmployeeDateRules.mockResolvedValue(null);
     });
 
     it("carga empleados y tipos de ausencia para registrar", async () => {
@@ -305,7 +308,7 @@ describe("useAbsenceForm", () => {
         });
         await submitForm(result);
 
-        expect(result.current.errors.file).toBe("tama\u00f1o superior a 10mb");
+        expect(result.current.errors.file).toBe("Tama\u00f1o superior a 10mb");
         expect(createAbsenceService).not.toHaveBeenCalled();
     });
 
@@ -313,14 +316,14 @@ describe("useAbsenceForm", () => {
         [
             "empleado que no esta en la base de datos",
             { employeeId: "emp-missing" },
-            apiError("usuario no encontrado", 404),
-            "usuario no encontrado",
+            apiError("Usuario no encontrado", 404),
+            "Usuario no encontrado",
         ],
         [
             "empleado dado de baja",
             { employeeId: "emp-inactive" },
-            apiError("usuario no encontrado", 404),
-            "usuario no encontrado",
+            apiError("Usuario no encontrado", 404),
+            "Usuario no encontrado",
         ],
         [
             "tipo de ausencia que no esta en la base de datos",
@@ -337,8 +340,8 @@ describe("useAbsenceForm", () => {
         [
             "trabajador de otra casa hogar",
             { employeeId: "emp-other-house" },
-            apiError("usuario no encontrado", 404),
-            "usuario no encontrado",
+            apiError("Usuario no encontrado", 404),
+            "Usuario no encontrado",
         ],
         [
             "limite de 10 ausencias en la misma fecha",

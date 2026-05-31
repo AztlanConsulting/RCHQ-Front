@@ -1,8 +1,7 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const getEmployeeFormData = async () => {
-  const res = await secureFetch(`${API_URL}/employee/add`, {
+  const res = await secureFetch(`/employee/add`, {
     method: "GET",
   });
 
@@ -27,7 +26,7 @@ export const createEmployee = async (data) => {
     }
   });
 
-  const res = await secureFetch(`${API_URL}/employee/add`, {
+  const res = await secureFetch(`/employee/add`, {
     method: "POST",
     body: formData,
   });
@@ -70,7 +69,7 @@ export const getEmployees = async (
     active,
   });
 
-  const res = await secureFetch(`${API_URL}/employee/getAll?${params}`, {
+  const res = await secureFetch(`/employee/getAll?${params}`, {
     method: "GET",
   });
 
@@ -91,7 +90,7 @@ export const getEmployees = async (
 };
 
 export const getEmployeeById = async (employeeId) => {
-  const res = await secureFetch(`${API_URL}/employee/${employeeId}`, {
+  const res = await secureFetch(`/employee/${employeeId}`, {
     method: "GET",
   });
 

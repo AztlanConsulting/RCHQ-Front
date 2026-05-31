@@ -24,7 +24,10 @@ import {
     getRemainingVacations,
     updateVacationRequestDates,
 } from "../../services/vacationService";
-import { getEventsInRange } from "../../services/calendarService";
+import { 
+    getEventsInRange, 
+    getEmployeeDateRules 
+} from "../../services/calendarService";
 
 vi.mock("../../services/vacationRequestService", () => ({
     getFutureVacationRequests: vi.fn(),
@@ -41,6 +44,7 @@ vi.mock("../../services/calendarService", () => ({
     getEventsInRange: vi.fn(),
     getOwnEmployeeId: vi.fn(() => "own-employee"),
     getCalendarViewerRole: vi.fn(() => "Trabajador"),
+    getEmployeeDateRules: vi.fn(),
 }));
 
 vi.mock("../../components/atoms/vacationDateField", () => ({
@@ -244,13 +248,15 @@ describe("Integración: VacationList", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        getEmployeeDateRules.mockResolvedValue({
+            remainingVacations: 10,
+            vacationPeriod: {
+                startDate: "2026-01-01",
+                endDate: "2026-12-31",
+            },
+        });
         getFutureVacationRequests.mockResolvedValue(futureResponse);
         getPastVacationRequests.mockResolvedValue(pastResponse);
-        getRemainingVacations.mockResolvedValue({
-            remainingVacations: 10,
-            startDate: "2026-01-01",
-            endDate: "2026-12-31",
-        });
         updateVacationRequestDates.mockResolvedValue({
             vacationRequestId: "123e4567-e89b-12d3-a456-426614174000",
             startDate: "2026-06-16",
@@ -310,7 +316,9 @@ describe("Integración: VacationList", () => {
 
         expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole("button", { name: "Vacaciones pasadas" }));
+        fireEvent.change(screen.getByLabelText("Vista de vacaciones"), {
+            target: { value: "past" },
+        });
 
         expect(await screen.findByText("Pasada aprobada")).toBeInTheDocument();
         expect(screen.getByText("Inicia hoy")).toBeInTheDocument();
@@ -322,6 +330,52 @@ describe("Integración: VacationList", () => {
                 status: "all",
             }),
         );
+
+        const statusSelect = screen.getByLabelText("Filtrar por estado");
+
+        expect(
+            within(statusSelect).queryByRole("option", { name: "Pendientes" }),
+        ).toBeNull();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Aprobadas" }),
+        ).toBeInTheDocument();
+        expect(
+            within(statusSelect).getByRole("option", { name: "Rechazadas" }),
+        ).toBeInTheDocument();
+    });
+
+    it("reinicia el filtro pendiente al cambiar a vacaciones pasadas", async () => {
+        renderVacationList();
+
+        expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
+
+        fireEvent.change(screen.getByLabelText("Filtrar por estado"), {
+            target: { value: "pending" },
+        });
+
+        await waitFor(() => {
+            expect(getFutureVacationRequests).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    status: "pending",
+                    page: 1,
+                }),
+            );
+        });
+
+        fireEvent.change(screen.getByLabelText("Vista de vacaciones"), {
+            target: { value: "past" },
+        });
+
+        await waitFor(() => {
+            expect(getPastVacationRequests).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    status: "all",
+                    page: 1,
+                }),
+            );
+        });
+
+        expect(screen.getByLabelText("Filtrar por estado")).toHaveValue("all");
     });
 
     it("manda filtros de estado y rango de fechas al servicio de la vista activa", async () => {
@@ -407,12 +461,12 @@ describe("Integración: VacationList", () => {
 
         expect(await screen.findByText("Futura pendiente 1")).toBeInTheDocument();
 
-        fireEvent.click(screen.getAllByTitle("Modificar vacación")[0]);
+        fireEvent.click(screen.getAllByTitle("Editar vacación")[0]);
 
         const dialog = await screen.findByRole("dialog");
 
         expect(
-            within(dialog).getByText("Modificar vacaciones"),
+            within(dialog).getByText("Editar vacaciones"),
         ).toBeInTheDocument();
         expect(within(dialog).queryByText("Nombre del trabajador")).toBeNull();
         expect(within(dialog).queryByText("CURP")).toBeNull();
@@ -422,7 +476,7 @@ describe("Integración: VacationList", () => {
         expect(within(dialog).getByLabelText("Fecha de fin")).toHaveValue(
             "2026-06-16",
         );
-        expect(getRemainingVacations).toHaveBeenCalledWith("own-employee");
+        expect(getEmployeeDateRules).toHaveBeenCalledWith("own-employee", "vacation");
     });
 
     it("abre el modal de borrado y elimina una vacación futura sin mostrar datos del empleado", async () => {

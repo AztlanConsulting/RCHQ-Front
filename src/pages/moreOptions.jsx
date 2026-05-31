@@ -3,7 +3,6 @@ import OptionCard from "../components/molecules/optionCard";
 import BigButton from "../components/atoms/bigButton";
 import TextField from "../components/atoms/textField";
 import Alert from "../components/atoms/alerts";
-import ModalCloseButton from "../components/atoms/modalCloseButton";
 import TwoFactorAuth from "./auth/twoFactorAuth";
 import ChangePasswordModal from "../components/organism/changePasswordModal";
 import eye from "/showEye.svg";
@@ -24,6 +23,7 @@ const MoreOptions = () => {
     error,
     setError,
     successMessage,
+    setSuccessMessage,
     handleDisable,
     handleEnableSuccess,
     handleCancelDisable,
@@ -41,6 +41,7 @@ const MoreOptions = () => {
     showNewPassword,
     showConfirmPassword,
     handleCloseChangePasswordModal,
+    handleDismissChangePasswordErrors,
     handleSubmitChangePassword,
   } = useTwoFactorAuthOptions();
 
@@ -52,11 +53,15 @@ const MoreOptions = () => {
 
       {successMessage && (
         <div className="mb-4">
-          <Alert type="success" message={successMessage} />
+          <Alert
+            type="success"
+            message={successMessage}
+            onClose={() => setSuccessMessage("")}
+          />
         </div>
       )}
 
-      <div className="min-h-96 rounded-2xl border border-slate-200 bg-transparent p-4 sm:p-6 md:min-h-[30rem] md:p-8">
+      <div className="min-h-96 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-6 md:min-h-[30rem] md:p-8">
         <div className="flex justify-center md:justify-start">
           <BigButton
             text="Regresar a mi perfil"
@@ -131,13 +136,11 @@ const MoreOptions = () => {
 
       {showTwoFactorAuthModal.value && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:p-4">
-          <div className="relative my-3 sm:my-0">
-            <ModalCloseButton
-              onClick={() => showTwoFactorAuthModal.toggle()}
-              className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6"
-              ariaLabel="Cerrar"
+          <div className="my-3 sm:my-0">
+            <TwoFactorAuth
+              onClose={handleEnableSuccess}
+              onDismiss={() => showTwoFactorAuthModal.toggle()}
             />
-            <TwoFactorAuth onClose={handleEnableSuccess} />
           </div>
         </div>
       )}
@@ -152,7 +155,13 @@ const MoreOptions = () => {
               Ingresa tu contraseña para confirmar.
             </p>
 
-            {error && <Alert type="error" message={error} />}
+            {error && (
+              <Alert
+                type="error"
+                message={error}
+                onClose={() => setError("")}
+              />
+            )}
 
             <TextField
               id="disable-password"
@@ -196,6 +205,7 @@ const MoreOptions = () => {
         onClose={handleCloseChangePasswordModal}
         loading={changePasswordLoading}
         errors={changePasswordErrors}
+        onErrorsClose={handleDismissChangePasswordErrors}
         onSubmit={handleSubmitChangePassword}
         currentPassword={currentPassword}
         setCurrentPassword={setCurrentPassword}

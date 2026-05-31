@@ -1,7 +1,5 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const buildQueryParams = ({
     page = 1,
     limit = 6,
@@ -91,7 +89,7 @@ export const getPendingVacationRequests = async ({
         endDate,
     });
 
-    const res = await secureFetch(`${API_URL}/vacation/requests/pending?${query}`, {
+    const res = await secureFetch(`/vacation/requests/pending?${query}`, {
         method: "GET",
     });
 
@@ -115,7 +113,7 @@ export const getReviewedVacationRequests = async ({
         status,
     });
 
-    const res = await secureFetch(`${API_URL}/vacation/requests/reviewed?${query}`, {
+    const res = await secureFetch(`/vacation/requests/reviewed?${query}`, {
         method: "GET",
     });
 
@@ -137,7 +135,7 @@ export const getFutureVacationRequests = async ({
         status,
     });
 
-    const res = await secureFetch(`${API_URL}/vacation/requests/future?${query}`, {
+    const res = await secureFetch(`/vacation/requests/future?${query}`, {
         method: "GET",
     });
 
@@ -159,7 +157,7 @@ export const getPastVacationRequests = async ({
         status,
     });
 
-    const res = await secureFetch(`${API_URL}/vacation/requests/past?${query}`, {
+    const res = await secureFetch(`/vacation/requests/past?${query}`, {
         method: "GET",
     });
 
@@ -168,7 +166,7 @@ export const getPastVacationRequests = async ({
 
 export const approveVacationRequest = async (vacationRequestId) => {
     const res = await secureFetch(
-        `${API_URL}/vacation/request/${vacationRequestId}/approve`,
+        `/vacation/request/${vacationRequestId}/approve`,
         {
             method: "PATCH",
             headers: {
@@ -183,7 +181,7 @@ export const approveVacationRequest = async (vacationRequestId) => {
 
 export const rejectVacationRequest = async (vacationRequestId, feedback) => {
     const res = await secureFetch(
-        `${API_URL}/vacation/request/${vacationRequestId}/reject`,
+        `/vacation/request/${vacationRequestId}/reject`,
         {
             method: "PATCH",
             headers: {

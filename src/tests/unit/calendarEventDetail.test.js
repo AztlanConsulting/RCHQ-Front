@@ -3,6 +3,7 @@ import {
   addDaysToDateOnly,
   calculateDateRangeDays,
   calendarItemToDetail,
+  eventApiToDetail,
   formatEventDate,
   formatEventDateOnly,
   formatEventDateRange,
@@ -112,8 +113,48 @@ describe("calendarEventDetail", () => {
     expect(formatEventDateRange("", "")).toBe("—");
   });
 
+  it("eventApiToDetail usa el rango original UTC aunque la fila de lista sea un segmento", () => {
+    const result = eventApiToDetail({
+      id: "segment-2",
+      title: "Vacaciones de John Smith",
+      start: new Date("2026-05-06T00:00:00"),
+      end: new Date("2026-05-07T00:00:00"),
+      allDay: true,
+      extendedProps: {
+        focus: "vacaciones",
+        detailAllDay: false,
+        utcStart: "2026-05-05T06:00:00.000Z",
+        utcEnd: "2026-05-07T06:00:00.000Z",
+        startDate: "2026-05-05",
+        endDate: "2026-05-07",
+        startReadableDate: "2026-05-05",
+        endReadableDate: "2026-05-07",
+      },
+    });
+
+    expect(result).toMatchObject({
+      allDay: false,
+      startDate: "2026-05-05",
+      endDate: "2026-05-07",
+      readableStart: "2026-05-05",
+      readableEnd: "2026-05-07",
+    });
+    expect(result.start.toISOString()).toBe("2026-05-05T06:00:00.000Z");
+    expect(result.end.toISOString()).toBe("2026-05-07T06:00:00.000Z");
+  });
+
   it("formatEventTime formatea horas válidas", () => {
-    expect(formatEventTime("2026-05-15T15:30:00.000Z")).toBe("3:30 p.m.");
+    expect(
+      formatEventTime("2026-05-15T15:30:00.000Z", { timeZone: "UTC" }),
+    ).toBe("3:30 p.m.");
+  });
+
+  it("formatEventTime conserva el minuto real del registro", () => {
+    expect(
+      formatEventTime("2026-05-06T06:00:00.000Z", {
+        timeZone: "America/Matamoros",
+      }),
+    ).toBe("1:00 a.m.");
   });
 
   it("formatEventTime regresa guion si no hay valor", () => {
