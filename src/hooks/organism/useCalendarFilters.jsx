@@ -501,6 +501,38 @@ export const useCalendarFilters = (
     }, []);
 
     useEffect(() => {
+        if (!allEvents || allEvents.length === 0) return;
+
+        setEventTypeOptions((prevOptions) => {
+            const known = new Set(prevOptions.map((o) => o.value));
+            const toAdd = [];
+            for (const e of allEvents) {
+                if (e.focus !== "eventos") continue;
+                const key = String(e.type || "").toLowerCase();
+                if (key && !known.has(key)) {
+                    toAdd.push({ value: key, label: e.type });
+                    known.add(key);
+                }
+            }
+            return toAdd.length === 0 ? prevOptions : [...prevOptions, ...toAdd];
+        });
+
+        setEventTypeFilters((prevFilters) => {
+            const current = new Set(prevFilters);
+            const toAdd = [];
+            for (const e of allEvents) {
+                if (e.focus !== "eventos") continue;
+                const key = String(e.type || "").toLowerCase();
+                if (key && !current.has(key)) {
+                    toAdd.push(key);
+                    current.add(key);
+                }
+            }
+            return toAdd.length === 0 ? prevFilters : [...prevFilters, ...toAdd];
+        });
+    }, [allEvents]);
+
+    useEffect(() => {
         getAbsenceTypes()
             .then((absenceTypes) => {
                 if (!Array.isArray(absenceTypes)) return;
