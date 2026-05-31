@@ -67,6 +67,24 @@ describe("EventDetail", () => {
         ).not.toBeInTheDocument();
     });
 
+    it("omite la etiqueta de capacitador cuando el tipo de evento no es capacitaciones", () => {
+        render(
+            <EventDetail
+                event={buildEvent({
+                    eventType: "Reunion",
+                    trainer: "Dra. Campos",
+                })}
+                viewerRole="Coordinador"
+                onEdit={vi.fn()}
+                onDelete={vi.fn()}
+            />,
+        );
+
+        expect(screen.queryByText(/capacitador:/i)).not.toBeInTheDocument();
+        expect(screen.queryByText("Dra. Campos")).not.toBeInTheDocument();
+        expect(screen.getByText("Eventos · Reunion")).toBeInTheDocument();
+    });
+
     it("muestra correctamente los datos cortos de una capacitacion", () => {
         render(
             <EventDetail

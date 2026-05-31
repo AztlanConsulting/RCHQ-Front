@@ -374,4 +374,45 @@ describe("Integracion: consulta de capacitaciones personales", () => {
         ).not.toBeInTheDocument();
         expect(within(dialog).getByText("Capacitacion de primeros auxilios")).toBeInTheDocument();
     });
+
+    it("si el tipo de evento no es capacitaciones no renderiza el trainer en la funcionalidad", () => {
+        setCalendarState({
+            viewerRole: "Coordinador",
+            allEvents: [
+                buildPersonalTrainingEvent({
+                    eventId: "meeting-001",
+                    title: "Reunion operativa",
+                    trainer: "Lic. Herrera",
+                    description: "Seguimiento semanal del area.",
+                    peopleInsideEvent: [{ id: "worker-1", name: "Laura Mendoza" }],
+                    eventType: "Reunion",
+                }),
+            ],
+        });
+
+        renderCalendar();
+
+        fireEvent.click(screen.getByTestId("calendar-event-meeting-001"));
+
+        const dialog = screen.getByRole("dialog", {
+            name: /detalle del evento/i,
+        });
+
+        expect(
+            within(dialog).getByRole("heading", {
+                level: 2,
+                name: "Reunion operativa",
+            }),
+        ).toBeInTheDocument();
+        expect(within(dialog).getByText("Eventos · Reunion")).toBeInTheDocument();
+        expect(
+            within(dialog).queryByText(/capacitador:/i),
+        ).not.toBeInTheDocument();
+        expect(
+            within(dialog).queryByText("Lic. Herrera"),
+        ).not.toBeInTheDocument();
+        expect(
+            within(dialog).getByText("Seguimiento semanal del area."),
+        ).toBeInTheDocument();
+    });
 });
