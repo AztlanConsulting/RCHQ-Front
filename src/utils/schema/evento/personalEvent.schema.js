@@ -64,6 +64,17 @@ export const baseSchema = z.object({
     forceOverlap: z.boolean().default(false),
 
     employeeIds: z.array(z.string().uuid()).optional(),
+
+    trainer: z
+        .string()
+        .max(100, "Máximo 100 caracteres")
+        .refine(
+            (val) => !val || TEXT_REGEX.test(val),
+            "El instructor contiene caracteres no permitidos",
+        )
+        .optional(),
+
+    isCapacitaciones: z.boolean().optional(),
 });
 
 export const allDaySchema = baseSchema.extend({
@@ -96,16 +107,25 @@ export const timedSchema = baseSchema
         },
     );
 
-export const personalEventSchema = z.discriminatedUnion("allDay", [
-    allDaySchema,
-    timedSchema,
-]);
+export const personalEventSchema = z
+    .discriminatedUnion("allDay", [allDaySchema, timedSchema])
+    .superRefine((data, ctx) => {
+        if (data.isCapacitaciones && !data.trainer?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                    "El capacitador es obligatorio para eventos de capacitación.",
+                path: ["trainer"],
+            });
+        }
+    });
 
 export function buildPersonalPayload(formData) {
     const {
         name,
         eventTypeId,
         description,
+        trainer,
         allDay,
         date,
         endDate,
@@ -123,6 +143,7 @@ export function buildPersonalPayload(formData) {
         allDay,
         timeZone,
         ...(description?.trim() ? { description: description.trim() } : {}),
+        ...(trainer ? { trainer } : {}),
         employeeIds: employeeIds ?? [],
         forceOverlap,
     };
