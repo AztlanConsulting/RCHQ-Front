@@ -22,6 +22,7 @@ import { shiftSameDayTimeRange } from "../../utils/dateRangeShift";
 const DEFAULT_FORM = {
     eventTypeId: "",
     description: "",
+    trainer: "",
     allDay: false,
     date: "",
     endDate: "",
@@ -77,7 +78,7 @@ export const usePersonalForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        getEventTypes("personal")
             .then((types) =>
                 setEventTypes(
                     types.map((t) => ({
@@ -150,6 +151,13 @@ export const usePersonalForm = ({
         initialAllDay,
         onValidationAlert,
     ]);
+
+    const isCapacitaciones = useMemo(
+        () =>
+            eventTypes.find((t) => t.value === form.eventTypeId)?.label?.toLowerCase() ===
+            "capacitaciones",
+        [eventTypes, form.eventTypeId],
+    );
 
     const showEndDateField = shouldShowPersonalEndDateField({
         allDay: form.allDay,
@@ -247,9 +255,15 @@ export const usePersonalForm = ({
 
         const result = personalEventSchema.safeParse(input);
 
+        const capacitorError =
+            isCapacitaciones && !form.trainer?.trim()
+                ? "El instructor es obligatorio para eventos de capacitación."
+                : null;
+
         if (
             result.success &&
             !mexicoRangeError &&
+            !capacitorError &&
             !(isCoordinator && selectedEmployees.length === 0)
         ) {
             setErrors({});
@@ -269,6 +283,10 @@ export const usePersonalForm = ({
 
         if (isCoordinator && selectedEmployees.length === 0) {
             fieldErrors.employees = "Debes seleccionar al menos un empleado.";
+        }
+
+        if (capacitorError) {
+            fieldErrors.trainer = capacitorError;
         }
 
         if (mexicoRangeError) {
@@ -324,6 +342,7 @@ export const usePersonalForm = ({
         await submitPayload(
             buildPersonalPayload({
                 ...validated,
+                trainer: isCapacitaciones ? form.trainer?.trim() || null : null,
                 endDate: effectiveEndDate,
                 forceOverlap: false,
                 timeZone: calendarTimeZone,
@@ -371,6 +390,7 @@ export const usePersonalForm = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
+        isCapacitaciones,
         overlapState,
         showEndDateField,
         setField,

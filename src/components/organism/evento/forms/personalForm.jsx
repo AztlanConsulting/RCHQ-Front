@@ -5,6 +5,7 @@ import DateField from "../../../atoms/dateField";
 import EmployeeSearchSelect from "../../../atoms/employeeSearchSelect";
 import ErrorText from "../../../atoms/errorText";
 import SelectField from "../../../atoms/selectField";
+import TextField from "../../../atoms/textField";
 import TimeField from "../../../atoms/timeField";
 import TimeZoneSaveNotice from "../../../atoms/timeZoneSaveNotice";
 import OverlapModal from "../../overlapModal";
@@ -25,6 +26,7 @@ const PersonalForm = (props) => {
         selectedEmployees,
         isSubmitting,
         isCoordinator,
+        isCapacitaciones,
         overlapState,
         showEndDateField,
         setField,
@@ -177,6 +179,40 @@ const PersonalForm = (props) => {
             />
 
             {errors.eventTypeId && <ErrorText>{errors.eventTypeId}</ErrorText>}
+
+            <div
+                style={{
+                    maxHeight: isCapacitaciones ? "100px" : "0px",
+                    overflow: "hidden",
+                    opacity: isCapacitaciones ? 1 : 0,
+                    transition: "max-height 300ms ease, opacity 250ms ease",
+                }}
+            >
+                <div style={{ paddingTop: "4px" }}>
+                    <TextField
+                        text="Instructor"
+                        labelClassName="text-sm font-bold text-[#374151]"
+                        value={form.trainer}
+                        setValue={(value) =>
+                            setField(
+                                "trainer",
+                                value.replace(
+                                    /[^A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\-!¿¡?.,:;()]/g,
+                                    "",
+                                ),
+                            )
+                        }
+                        placeholder="Nombre del instructor"
+                        maxLength={100}
+                        containerClassName={
+                            errors.trainer
+                                ? "shadow-[inset_0_0_0_2px_#f87171,inset_0px_4px_4px_#00000040]"
+                                : ""
+                        }
+                    />
+                    {errors.trainer && <ErrorText>{errors.trainer}</ErrorText>}
+                </div>
+            </div>
 
             {isCoordinator && (
                 <div>
