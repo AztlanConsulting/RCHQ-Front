@@ -152,7 +152,7 @@ const buildPersonalTrainingEvent = (overrides = {}) => {
             focusLabel: "Eventos",
             scope,
             scopeLabel: scope === "house" ? "Casa" : "Personal",
-            eventType: "Capacitaciones",
+            eventType: overrides.eventType ?? "Capacitaciones",
             description:
                 overrides.description ??
                 "Uso correcto del botiquin y protocolo interno.",
@@ -370,7 +370,7 @@ describe("Integracion: consulta de capacitaciones personales", () => {
         });
 
         expect(
-            within(dialog).queryByText(/capacitador:/i),
+            within(dialog).queryByText(/instructor:/i),
         ).not.toBeInTheDocument();
         expect(within(dialog).getByText("Capacitacion de primeros auxilios")).toBeInTheDocument();
     });
@@ -406,7 +406,7 @@ describe("Integracion: consulta de capacitaciones personales", () => {
         ).toBeInTheDocument();
         expect(within(dialog).getByText("Eventos · Reunion")).toBeInTheDocument();
         expect(
-            within(dialog).queryByText(/capacitador:/i),
+            within(dialog).queryByText(/instructor:/i),
         ).not.toBeInTheDocument();
         expect(
             within(dialog).queryByText("Lic. Herrera"),

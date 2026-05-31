@@ -177,7 +177,7 @@ const EventDetail = ({
                         variant="metric-label"
                         className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
                     >
-                        Capacitador:
+                        Instructor:
                     </Type>
                     <Type
                         variant="body"
