@@ -49,7 +49,7 @@ export const useHouseForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        getEventTypes("house")
             .then((types) =>
                 setEventTypes(
                     types.map((t) => ({
