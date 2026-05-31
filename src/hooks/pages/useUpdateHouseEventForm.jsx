@@ -128,7 +128,7 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        getEventTypes("house")
             .then((types) => {
                 const options = types.map((type) => ({
                     value: type.eventTypeId,
