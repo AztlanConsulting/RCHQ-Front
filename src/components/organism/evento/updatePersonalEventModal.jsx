@@ -35,6 +35,7 @@ const UpdatePersonalEventModal = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
+        isCapacitaciones,
         overlapState,
         showEndDateField,
         setField,
@@ -67,6 +68,12 @@ const UpdatePersonalEventModal = ({
     const today = new Date();
     const personalDateMin = today;
     const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+
+    const todayStart = new Date(today);
+    todayStart.setHours(0, 0, 0, 0);
+    const eventDayStart = event?.start ? new Date(event.start) : null;
+    if (eventDayStart) eventDayStart.setHours(0, 0, 0, 0);
+    const isPastEvent = Boolean(eventDayStart && eventDayStart < todayStart);
 
     return (
         <>
@@ -111,6 +118,7 @@ const UpdatePersonalEventModal = ({
                         placeholder="Evento personal"
                         maxLength={70}
                         labelClassName="hidden"
+                        disabled={isPastEvent}
                     />
                     {errors.name && <ErrorText>{errors.name}</ErrorText>}
 
@@ -124,7 +132,7 @@ const UpdatePersonalEventModal = ({
                                 gap: "8px",
                             }}
                         >
-                            <div style={{ minWidth: 0 }}>
+                            <div style={{ minWidth: 0 }} className={isPastEvent ? "pointer-events-none opacity-60" : ""}>
                                 <DateField
                                     label="Fecha"
                                     labelColor="text-[#374151]"
@@ -143,7 +151,7 @@ const UpdatePersonalEventModal = ({
                             </div>
 
                             {showEndDateField && (
-                                <div style={{ minWidth: 0 }}>
+                                <div style={{ minWidth: 0 }} className={isPastEvent ? "pointer-events-none opacity-60" : ""}>
                                     <DateField
                                         label="Fecha final"
                                         labelColor="text-[#374151]"
@@ -188,7 +196,7 @@ const UpdatePersonalEventModal = ({
                                         placeholder="Inicio"
                                         error={errors.startTime}
                                         hideErrorText
-                                        disabled={form.allDay}
+                                        disabled={form.allDay || isPastEvent}
                                     />
                                 </div>
                                 <div style={{ flex: 1 }}>
@@ -201,7 +209,7 @@ const UpdatePersonalEventModal = ({
                                         placeholder="Fin"
                                         error={errors.endTime}
                                         hideErrorText
-                                        disabled={form.allDay}
+                                        disabled={form.allDay || isPastEvent}
                                     />
                                 </div>
                             </div>
@@ -222,6 +230,7 @@ const UpdatePersonalEventModal = ({
                             label="Todo el día"
                             checked={form.allDay}
                             onChange={(value) => setField("allDay", value)}
+                            disabled={isPastEvent}
                         />
                     </div>
 
@@ -233,10 +242,39 @@ const UpdatePersonalEventModal = ({
                         options={eventTypes}
                         placeholder="General"
                         error={!!errors.eventTypeId}
+                        disabled={isPastEvent}
                     />
                     {errors.eventTypeId && (
                         <ErrorText>{errors.eventTypeId}</ErrorText>
                     )}
+
+                    <div
+                        style={{
+                            maxHeight: isCapacitaciones ? "100px" : "0px",
+                            overflow: "hidden",
+                            opacity: isCapacitaciones ? 1 : 0,
+                            transition: "max-height 300ms ease, opacity 250ms ease",
+                        }}
+                    >
+                        <div style={{ paddingTop: "4px" }}>
+                            <TextField
+                                text="Instructor"
+                                labelClassName="text-sm font-bold text-[#374151]"
+                                value={form.trainer}
+                                setValue={(value) => setField("trainer", value)}
+                                placeholder="Nombre del instructor"
+                                maxLength={100}
+                                containerClassName={
+                                    errors.trainer
+                                        ? "shadow-[inset_0_0_0_2px_#f87171,inset_0px_4px_4px_#00000040]"
+                                        : ""
+                                }
+                            />
+                            {errors.trainer && (
+                                <ErrorText>{errors.trainer}</ErrorText>
+                            )}
+                        </div>
+                    </div>
 
                     {isCoordinator && (
                         <div>
@@ -266,7 +304,8 @@ const UpdatePersonalEventModal = ({
                             }
                             maxLength={250}
                             rows={4}
-                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa]"
+                            disabled={isPastEvent}
+                            className="min-h-[96px] w-full resize-none rounded-lg border-0 bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] disabled:cursor-not-allowed disabled:opacity-60"
                             style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
                         />
                         <div className="mt-1 text-right text-xs font-medium text-slate-500">

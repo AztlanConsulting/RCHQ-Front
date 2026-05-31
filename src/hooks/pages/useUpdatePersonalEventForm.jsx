@@ -23,6 +23,7 @@ const DEFAULT_FORM = {
     name: "",
     eventTypeId: "",
     description: "",
+    trainer: "",
     allDay: false,
     date: "",
     endDate: "",
@@ -49,6 +50,7 @@ const getInitialForm = (event, calendarTimeZone) => {
         name: event.title ?? "",
         eventTypeId: event.eventTypeId ?? "",
         description: event.description ?? "",
+        trainer: event.trainer ?? "",
         allDay: Boolean(event.allDay),
         date,
         endDate: endDate || date,
@@ -97,6 +99,23 @@ export const useUpdatePersonalEventForm = ({
     });
 
     const personalEventId = useMemo(() => event?.eventId ?? "", [event]);
+    const isPastEvent = useMemo(() => {
+        if (!event?.start) return false;
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const eventDayStart = new Date(event.start);
+        eventDayStart.setHours(0, 0, 0, 0);
+        return eventDayStart < todayStart;
+    }, [event?.start]);
+    const isCapacitaciones = useMemo(() => {
+        if (eventTypes.length > 0) {
+            return (
+                eventTypes.find((t) => t.value === form.eventTypeId)?.label?.toLowerCase() ===
+                "capacitaciones"
+            );
+        }
+        return event?.eventType?.toLowerCase() === "capacitaciones";
+    }, [event?.eventType, eventTypes, form.eventTypeId]);
     const showEndDateField = shouldShowPersonalEndDateField({
         allDay: form.allDay,
         calendarTimeZoneMode,
@@ -128,7 +147,7 @@ export const useUpdatePersonalEventForm = ({
 
     useEffect(() => {
         if (!isOpen) return;
-        getEventTypes()
+        getEventTypes("personal")
             .then((types) => {
                 const options = types.map((t) => ({
                     value: t.eventTypeId,
@@ -166,7 +185,7 @@ export const useUpdatePersonalEventForm = ({
     const setField = useCallback((field, value) => {
         setForm((prev) => {
             const nextValue =
-                field === "name" || field === "description"
+                field === "name" || field === "description" || field === "trainer"
                     ? String(value).replace(TEXT_SANITIZER, "")
                     : value;
 
@@ -195,14 +214,23 @@ export const useUpdatePersonalEventForm = ({
             return null;
         }
 
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        const validationDate = isPastEvent ? todayStr : form.date;
+        const validationEndDate = isPastEvent
+            ? (effectiveEndDate ? todayStr : undefined)
+            : effectiveEndDate;
+
         const input = {
             ...form,
+            date: validationDate,
+            endDate: validationEndDate,
             categoryKey: "personal",
-            endDate: effectiveEndDate,
             forceOverlap: false,
             employeeIds: selectedEmployees.map((e) => e.employeeId),
+            isCapacitaciones,
         };
-        const mexicoRangeError = getPersonalEventMexicoRangeError({
+        const mexicoRangeError = isPastEvent ? null : getPersonalEventMexicoRangeError({
             startDate: form.date,
             endDate: effectiveEndDate ?? form.date,
             startTime: form.startTime,
@@ -281,7 +309,9 @@ export const useUpdatePersonalEventForm = ({
         await submitPayload(
             buildPersonalPayload({
                 ...validated,
+                date: form.date,
                 endDate: effectiveEndDate,
+                trainer: isCapacitaciones ? form.trainer?.trim() || null : null,
                 forceOverlap: false,
                 timeZone: calendarTimeZone,
             }),
@@ -334,6 +364,7 @@ export const useUpdatePersonalEventForm = ({
         selectedEmployees,
         isSubmitting,
         isCoordinator,
+        isCapacitaciones,
         overlapState,
         showEndDateField,
         setField,
