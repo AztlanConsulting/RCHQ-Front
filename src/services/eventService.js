@@ -53,7 +53,7 @@ export async function getEmployeesForSelector(params = {}) {
 }
 
 export async function createGlobalEvent(payload) {
-    const response = await secureFetch(`${BASE_URL}/event/global/add`, {
+    const response = await secureFetch(`/event/global/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
