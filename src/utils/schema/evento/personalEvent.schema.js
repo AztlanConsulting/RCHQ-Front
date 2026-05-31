@@ -76,7 +76,7 @@ export const baseSchema = z.object({
 
     trainer: z
         .string()
-        .max(100, "Máximo 100 caracteres")
+        .max(150, "Máximo 150 caracteres")
         .refine(
             (val) => !val || TEXT_REGEX.test(val),
             "El instructor contiene caracteres no permitidos",
