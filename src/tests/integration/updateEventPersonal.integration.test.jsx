@@ -91,6 +91,7 @@ const TODAY = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, "0")}
 
 const EVENT_TYPE_ID = "11111111-1111-4111-8111-111111111111";
 const EVENT_TYPE_ID_2 = "22222222-2222-4222-8222-222222222222";
+const EVENT_TYPE_ID_CAP = "33333333-3333-4333-8333-333333333333";
 const PERSONAL_EVENT_ID = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 const EMP_ID_1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const EMP_ID_2 = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -98,6 +99,11 @@ const EMP_ID_2 = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const mockEventTypes = [
     { eventTypeId: EVENT_TYPE_ID, name: "Cita médica" },
     { eventTypeId: EVENT_TYPE_ID_2, name: "Permiso personal" },
+];
+
+const mockEventTypesWithCap = [
+    ...mockEventTypes,
+    { eventTypeId: EVENT_TYPE_ID_CAP, name: "Capacitaciones" },
 ];
 
 const mockOverlappedEmployees = [
@@ -532,6 +538,86 @@ describe("Integración: modificar evento personal", () => {
 
             expect(onSuccess).toHaveBeenCalled();
             expect(onClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("modo capacitaciones", () => {
+        const mockCapacitacionesEvent = {
+            ...mockEvent,
+            eventTypeId: EVENT_TYPE_ID_CAP,
+            eventType: "Capacitaciones",
+            trainer: "Dr. García",
+        };
+
+        beforeEach(() => {
+            getEventTypes.mockResolvedValue(mockEventTypesWithCap);
+        });
+
+        it("pre-popula el campo de instructor desde el evento", async () => {
+            await renderModal({ event: mockCapacitacionesEvent });
+            await waitForForm();
+
+            expect(
+                screen.getByPlaceholderText("Nombre del instructor"),
+            ).toHaveValue("Dr. García");
+        });
+
+        it("muestra error si se intenta modificar sin instructor", async () => {
+            await renderModal({
+                event: { ...mockCapacitacionesEvent, trainer: "" },
+            });
+            await waitForForm();
+
+            await clickSubmit();
+
+            expect(
+                screen.getByText(
+                    "El capacitador es obligatorio para eventos de capacitación.",
+                ),
+            ).toBeInTheDocument();
+            expect(updatePersonalEvent).not.toHaveBeenCalled();
+        });
+
+        it("incluye el instructor en el payload al modificar el evento", async () => {
+            const { onClose, onSuccess } = await renderModal({
+                event: mockCapacitacionesEvent,
+            });
+            await waitForForm();
+
+            await clickSubmit();
+
+            await waitFor(() => {
+                expect(updatePersonalEvent).toHaveBeenCalledTimes(1);
+            });
+
+            expect(updatePersonalEvent).toHaveBeenCalledWith(
+                PERSONAL_EVENT_ID,
+                expect.objectContaining({ trainer: "Dr. García" }),
+            );
+
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        it("permite editar el instructor y envía el valor actualizado", async () => {
+            await renderModal({ event: mockCapacitacionesEvent });
+            await waitForForm();
+
+            fireEvent.change(
+                screen.getByPlaceholderText("Nombre del instructor"),
+                { target: { value: "Ing. Ramírez" } },
+            );
+
+            await clickSubmit();
+
+            await waitFor(() => {
+                expect(updatePersonalEvent).toHaveBeenCalledTimes(1);
+            });
+
+            expect(updatePersonalEvent).toHaveBeenCalledWith(
+                PERSONAL_EVENT_ID,
+                expect.objectContaining({ trainer: "Ing. Ramírez" }),
+            );
         });
     });
 });
