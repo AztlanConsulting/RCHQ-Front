@@ -2,7 +2,11 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useBaseCalendar } from "../../hooks/organism/useBaseCalendar";
-import { getEventsInRange } from "../../services/calendarService";
+import {
+    getCalendarViewerRole,
+    getEventsInRange,
+    getHouseEventsInRange,
+} from "../../services/calendarService";
 
 vi.mock("../../services/calendarService", () => ({
     getCalendarViewerRole: vi.fn(() => "Empleado"),
@@ -27,6 +31,16 @@ const makeCalendarRef = () => {
         },
     };
 };
+
+const buildDateInfo = () => ({
+    startStr: "2026-05-06T00:00:00-05:00",
+    endStr: "2026-05-07T00:00:00-05:00",
+    view: {
+        calendar: {
+            getDate: () => new Date(2026, 4, 6),
+        },
+    },
+});
 
 describe("useBaseCalendar", () => {
     beforeEach(() => {
@@ -82,19 +96,11 @@ describe("useBaseCalendar", () => {
         });
     });
 
-    it("consulta un día extra antes y después del rango visible para eventos con desfase horario", async () => {
+    it("consulta un dia extra antes y despues del rango visible para eventos con desfase horario", async () => {
         const { result } = renderHook(() => useBaseCalendar());
 
         await act(async () => {
-            await result.current.handleDatesSet({
-                startStr: "2026-05-06T00:00:00-05:00",
-                endStr: "2026-05-07T00:00:00-05:00",
-                view: {
-                    calendar: {
-                        getDate: () => new Date(2026, 4, 6),
-                    },
-                },
-            });
+            await result.current.handleDatesSet(buildDateInfo());
         });
 
         expect(getEventsInRange).toHaveBeenCalledWith(
@@ -102,5 +108,84 @@ describe("useBaseCalendar", () => {
             "2026-05-05",
             "2026-05-08",
         );
+    });
+
+    it("en calendario personal solo mantiene capacitaciones personales donde el trabajador esta registrado", async () => {
+        vi.mocked(getCalendarViewerRole).mockReturnValue("Empleado");
+        vi.mocked(getHouseEventsInRange).mockResolvedValue([]);
+        vi.mocked(getEventsInRange).mockResolvedValue([
+            {
+                eventId: "training-assigned",
+                focus: "eventos",
+                scope: "personal",
+                eventType: "Capacitaciones",
+                peopleInsideEvent: [
+                    { id: "employee-1", name: "Laura" },
+                    { id: "employee-8", name: "Mario" },
+                ],
+            },
+            {
+                eventId: "training-unassigned",
+                focus: "eventos",
+                scope: "personal",
+                eventType: "Capacitaciones",
+                peopleInsideEvent: [{ id: "employee-9", name: "Rosa" }],
+            },
+        ]);
+
+        const { result } = renderHook(() => useBaseCalendar());
+
+        await act(async () => {
+            await result.current.handleDatesSet(buildDateInfo());
+        });
+
+        expect(result.current.calendarMode).toBe("personal");
+        expect(result.current.canSwitchCalendarMode).toBe(false);
+        expect(result.current.allEvents).toHaveLength(1);
+        expect(result.current.allEvents[0]).toMatchObject({
+            eventId: "training-assigned",
+            eventType: "Capacitaciones",
+        });
+    });
+
+    it("el coordinador puede cambiar al calendario de casa y ver capacitaciones no ligadas a su registro", async () => {
+        vi.mocked(getCalendarViewerRole).mockReturnValue("Coordinador");
+        vi.mocked(getHouseEventsInRange).mockResolvedValue([]);
+        vi.mocked(getEventsInRange).mockResolvedValue([
+            {
+                eventId: "training-assigned",
+                focus: "eventos",
+                scope: "personal",
+                eventType: "Capacitaciones",
+                peopleInsideEvent: [{ id: "employee-1", name: "Laura" }],
+            },
+            {
+                eventId: "training-house",
+                focus: "eventos",
+                scope: "personal",
+                eventType: "Capacitaciones",
+                peopleInsideEvent: [{ id: "employee-9", name: "Rosa" }],
+            },
+        ]);
+
+        const { result } = renderHook(() => useBaseCalendar());
+
+        await act(async () => {
+            await result.current.handleDatesSet(buildDateInfo());
+        });
+
+        expect(result.current.canSwitchCalendarMode).toBe(true);
+        expect(result.current.allEvents.map((event) => event.eventId)).toEqual([
+            "training-assigned",
+        ]);
+
+        act(() => {
+            result.current.setCalendarMode("house");
+        });
+
+        expect(result.current.allEvents.map((event) => event.eventId)).toEqual([
+            "training-assigned",
+            "training-house",
+        ]);
     });
 });

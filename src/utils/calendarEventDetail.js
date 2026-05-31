@@ -101,6 +101,7 @@ export const eventApiToDetail = (ev) => {
         endDate: normalizeDateOnly(x.endDate ?? x.sourceEnd ?? end),
         isDeleted: x.isDeleted,
         peopleInsideEvent: x.peopleInsideEvent ?? null,
+        trainer: x.trainer ?? "",
     };
 };
 
@@ -167,6 +168,7 @@ export const calendarItemToDetail = (item) => {
         endDate,
         isDeleted: item.isDeleted,
         peopleInsideEvent: item.peopleInsideEvent ?? null,
+        trainer: item.trainer ?? "",
     };
 };
 

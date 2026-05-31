@@ -171,6 +171,23 @@ const EventDetail = ({
                 </div>
             ) : null}
 
+            {event.eventType?.toLowerCase() === "capacitaciones" && event.trainer ? (
+                <div className="mb-6">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Instructor:
+                    </Type>
+                    <Type
+                        variant="body"
+                        className="block max-w-full text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
+                    >
+                        {event.trainer}
+                    </Type>
+                </div>
+            ) : null}
+
             {visiblePeople.length > 0 ? (
                 <div className="mb-4">
                     <Type

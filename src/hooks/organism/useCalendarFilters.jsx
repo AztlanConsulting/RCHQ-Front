@@ -438,6 +438,7 @@ const getFilteredEvents = (
                         rawEvent.end ||
                         "",
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
+                    trainer: rawEvent.trainer ?? "",
                 },
             };
         });
