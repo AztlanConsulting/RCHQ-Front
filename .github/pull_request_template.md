@@ -23,8 +23,6 @@
 - [ ] Pruebas
 - [ ] Refactoriza
 - [ ] Resuelve defectos
-- [ ] He modificado la seed
-- [ ] Modificación a la base de datos
 - [ ] Resuelve inconsistencias
 - [ ] Documentación
 - [ ] Chore
@@ -32,6 +30,7 @@
 
 ## ¿Cómo se ha probado?
 <!-- Describe las pruebas realizadas -->
+
 - [ ] Test unitario
 - [ ] Test de integración
 - [ ] Matriz de pruebas
