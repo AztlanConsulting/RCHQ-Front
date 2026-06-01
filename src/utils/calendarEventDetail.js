@@ -268,6 +268,21 @@ export const formatCardDateNoYear = (value) => {
     );
 };
 
+export const formatCardDate = (value) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    return new Date(`${normalizedValue}T00:00:00.000Z`).toLocaleDateString(
+        "es-MX",
+        {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            timeZone: "UTC",
+        },
+    );
+};
+
 export const formatCardTime = (value) => {
     if (value == null || value === "") return "";
     const hourValue = typeof value === "string" ? value : null;
