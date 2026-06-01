@@ -32,6 +32,7 @@ const EventDetail = ({
     viewerRole = "",
     calendarTimeZone,
     showMexicoReferenceNotice = false,
+    hideActions = false,
 }) => {
     const {
         visibleItems: visiblePeople,
@@ -46,8 +47,8 @@ const EventDetail = ({
 
     if (!event) return null;
 
-    const showDelete = canDelete(event.scope, viewerRole);
-    const showEdit = canEdit(event.scope, viewerRole);
+    const showDelete = !hideActions && canDelete(event.scope, viewerRole);
+    const showEdit = !hideActions && canEdit(event.scope, viewerRole);
 
     const isMultiDay = Boolean(event.multiDay);
     const rangeStart =
