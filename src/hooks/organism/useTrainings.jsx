@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStoredUser } from "../../utils/authStorage";
 import { getTrainingsService } from "../../services/trainingService";
+import { getBrowserTimeZone } from "../../utils/timeZone";
 
 const getViewerContext = () => {
   const storedUser = getStoredUser();
@@ -10,9 +11,6 @@ const getViewerContext = () => {
   };
 };
 
-const getCalendarTimeZone = () =>
-  Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Mexico_City";
-
 export const useTrainings = (employeeId) => {
   const [trainings, setTrainings] = useState([]);
   const [loadingTrainings, setLoadingTrainings] = useState(Boolean(employeeId));
@@ -20,7 +18,7 @@ export const useTrainings = (employeeId) => {
   const [selectedTraining, setSelectedTraining] = useState(null);
 
   const viewerContext = useMemo(() => getViewerContext(), []);
-  const calendarTimeZone = useMemo(() => getCalendarTimeZone(), []);
+  const calendarTimeZone = useMemo(() => getBrowserTimeZone(), []);
 
   const fetchTrainings = useCallback(async () => {
     if (!employeeId) {
