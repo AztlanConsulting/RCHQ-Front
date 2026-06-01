@@ -395,8 +395,10 @@ const getFilteredEvents = (
                     sourceStart: rawEvent.start,
                     sourceEnd: rawEvent.end,
                     detailAllDay:
-                        rawEvent.allDay === true &&
-                        originalAllDayRange.isAllDay,
+                        rawEvent.focus === "eventos"
+                            ? rawEvent.allDay === true
+                            : rawEvent.allDay === true &&
+                              originalAllDayRange.isAllDay,
                     date: rawEvent.date ?? "",
                     icon: getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,

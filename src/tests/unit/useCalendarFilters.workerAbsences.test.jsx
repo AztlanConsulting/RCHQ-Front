@@ -559,4 +559,40 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             ).toEqual(expect.arrayContaining(["medica", "personal"]));
         });
     });
+
+    it("conserva detailAllDay en true para eventos aunque el calendario los expanda por zona horaria", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Capacitacion all-day",
+            scope: "personal",
+            type: "Capacitaciones",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            allDay: true,
+            trainer: "Dra. Martinez",
+            peopleInsideEvent: [{ id: "employee-worker", name: "John Smith" }],
+        };
+
+        const { result } = renderHook(() =>
+            useCalendarFilters([event], {
+                isList: false,
+                viewerRole: "Psicóloga",
+                calendarTimeZone: "America/Matamoros",
+            }),
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(1),
+        );
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T01:00:00",
+            end: "2026-05-06T01:00:00",
+            allDay: false,
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            detailAllDay: true,
+        });
+    });
 });

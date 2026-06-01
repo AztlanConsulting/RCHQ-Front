@@ -22,6 +22,7 @@ const mockTraining = {
   eventId: "training-001",
   title: "Capacitacion del DIF",
   trainer: "Emilio Santiago Lopez Quinonez",
+  focus: "eventos",
 };
 
 beforeEach(() => {
@@ -81,6 +82,33 @@ describe("useTrainings", () => {
     });
 
     expect(result.current.selectedTraining).toBeNull();
+  });
+
+  it("normaliza la fecha canonica y respeta allDay al abrir el detalle", async () => {
+    const timedTraining = {
+      ...mockTraining,
+      date: "2026-06-01T00:00:00.000Z",
+      start: "2026-06-01T23:00:00.000Z",
+      end: "2026-06-02T01:00:00.000Z",
+      allDay: true,
+    };
+    const { result } = renderHook(() => useTrainings("emp-123"));
+
+    await waitFor(() => {
+      expect(result.current.loadingTrainings).toBe(false);
+    });
+
+    act(() => {
+      result.current.openTrainingDetail(timedTraining);
+    });
+
+    expect(result.current.selectedTraining).toMatchObject({
+      allDay: true,
+      readableStart: "2026-06-01",
+      readableEnd: "2026-06-01",
+      startDate: "2026-06-01",
+      endDate: "2026-06-01",
+    });
   });
 
   it("expone el mensaje de error cuando falla la consulta", async () => {

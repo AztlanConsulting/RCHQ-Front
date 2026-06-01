@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStoredUser } from "../../utils/authStorage";
 import { getTrainingsService } from "../../services/trainingService";
 import { getBrowserTimeZone } from "../../utils/timeZone";
+import { normalizeTrainingDetail } from "../../utils/calendarEventDetail";
 
 const getViewerContext = () => {
   const storedUser = getStoredUser();
@@ -44,7 +45,7 @@ export const useTrainings = (employeeId) => {
   }, [fetchTrainings]);
 
   const openTrainingDetail = useCallback((training) => {
-    setSelectedTraining(training);
+    setSelectedTraining(normalizeTrainingDetail(training));
   }, []);
 
   const closeTrainingDetail = useCallback(() => {
