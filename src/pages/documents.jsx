@@ -22,7 +22,7 @@ const Documents = () => {
         onCloseTraining={trainingsState.closeTrainingDetail}
         viewerRole={trainingsState.viewerRole}
         calendarTimeZone={trainingsState.calendarTimeZone}
-        emptyMessage="Aun no tienes capacitaciones registradas."
+        emptyMessage="Este empleado aún no tiene capacitaciones registradas."
       />
     </div>
   );

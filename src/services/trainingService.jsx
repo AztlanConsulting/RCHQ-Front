@@ -1,6 +1,5 @@
 import { secureFetch } from "../utils/secureFetchWrapper";
-
-const TRAINING_COLOR = "#D58936";
+import { calendarItemToDetail } from "../utils/calendarEventDetail";
 
 const buildApiError = (response, data, fallbackMessage) => {
   const errorMessage = new Error(data?.message || fallbackMessage);
@@ -8,20 +7,6 @@ const buildApiError = (response, data, fallbackMessage) => {
   errorMessage.field = data?.field;
   return errorMessage;
 };
-
-const mapTrainingToDetail = (training) => ({
-  ...training,
-  eventId: training.eventId ?? training.personalEventId,
-  title: training.title ?? training.name,
-  eventType: training.eventType ?? training.type ?? "Capacitaciones",
-  focus: training.focus ?? "eventos",
-  focusLabel: training.focusLabel ?? "Eventos",
-  scope: training.scope ?? "personal",
-  scopeLabel: training.scopeLabel ?? "Personal",
-  backgroundColor: training.backgroundColor ?? training.color ?? TRAINING_COLOR,
-  borderColor: training.borderColor ?? training.color ?? TRAINING_COLOR,
-  peopleInsideEvent: training.peopleInsideEvent ?? [],
-});
 
 export const getTrainingsService = async (employeeId) => {
   const response = await secureFetch(`/event/trainings/${employeeId}`);
@@ -37,6 +22,6 @@ export const getTrainingsService = async (employeeId) => {
 
   return {
     ...data,
-    data: (data?.data?.trainings ?? []).map(mapTrainingToDetail),
+    data: (data?.data?.trainings ?? []).map(calendarItemToDetail),
   };
 };
