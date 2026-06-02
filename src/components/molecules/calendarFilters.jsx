@@ -237,7 +237,7 @@ const CalendarFilters = ({
       {canSwitchCalendarTimeZone ? (
         <>
           {canSwitchCalendarMode ? (
-            <FilterSeparator className="my-2" />
+            <FilterSeparator className="mb-2 mt-4" />
           ) : null}
           <CalendarSwitchGroup
             label="HORARIO"

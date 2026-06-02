@@ -272,16 +272,14 @@ export const useBaseCalendar = () => {
     }, [getDayWidth, viewType]);
 
     const getWeekDayName = (currentDay) => {
-        const weekDayIndex = currentDay.date.getDay();
+        const weekDayIndex = currentDay.date.getUTCDay();
         const hasNumber = viewType == "Week";
 
         const weekDay = validateShortenedSize(hasNumber)
             ? SHORT_DAYS[weekDayIndex]
             : FULL_DAYS[weekDayIndex];
 
-        currentDay.date.setDate(currentDay.date.getDate() + 1)
-
-        const dayNumber = hasNumber ? ` ${currentDay.date.getDate()}` : "";
+        const dayNumber = hasNumber ? ` ${currentDay.date.getUTCDate()}` : "";
 
         return `${weekDay}${dayNumber}`;
     };

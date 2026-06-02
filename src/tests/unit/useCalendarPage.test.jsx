@@ -112,6 +112,39 @@ describe("useCalendarPage", () => {
         });
     });
 
+    it("usa las fechas base de México para editar ausencias aunque el detalle visible esté desfazado", () => {
+        const { result } = renderHook(() =>
+            useCalendarPage({
+                absenceTypeOptions: [{ value: "type-1", label: "Paternidad" }],
+                reloadCurrentRange: vi.fn(),
+            }),
+        );
+
+        const clickInfo = buildCalendarClickInfo();
+        clickInfo.event.extendedProps = {
+            ...clickInfo.event.extendedProps,
+            startDate: "2026-05-17",
+            endDate: "2026-05-17",
+            startReadableDate: "2026-05-17",
+            endReadableDate: "2026-05-18",
+        };
+
+        act(() => {
+            result.current.handleEventClick(clickInfo);
+        });
+
+        act(() => {
+            result.current.startAbsenceEdit();
+        });
+
+        expect(result.current.absenceForm).toEqual({
+            absenceTypeId: "type-1",
+            startDate: "2026-05-17",
+            endDate: "2026-05-17",
+            description: "Permiso por paternidad",
+        });
+    });
+
     it.each(["Administrador", "Coordinador"])(
         "muestra subir evidencia para %s cuando la ausencia no tiene evidencia",
         (viewerRole) => {

@@ -263,7 +263,9 @@ describe("useCalendarFilters - vacaciones", () => {
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
             startDate: "2026-06-05",
-            endDate: "2026-06-06",
+            endDate: "2026-06-05",
+            startReadableDate: "2026-06-05",
+            endReadableDate: "2026-06-06",
             totalDays: 1,
         });
     });
