@@ -1,3 +1,4 @@
+import Button from "../atoms/button";
 import { formatCardDate } from "../../utils/calendarEventDetail";
 
 const TrainingIcon = () => (
@@ -34,15 +35,38 @@ const TrainingIcon = () => (
   </svg>
 );
 
-const TrainingCard = ({ training, onOpen }) => (
-  <button
-    type="button"
-    onClick={() => onOpen(training)}
-    className="flex h-full w-full flex-col overflow-hidden rounded-[8px] border border-slate-200 bg-white text-left shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#1F3664]/25"
+const DeleteIcon = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
   >
-    <div className="flex h-[140px] w-full items-center justify-center bg-slate-100">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+    <path d="M10 11v6M14 11v6" />
+    <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+  </svg>
+);
+
+const TrainingCard = ({ training, onOpen, onRemove }) => (
+  <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+    <Button
+      onClick={() => onOpen(training)}
+      bgColor="bg-slate-100"
+      hoverColor="hover:bg-slate-200"
+      activeColor=""
+      width="w-full"
+      height="h-[140px]"
+      className="!rounded-none"
+    >
       <TrainingIcon />
-    </div>
+    </Button>
 
     <div className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-3">
       <p className="line-clamp-2 text-sm font-semibold leading-tight text-slate-800">
@@ -55,10 +79,27 @@ const TrainingCard = ({ training, onOpen }) => (
         Impartido por:
       </p>
       <p className="line-clamp-3 text-sm font-medium leading-snug text-slate-500">
-        {training.trainer || "Sin informacion"}
+        {training.trainer || "Sin información"}
       </p>
+
+      {onRemove && (
+        <div className="mt-auto flex justify-end pt-3">
+          <Button
+            onClick={onRemove}
+            title="Quitar de esta capacitación"
+            bgColor="bg-[#dd4344]"
+            hoverColor="hover:bg-red-700"
+            activeColor="active:bg-red-800"
+            width="w-8"
+            height="h-8"
+            className="!rounded-lg"
+          >
+            <DeleteIcon />
+          </Button>
+        </div>
+      )}
     </div>
-  </button>
+  </div>
 );
 
 export default TrainingCard;
