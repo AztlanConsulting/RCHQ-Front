@@ -8,6 +8,7 @@ import {
   formatEventDateOnly,
   formatEventDateRange,
   formatEventTime,
+  normalizeTrainingDetail,
   normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
 
@@ -77,6 +78,25 @@ describe("calendarEventDetail", () => {
     });
 
     expect(result.totalDays).toBeNull();
+  });
+
+  it("normalizeTrainingDetail fija la fecha canonica y respeta allDay para el modal de capacitaciones", () => {
+    const result = normalizeTrainingDetail({
+      focus: "eventos",
+      title: "Capacitacion",
+      date: "2026-06-01T00:00:00.000Z",
+      start: "2026-06-01T23:00:00.000Z",
+      end: "2026-06-02T01:00:00.000Z",
+      allDay: true,
+    });
+
+    expect(result).toMatchObject({
+      allDay: true,
+      readableStart: "2026-06-01",
+      readableEnd: "2026-06-01",
+      startDate: "2026-06-01",
+      endDate: "2026-06-01",
+    });
   });
 
   it("formatea fechas de solo día sin moverlas al día anterior", () => {

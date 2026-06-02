@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import EventDetail from "../../components/molecules/calendarCards/eventDetail";
@@ -106,5 +106,40 @@ describe("EventDetail", () => {
         expect(screen.getByText("Eventos · Capacitaciones")).toBeInTheDocument();
         expect(screen.getByText("Leo")).toBeInTheDocument();
         expect(screen.getByText("Intro")).toBeInTheDocument();
+    });
+
+    it("oculta acciones y permite expandir la lista de empleados ligados", () => {
+        render(
+            <EventDetail
+                event={buildEvent({
+                    peopleInsideEvent: [
+                        { id: "emp-1", name: "Empleado 1" },
+                        { id: "emp-2", name: "Empleado 2" },
+                        { id: "emp-3", name: "Empleado 3" },
+                        { id: "emp-4", name: "Empleado 4" },
+                        { id: "emp-5", name: "Empleado 5" },
+                        { id: "emp-6", name: "Empleado 6" },
+                    ],
+                })}
+                viewerRole="Coordinador"
+                hideActions
+                onEdit={vi.fn()}
+                onDelete={vi.fn()}
+            />,
+        );
+
+        expect(screen.getByText("Empleado 1")).toBeInTheDocument();
+        expect(screen.getByText("Empleado 5")).toBeInTheDocument();
+        expect(screen.queryByText("Empleado 6")).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /editar/i }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /eliminar/i }),
+        ).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: /ver 1 más/i }));
+
+        expect(screen.getByText("Empleado 6")).toBeInTheDocument();
     });
 });

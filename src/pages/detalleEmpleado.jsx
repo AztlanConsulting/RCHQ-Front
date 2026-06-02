@@ -9,11 +9,13 @@ import EmployeeBasicCard from "../components/organism/employeeBasicCard";
 import EmployeeContactCard from "../components/organism/employeeContactCard";
 import EmployeeAdminCard from "../components/organism/employeeAdminCard";
 import DocumentsSection from "../components/organism/documentsSection";
+import TrainingsSection from "../components/organism/trainingsSection";
 import ReasonCard from "../components/organism/reasonCard";
 import { useDrawer } from "@/hooks/atoms/useDrawer";
 import { useEmployeeDetail } from "@/hooks/pages/useEmployeeDetail";
 import { useEditEmployee } from "@/hooks/organism/useEditEmployee";
 import { useDocuments } from "../hooks/organism/useDocuments";
+import { useTrainings } from "../hooks/organism/useTrainings";
 import { useDeactivateEmployee } from "@/hooks/organism/useDeactivateEmployee";
 import { getStoredUser } from "@/utils/authStorage";
 
@@ -82,6 +84,18 @@ const DetalleEmpleado = () => {
     displayError,
     handleModalSubmit,
   } = useDocuments(employeeId);
+
+  const {
+    trainings,
+    loadingTrainings,
+    fetchError: trainingsFetchError,
+    clearFetchError: clearTrainingsFetchError,
+    selectedTraining,
+    openTrainingDetail,
+    closeTrainingDetail,
+    viewerRole,
+    calendarTimeZone,
+  } = useTrainings(employeeId);
 
   const infoDrawer     = useDrawer();
   const workdaysDrawer = useDrawer();
@@ -300,36 +314,50 @@ const DetalleEmpleado = () => {
       )}
 
       {currentTab === "expediente" && (
-        <DocumentsSection
-          documents={documents}
-          loadingDocs={loadingDocs}
-          fetchError={fetchError}
-          onFetchErrorClose={clearFetchError}
-          successMessage={successMessage}
-          onSuccessMessageClose={clearSuccessMessage}
-          canModify={canModify}
-          deletingId={deletingId}
-          docToDelete={docToDelete}
-          conflictDocument={conflictDocument}
-          showUploadModal={showUploadModal}
-          isEditing={isEditing}
-          documentTypes={documentTypes}
-          documentType={documentType}
-          fileName={fileName}
-          displayError={displayError}
-          onUploadErrorClose={clearUploadError}
-          modalError={modalError}
-          modalLoading={modalLoading}
-          handleOpenUpload={handleOpenUpload}
-          handleCloseModal={handleCloseModal}
-          handleFileChange={handleFileChange}
-          handleModalSubmit={handleModalSubmit}
-          handleOpenEdit={handleOpenEdit}
-          setDocToDelete={setDocToDelete}
-          handleDeleteConfirm={handleDeleteConfirm}
-          handleConflictConfirm={handleConflictConfirm}
-          handleConflictCancel={handleConflictCancel}
-        />
+        <div className="flex flex-col gap-10">
+          <DocumentsSection
+            documents={documents}
+            loadingDocs={loadingDocs}
+            fetchError={fetchError}
+            onFetchErrorClose={clearFetchError}
+            successMessage={successMessage}
+            onSuccessMessageClose={clearSuccessMessage}
+            canModify={canModify}
+            deletingId={deletingId}
+            docToDelete={docToDelete}
+            conflictDocument={conflictDocument}
+            showUploadModal={showUploadModal}
+            isEditing={isEditing}
+            documentTypes={documentTypes}
+            documentType={documentType}
+            fileName={fileName}
+            displayError={displayError}
+            onUploadErrorClose={clearUploadError}
+            modalError={modalError}
+            modalLoading={modalLoading}
+            handleOpenUpload={handleOpenUpload}
+            handleCloseModal={handleCloseModal}
+            handleFileChange={handleFileChange}
+            handleModalSubmit={handleModalSubmit}
+            handleOpenEdit={handleOpenEdit}
+            setDocToDelete={setDocToDelete}
+            handleDeleteConfirm={handleDeleteConfirm}
+            handleConflictConfirm={handleConflictConfirm}
+            handleConflictCancel={handleConflictCancel}
+          />
+
+          <TrainingsSection
+            trainings={trainings}
+            loadingTrainings={loadingTrainings}
+            fetchError={trainingsFetchError}
+            onFetchErrorClose={clearTrainingsFetchError}
+            selectedTraining={selectedTraining}
+            onOpenTraining={openTrainingDetail}
+            onCloseTraining={closeTrainingDetail}
+            viewerRole={viewerRole}
+            calendarTimeZone={calendarTimeZone}
+          />
+        </div>
       )}
     </div>
   );

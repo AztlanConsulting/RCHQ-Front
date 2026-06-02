@@ -556,14 +556,14 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
 
     it("muestra error del backend si no hay suficientes días disponibles", async () => {
         const { onClose, onSuccess } = await renderModal({
-            initialStartDate: "2026-06-01",
+            initialStartDate: "2026-06-02",
             initialEndDate: "2026-06-30",
         });
         const message =
             "No se tienen suficientes días disponibles para solicitar las vacaciones";
 
         requestEmployeeVacation.mockImplementation(async ({ startDate, endDate }) => {
-            if (startDate === "2026-06-01" && endDate === "2026-06-30") {
+            if (startDate === "2026-06-02" && endDate === "2026-06-30") {
                 throw new Error(message);
             }
 
@@ -576,7 +576,7 @@ describe("Integración: trabajador solicita vacaciones desde calendario", () => 
         await waitFor(() => {
             expect(requestEmployeeVacation).toHaveBeenCalledWith({
                 employeeId: "own-employee",
-                startDate: "2026-06-01",
+                startDate: "2026-06-02",
                 endDate: "2026-06-30",
             });
         });

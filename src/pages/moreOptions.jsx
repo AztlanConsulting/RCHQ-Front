@@ -74,17 +74,6 @@ const MoreOptions = () => {
           <OptionCard
             icon={
               <img
-                src="/certificate.svg"
-                alt="Certificaciones"
-                className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"
-              />
-            }
-            label="Certificaciones"
-            onClick={() => navigate("/app/certificaciones")}
-          />
-          <OptionCard
-            icon={
-              <img
                 src="/document.svg"
                 alt="Documentos"
                 className="h-8 w-8 invert opacity-90 sm:h-9 sm:w-9 md:h-7 md:w-7"

@@ -172,6 +172,28 @@ export const calendarItemToDetail = (item) => {
     };
 };
 
+export const normalizeTrainingDetail = (training) => {
+    if (!training) return null;
+
+    const normalizedCalendarDate = normalizeDateOnly(training.date);
+    const shouldPinCalendarDate =
+        Boolean(normalizedCalendarDate) &&
+        training.focus === "eventos" &&
+        !training.multiDay;
+
+    return {
+        ...training,
+        ...(shouldPinCalendarDate
+            ? {
+                  readableStart: normalizedCalendarDate,
+                  readableEnd: normalizedCalendarDate,
+                  startDate: normalizedCalendarDate,
+                  endDate: normalizedCalendarDate,
+              }
+            : {}),
+    };
+};
+
 export const formatEventDateTime = (value) => {
     if (value == null || value === "") return "—";
     const d = value instanceof Date ? value : new Date(value);
@@ -263,6 +285,21 @@ export const formatCardDateNoYear = (value) => {
         {
             day: "numeric",
             month: "long",
+            timeZone: "UTC",
+        },
+    );
+};
+
+export const formatCardDate = (value) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    return new Date(`${normalizedValue}T00:00:00.000Z`).toLocaleDateString(
+        "es-MX",
+        {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
             timeZone: "UTC",
         },
     );
