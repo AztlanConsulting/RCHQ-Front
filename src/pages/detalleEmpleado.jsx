@@ -95,7 +95,15 @@ const DetalleEmpleado = () => {
     closeTrainingDetail,
     viewerRole,
     calendarTimeZone,
-  } = useTrainings(employeeId);
+    trainingToRemove,
+    isRemoving,
+    removeError,
+    openRemoveConfirm,
+    closeRemoveConfirm,
+    confirmRemove,
+  } = useTrainings(employeeId, {
+    onRemoveSuccess: (msg) => setAlert({ type: "success", message: msg }),
+  });
 
   const infoDrawer     = useDrawer();
   const workdaysDrawer = useDrawer();
@@ -356,6 +364,13 @@ const DetalleEmpleado = () => {
             onCloseTraining={closeTrainingDetail}
             viewerRole={viewerRole}
             calendarTimeZone={calendarTimeZone}
+            canRemove={canEdit}
+            trainingToRemove={trainingToRemove}
+            isRemoving={isRemoving}
+            removeError={removeError}
+            onOpenRemoveConfirm={openRemoveConfirm}
+            onCloseRemoveConfirm={closeRemoveConfirm}
+            onConfirmRemove={confirmRemove}
           />
         </div>
       )}
