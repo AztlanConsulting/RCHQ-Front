@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStoredUser } from "../../utils/authStorage";
 import { getTrainingsService } from "../../services/trainingService";
+import { removeEmployeeFromTraining } from "../../services/deleteEventService";
 import { getBrowserTimeZone } from "../../utils/timeZone";
 import { normalizeTrainingDetail } from "../../utils/calendarEventDetail";
 
@@ -12,11 +13,15 @@ const getViewerContext = () => {
   };
 };
 
-export const useTrainings = (employeeId) => {
+export const useTrainings = (employeeId, { onRemoveSuccess } = {}) => {
   const [trainings, setTrainings] = useState([]);
   const [loadingTrainings, setLoadingTrainings] = useState(Boolean(employeeId));
   const [fetchError, setFetchError] = useState("");
   const [selectedTraining, setSelectedTraining] = useState(null);
+
+  const [trainingToRemove, setTrainingToRemove] = useState(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState("");
 
   const viewerContext = useMemo(() => getViewerContext(), []);
   const calendarTimeZone = useMemo(() => getBrowserTimeZone(), []);
@@ -54,6 +59,37 @@ export const useTrainings = (employeeId) => {
 
   const clearFetchError = useCallback(() => setFetchError(""), []);
 
+  const openRemoveConfirm = useCallback((training) => {
+    setRemoveError("");
+    setTrainingToRemove(training);
+  }, []);
+
+  const closeRemoveConfirm = useCallback(() => {
+    setTrainingToRemove(null);
+    setRemoveError("");
+  }, []);
+
+  const confirmRemove = useCallback(async () => {
+    if (!trainingToRemove) return;
+    const eventId = trainingToRemove.eventId
+    if (!eventId) return;
+
+    setIsRemoving(true);
+    setRemoveError("");
+    try {
+      const res = await removeEmployeeFromTraining(eventId, employeeId);
+      setTrainings((prev) =>
+        prev.filter((t) => (t.eventId ?? t.personalEventId) !== eventId),
+      );
+      setTrainingToRemove(null);
+      onRemoveSuccess?.(res.message ?? "Empleado eliminado de la capacitación correctamente.");
+    } catch (err) {
+      setRemoveError(err?.message ?? "Error al quitar al empleado de la capacitación");
+    } finally {
+      setIsRemoving(false);
+    }
+  }, [trainingToRemove, employeeId, onRemoveSuccess]);
+
   return {
     trainings,
     loadingTrainings,
@@ -65,5 +101,11 @@ export const useTrainings = (employeeId) => {
     viewerRole: viewerContext.viewerRole,
     ownEmployeeId: viewerContext.employeeId,
     calendarTimeZone,
+    trainingToRemove,
+    isRemoving,
+    removeError,
+    openRemoveConfirm,
+    closeRemoveConfirm,
+    confirmRemove,
   };
 };
