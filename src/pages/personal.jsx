@@ -59,6 +59,7 @@ const Personal = () => {
                         text="Añadir"
                         onClick={() => navigate("/app/personal/nuevo")}
                         className="min-w-0"
+                        mobileIcon="/add.svg"
                     />
                 )}
             </div>
