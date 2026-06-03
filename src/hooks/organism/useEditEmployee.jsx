@@ -22,12 +22,6 @@ const mapZodFieldErrors = (issues = []) =>
   }, {});
 
 export const useEditEmployee = (employeeId, onSuccess) => {
-  const revokePreviewUrl = (url) => {
-    if (url?.startsWith("blob:")) {
-      URL.revokeObjectURL(url);
-    }
-  };
-
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
@@ -61,7 +55,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
     setBasicErrors({});
-    revokePreviewUrl(basicPicturePreview);
     setBasicPictureFile(null);
     setBasicPicturePreview("");
     setBasicFormState({
@@ -74,7 +67,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       birthDate:   employee?.birthDate ? String(employee.birthDate).slice(0, 10) : "",
     });
     setEditSection("basic");
-  }, [basicPicturePreview]);
+  }, []);
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
@@ -148,7 +141,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const closeEdit = useCallback(() => {
-    revokePreviewUrl(basicPicturePreview);
     setBasicPictureFile(null);
     setBasicPicturePreview("");
     setEditSection(null);
@@ -156,7 +148,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setBasicErrors({});
     setContactErrors({});
     setAdminErrors({});
-  }, [basicPicturePreview]);
+  }, []);
 
   const setBasicField = useCallback((field, value) => {
     let finalValue = value;
@@ -200,9 +192,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const setBasicPicture = useCallback((file) => {
     if (!file) {
-      revokePreviewUrl(basicPicturePreview);
-      setBasicPictureFile(null);
-      setBasicPicturePreview("");
       return;
     }
 
@@ -218,10 +207,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     }
 
     setSaveError(null);
-    revokePreviewUrl(basicPicturePreview);
     setBasicPictureFile(file);
-    setBasicPicturePreview(URL.createObjectURL(file));
-  }, [basicPicturePreview]);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBasicPicturePreview(typeof reader.result === "string" ? reader.result : "");
+    };
+    reader.readAsDataURL(file);
+  }, []);
 
   const setContactField = useCallback((field, value) => {
     let finalValue = value;
