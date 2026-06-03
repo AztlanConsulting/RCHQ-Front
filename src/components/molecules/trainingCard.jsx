@@ -88,9 +88,9 @@ const TrainingCard = ({ training, onOpen, onRemove }) => (
           <Button
             onClick={onRemove}
             title="Quitar de esta capacitación"
-            bgColor="bg-[#dd4344]"
-            hoverColor="hover:bg-red-700"
-            activeColor="active:bg-red-800"
+            bgColor="bg-[#A20000]"
+            hoverColor="hover:bg-[#870000]"
+            activeColor="active:bg-[#6B0000]"
             width="w-8"
             height="h-8"
             className="!rounded-lg"
