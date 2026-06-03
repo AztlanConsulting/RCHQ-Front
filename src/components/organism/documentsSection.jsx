@@ -85,9 +85,16 @@ const DocumentsSection = ({
         </div>
         {canModify && (
           <BigButton
-            text="+ Subir documento"
+            text={
+              <>
+                <span className="min-[451px]:hidden">+</span>
+                <span className="hidden min-[451px]:inline">
+                  + Subir documento
+                </span>
+              </>
+            }
             onClick={handleOpenUpload}
-            className="h-[42px] min-w-0 px-5 text-sm"
+            className="h-[42px] min-w-[42px] px-0 text-sm min-[451px]:min-w-0 min-[451px]:px-5"
           />
         )}
       </div>
