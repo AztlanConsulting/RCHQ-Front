@@ -86,7 +86,7 @@ export const employeeBasicUpdateSchema = z
         const dayDiff   = new Date().getDate()  - d.getDate();
         if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
         return age >= 18;
-      }, { message: "El empleado debe ser mayor de 18 años y la fecha debe ser posterior a 1900" })
+      }, { message: "El empleado debe ser mayor de 18 años" })
       .optional(),
   })
   .strict();
