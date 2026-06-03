@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import Type from "../atoms/type";
 import Loader from "../atoms/loader";
 import Drawer from "../atoms/drawer";
@@ -69,6 +70,8 @@ const EmployeeAdminCard = ({
   onCancel,
   canEdit = true,
 }) => {
+  const adminCardRef = useRef(null);
+  const [isAdminInfoWide, setIsAdminInfoWide] = useState(false);
   const currentRoleOption = roles.find(
     (role) => String(role.roleId) === String(adminForm.originalRoleId),
   );
@@ -93,8 +96,35 @@ const EmployeeAdminCard = ({
     });
   }
 
+  useEffect(() => {
+    const adminCard = adminCardRef.current;
+    if (!adminCard) return undefined;
+
+    const updateWidthState = (width = adminCard.getBoundingClientRect().width) => {
+      setIsAdminInfoWide(width >= 610);
+    };
+
+    updateWidthState();
+
+    if (typeof ResizeObserver === "undefined") {
+      const handleResize = () => updateWidthState();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      updateWidthState(entry.contentRect.width);
+    });
+    observer.observe(adminCard);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
+    <div
+      ref={adminCardRef}
+      className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1"
+    >
       <div
         className={
           isEditing
@@ -314,11 +344,17 @@ const EmployeeAdminCard = ({
                   {adminForm.selectedWorkdays.map((w) => (
                     <div
                       key={w.workdayId}
-                      className={`flex flex-col gap-3 rounded-lg px-3 py-3 transition-colors sm:flex-row sm:items-center ${
+                      className={`flex gap-3 rounded-lg px-3 py-3 transition-colors ${
+                        isAdminInfoWide ? "flex-row items-center" : "flex-col"
+                      } ${
                         w.selected ? "bg-slate-50 border border-slate-200" : ""
                       }`}
                     >
-                      <label className="flex w-full cursor-pointer items-center gap-2 sm:w-32 sm:shrink-0">
+                      <label
+                        className={`flex cursor-pointer items-center gap-2 ${
+                          isAdminInfoWide ? "w-32 shrink-0" : "w-full"
+                        }`}
+                      >
                         <input
                           type="checkbox"
                           checked={w.selected}
@@ -329,8 +365,12 @@ const EmployeeAdminCard = ({
                       </label>
                       {w.selected && (
                         <div className="grid w-full grid-cols-1 gap-2">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                            <div className="w-full sm:w-[208px]">
+                          <div
+                            className={`flex gap-2 ${
+                              isAdminInfoWide ? "flex-row items-center" : "flex-col"
+                            }`}
+                          >
+                            <div className={isAdminInfoWide ? "w-[208px]" : "w-full"}>
                               <TimeField
                                 value={w.start}
                                 onChange={(value) => setWorkdayTime(w.workdayId, "start", value)}
@@ -339,8 +379,14 @@ const EmployeeAdminCard = ({
                                 disabled={w.allDay}
                               />
                             </div>
-                            <span className="hidden text-slate-400 text-xs sm:inline">—</span>
-                            <div className="w-full sm:w-[208px]">
+                            <span
+                              className={`text-slate-400 text-xs ${
+                                isAdminInfoWide ? "inline" : "hidden"
+                              }`}
+                            >
+                              —
+                            </span>
+                            <div className={isAdminInfoWide ? "w-[208px]" : "w-full"}>
                               <TimeField
                                 value={w.end}
                                 onChange={(value) => setWorkdayTime(w.workdayId, "end", value)}
@@ -351,7 +397,7 @@ const EmployeeAdminCard = ({
                               />
                             </div>
                           </div>
-                          <div className="pl-0 sm:pl-1">
+                          <div className={isAdminInfoWide ? "pl-1" : "pl-0"}>
                             <CheckboxField
                               id={`all-day-workday-${w.workdayId}`}
                               label="Turno de 24 horas"
