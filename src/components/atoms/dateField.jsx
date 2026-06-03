@@ -126,7 +126,7 @@ const DateField = ({
         return (
             <div className={`date-field-wrapper flex w-full flex-col gap-1.5 ${wrapperClassName}`}>
                 <label
-                    className={`text-sm font-bold sm:text-base ${labelColor} ${labelClassName}`}
+                    className={`text-sm font-bold ${labelColor} ${labelClassName}`}
                 >
                     {label}
                 </label>
@@ -165,7 +165,7 @@ const DateField = ({
             onClickCapture={updateFixedPopupPosition}
             className={`date-field-wrapper relative flex w-full flex-col gap-1.5 ${wrapperClassName}`}
         >
-            <label className={`text-sm font-bold sm:text-base ${labelColor} ${labelClassName}`}>
+            <label className={`text-sm font-bold ${labelColor} ${labelClassName}`}>
                 {label}
             </label>
 

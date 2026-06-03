@@ -56,9 +56,10 @@ const Personal = () => {
                 <h1 className="font-bold text-3xl md:text-4xl text-[#121212]">Usuarios</h1>
                 {!isBlacklistMode && (
                     <BigButton
-                        text="Añadir"
+                        text="Añadir personal"
                         onClick={() => navigate("/app/personal/nuevo")}
                         className="min-w-0"
+                        mobileIcon="/add.svg"
                     />
                 )}
             </div>

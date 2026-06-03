@@ -32,13 +32,12 @@ const EmployeeContactCard = ({
         <Type variant="section-title" as="h3">Contacto</Type>
 
         {isEditing ? (
-          <div className="flex w-full flex-col gap-2 xl:w-auto xl:shrink-0 xl:flex-row">
+          <div className="flex w-full flex-col gap-2 [&>button]:w-full xl:w-auto xl:shrink-0 xl:flex-row xl:[&>button]:w-auto">
             <SmallButton
               text="Cancelar"
               onClick={onCancel}
               disabled={saving}
               cancel
-              hasAdjustableWidth
             />
             {canEdit ? (
               <SmallButton
@@ -46,7 +45,6 @@ const EmployeeContactCard = ({
                 onClick={onSubmit}
                 disabled={saving}
                 leadingIcon={saving ? <Loader size="sm" /> : null}
-                hasAdjustableWidth
               />
             ) : null}
           </div>
