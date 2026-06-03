@@ -190,7 +190,7 @@ describe("Documents — subir documento", () => {
       ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
-    expect(screen.getByRole("heading", { name: /subir documento/i })).toBeInTheDocument();
+    expect(screen.getByText("Subir documento")).toBeInTheDocument();
     expect(screen.getByText(/selecciona un tipo/i)).toBeInTheDocument();
   });
 
@@ -203,10 +203,10 @@ describe("Documents — subir documento", () => {
       ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
-    expect(screen.getByRole("heading", { name: /subir documento/i })).toBeInTheDocument();
+    expect(screen.getByText("Subir documento")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
     await waitFor(() => {
-      expect(screen.queryByRole("heading", { name: /subir documento/i })).toBeNull();
+      expect(screen.queryByText("Subir documento")).toBeNull();
     });
   });
 
