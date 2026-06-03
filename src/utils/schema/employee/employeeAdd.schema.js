@@ -84,5 +84,5 @@ export const employeeCreateSchema = z.object({
         age--;
       }
       return age >= 18;
-    }, "El usuario debe tener al menos 18 años y la fecha debe ser posterior a 1900"),
+    }, "El usuario debe tener al menos 18 años"),
 });
