@@ -85,9 +85,10 @@ const DocumentsSection = ({
         </div>
         {canModify && (
           <BigButton
-            text="+ Subir documento"
+            text="Subir documento"
             onClick={handleOpenUpload}
-            className="h-[42px] min-w-0 px-5 text-sm"
+            className="h-[42px] min-w-0 sm:px-5 text-sm"
+            mobileIcon="/add.svg"
           />
         )}
       </div>
