@@ -22,18 +22,31 @@ const EmployeeContactCard = ({
   const EMPTY_LABEL = "N/A";
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:flex md:basis-1/3 md:shrink-0 md:flex-col">
-      <div className="flex justify-between items-start">
+      <div
+        className={
+          isEditing
+            ? "flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between"
+            : "flex items-start justify-between gap-3"
+        }
+      >
         <Type variant="section-title" as="h3">Contacto</Type>
 
         {isEditing ? (
-          <div className="flex gap-2 shrink-0">
-            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+          <div className="flex w-full flex-col gap-2 xl:w-auto xl:shrink-0 xl:flex-row">
+            <SmallButton
+              text="Cancelar"
+              onClick={onCancel}
+              disabled={saving}
+              cancel
+              hasAdjustableWidth
+            />
             {canEdit ? (
               <SmallButton
                 text="Guardar"
                 onClick={onSubmit}
                 disabled={saving}
                 leadingIcon={saving ? <Loader size="sm" /> : null}
+                hasAdjustableWidth
               />
             ) : null}
           </div>
