@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useAlertAnimation = (message, onClose) => {
+const useAlertAnimation = (message, onClose, duration = 5000) => {
   const [status, setStatus] = useState("mounting");
 
   useEffect(() => {
@@ -20,10 +20,10 @@ const useAlertAnimation = (message, onClose) => {
       setTimeout(() => {
         onClose();
       }, 300);
-    }, 5000);
+    }, duration);
 
     return () => clearTimeout(displayTimer);
-  }, [status, message, onClose]);
+  }, [status, message, onClose, duration]);
 
   return status;
 };

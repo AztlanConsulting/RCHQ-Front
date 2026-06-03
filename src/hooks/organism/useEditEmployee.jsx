@@ -31,6 +31,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
+  const [validationAlert, setValidationAlert] = useState(null);
   const [basicErrors, setBasicErrors] = useState({});
   const [contactErrors, setContactErrors] = useState({});
   const [adminErrors, setAdminErrors] = useState({});
@@ -60,6 +61,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     revokePreviewUrl(basicPicturePreview);
     setBasicPictureFile(null);
@@ -78,6 +80,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
+    setValidationAlert(null);
     setContactErrors({});
     setContactFormState({
       email:       employee?.email ?? "",
@@ -93,6 +96,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
+    setValidationAlert(null);
     setAdminErrors({});
     setEditSection("Administrador");
     setLoadingCatalogues(true);
@@ -153,6 +157,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setBasicPicturePreview("");
     setEditSection(null);
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     setContactErrors({});
     setAdminErrors({});
@@ -358,6 +363,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitBasic = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     try {
       const validation = employeeBasicUpdateSchema.safeParse(basicForm);
@@ -394,6 +400,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitContact = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setContactErrors({});
     try {
       const validation = employeeContactUpdateSchema.safeParse(contactForm);
@@ -420,6 +427,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitAdmin = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setAdminErrors({});
     try {
       const requiredErrors = {};
@@ -428,6 +436,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       if (adminForm.salary === "") requiredErrors.salary = "El salario es obligatorio";
       if (Object.keys(requiredErrors).length > 0) {
         setAdminErrors(requiredErrors);
+        setValidationAlert("Falta completar un dato obligatorio en la información administrativa.");
         return;
       }
 
@@ -454,6 +463,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
       if (selectedWorkdays.length === 0) {
         setAdminErrors({ workdays: "Debes seleccionar al menos un día de trabajo." });
+        setValidationAlert("Falta completar un dato obligatorio en la información administrativa.");
         return;
       }
 
@@ -517,7 +527,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, [adminForm, employeeId, closeEdit, onSuccess]);
 
   return {
-    editSection, saving, saveError, loadingCatalogues,
+    editSection, saving, saveError, validationAlert, loadingCatalogues,
     basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
@@ -525,6 +535,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime, setWorkdayAllDay,
-    submitBasic, submitContact, submitAdmin,
+    submitBasic, submitContact, submitAdmin, setValidationAlert,
   };
 };

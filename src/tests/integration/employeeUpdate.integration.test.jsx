@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   render,
   screen,
@@ -149,6 +149,10 @@ beforeEach(() => {
   updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
   updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
   updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("DetalleEmpleado — renderizado base", () => {
@@ -462,6 +466,39 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     });
 
     expect(await screen.findByText("Salario inválido")).toBeInTheDocument();
+  });
+
+  it("muestra una notificación temporal cuando falta un dato administrativo obligatorio", async () => {
+    vi.useFakeTimers();
+
+    renderPage();
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
+
+    const saveBtn = screen.getByRole("button", { name: /guardar/i });
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "" } });
+
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
+
+    expect(
+      screen.getByText("Falta completar un dato obligatorio en la información administrativa."),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(3300);
+    });
+
+    expect(
+      screen.queryByText("Falta completar un dato obligatorio en la información administrativa."),
+    ).not.toBeInTheDocument();
   });
 
   it("deshabilita Guardar mientras carga catálogos", async () => {

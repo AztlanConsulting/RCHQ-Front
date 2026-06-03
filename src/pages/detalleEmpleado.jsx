@@ -39,7 +39,7 @@ const DetalleEmpleado = () => {
   } = useEmployeeDetail(employeeId);
 
   const {
-    editSection, saving, saveError, loadingCatalogues,
+    editSection, saving, saveError, validationAlert, loadingCatalogues,
     basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
@@ -48,7 +48,7 @@ const DetalleEmpleado = () => {
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime, setWorkdayAllDay,
-    submitBasic, submitContact, submitAdmin,
+    submitBasic, submitContact, submitAdmin, setValidationAlert,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
     getEmployeeDetail();
@@ -141,6 +141,17 @@ const DetalleEmpleado = () => {
             type={alert.type}
             message={alert.message}
             onClose={() => setAlert({})}
+          />
+        </div>
+      ) : null}
+
+      {validationAlert ? (
+        <div className="fixed top-30 left-[5%] right-0 z-[60] px-4">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={() => setValidationAlert(null)}
           />
         </div>
       ) : null}
