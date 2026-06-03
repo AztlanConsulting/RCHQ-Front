@@ -150,56 +150,60 @@ const DetalleEmpleado = () => {
         onCancel={closeModal}
       />
 
-      <div className="flex items-center gap-2 md:hidden">
-        <button
-          type="button"
-          onClick={() => navigate("/app/personal")}
-          className="rounded-lg p-2 hover:bg-slate-100 transition-colors shrink-0"
-        >
-          <svg
-            className="w-5 h-5 text-slate-600 rotate-90"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div className="flex flex-col gap-3 md:hidden">
+        <div className="flex min-w-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate("/app/personal")}
+            className="shrink-0 rounded-lg p-2 transition-colors hover:bg-slate-100"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
+            <svg
+              className="h-5 w-5 rotate-90 text-slate-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
 
-        <Type
-          variant="page-title"
-          as="h2"
-          className="min-w-0 flex-1 truncate text-[1rem] leading-tight sm:text-[1.15rem]"
-        >
-          Gestión de Empleados
-        </Type>
-
-        <div className="w-28 shrink-0">
-          <NativeSelect
-            size="sm"
-            aria-label="Tabs"
-            value={currentTab}
-            onChange={(e) => setCurrentTab(e.target.value)}
-            options={tabs.map((t) => ({ label: t.label, value: t.id }))}
-          />
+          <Type
+            variant="page-title"
+            as="h2"
+            className="min-w-0 flex-1 truncate text-[1rem] leading-tight sm:text-[1.15rem]"
+          >
+            Gestión de Empleados
+          </Type>
         </div>
 
-        {canEdit ? (
-          <BigButton
-            text="Dar de baja"
-            onClick={openModal}
-            hasNoRollback
-            className="min-w-0 shrink-0 px-3"
-          />
-        ) : null}
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="w-full">
+            <NativeSelect
+              size="sm"
+              aria-label="Tabs"
+              value={currentTab}
+              onChange={(e) => setCurrentTab(e.target.value)}
+              options={tabs.map((t) => ({ label: t.label, value: t.id }))}
+            />
+          </div>
+
+          {canEdit ? (
+            <BigButton
+              text="Dar de baja"
+              onClick={openModal}
+              hasNoRollback
+              className="w-full whitespace-nowrap px-3 !text-sm"
+            />
+          ) : null}
+        </div>
       </div>
 
-      <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-nowrap">
+      <div className="hidden min-w-0 items-center gap-2 md:flex md:flex-wrap">
         <button
           type="button"
           onClick={() => navigate("/app/personal")}
@@ -220,7 +224,7 @@ const DetalleEmpleado = () => {
           </svg>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center gap-4 md:gap-8">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-3 md:gap-x-8">
           <Type
             variant="page-title"
             as="h2"
@@ -247,7 +251,7 @@ const DetalleEmpleado = () => {
             text="Dar de baja"
             onClick={openModal}
             hasNoRollback
-            className="ml-auto mr-2 min-w-0 shrink-0 px-5"
+            className="ml-auto mr-2 min-w-[8.75rem] shrink-0 whitespace-nowrap px-5"
           />
         ) : null}
       </div>
