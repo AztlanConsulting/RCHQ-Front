@@ -41,7 +41,7 @@ const SmallButton = ({
             onClick={onClick}
             disabled={disabled}
             title={title}
-            className={`${width} inline-flex h-10 min-w-[112px] items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition-colors ${variant.color} ${variant.state} ${variant.border} shadow-md disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+            className={`${width} inline-flex h-8 min-w-[80px] items-center justify-center gap-2 rounded-lg px-3 text-xs font-semibold transition-colors sm:h-10 sm:min-w-[112px] sm:px-5 sm:text-sm ${variant.color} ${variant.state} ${variant.border} shadow-md disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
         >
             {leadingIcon ? (
                 <span className="flex items-center">{leadingIcon}</span>
