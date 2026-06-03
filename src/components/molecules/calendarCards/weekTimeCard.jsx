@@ -6,10 +6,7 @@ const WeekTimeCard = ({ arg }) => {
   const start = ev.start;
   const end = ev.end;
   const x = ev.extendedProps ?? {};
-  const isMultiDay = Boolean(x.multiDay);
-  const isTimeGridView =
-    arg.view.type === "timeGridWeek" || arg.view.type === "timeGridDay";
-  const showAsAllDay = ev.allDay || (isMultiDay && isTimeGridView);
+  const showAsAllDay = ev.allDay;
   const subtitle = String(x.subtitle ?? "").trim();
   const description = String(x.description ?? "").trim();
 

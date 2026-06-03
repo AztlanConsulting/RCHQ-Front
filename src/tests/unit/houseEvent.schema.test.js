@@ -29,6 +29,24 @@ describe("houseEvent buildPayload", () => {
         });
     });
 
+    it("mantiene 12:00 como mediodía sin mover el fin al día siguiente", () => {
+        expect(
+            buildPayload({
+                ...baseForm,
+                allDay: false,
+                isFreeDay: false,
+                startTime: "11:00",
+                endTime: "12:00",
+                timeZone: "Europe/London",
+            }),
+        ).toMatchObject({
+            start: "2026-05-05T10:00:00.000Z",
+            end: "2026-05-05T11:00:00.000Z",
+            allDay: false,
+            timeZone: "Europe/London",
+        });
+    });
+
     it("guarda eventos all-day como rango UTC de 00:00 a 00:00 en el horario del calendario", () => {
         expect(
             buildPayload({
