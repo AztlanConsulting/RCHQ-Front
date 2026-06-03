@@ -78,7 +78,7 @@ const EmployeeContactCard = ({
       )}
 
       {!isEditing && (
-        <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-between">
+        <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-start">
           {[
             { label: "Correo Electrónico",  value: employee?.email },
             { label: "Número de Teléfono",  value: employee?.phoneNumber },
