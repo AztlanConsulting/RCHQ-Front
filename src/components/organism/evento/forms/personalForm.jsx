@@ -50,7 +50,11 @@ const PersonalForm = (props) => {
     const today = new Date();
 
     const minDateLimit = props.minDate || today;
-    const personalDateMax = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+    const personalDateMax = new Date(
+        today.getFullYear() + 2,
+        today.getMonth(),
+        today.getDate(),
+    );
 
     return (
         <>
@@ -94,7 +98,11 @@ const PersonalForm = (props) => {
                                 onChange={(e) =>
                                     setField("endDate", e.target.value)
                                 }
-                                minDate={form.date ? new Date(`${form.date}T12:00:00`) : minDateLimit}
+                                minDate={
+                                    form.date
+                                        ? new Date(`${form.date}T12:00:00`)
+                                        : minDateLimit
+                                }
                                 maxDate={personalDateMax}
                                 error={!!errors.endDate}
                             />
@@ -118,11 +126,19 @@ const PersonalForm = (props) => {
                             "max-height 300ms ease, margin-top 300ms ease, opacity 250ms ease",
                     }}
                 >
-                    <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "flex-end",
+                        }}
+                    >
                         <div style={{ flex: 1 }}>
                             <TimeField
                                 value={form.startTime}
-                                onChange={(value) => setField("startTime", value)}
+                                onChange={(value) =>
+                                    setField("startTime", value)
+                                }
                                 placeholder="Inicio"
                                 error={errors.startTime}
                                 hideErrorText
@@ -145,10 +161,14 @@ const PersonalForm = (props) => {
 
                     <div style={{ display: "flex", gap: "8px" }}>
                         <div style={{ flex: 1 }}>
-                            {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+                            {errors.startTime && (
+                                <ErrorText>{errors.startTime}</ErrorText>
+                            )}
                         </div>
                         <div style={{ flex: 1 }}>
-                            {errors.endTime && <ErrorText>{errors.endTime}</ErrorText>}
+                            {errors.endTime && (
+                                <ErrorText>{errors.endTime}</ErrorText>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -171,6 +191,7 @@ const PersonalForm = (props) => {
             </div>
 
             <SelectField
+                label="Tipo de evento"
                 placeholder="Selecciona tipo de evento ..."
                 value={form.eventTypeId}
                 setValue={(value) => setField("eventTypeId", value)}
@@ -226,7 +247,9 @@ const PersonalForm = (props) => {
                         onSearch={searchEmployees}
                         error={!!errors.employees}
                     />
-                    {errors.employees && <ErrorText>{errors.employees}</ErrorText>}
+                    {errors.employees && (
+                        <ErrorText>{errors.employees}</ErrorText>
+                    )}
                 </div>
             )}
 
@@ -250,7 +273,11 @@ const PersonalForm = (props) => {
                     maxLength={250}
                     rows={3}
                     className="w-full rounded-lg bg-neutral-50 px-4 py-3 text-sm font-medium text-[#222] placeholder-[#aaaaaa] border-0 resize-none outline-none"
-                    style={{ boxShadow: errors.description ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040" : "inset 0px 4px 4px #00000040" }}
+                    style={{
+                        boxShadow: errors.description
+                            ? "inset 0 0 0 2px #f87171, inset 0px 4px 4px #00000040"
+                            : "inset 0px 4px 4px #00000040",
+                    }}
                 />
 
                 <div className="mt-1 text-right text-xs font-medium text-slate-500">
