@@ -3,7 +3,6 @@ import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
-import Alert from "../atoms/alerts";
 
 const EmployeeContactCard = ({
   employee,
@@ -13,8 +12,6 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
-  validationAlert,
-  onValidationAlertClose,
   errors = {},
   onOpenEdit,
   onSubmit,
@@ -35,12 +32,13 @@ const EmployeeContactCard = ({
         <Type variant="section-title" as="h3">Contacto</Type>
 
         {isEditing ? (
-          <div className="flex w-full flex-col gap-2 [&>button]:w-full xl:w-auto xl:shrink-0 xl:flex-row xl:[&>button]:w-auto">
+          <div className="flex w-full flex-col gap-2 xl:w-auto xl:shrink-0 xl:flex-row">
             <SmallButton
               text="Cancelar"
               onClick={onCancel}
               disabled={saving}
               cancel
+              hasAdjustableWidth
             />
             {canEdit ? (
               <SmallButton
@@ -48,6 +46,7 @@ const EmployeeContactCard = ({
                 onClick={onSubmit}
                 disabled={saving}
                 leadingIcon={saving ? <Loader size="sm" /> : null}
+                hasAdjustableWidth
               />
             ) : null}
           </div>
@@ -66,19 +65,8 @@ const EmployeeContactCard = ({
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
-      {validationAlert && isEditing && canEdit && (
-        <div className="mt-2">
-          <Alert
-            type="error"
-            message={validationAlert}
-            duration={3000}
-            onClose={onValidationAlertClose}
-          />
-        </div>
-      )}
-
       {!isEditing && (
-        <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-between">
+        <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-start">
           {[
             { label: "Correo Electrónico",  value: employee?.email },
             { label: "Número de Teléfono",  value: employee?.phoneNumber },
