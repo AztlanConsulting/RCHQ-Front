@@ -47,9 +47,15 @@ const EmployeeBasicCard = ({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div
+          className={
+            isEditing
+              ? "flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between"
+              : "flex items-start justify-between gap-3"
+          }
+        >
           <div className="min-w-0">
-            <Type variant="page-title" as="h2" className="text-[2rem] leading-none tracking-[-0.02em]">
+            <Type variant="page-title" as="h2" className="break-words text-[2rem] leading-none tracking-[-0.02em] [overflow-wrap:anywhere]">
               {`${employee?.name ?? ""} ${employee?.surname ?? ""}`}
             </Type>
             <Type variant="subtitle" as="p" className="mt-2 text-lg font-semibold text-slate-500">
@@ -58,8 +64,13 @@ const EmployeeBasicCard = ({
           </div>
 
           {isEditing ? (
-            <div className="flex gap-2 shrink-0">
-              <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            <div className="flex w-full flex-col gap-2 [&>button]:w-full lg:w-auto lg:shrink-0 lg:flex-row lg:[&>button]:w-auto">
+              <SmallButton
+                text="Cancelar"
+                onClick={onCancel}
+                disabled={saving}
+                cancel
+              />
               {canEdit ? (
                 <SmallButton
                   text="Guardar"
