@@ -140,9 +140,9 @@ const DocumentCard = ({
             <Button
               onClick={() => onEdit(doc)}
               title="Editar"
-              bgColor="bg-blue-600"
-              hoverColor="hover:bg-blue-700"
-              activeColor="active:bg-blue-800"
+              bgColor="bg-[#24375e]"
+              hoverColor="hover:bg-[#162d4a]"
+              activeColor="active:bg-[#0f2035]"
               width="w-8"
               height="h-8"
               className="!rounded-lg"
@@ -154,9 +154,9 @@ const DocumentCard = ({
               onClick={() => onDelete(doc)}
               disabled={isBeingDeleted}
               title="Eliminar"
-              bgColor="bg-[#dd4344]"
-              hoverColor="hover:bg-red-700"
-              activeColor="active:bg-red-800"
+              bgColor="bg-[#A20000]"
+              hoverColor="hover:bg-[#870000]"
+              activeColor="active:bg-[#6B0000]"
               width="w-8"
               height="h-8"
               className="!rounded-lg"
