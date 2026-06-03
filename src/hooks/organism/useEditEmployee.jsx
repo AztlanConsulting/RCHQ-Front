@@ -21,10 +21,17 @@ const mapZodFieldErrors = (issues = []) =>
     return fieldErrors;
   }, {});
 
+const VALIDATION_ALERTS = {
+  basic: "Falta completar o corregir datos en la información básica.",
+  contact: "Falta completar o corregir datos en la información de contacto.",
+  admin: "Falta completar o corregir datos en la información administrativa.",
+};
+
 export const useEditEmployee = (employeeId, onSuccess) => {
   const [editSection, setEditSection] = useState(null);
   const [saving, setSaving]           = useState(false);
   const [saveError, setSaveError]     = useState(null);
+  const [validationAlert, setValidationAlert] = useState(null);
   const [basicErrors, setBasicErrors] = useState({});
   const [contactErrors, setContactErrors] = useState({});
   const [adminErrors, setAdminErrors] = useState({});
@@ -54,6 +61,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openBasicEdit = useCallback((employee) => {
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     setBasicPictureFile(null);
     setBasicPicturePreview("");
@@ -71,6 +79,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openContactEdit = useCallback((employee, address) => {
     setSaveError(null);
+    setValidationAlert(null);
     setContactErrors({});
     setContactFormState({
       email:       employee?.email ?? "",
@@ -86,6 +95,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
 
   const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
     setSaveError(null);
+    setValidationAlert(null);
     setAdminErrors({});
     setEditSection("Administrador");
     setLoadingCatalogues(true);
@@ -145,6 +155,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setBasicPicturePreview("");
     setEditSection(null);
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     setContactErrors({});
     setAdminErrors({});
@@ -351,6 +362,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitBasic = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setBasicErrors({});
     try {
       const validation = employeeBasicUpdateSchema.safeParse(basicForm);
@@ -358,6 +370,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         const issues = validation.error?.issues || validation.error?.errors || [];
         const fieldErrors = mapZodFieldErrors(issues);
         setBasicErrors(fieldErrors);
+        setValidationAlert(VALIDATION_ALERTS.basic);
         if (Object.keys(fieldErrors).length === 0) {
           setSaveError(issues[0]?.message || "Por favor, llena todos los campos obligatorios correctamente.");
         }
@@ -387,6 +400,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitContact = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setContactErrors({});
     try {
       const validation = employeeContactUpdateSchema.safeParse(contactForm);
@@ -394,6 +408,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         const issues = validation.error?.issues || validation.error?.errors || [];
         const fieldErrors = mapZodFieldErrors(issues);
         setContactErrors(fieldErrors);
+        setValidationAlert(VALIDATION_ALERTS.contact);
         if (Object.keys(fieldErrors).length === 0) {
           setSaveError(issues[0]?.message || "Es necesario completar todos los campos de contacto.");
         }
@@ -413,6 +428,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const submitAdmin = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
+    setValidationAlert(null);
     setAdminErrors({});
     try {
       const requiredErrors = {};
@@ -421,16 +437,19 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       if (adminForm.salary === "") requiredErrors.salary = "El salario es obligatorio";
       if (Object.keys(requiredErrors).length > 0) {
         setAdminErrors(requiredErrors);
+        setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
       const salaryNum = Number(adminForm.salary);
       if (isNaN(salaryNum) || salaryNum < 0) {
         setAdminErrors({ salary: "El salario debe ser un número válido." });
+        setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
       if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
         setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+        setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
@@ -447,6 +466,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
       if (selectedWorkdays.length === 0) {
         setAdminErrors({ workdays: "Debes seleccionar al menos un día de trabajo." });
+        setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
@@ -489,6 +509,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         const issues = validation.error?.issues || [];
         const fieldErrors = mapZodFieldErrors(issues);
         setAdminErrors(fieldErrors);
+        setValidationAlert(VALIDATION_ALERTS.admin);
         if (Object.keys(fieldErrors).length === 0) {
           setSaveError(issues[0]?.message || "Revisa los campos administrativos.");
         }
@@ -501,6 +522,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } catch (err) {
       if (err.message?.startsWith("Debes asignar") || err.message?.startsWith("El turno")) {
         setAdminErrors({ workdays: err.message });
+        setValidationAlert(VALIDATION_ALERTS.admin);
       } else {
         setSaveError(err.message ?? "Error al guardar");
       }
@@ -510,7 +532,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, [adminForm, employeeId, closeEdit, onSuccess]);
 
   return {
-    editSection, saving, saveError, loadingCatalogues,
+    editSection, saving, saveError, validationAlert, loadingCatalogues,
     basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
@@ -518,6 +540,6 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
     toggleWorkday, setWorkdayTime, setWorkdayAllDay,
-    submitBasic, submitContact, submitAdmin,
+    submitBasic, submitContact, submitAdmin, setValidationAlert,
   };
 };

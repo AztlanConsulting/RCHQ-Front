@@ -8,6 +8,7 @@ import TimeField from "../atoms/timeField";
 import CheckboxField from "../atoms/checkboxField";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -64,6 +65,8 @@ const EmployeeAdminCard = ({
   setWorkdayAllDay,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   onOpenEdit,
   onSubmit,
@@ -164,6 +167,17 @@ const EmployeeAdminCard = ({
 
       {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
+      )}
+
+      {validationAlert && isEditing && canEdit && (
+        <div className="mt-2">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
+        </div>
       )}
 
       {!isEditing && (
