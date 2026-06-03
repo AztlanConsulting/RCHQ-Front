@@ -72,7 +72,7 @@ const EmployeeBasicCard = ({
           ) : canEdit ? (
             <button
               type="button" aria-label="Editar información básica"
-              className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
+              className="rounded-lg p-2 hover:bg-slate-100 shrink-0 ml-auto"
               onClick={onOpenEdit}
             >
               <img src="/edit.svg" alt="" className="h-5 w-5" />
