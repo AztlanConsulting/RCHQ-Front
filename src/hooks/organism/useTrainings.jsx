@@ -71,7 +71,7 @@ export const useTrainings = (employeeId, { onRemoveSuccess } = {}) => {
 
   const confirmRemove = useCallback(async () => {
     if (!trainingToRemove) return;
-    const eventId = trainingToRemove.eventId
+    const eventId = trainingToRemove.eventId ?? trainingToRemove.personalEventId;
     if (!eventId) return;
 
     setIsRemoving(true);

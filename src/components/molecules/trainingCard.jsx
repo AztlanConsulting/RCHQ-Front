@@ -58,6 +58,7 @@ const TrainingCard = ({ training, onOpen, onRemove }) => (
   <div className="flex h-full w-full flex-col overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
     <Button
       onClick={() => onOpen(training)}
+      aria-label={training.title}
       bgColor="bg-slate-100"
       hoverColor="hover:bg-slate-200"
       activeColor=""
