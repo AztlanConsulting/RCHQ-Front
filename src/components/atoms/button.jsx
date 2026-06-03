@@ -1,6 +1,7 @@
 const Button = ({
   text,
   title,
+  "aria-label": ariaLabel,
   onClick,
   type = "button",
   disabled = false,
@@ -22,6 +23,7 @@ const Button = ({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={ariaLabel}
       className={`${width}
         ${height} 
         flex items-center justify-center rounded-lg overflow-hidden 

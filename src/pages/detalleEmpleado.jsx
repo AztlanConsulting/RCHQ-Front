@@ -95,7 +95,15 @@ const DetalleEmpleado = () => {
     closeTrainingDetail,
     viewerRole,
     calendarTimeZone,
-  } = useTrainings(employeeId);
+    trainingToRemove,
+    isRemoving,
+    removeError,
+    openRemoveConfirm,
+    closeRemoveConfirm,
+    confirmRemove,
+  } = useTrainings(employeeId, {
+    onRemoveSuccess: (msg) => setAlert({ type: "success", message: msg }),
+  });
 
   const infoDrawer     = useDrawer();
   const workdaysDrawer = useDrawer();
@@ -127,15 +135,15 @@ const DetalleEmpleado = () => {
 
   return (
     <div className="flex flex-col gap-4 overflow-x-hidden text-black">
-      {alert?.message && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+      {alert?.message ? (
+        <div className="fixed top-30 left-[5%] right-0 z-50 px-4">
           <Alert
             type={alert.type}
             message={alert.message}
             onClose={() => setAlert({})}
           />
         </div>
-      )}
+      ) : null}
 
       <ReasonCard
         isOpen={isModalOpen}
@@ -356,6 +364,13 @@ const DetalleEmpleado = () => {
             onCloseTraining={closeTrainingDetail}
             viewerRole={viewerRole}
             calendarTimeZone={calendarTimeZone}
+            canRemove={canEdit}
+            trainingToRemove={trainingToRemove}
+            isRemoving={isRemoving}
+            removeError={removeError}
+            onOpenRemoveConfirm={openRemoveConfirm}
+            onCloseRemoveConfirm={closeRemoveConfirm}
+            onConfirmRemove={confirmRemove}
           />
         </div>
       )}
