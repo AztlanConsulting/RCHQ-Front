@@ -6,6 +6,7 @@ import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -20,6 +21,8 @@ const EmployeeBasicCard = ({
   setBasicPicture,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   infoDrawer,
   onOpenEdit,
@@ -84,6 +87,15 @@ const EmployeeBasicCard = ({
           <p className="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
             {saveError}
           </p>
+        )}
+
+        {validationAlert && isEditing && canEdit && (
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
         )}
 
         {!isEditing && (

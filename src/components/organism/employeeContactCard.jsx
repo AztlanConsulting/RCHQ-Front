@@ -3,6 +3,7 @@ import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 
 const EmployeeContactCard = ({
   employee,
@@ -12,6 +13,8 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   onOpenEdit,
   onSubmit,
@@ -50,6 +53,17 @@ const EmployeeContactCard = ({
 
       {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
+      )}
+
+      {validationAlert && isEditing && canEdit && (
+        <div className="mt-2">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
+        </div>
       )}
 
       {!isEditing && (
