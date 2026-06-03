@@ -8,14 +8,14 @@ const SelectField = ({
   options = [],
   placeholder = "Selecciona una opción",
   required = false,
-  labelColor = "text-[#121212]",
+  labelColor = "text-[#374151]",
   disabled = false,
   error = false,
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
-        <label htmlFor={id} className={`font-semibold text-sm ${labelColor}`}>
+        <label htmlFor={id} className={`text-sm font-bold ${labelColor}`}>
           {label}
           {required && (
             <span className="text-red-600 ml-0.5" aria-hidden="true">
