@@ -20,6 +20,10 @@ const makeCalendarRef = () => {
     const calendarApi = {
         selectable: true,
         unselect: vi.fn(),
+        view: { type: "dayGridMonth" },
+        changeView: vi.fn((view) => {
+            calendarApi.view.type = view;
+        }),
     };
 
     return {
@@ -44,6 +48,7 @@ const buildDateInfo = () => ({
 
 describe("useBaseCalendar", () => {
     beforeEach(() => {
+        document.body.innerHTML = "";
         vi.clearAllMocks();
     });
 
@@ -94,6 +99,58 @@ describe("useBaseCalendar", () => {
             endTime: "",
             allDay: true,
         });
+    });
+
+    it("muestra el nombre correcto del día sin mutar la fecha del header", () => {
+        const { result } = renderHook(() => useBaseCalendar());
+        const headerDate = new Date("2026-06-01T00:00:00.000Z");
+
+        const label = result.current.getWeekDayName({ date: headerDate });
+
+        expect(label).toBe("Lun");
+        expect(headerDate.toISOString()).toBe("2026-06-01T00:00:00.000Z");
+    });
+
+    it("muestra día y número correctos en el header de semana", () => {
+        const { result } = renderHook(() => useBaseCalendar());
+        const { calendarRef } = makeCalendarRef();
+
+        act(() => {
+            result.current.setWeekView(calendarRef);
+        });
+
+        const label = result.current.getWeekDayName({
+            date: new Date("2026-06-03T00:00:00.000Z"),
+        });
+
+        expect(label).toBe("Mié 3");
+    });
+
+    it("usa nombres completos en el header cuando hay espacio suficiente", () => {
+        const tableCell = document.createElement("div");
+        tableCell.className = "fc-day";
+        Object.defineProperty(tableCell, "clientWidth", { value: 180 });
+        document.body.appendChild(tableCell);
+
+        const { result } = renderHook(() => useBaseCalendar());
+        const { calendarRef } = makeCalendarRef();
+
+        act(() => {
+            result.current.setWeekView(calendarRef);
+        });
+
+        expect(
+            result.current.getWeekDayName({
+                date: new Date("2026-06-03T00:00:00.000Z"),
+            }),
+        ).toBe("Miércoles 3");
+    });
+
+    it("calcula el header con el día UTC del marcador del calendario", () => {
+        const { result } = renderHook(() => useBaseCalendar());
+        const headerDate = new Date("2026-06-01T23:00:00.000Z");
+
+        expect(result.current.getWeekDayName({ date: headerDate })).toBe("Lun");
     });
 
     it("consulta un dia extra antes y despues del rango visible para eventos con desfase horario", async () => {

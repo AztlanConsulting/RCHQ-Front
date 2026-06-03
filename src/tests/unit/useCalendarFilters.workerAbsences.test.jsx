@@ -237,6 +237,11 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             end: "2026-05-06",
             allDay: true,
         });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            detailAllDay: true,
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-05",
+        });
 
         rerender({ calendarTimeZone: "America/Matamoros" });
 
@@ -247,7 +252,9 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
             startDate: "2026-05-05",
-            endDate: "2026-05-06",
+            endDate: "2026-05-05",
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-06",
             totalDays: 1,
             usedDays: 1,
         });
@@ -560,7 +567,7 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         });
     });
 
-    it("conserva detailAllDay en true para eventos aunque el calendario los expanda por zona horaria", async () => {
+    it("quita detailAllDay cuando un evento all-day no cae como todo el día en la zona activa", async () => {
         const event = {
             focus: "eventos",
             name: "Capacitacion all-day",
@@ -592,7 +599,9 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             allDay: false,
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
-            detailAllDay: true,
+            detailAllDay: false,
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-06",
         });
     });
 });
