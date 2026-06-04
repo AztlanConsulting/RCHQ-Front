@@ -28,6 +28,8 @@ import Certificaciones from "./pages/certificaciones";
 import Alert from "./components/atoms/alerts";
 import NotFound from "./pages/notFound";
 import warningSvg from "/error.svg";
+import Beneficiarios from "./pages/beneficiaries";
+import AltaBeneficiario from "./pages/beneficiaries/altaBeneficiario";
 
 function App() {
   const [rateLimitMessage, setRateLimitMessage] = useState(null);
@@ -88,6 +90,8 @@ function App() {
             <Route path="vacaciones" element={<Vacaciones />} />
             <Route path="donaciones" element={<Donaciones />} />
             <Route path="certificaciones" element={<Certificaciones />} />
+            <Route path="beneficiarios/nuevo" element={<AltaBeneficiario />} />
+            <Route path="beneficiarios" element={<Beneficiarios />} />
             
             <Route element={<RoleRoute allowedRoles={["Coordinador"]} />}>
               <Route path="acciones/casa" element={<LogsHouse />} />
