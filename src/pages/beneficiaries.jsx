@@ -12,6 +12,7 @@ const Personal = () => {
                     text="Añadir"
                     onClick={() => navigate("/app/beneficiarios/nuevo")}
                     className="min-w-0"
+                    mobileIcon="/add.svg"
                 />
             </div>
         </div>
