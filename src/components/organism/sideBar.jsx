@@ -42,6 +42,7 @@ const getNavItems = (user) => {
 
   if (isCoordinator || isAdministrator) {
     navItems.push({ to: "/app/personal", label: "Personal", icon: "employee" });
+    navItems.push({ to: "/app/beneficiarios", label: "Beneficiarios", icon: "beneficiary" })
   }
 
   if (isAdministrator) {
