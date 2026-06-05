@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { capitalizeName } from "../../capitalizeName";
 
 const CURP_REGEX = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 const NAMES_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
@@ -30,7 +31,8 @@ const nameField = (label) =>
         .trim()
         .min(2, `${label} es obligatorio`)
         .max(50, `${label} es demasiado largo`)
-        .regex(NAMES_REGEX, `No se permiten caracteres especiales en ${label.toLowerCase()}`);
+        .regex(NAMES_REGEX, `No se permiten caracteres especiales en ${label.toLowerCase()}`)
+        .transform(capitalizeName);
 
 export const beneficiaryCreateSchema = z
     .object({

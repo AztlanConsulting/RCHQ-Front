@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createBeneficiary } from "../../services/beneficiaryService";
 import { beneficiaryCreateSchema } from "../../utils/schema/beneficiary/beneficiaryAdd.schema";
+import { capitalizeName } from "../../utils/capitalizeName";
 
 const INITIAL_FORM = {
     name: "",
@@ -44,7 +45,9 @@ const useBeneficiaryCreateForm = (onSuccess) => {
             case "maternal_surname":
             case "paternal_surname":
             case "preferred_name":
-                finalValue = value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, "");
+                finalValue = capitalizeName(
+                    value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""),
+                );
                 break;
 
             case "curp":

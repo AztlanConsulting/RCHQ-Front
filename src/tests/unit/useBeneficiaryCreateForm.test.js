@@ -49,6 +49,28 @@ describe("useBeneficiaryCreateForm", () => {
         vi.clearAllMocks();
     });
 
+    it("capitaliza nombres al escribir", () => {
+        const { result } = renderHook(() => useBeneficiaryCreateForm(), {
+            wrapper,
+        });
+
+        act(() => {
+            result.current.handleChange({
+                target: { name: "name", value: "juan manuel" },
+            });
+        });
+
+        expect(result.current.form.name).toBe("Juan Manuel");
+
+        act(() => {
+            result.current.handleChange({
+                target: { name: "paternal_surname", value: "garcia" },
+            });
+        });
+
+        expect(result.current.form.paternal_surname).toBe("Garcia");
+    });
+
     it("inicializa el formulario vacío", () => {
         const { result } = renderHook(() => useBeneficiaryCreateForm(), {
             wrapper,
