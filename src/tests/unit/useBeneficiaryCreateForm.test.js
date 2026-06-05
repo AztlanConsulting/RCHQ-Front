@@ -82,10 +82,10 @@ describe("useBeneficiaryCreateForm", () => {
         expect(result.current.serverError).toBeTruthy();
     });
 
-    it("registra al beneficiario y navega al redirect", async () => {
+    it("muestra éxito sin redirigir", async () => {
         const onSuccess = vi.fn();
         createBeneficiary.mockResolvedValueOnce({
-            redirect: "/app/beneficiarios/ver/ben-99",
+            message: "Beneficiario registrado con éxito.",
         });
 
         const { result } = renderHook(
@@ -99,14 +99,40 @@ describe("useBeneficiaryCreateForm", () => {
             await result.current.handleSubmit();
         });
 
-        await waitFor(() => {
-            expect(createBeneficiary).toHaveBeenCalledTimes(1);
-        });
+        expect(createBeneficiary).toHaveBeenCalledTimes(1);
         expect(onSuccess).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith(
-            "/app/beneficiarios/ver/ben-99",
+        expect(result.current.serverSuccess).toBe(
+            "Beneficiario registrado con éxito.",
         );
+        expect(mockNavigate).not.toHaveBeenCalled();
         expect(result.current.form.name).toBe("");
+        expect(result.current.conflictModal.show).toBe(false);
+    });
+
+    it("abre el modal de conflicto cuando el beneficiario ya existe", async () => {
+        const conflictError = new Error(
+            "Beneficiario con la misma información ya se encuentra en esta casa",
+        );
+        conflictError.status = 406;
+        conflictError.isAlreadyRegistered = true;
+        createBeneficiary.mockRejectedValueOnce(conflictError);
+
+        const { result } = renderHook(() => useBeneficiaryCreateForm(), {
+            wrapper,
+        });
+
+        fillForm(result);
+
+        await act(async () => {
+            await result.current.handleSubmit();
+        });
+
+        expect(result.current.conflictModal).toEqual({
+            show: true,
+            message:
+                "Beneficiario con la misma información ya se encuentra en esta casa",
+        });
+        expect(result.current.serverError).toBeNull();
     });
 
     it("muestra error del servidor y fieldErrors del backend", async () => {

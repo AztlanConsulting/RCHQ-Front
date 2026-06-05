@@ -20,6 +20,11 @@ const useBeneficiaryCreateForm = (onSuccess) => {
     const [form, setForm] = useState(INITIAL_FORM);
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState(null);
+    const [serverSuccess, setServerSuccess] = useState(null);
+    const [conflictModal, setConflictModal] = useState({
+        show: false,
+        message: "",
+    });
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -60,9 +65,15 @@ const useBeneficiaryCreateForm = (onSuccess) => {
         }));
     };
 
+    const closeConflictModal = () => {
+        setConflictModal({ show: false, message: "" });
+    };
+
     const handleSubmit = async () => {
         setErrors({});
         setServerError(null);
+        setServerSuccess(null);
+        closeConflictModal();
 
         const result = beneficiaryCreateSchema.safeParse(form);
 
@@ -85,17 +96,21 @@ const useBeneficiaryCreateForm = (onSuccess) => {
             const response = await createBeneficiary(result.data);
 
             setForm(INITIAL_FORM);
+            setServerSuccess(
+                response.message || "Beneficiario registrado con éxito.",
+            );
             onSuccess?.();
-
-            if (response.redirect) {
-                navigate(response.redirect);
-            } else {
-                navigate("/app/beneficiarios");
-            }
         } catch (err) {
-            setServerError(err.message);
-            if (err.fieldErrors) {
-                setErrors(err.fieldErrors);
+            if (err.isAlreadyRegistered || err.status === 406) {
+                setConflictModal({
+                    show: true,
+                    message: err.message,
+                });
+            } else {
+                setServerError(err.message);
+                if (err.fieldErrors) {
+                    setErrors(err.fieldErrors);
+                }
             }
         } finally {
             setIsLoading(false);
@@ -106,8 +121,12 @@ const useBeneficiaryCreateForm = (onSuccess) => {
         form,
         errors,
         serverError,
+        serverSuccess,
+        conflictModal,
         isLoading,
         setServerError,
+        setServerSuccess,
+        closeConflictModal,
         handleChange,
         handleSubmit,
         navigate,

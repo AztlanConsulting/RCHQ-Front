@@ -29,6 +29,9 @@ export const createBeneficiary = async (data) => {
             response.message || "Error al registrar el beneficiario",
         );
 
+        error.status = res.status;
+        error.isAlreadyRegistered = res.status === 406;
+
         const fieldErrors = mapValidationErrors(response.errors);
         if (fieldErrors) {
             error.fieldErrors = fieldErrors;

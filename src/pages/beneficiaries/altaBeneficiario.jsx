@@ -6,8 +6,12 @@ const AltaNuevoBeneficiarioPage = ({ onCancel, onSuccess }) => {
         form,
         errors,
         serverError,
+        serverSuccess,
+        conflictModal,
         isLoading,
         setServerError,
+        setServerSuccess,
+        closeConflictModal,
         handleChange,
         handleSubmit,
         navigate,
@@ -48,7 +52,11 @@ const AltaNuevoBeneficiarioPage = ({ onCancel, onSuccess }) => {
                     form={form}
                     errors={errors}
                     serverError={serverError}
+                    serverSuccess={serverSuccess}
                     onServerErrorClose={() => setServerError(null)}
+                    onServerSuccessClose={() => setServerSuccess(null)}
+                    conflictModal={conflictModal}
+                    onCloseConflictModal={closeConflictModal}
                     handleChange={handleChange}
                     onSubmit={handleSubmit}
                     onCancel={goBack}

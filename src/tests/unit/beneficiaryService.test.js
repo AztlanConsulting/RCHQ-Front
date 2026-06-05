@@ -29,7 +29,8 @@ describe("beneficiaryService", () => {
                 ok: true,
                 json: async () => ({
                     success: true,
-                    redirect: "/app/beneficiarios/ver/ben-1",
+                    message: "Beneficiario registrado con éxito.",
+                    data: { beneficiaryId: "ben-1" },
                 }),
             });
 
@@ -43,20 +44,23 @@ describe("beneficiaryService", () => {
                     body: JSON.stringify(validBody),
                 }),
             );
-            expect(response.redirect).toBe("/app/beneficiarios/ver/ben-1");
+            expect(response.message).toBe("Beneficiario registrado con éxito.");
         });
 
         it("lanza error con el mensaje del backend", async () => {
             secureFetch.mockResolvedValueOnce({
                 ok: false,
+                status: 406,
                 json: async () => ({
                     message: "El beneficiario ya está registrado",
                 }),
             });
 
-            await expect(createBeneficiary(validBody)).rejects.toThrow(
-                "El beneficiario ya está registrado",
-            );
+            await expect(createBeneficiary(validBody)).rejects.toMatchObject({
+                message: "El beneficiario ya está registrado",
+                status: 406,
+                isAlreadyRegistered: true,
+            });
         });
 
         it("mapea errores de validación del backend a fieldErrors", async () => {

@@ -4,6 +4,7 @@ import DateField from "../atoms/dateField";
 import ErrorText from "../atoms/errorText";
 import SelectField from "../atoms/selectField";
 import SmallButton from "../atoms/smallButton";
+import BeneficiaryConflictModal from "./beneficiaryConflictModal";
 import { BLOOD_TYPE_OPTIONS } from "../../utils/schema/beneficiary/beneficiaryAdd.schema";
 
 const ChildIcon = () => (
@@ -29,7 +30,11 @@ const BeneficiaryInfoSection = ({
     form,
     errors = {},
     serverError,
+    serverSuccess,
     onServerErrorClose,
+    onServerSuccessClose,
+    conflictModal,
+    onCloseConflictModal,
     handleChange,
     onCancel,
     onSubmit,
@@ -192,6 +197,17 @@ const BeneficiaryInfoSection = ({
                 </div>
             )}
 
+            {serverSuccess && (
+                <div className="absolute left-1/2 top-4 z-50 w-full -translate-x-1/2 px-2">
+                    <Alert
+                        type="success"
+                        message={serverSuccess}
+                        onClose={onServerSuccessClose}
+                        duration={5000}
+                    />
+                </div>
+            )}
+
             <div className="flex justify-end gap-4 mt-4">
                 <SmallButton
                     text="Cancelar"
@@ -206,6 +222,13 @@ const BeneficiaryInfoSection = ({
                     disabled={isLoading}
                 />
             </div>
+
+            <BeneficiaryConflictModal
+                isOpen={conflictModal?.show}
+                message={conflictModal?.message}
+                onConfirm={onCloseConflictModal}
+                onClose={onCloseConflictModal}
+            />
         </section>
     );
 };

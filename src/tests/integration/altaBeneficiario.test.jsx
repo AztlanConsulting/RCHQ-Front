@@ -4,6 +4,7 @@ import {
     render,
     screen,
     waitFor,
+    within,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -124,7 +125,7 @@ describe("AltaBeneficiario — integración de formulario y servicios", () => {
 
     it("registra al beneficiario exitosamente", async () => {
         createBeneficiary.mockResolvedValueOnce({
-            redirect: "/app/beneficiarios/ver/ben-1",
+            message: "Beneficiario registrado con éxito.",
         });
 
         renderPage();
@@ -134,9 +135,41 @@ describe("AltaBeneficiario — integración de formulario y servicios", () => {
             expect(createBeneficiary).toHaveBeenCalledTimes(1);
         });
         expect(mockOnSuccess).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith(
-            "/app/beneficiarios/ver/ben-1",
+        expect(
+            screen.getByText("Beneficiario registrado con éxito."),
+        ).toBeInTheDocument();
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it("muestra modal de conflicto si el beneficiario ya existe", async () => {
+        const conflictError = new Error(
+            "Beneficiario ya existe en casa: Sonríe villa infantil. Contacte al coordinador: Ana al 4420000001 o ana@test.com",
         );
+        conflictError.status = 406;
+        conflictError.isAlreadyRegistered = true;
+        createBeneficiary.mockRejectedValueOnce(conflictError);
+
+        renderPage();
+        await fillAndSubmit(validFormData);
+
+        let dialog;
+        await waitFor(() => {
+            dialog = screen.getByRole("dialog", {
+                name: /beneficiario ya existe/i,
+            });
+            expect(dialog).toBeInTheDocument();
+        });
+
+        await act(async () => {
+            fireEvent.click(
+                within(dialog).getByRole("button", { name: /confirmar/i }),
+            );
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        });
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("muestra error si el backend falla", async () => {
