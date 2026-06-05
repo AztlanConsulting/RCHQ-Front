@@ -65,6 +65,17 @@ const EmployeeContactCard = ({
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
       )}
 
+      {validationAlert && isEditing && canEdit && (
+        <div className="mt-2">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
+        </div>
+      )}
+
       {!isEditing && (
         <div className="mt-6 flex flex-col gap-6 md:flex-1 md:justify-start">
           {[
