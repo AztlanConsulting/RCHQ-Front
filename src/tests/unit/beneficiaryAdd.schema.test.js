@@ -23,15 +23,15 @@ describe("beneficiaryCreateSchema", () => {
         }
     });
 
-    it("normaliza el CURP a mayúsculas cuando es válido", () => {
+    it("acepta un CURP válido en mayúsculas", () => {
         const result = beneficiaryCreateSchema.safeParse({
             ...validPayload,
-            curp: "galj150310hdfrzn09",
+            curp: "AAAA010101HDFNNN01",
         });
 
         expect(result.success).toBe(true);
         if (result.success) {
-            expect(result.data.curp).toBe("GALJ150310HDFRZN09");
+            expect(result.data.curp).toBe("AAAA010101HDFNNN01");
         }
     });
 

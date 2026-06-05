@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
@@ -19,7 +20,8 @@ vi.mock("../../services/beneficiaryService", () => ({
     createBeneficiary: vi.fn(),
 }));
 
-const wrapper = ({ children }) => <MemoryRouter>{children}</MemoryRouter>;
+const wrapper = ({ children }) =>
+    createElement(MemoryRouter, null, children);
 
 const validForm = {
     name: "Juan Manuel",
