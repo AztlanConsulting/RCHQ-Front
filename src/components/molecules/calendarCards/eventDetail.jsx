@@ -32,6 +32,7 @@ const EventDetail = ({
     viewerRole = "",
     calendarTimeZone,
     showMexicoReferenceNotice = false,
+    hideActions = false,
 }) => {
     const {
         visibleItems: visiblePeople,
@@ -46,8 +47,8 @@ const EventDetail = ({
 
     if (!event) return null;
 
-    const showDelete = canDelete(event.scope, viewerRole);
-    const showEdit = canEdit(event.scope, viewerRole);
+    const showDelete = !hideActions && canDelete(event.scope, viewerRole);
+    const showEdit = !hideActions && canEdit(event.scope, viewerRole);
 
     const isMultiDay = Boolean(event.multiDay);
     const rangeStart =
@@ -167,6 +168,23 @@ const EventDetail = ({
                         className="block max-w-full whitespace-pre-wrap break-words text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
                     >
                         {event.description}
+                    </Type>
+                </div>
+            ) : null}
+
+            {event.eventType?.toLowerCase() === "capacitaciones" && event.trainer ? (
+                <div className="mb-6">
+                    <Type
+                        variant="metric-label"
+                        className="mb-1 block text-[0.9rem] font-bold text-[#121212]"
+                    >
+                        Instructor:
+                    </Type>
+                    <Type
+                        variant="body"
+                        className="block max-w-full text-[1.05rem] leading-snug text-[#121212] [overflow-wrap:anywhere]"
+                    >
+                        {event.trainer}
                     </Type>
                 </div>
             ) : null}

@@ -17,12 +17,16 @@ vi.mock("../../services/documentService", () => ({
   deleteDocumentService:   vi.fn(),
   getDocumentTypesService: vi.fn(() => Promise.resolve([
     { value: "cv",  label: "CV" },
-    { value: "nss", label: "NSS" },
+      { value: "nss", label: "NSS" },
   ])),
   DOCUMENT_TYPES: [
     { value: "cv",  label: "CV" },
     { value: "nss", label: "NSS" },
   ],
+}));
+
+vi.mock("../../services/trainingService", () => ({
+  getTrainingsService: vi.fn(),
 }));
 
 import {
@@ -32,6 +36,7 @@ import {
   deleteDocumentService,
   getDocumentTypesService,
 } from "../../services/documentService";
+import { getTrainingsService } from "../../services/trainingService";
 
 // ─── Helpers ──────────────────────────────────────────────
 const makeToken = (role = "Coordinador") => {
@@ -43,6 +48,11 @@ const TEST_EMPLOYEE_ID = "emp-123";
 
 const renderPage = (role = "Coordinador") => {
   localStorage.setItem("token", makeToken(role));
+  localStorage.setItem(
+    "user",
+    JSON.stringify({ role, employeeId: TEST_EMPLOYEE_ID }),
+  );
+
   return render(
     <MemoryRouter initialEntries={[`/employee/${TEST_EMPLOYEE_ID}/documents`]}>
       <Routes>
@@ -73,10 +83,35 @@ const mockEmptyResponse = {
   body:    null,
 };
 
+const buildTraining = (overrides = {}) => ({
+  eventId: "training-001",
+  title: "Capacitacion del DIF",
+  date: "2026-05-27T00:00:00.000Z",
+  start: "2026-05-27T12:30:00.000Z",
+  end: "2026-05-27T14:00:00.000Z",
+  scope: "personal",
+  scopeLabel: "Personal",
+  focus: "eventos",
+  focusLabel: "Eventos",
+  eventType: "Capacitaciones",
+  trainer: "Emilio Santiago Lopez Quinonez",
+  description: "Sesion interna",
+  backgroundColor: "#D58936",
+  borderColor: "#D58936",
+  peopleInsideEvent: [
+    { id: "emp-1", name: "Manuel Bajos Rivera" },
+    { id: "emp-2", name: "Santiago Jimenez Palazuelos" },
+    { id: "emp-3", name: "Ernesto Villafranco Ozuna" },
+    { id: "emp-4", name: "Emilio Santiago Lopez Quinonez" },
+  ],
+  ...overrides,
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
   getDocumentsService.mockResolvedValue({ success: true, data: [] });
+  getTrainingsService.mockResolvedValue({ success: true, data: [] });
   getDocumentTypesService.mockResolvedValue([
     { value: "cv",  label: "CV" },
     { value: "nss", label: "NSS" },
@@ -155,7 +190,7 @@ describe("Documents — subir documento", () => {
       ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
-    expect(screen.getByText("Subir documento")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /subir documento/i })).toBeInTheDocument();
     expect(screen.getByText(/selecciona un tipo/i)).toBeInTheDocument();
   });
 
@@ -168,10 +203,10 @@ describe("Documents — subir documento", () => {
       ).toBeInTheDocument(),
     );
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
-    expect(screen.getByText("Subir documento")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /subir documento/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
     await waitFor(() => {
-      expect(screen.queryByText("Subir documento")).toBeNull();
+      expect(screen.queryByRole("heading", { name: /subir documento/i })).toBeNull();
     });
   });
 
@@ -290,7 +325,7 @@ describe("Documents — eliminar documento", () => {
     clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/esta acción no se puede revertir/i),
+      screen.getByText(/no se puede revertir/i),
     ).toBeInTheDocument();
   });
 
@@ -346,7 +381,7 @@ describe("Documents — eliminar documento", () => {
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
       expect(
-        screen.getByText(/esta acción no se puede revertir/i),
+        screen.getByText(/no se puede revertir/i),
       ).toBeInTheDocument(),
     );
     await act(async () => {
@@ -355,5 +390,108 @@ describe("Documents — eliminar documento", () => {
     await waitFor(() => {
       expect(screen.getByText(/error al eliminar/i)).toBeInTheDocument();
     });
+  });
+});
+
+describe("Documents - capacitaciones del trabajador", () => {
+  it("muestra solo las capacitaciones que regresa el servicio para el trabajador", async () => {
+    getTrainingsService.mockResolvedValue({
+      success: true,
+      data: [
+        buildTraining(),
+        buildTraining({
+          eventId: "training-002",
+          title: "Capacitacion de seguridad",
+        }),
+      ],
+    });
+
+    renderPage("Cuidador");
+
+    await waitFor(() => {
+      expect(screen.getByText("Capacitacion del DIF")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText("Capacitacion de seguridad"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Capacitacion fuera de la casa"),
+    ).not.toBeInTheDocument();
+    expect(getTrainingsService).toHaveBeenCalledWith(TEST_EMPLOYEE_ID);
+  });
+
+  it("muestra mensaje vacio cuando el trabajador no tiene capacitaciones", async () => {
+    renderPage("Cuidador");
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /este empleado a[uú]n no tiene capacitaciones registradas/i,
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("abre el detalle sin botones de accion y muestra a todos los empleados ligados", async () => {
+    getTrainingsService.mockResolvedValue({
+      success: true,
+      data: [buildTraining()],
+    });
+
+    renderPage("Cuidador");
+
+    const trainingCard = await screen.findByRole("button", {
+      name: /capacitacion del dif/i,
+    });
+    fireEvent.click(trainingCard);
+
+    await waitFor(() => {
+      expect(screen.getByText("Detalle del evento")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText("Empleados ligados al evento:"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Manuel Bajos Rivera")).toBeInTheDocument();
+    expect(
+      screen.getByText("Santiago Jimenez Palazuelos"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Ernesto Villafranco Ozuna"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Emilio Santiago Lopez Quinonez").length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.queryByRole("button", { name: /editar/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /eliminar/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renderiza todas las capacitaciones cuando hay muchas registradas", async () => {
+    const manyTrainings = Array.from({ length: 8 }, (_, index) =>
+      buildTraining({
+        eventId: `training-${index + 1}`,
+        title: `Capacitacion ${index + 1}`,
+      }),
+    );
+
+    getTrainingsService.mockResolvedValue({
+      success: true,
+      data: manyTrainings,
+    });
+
+    renderPage("Cuidador");
+
+    await waitFor(() => {
+      expect(screen.getByText("Capacitacion 1")).toBeInTheDocument();
+    });
+
+    for (const training of manyTrainings) {
+      expect(screen.getByText(training.title)).toBeInTheDocument();
+    }
   });
 });

@@ -215,10 +215,11 @@ const UpdateHouseEventModal = ({
                     ) : null}
 
                     <SelectField
+                        label="Tipo de evento"
                         value={form.eventTypeId}
                         setValue={(value) => setField("eventTypeId", value)}
                         options={eventTypes}
-                        placeholder="General"
+                        placeholder="Selecciona tipo de evento ..."
                         error={!!errors.eventTypeId}
                     />
                     {errors.eventTypeId && (

@@ -44,11 +44,12 @@ const getInitialForm = (event, calendarTimeZone) => {
     const startDate =
         normalizeDateOnly(event.startDate) ||
         dateInTimeZoneToInputValue(event.start, calendarTimeZone);
+    const explicitEndDate = normalizeDateOnly(event.endDate);
     const rawEndDate =
-        normalizeDateOnly(event.endDate) ||
+        explicitEndDate ||
         dateInTimeZoneToInputValue(event.end ?? event.start, calendarTimeZone);
     const endDate =
-        event.allDay && rawEndDate > startDate
+        event.allDay && !explicitEndDate && rawEndDate > startDate
             ? addDaysToDateOnly(rawEndDate, -1)
             : rawEndDate;
 
@@ -128,7 +129,7 @@ export const useUpdateHouseEventForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        getEventTypes()
+        getEventTypes("house")
             .then((types) => {
                 const options = types.map((type) => ({
                     value: type.eventTypeId,

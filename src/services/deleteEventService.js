@@ -25,6 +25,30 @@ export const deleteHouseEvent = async (houseEventId) => {
     return response;
 };
 
+export const removeEmployeeFromTraining = async (eventId, employeeId) => {
+    const rawResponse = await secureFetch(
+        `/event/personal/${eventId}/employee/${employeeId}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        },
+    );
+
+    const response = await rawResponse.json().catch(() => ({}));
+
+    if (!rawResponse.ok) {
+        throw buildApiError(
+            rawResponse,
+            response,
+            "No se pudo eliminar al empleado de la capacitación",
+        );
+    }
+
+    return response;
+};
+
 export const deletePersonalEvent = async (personalEventId) => {
     const rawResponse = await secureFetch(
         `/event/personal/${personalEventId}`,

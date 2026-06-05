@@ -348,6 +348,18 @@ const getFilteredEvents = (
             const originalEndDate = originalAllDayRange.isAllDay
                 ? originalAllDayRange.displayEndDate
                 : dateInTimeZoneToInputValue(rawEvent.end, calendarTimeZone);
+            const storedStartDate = isRangeRecord
+                ? normalizeDateOnly(rawEvent.startDate) || originalStartDate
+                : originalStartDate ||
+                  normalizeDateOnly(rawEvent.startDate) ||
+                  normalizeDateOnly(rawEvent.start);
+            const storedEndDate = isRangeRecord
+                ? normalizeDateOnly(rawEvent.endDate) || originalEndDate
+                : originalEndDate ||
+                  normalizeDateOnly(rawEvent.endDate) ||
+                  normalizeDateOnly(rawEvent.end);
+            const detailAllDay =
+                rawEvent.allDay === true && originalAllDayRange.isAllDay;
 
             return {
                 id: String(idx),
@@ -394,9 +406,7 @@ const getFilteredEvents = (
                     multiDay: isMultiDay,
                     sourceStart: rawEvent.start,
                     sourceEnd: rawEvent.end,
-                    detailAllDay:
-                        rawEvent.allDay === true &&
-                        originalAllDayRange.isAllDay,
+                    detailAllDay,
                     date: rawEvent.date ?? "",
                     icon: getFocusOption(rawEvent)?.icon ?? "",
                     status: rawEvent.status,
@@ -407,12 +417,12 @@ const getFilteredEvents = (
                             ? (rawEvent.link ?? "")
                             : "",
                     startDate:
-                        originalStartDate ||
+                        storedStartDate ||
                         rawEvent.startDate ||
                         rawEvent.start ||
                         eventStart,
                     endDate:
-                        originalEndDate ||
+                        storedEndDate ||
                         rawEvent.endDate ||
                         rawEvent.end ||
                         eventStart,
@@ -438,6 +448,7 @@ const getFilteredEvents = (
                         rawEvent.end ||
                         "",
                     peopleInsideEvent: rawEvent.peopleInsideEvent ?? null,
+                    trainer: rawEvent.trainer ?? "",
                 },
             };
         });
@@ -498,6 +509,38 @@ export const useCalendarFilters = (
             })
             .catch(console.error);
     }, []);
+
+    useEffect(() => {
+        if (!allEvents || allEvents.length === 0) return;
+
+        setEventTypeOptions((prevOptions) => {
+            const known = new Set(prevOptions.map((o) => o.value));
+            const toAdd = [];
+            for (const e of allEvents) {
+                if (e.focus !== "eventos") continue;
+                const key = String(e.type || "").toLowerCase();
+                if (key && !known.has(key)) {
+                    toAdd.push({ value: key, label: e.type });
+                    known.add(key);
+                }
+            }
+            return toAdd.length === 0 ? prevOptions : [...prevOptions, ...toAdd];
+        });
+
+        setEventTypeFilters((prevFilters) => {
+            const current = new Set(prevFilters);
+            const toAdd = [];
+            for (const e of allEvents) {
+                if (e.focus !== "eventos") continue;
+                const key = String(e.type || "").toLowerCase();
+                if (key && !current.has(key)) {
+                    toAdd.push(key);
+                    current.add(key);
+                }
+            }
+            return toAdd.length === 0 ? prevFilters : [...prevFilters, ...toAdd];
+        });
+    }, [allEvents]);
 
     useEffect(() => {
         getAbsenceTypes()

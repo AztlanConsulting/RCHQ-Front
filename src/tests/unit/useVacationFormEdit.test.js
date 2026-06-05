@@ -84,6 +84,32 @@ describe("useVacationFormEdit", () => {
         });
     });
 
+    it("usa las fechas base de México para editar aunque las fechas legibles estén desfazadas", async () => {
+        const { result } = renderUseVacationFormEdit({
+            selectedEvent: {
+                ...baseVacation,
+                startDate: "2026-06-05",
+                endDate: "2026-06-05",
+                readableStart: "2026-06-05",
+                readableEnd: "2026-06-06",
+            },
+        });
+
+        act(() => {
+            result.current.startVacationEdit();
+        });
+
+        expect(result.current.vacationForm).toEqual({
+            vacationRequestId: "vacation-1",
+            startDate: "2026-06-05",
+            endDate: "2026-06-05",
+        });
+
+        await waitFor(() => {
+            expect(getEmployeeDateRules).toHaveBeenCalledWith("emp-1", "vacation");
+        });
+    });
+
     it("carga los días disponibles del empleado al iniciar edición", async () => {
         const { result } = renderUseVacationFormEdit();
 

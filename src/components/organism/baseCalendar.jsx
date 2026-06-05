@@ -111,7 +111,7 @@ const BaseCalendar = ({
                 click: () => toggleList(calendarRef),
             },
             createEventButton: {
-                text: "",
+                icon: "add",
                 hint: "Crear evento",
                 click: () => openCreationModal?.(calendarRef),
             },

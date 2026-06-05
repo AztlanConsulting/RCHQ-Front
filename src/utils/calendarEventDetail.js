@@ -101,6 +101,7 @@ export const eventApiToDetail = (ev) => {
         endDate: normalizeDateOnly(x.endDate ?? x.sourceEnd ?? end),
         isDeleted: x.isDeleted,
         peopleInsideEvent: x.peopleInsideEvent ?? null,
+        trainer: x.trainer ?? "",
     };
 };
 
@@ -167,6 +168,29 @@ export const calendarItemToDetail = (item) => {
         endDate,
         isDeleted: item.isDeleted,
         peopleInsideEvent: item.peopleInsideEvent ?? null,
+        trainer: item.trainer ?? "",
+    };
+};
+
+export const normalizeTrainingDetail = (training) => {
+    if (!training) return null;
+
+    const normalizedCalendarDate = normalizeDateOnly(training.date);
+    const shouldPinCalendarDate =
+        Boolean(normalizedCalendarDate) &&
+        training.focus === "eventos" &&
+        !training.multiDay;
+
+    return {
+        ...training,
+        ...(shouldPinCalendarDate
+            ? {
+                  readableStart: normalizedCalendarDate,
+                  readableEnd: normalizedCalendarDate,
+                  startDate: normalizedCalendarDate,
+                  endDate: normalizedCalendarDate,
+              }
+            : {}),
     };
 };
 
@@ -261,6 +285,21 @@ export const formatCardDateNoYear = (value) => {
         {
             day: "numeric",
             month: "long",
+            timeZone: "UTC",
+        },
+    );
+};
+
+export const formatCardDate = (value) => {
+    const normalizedValue = normalizeUTCDateOnly(value);
+    if (!normalizedValue) return "";
+
+    return new Date(`${normalizedValue}T00:00:00.000Z`).toLocaleDateString(
+        "es-MX",
+        {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
             timeZone: "UTC",
         },
     );

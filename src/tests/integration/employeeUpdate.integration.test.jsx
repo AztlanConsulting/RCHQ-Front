@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   render,
   screen,
@@ -46,6 +46,10 @@ import {
   updateAdminInfoService,
 } from "../../services/employeeUpdateService";
 import { useEmployeeDetail } from "../../hooks/pages/useEmployeeDetail";
+import {
+  employeeBasicUpdateSchema,
+  employeeContactUpdateSchema,
+} from "../../utils/schema/employee/update.schema";
 
 const TEST_EMPLOYEE_ID = "emp-001";
 
@@ -149,6 +153,10 @@ beforeEach(() => {
   updateBasicInfoService.mockResolvedValue({ success: true, message: "Información básica actualizada con éxito" });
   updateContactInfoService.mockResolvedValue({ success: true, message: "Información de contacto actualizada con éxito" });
   updateAdminInfoService.mockResolvedValue({ success: true, message: "Información administrativa actualizada con éxito" });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("DetalleEmpleado — renderizado base", () => {
@@ -277,6 +285,37 @@ describe("DetalleEmpleado — editar información básica", () => {
       expect(screen.getByText("Datos inválidos")).toBeInTheDocument();
     });
   });
+
+  it("muestra una notificación temporal dentro de básica cuando faltan o son inválidos datos", async () => {
+    vi.useFakeTimers();
+    employeeBasicUpdateSchema.safeParse.mockReturnValueOnce({
+      success: false,
+      error: {
+        issues: [{ path: ["name"], message: "El nombre es obligatorio" }],
+      },
+    });
+
+    renderPage();
+    fireEvent.click(await screen.findByLabelText("Editar información básica"));
+    await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("Guardar"));
+    });
+
+    expect(
+      screen.getByText("Falta completar o corregir datos en la información básica."),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(3300);
+    });
+
+    expect(
+      screen.queryByText("Falta completar o corregir datos en la información básica."),
+    ).not.toBeInTheDocument();
+  });
 });
 
 describe("DetalleEmpleado — editar información de contacto", () => {
@@ -353,6 +392,37 @@ describe("DetalleEmpleado — editar información de contacto", () => {
     await waitFor(() => {
       expect(screen.getByText("Email inválido")).toBeInTheDocument();
     });
+  });
+
+  it("muestra una notificación temporal dentro de contacto cuando faltan o son inválidos datos", async () => {
+    vi.useFakeTimers();
+    employeeContactUpdateSchema.safeParse.mockReturnValueOnce({
+      success: false,
+      error: {
+        issues: [{ path: ["email"], message: "Formato de correo inválido" }],
+      },
+    });
+
+    renderPage();
+    fireEvent.click(await screen.findByLabelText("Editar contacto"));
+    await waitFor(() => expect(screen.getByText("Guardar")).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("Guardar"));
+    });
+
+    expect(
+      screen.getByText("Falta completar o corregir datos en la información de contacto."),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+      vi.advanceTimersByTime(3300);
+    });
+
+    expect(
+      screen.queryByText("Falta completar o corregir datos en la información de contacto."),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -462,6 +532,39 @@ describe("DetalleEmpleado — editar información administrativa", () => {
     });
 
     expect(await screen.findByText("Salario inválido")).toBeInTheDocument();
+  });
+
+  it("muestra una notificación temporal dentro de administrativa cuando faltan o son inválidos datos", async () => {
+    vi.useFakeTimers();
+
+    renderPage();
+    fireEvent.click(await screen.findByLabelText("Editar información administrativa"));
+
+    const saveBtn = screen.getByRole("button", { name: /guardar/i });
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+
+    const salaryInput = await screen.findByPlaceholderText(/Ej: 15000/i);
+    fireEvent.change(salaryInput, { target: { value: "" } });
+
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
+
+    expect(
+      screen.getByText("Falta completar o corregir datos en la información administrativa."),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(3300);
+    });
+
+    expect(
+      screen.queryByText("Falta completar o corregir datos en la información administrativa."),
+    ).not.toBeInTheDocument();
   });
 
   it("deshabilita Guardar mientras carga catálogos", async () => {

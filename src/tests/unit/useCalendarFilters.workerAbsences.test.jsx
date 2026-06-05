@@ -237,6 +237,11 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
             end: "2026-05-06",
             allDay: true,
         });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            detailAllDay: true,
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-05",
+        });
 
         rerender({ calendarTimeZone: "America/Matamoros" });
 
@@ -247,7 +252,9 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         });
         expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
             startDate: "2026-05-05",
-            endDate: "2026-05-06",
+            endDate: "2026-05-05",
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-06",
             totalDays: 1,
             usedDays: 1,
         });
@@ -557,6 +564,44 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
                     (event) => event.extendedProps.absenceId,
                 ),
             ).toEqual(expect.arrayContaining(["medica", "personal"]));
+        });
+    });
+
+    it("quita detailAllDay cuando un evento all-day no cae como todo el día en la zona activa", async () => {
+        const event = {
+            focus: "eventos",
+            name: "Capacitacion all-day",
+            scope: "personal",
+            type: "Capacitaciones",
+            start: "2026-05-05T06:00:00.000Z",
+            end: "2026-05-06T06:00:00.000Z",
+            allDay: true,
+            trainer: "Dra. Martinez",
+            peopleInsideEvent: [{ id: "employee-worker", name: "John Smith" }],
+        };
+
+        const { result } = renderHook(() =>
+            useCalendarFilters([event], {
+                isList: false,
+                viewerRole: "Psicóloga",
+                calendarTimeZone: "America/Matamoros",
+            }),
+        );
+
+        await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
+        await waitFor(() =>
+            expect(result.current.visibleEvents).toHaveLength(1),
+        );
+
+        expect(result.current.visibleEvents[0]).toMatchObject({
+            start: "2026-05-05T01:00:00",
+            end: "2026-05-06T01:00:00",
+            allDay: false,
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            detailAllDay: false,
+            startReadableDate: "2026-05-05",
+            endReadableDate: "2026-05-06",
         });
     });
 });

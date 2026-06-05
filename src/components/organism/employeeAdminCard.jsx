@@ -7,6 +7,7 @@ import TimeField from "../atoms/timeField";
 import CheckboxField from "../atoms/checkboxField";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 import {
   countWorkdayDays,
   countWorkdaysHours,
@@ -63,6 +64,8 @@ const EmployeeAdminCard = ({
   setWorkdayAllDay,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   onOpenEdit,
   onSubmit,
@@ -95,12 +98,23 @@ const EmployeeAdminCard = ({
 
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
-      <div className="flex justify-between items-start">
+      <div
+        className={
+          isEditing
+            ? "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+            : "flex items-start justify-between gap-3"
+        }
+      >
         <Type variant="section-title" as="h3" className="tracking-[-0.02em]">Información Administrativa</Type>
 
         {isEditing ? (
-          <div className="flex gap-2 shrink-0">
-            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+          <div className="flex w-full flex-col gap-2 [&>button]:w-full sm:w-auto sm:shrink-0 sm:flex-row sm:[&>button]:w-auto">
+            <SmallButton
+              text="Cancelar"
+              onClick={onCancel}
+              disabled={saving}
+              cancel
+            />
             {canEdit ? (
               <SmallButton
                 text="Guardar"
@@ -123,6 +137,17 @@ const EmployeeAdminCard = ({
 
       {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
+      )}
+
+      {validationAlert && isEditing && canEdit && (
+        <div className="mt-2">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
+        </div>
       )}
 
       {!isEditing && (

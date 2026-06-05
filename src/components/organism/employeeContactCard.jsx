@@ -3,6 +3,7 @@ import Loader from "../atoms/loader";
 import TextField from "../atoms/textField";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 
 const EmployeeContactCard = ({
   employee,
@@ -12,6 +13,8 @@ const EmployeeContactCard = ({
   setContactField,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   onOpenEdit,
   onSubmit,
@@ -22,12 +25,23 @@ const EmployeeContactCard = ({
   const EMPTY_LABEL = "N/A";
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:flex md:basis-1/3 md:shrink-0 md:flex-col">
-      <div className="flex justify-between items-start">
+      <div
+        className={
+          isEditing
+            ? "flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between"
+            : "flex items-start justify-between gap-3"
+        }
+      >
         <Type variant="section-title" as="h3">Contacto</Type>
 
         {isEditing ? (
-          <div className="flex gap-2 shrink-0">
-            <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+          <div className="flex w-full flex-col gap-2 [&>button]:w-full xl:w-auto xl:shrink-0 xl:flex-row xl:[&>button]:w-auto">
+            <SmallButton
+              text="Cancelar"
+              onClick={onCancel}
+              disabled={saving}
+              cancel
+            />
             {canEdit ? (
               <SmallButton
                 text="Guardar"
@@ -50,6 +64,17 @@ const EmployeeContactCard = ({
 
       {saveError && isEditing && canEdit && (
         <p className="mt-2 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{saveError}</p>
+      )}
+
+      {validationAlert && isEditing && canEdit && (
+        <div className="mt-2">
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
+        </div>
       )}
 
       {!isEditing && (

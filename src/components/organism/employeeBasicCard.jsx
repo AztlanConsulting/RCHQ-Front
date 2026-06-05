@@ -6,6 +6,7 @@ import Drawer from "../atoms/drawer";
 import Chip from "../atoms/chip";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
+import Alert from "../atoms/alerts";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -20,6 +21,8 @@ const EmployeeBasicCard = ({
   setBasicPicture,
   saving,
   saveError,
+  validationAlert,
+  onValidationAlertClose,
   errors = {},
   infoDrawer,
   onOpenEdit,
@@ -47,9 +50,15 @@ const EmployeeBasicCard = ({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div
+          className={
+            isEditing
+              ? "flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between"
+              : "flex items-start justify-between gap-3"
+          }
+        >
           <div className="min-w-0">
-            <Type variant="page-title" as="h2" className="text-[2rem] leading-none tracking-[-0.02em]">
+            <Type variant="page-title" as="h2" className="break-words text-[2rem] leading-none tracking-[-0.02em] [overflow-wrap:anywhere]">
               {`${employee?.name ?? ""} ${employee?.surname ?? ""}`}
             </Type>
             <Type variant="subtitle" as="p" className="mt-2 text-lg font-semibold text-slate-500">
@@ -58,8 +67,13 @@ const EmployeeBasicCard = ({
           </div>
 
           {isEditing ? (
-            <div className="flex gap-2 shrink-0">
-              <SmallButton text="Cancelar" onClick={onCancel} disabled={saving} cancel />
+            <div className="flex w-full flex-col gap-2 [&>button]:w-full lg:w-auto lg:shrink-0 lg:flex-row lg:[&>button]:w-auto">
+              <SmallButton
+                text="Cancelar"
+                onClick={onCancel}
+                disabled={saving}
+                cancel
+              />
               {canEdit ? (
                 <SmallButton
                   text="Guardar"
@@ -72,7 +86,7 @@ const EmployeeBasicCard = ({
           ) : canEdit ? (
             <button
               type="button" aria-label="Editar información básica"
-              className="rounded-lg p-2 hover:bg-slate-100 shrink-0"
+              className="rounded-lg p-2 hover:bg-slate-100 shrink-0 ml-auto"
               onClick={onOpenEdit}
             >
               <img src="/edit.svg" alt="" className="h-5 w-5" />
@@ -84,6 +98,15 @@ const EmployeeBasicCard = ({
           <p className="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
             {saveError}
           </p>
+        )}
+
+        {validationAlert && isEditing && canEdit && (
+          <Alert
+            type="error"
+            message={validationAlert}
+            duration={3000}
+            onClose={onValidationAlertClose}
+          />
         )}
 
         {!isEditing && (

@@ -16,6 +16,7 @@ const TextField = ({
   autoComplete,
   inputMode,
   maxLength,
+  disabled = false,
   labelClassName = "text-sm font-bold text-white sm:text-base",
   wrapperClassName = "",
   containerClassName = "",
@@ -34,8 +35,8 @@ const TextField = ({
       </label>
 
       <div
-        onClick={handleContainerClick}
-        className={`flex min-h-[50px] w-full cursor-text items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${containerClassName}`}
+        onClick={disabled ? undefined : handleContainerClick}
+        className={`flex min-h-[50px] w-full items-center rounded-lg bg-neutral-50 px-4 shadow-[inset_0px_4px_4px_#00000040] ${disabled ? "cursor-not-allowed opacity-60" : "cursor-text"} ${containerClassName}`}
       >
         <input
           ref={inputRef}
@@ -48,7 +49,8 @@ const TextField = ({
           autoComplete={autoComplete}
           inputMode={inputMode}
           maxLength={maxLength}
-          className={`h-full w-full flex-1 border-0 bg-transparent text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] sm:text-base ${inputClassName}`}
+          disabled={disabled}
+          className={`h-full w-full flex-1 border-0 bg-transparent text-sm font-medium text-[#222] outline-none placeholder-[#aaaaaa] disabled:cursor-not-allowed sm:text-base ${inputClassName}`}
         />
 
         {iconRight &&
