@@ -156,14 +156,18 @@ const BeneficiaryInfoSection = ({
                         required
                         labelColor={LABEL_COLOR}
                     />
-                    <div className="h-5">
+                    <div
+                        className={
+                            errors.blood_type ? "min-h-5 h-auto" : "h-5"
+                        }
+                    >
                         {errors.blood_type && (
                             <ErrorText>{errors.blood_type}</ErrorText>
                         )}
                     </div>
                 </div>
 
-                <div>
+                <div className={errors.blood_type ? "max-md:mt-2" : ""}>
                     <FormField
                         label="CURP (opcional)"
                         name="curp"
