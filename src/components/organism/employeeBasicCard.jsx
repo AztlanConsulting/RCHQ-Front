@@ -7,6 +7,7 @@ import Chip from "../atoms/chip";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
 import Alert from "../atoms/alerts";
+import { formatDateMx } from "../../utils/dates";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AVATAR_PLACEHOLDER = "/user-circle.svg";
@@ -113,10 +114,19 @@ const EmployeeBasicCard = ({
           <>
             <div className="grid w-full grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                { label: "Puesto",              value: employee?.role },
-                { label: "Fecha de Nacimiento", value: employee?.birthDate ? String(employee.birthDate).slice(0, 10) : null },
-                { label: "Fecha de Inicio",     value: employee?.startDate ? String(employee.startDate).slice(0, 10) : "Sin fecha" },
-                { label: "Fecha de Terminación", value: employee?.endDate ?? "N/A" },
+                { label: "Puesto", value: employee?.role },
+                {
+                  label: "Fecha de Nacimiento",
+                  value: formatDateMx(employee?.birthDate),
+                },
+                {
+                  label: "Fecha de Inicio",
+                  value: formatDateMx(employee?.startDate, "Sin fecha"),
+                },
+                {
+                  label: "Fecha de Terminación",
+                  value: formatDateMx(employee?.endDate),
+                },
               ].map(({ label, value }) => (
                 <div key={label} className="min-w-0">
                   <Type variant="metric-label" as="p" className="text-[1.05rem] text-slate-500">{label}</Type>
