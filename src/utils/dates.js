@@ -57,3 +57,15 @@ export const getStartHour = (timestamp) => {
     const m = base.getUTCMinutes();
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
+
+export const formatDateMx = (value, fallback = "N/A") => {
+    if (!value) return fallback;
+
+    const dateOnlyMatch = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (!dateOnlyMatch) return fallback;
+
+    const [, year, month, day] = dateOnlyMatch;
+
+    return `${day}-${month}-${year}`;
+};

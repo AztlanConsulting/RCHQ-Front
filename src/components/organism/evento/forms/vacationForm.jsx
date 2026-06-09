@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { getCalendarViewerRole } from "../../../../services/calendarService";
-
+import { formatDateMx } from "../../../../utils/dates";
 import Alert from "../../../atoms/alerts";
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
@@ -109,8 +109,8 @@ const VacationForm = (props) => {
                             </p>
                             <p className="text-xs text-slate-500">
                                 Periodo actual:{" "}
-                                {String(remainingInfo.startDate).split("T")[0]}{" "}
-                                a {String(remainingInfo.endDate).split("T")[0]}
+                                {formatDateMx(remainingInfo.startDate, "-")} a{" "}
+                                {formatDateMx(remainingInfo.endDate, "-")}
                             </p>
                         </>
                     ) : (
