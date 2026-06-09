@@ -2,7 +2,7 @@ import FormField from "./formField";
 import Alert from "../atoms/alerts";
 import DateField from "../atoms/dateField";
 import ErrorText from "../atoms/errorText";
-import PhotoUploader from "../atoms/photoUploader";
+import FileUploadField from "../atoms/fileUploadField";
 import SelectField from "../atoms/selectField";
 import SmallButton from "../atoms/smallButton";
 
@@ -200,14 +200,23 @@ const UserInfoSection = ({
 
                         <div>
                             <DateField
-                                label="Antigüedad"
+                                label={
+                                    <>
+                                        Antigüedad
+                                        <span
+                                            className="ml-0.5 text-red-600"
+                                            aria-hidden="true"
+                                        >
+                                            *
+                                        </span>
+                                    </>
+                                }
                                 name="startDate"
                                 value={form.startDate}
                                 onChange={handleChange}
                                 labelColor={LABEL_COLOR}
                                 minDate={new Date("1900-01-01")}
                                 maxDate={new Date()}
-                                error={Boolean(errors.startDate)}
                             />
                             <div className="h-5">
                                 {errors.startDate && (
@@ -218,12 +227,18 @@ const UserInfoSection = ({
                     </div>
                 </div>
 
-                <div className="row-span-2">
-                    <PhotoUploader
-                        file={photo}
-                        onFileChange={onPhotoChange}
+                <div>
+                    <FileUploadField
+                        id="employee-photo-input"
                         label="Foto del Usuario"
                         labelColor={LABEL_COLOR}
+                        fileName={photo?.name ?? ""}
+                        onFileChange={(e) =>
+                            onPhotoChange(e.target.files?.[0] || null)
+                        }
+                        placeholder="Selecciona una fotografía (PNG, JPG, WEBP)"
+                        accept="image/*"
+                        helperText="Máximo 10 MB · PNG, JPG o WEBP"
                     />
                 </div>
             </div>
