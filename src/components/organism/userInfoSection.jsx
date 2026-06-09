@@ -179,20 +179,42 @@ const UserInfoSection = ({
                 </div>
 
                 <div>
-                    <SelectField
-                        label="Puesto"
-                        name="roleId"
-                        value={form.roleId}
-                        onChange={handleChange}
-                        options={roleOptions}
-                        placeholder="Selecciona un puesto"
-                        required
-                        labelColor={LABEL_COLOR}
-                    />
-                    <div>
-                        {errors.roleId && (
-                            <ErrorText>{errors.roleId}</ErrorText>
-                        )}
+                    <div className="flex flex-col">
+                        <div>
+                            <SelectField
+                                label="Puesto"
+                                name="roleId"
+                                value={form.roleId}
+                                onChange={handleChange}
+                                options={roleOptions}
+                                placeholder="Selecciona un puesto"
+                                required
+                                labelColor={LABEL_COLOR}
+                            />
+                            <div className="h-5">
+                                {errors.roleId && (
+                                    <ErrorText>{errors.roleId}</ErrorText>
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <DateField
+                                label="Antigüedad"
+                                name="startDate"
+                                value={form.startDate}
+                                onChange={handleChange}
+                                labelColor={LABEL_COLOR}
+                                minDate={new Date("1900-01-01")}
+                                maxDate={new Date()}
+                                error={Boolean(errors.startDate)}
+                            />
+                            <div className="h-5">
+                                {errors.startDate && (
+                                    <ErrorText>{errors.startDate}</ErrorText>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
