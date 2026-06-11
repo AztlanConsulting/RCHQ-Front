@@ -22,6 +22,23 @@ vi.mock("../../services/personalService", () => ({
     createEmployee: vi.fn(),
 }));
 
+vi.mock("../../components/atoms/dateField", () => ({
+    default: ({ label, name, value, onChange, placeholder }) => (
+        <label>
+            {label}
+            <input
+                aria-label={typeof label === "string" ? label : name}
+                id={name}
+                name={name}
+                type="date"
+                value={value ?? ""}
+                placeholder={placeholder}
+                onChange={onChange}
+            />
+        </label>
+    ),
+}));
+
 import {
     getEmployeeFormData,
     createEmployee,
@@ -43,6 +60,7 @@ const validFormData = {
     nss: "12345678901",
     bankAccount: "123456789012345678",
     birthDate: "1990-01-01",
+    startDate: "2020-01-15",
     roleId: "a0000002-0000-4000-8000-000000000002",
 };
 
