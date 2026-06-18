@@ -16,6 +16,7 @@ const INITIAL_FORM = {
     nss: "",
     bankAccount: "",
     birthDate: "",
+    startDate: "",
 };
 
 const useEmployeeCreateForm = (onSuccess) => {
