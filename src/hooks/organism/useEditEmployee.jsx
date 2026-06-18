@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
-import { 
-  employeeBasicUpdateSchema, 
-  employeeContactUpdateSchema, 
+import {
+  employeeBasicUpdateSchema,
+  employeeContactUpdateSchema,
   employeeAdminUpdateSchema,
   normalizeEmployeeContractType,
 } from "../../utils/schema/employee/update.schema";
+import { isNoSalaryContract } from "../../utils/employeeContractTypes";
 import {
   getUpdateFormService,
   updateBasicInfoService,
@@ -431,31 +432,42 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setValidationAlert(null);
     setAdminErrors({});
     try {
+      const noSalaryRequired = isNoSalaryContract(adminForm.type);
       const requiredErrors = {};
       if (!adminForm.roleId) requiredErrors.roleId = "Selecciona un puesto";
       if (!adminForm.type) requiredErrors.type = "Selecciona un tipo de contrato";
-      if (adminForm.salary === "") requiredErrors.salary = "El salario es obligatorio";
+      if (!noSalaryRequired && adminForm.salary === "") {
+        requiredErrors.salary = "El salario es obligatorio";
+      }
       if (Object.keys(requiredErrors).length > 0) {
         setAdminErrors(requiredErrors);
         setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
-      const salaryNum = Number(adminForm.salary);
-      if (isNaN(salaryNum) || salaryNum < 0) {
-        setAdminErrors({ salary: "El salario debe ser un número válido." });
-        setValidationAlert(VALIDATION_ALERTS.admin);
-        return;
-      }
-      if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
-        setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+      let resolvedSalary = null;
+      if (adminForm.salary !== "") {
+        const salaryNum = Number(adminForm.salary);
+        if (isNaN(salaryNum) || salaryNum < 0) {
+          setAdminErrors({ salary: "El salario debe ser un número válido." });
+          setValidationAlert(VALIDATION_ALERTS.admin);
+          return;
+        }
+        if (!noSalaryRequired && salaryNum === 0) {
+          setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+          setValidationAlert(VALIDATION_ALERTS.admin);
+          return;
+        }
+        resolvedSalary = adminForm.salary;
+      } else if (!noSalaryRequired) {
+        setAdminErrors({ salary: "El salario es obligatorio" });
         setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
       const payload = {
-        type:                 adminForm.type,
-        salary:               adminForm.salary,
+        type: adminForm.type,
+        salary: resolvedSalary,
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 

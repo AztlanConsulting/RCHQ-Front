@@ -1,6 +1,11 @@
 import { z } from "zod";
+import {
+  EMPLOYEE_CONTRACT_TYPE_VALUES,
+  isNoSalaryContract,
+  normalizeEmployeeContractType,
+} from "../../employeeContractTypes";
 
-const CURP_REGEX         = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
+export { normalizeEmployeeContractType } from "../../employeeContractTypes";
 const RFC_REGEX          = /^[A-ZÑ]{3,4}\d{6}[A-Z0-9]{3}$/;
 const ONLY_NUMBERS_REGEX = /^\d+$/;
 const NAMES_REGEX        = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
@@ -15,20 +20,7 @@ const SALARY_REGEX       = /^\d+(\.\d{1,2})?$/;
 
 const emptyToNull = (val) => (val === "" ? null : val);
 
-const CONTRACT_TYPE_BY_NORMALIZED = {
-  nomina: "Nomina",
-  asalariado: "Asalariado",
-  honorarios: "Honorarios",
-  voluntariado: "Voluntariado",
-};
-
-export function normalizeEmployeeContractType(val) {
-  if (val === null || val === undefined) return val;
-  const s = String(val).trim();
-  if (s === "") return val;
-  const key = s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-  return CONTRACT_TYPE_BY_NORMALIZED[key] ?? s;
-}
+const CURP_REGEX         = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 
 export const employeeBasicUpdateSchema = z
   .object({
@@ -171,18 +163,23 @@ export const employeeAdminUpdateSchema = z
         val === null || val === undefined || val === ""
           ? val
           : normalizeEmployeeContractType(val),
-      z.enum(["Nomina", "Asalariado", "Honorarios", "Voluntariado"], {
+      z.enum(EMPLOYEE_CONTRACT_TYPE_VALUES, {
         errorMap: () => ({ message: "Tipo de contrato inválido" }),
       }).nullable().optional()
     ),
 
     frequencyOfPaymentId: z.string().uuid().nullable().optional(),
 
-    salary: z.string()
-      .regex(SALARY_REGEX, "El salario debe ser un número válido con hasta 2 decimales")
-      .refine((val) => Number(val) >= 0, { message: "El salario no puede ser negativo" })
-      .refine((val) => Number(val) <= 1_000_000, { message: "El salario excede el límite permitido" })
-      .optional(),
+    salary: z.preprocess(
+      (val) => (val === "" || val === null || val === undefined ? null : String(val)),
+      z.union([
+        z.null(),
+        z.string()
+          .regex(SALARY_REGEX, "El salario debe ser un número válido con hasta 2 decimales")
+          .refine((val) => Number(val) >= 0, { message: "El salario no puede ser negativo" })
+          .refine((val) => Number(val) <= 1_000_000, { message: "El salario excede el límite permitido" }),
+      ]).optional()
+    ),
 
     workdays: z.array(workdayUpdateSchema).min(1, "Debe incluir al menos un día").optional(),
   })
@@ -193,9 +190,11 @@ export const employeeAdminUpdateSchema = z
   )
   .refine(
     (data) => {
-      if (data.salary === undefined || data.salary === null) return true;
+      if (data.salary === undefined || data.salary === null) {
+        return isNoSalaryContract(data.type);
+      }
       const salary = Number(data.salary);
-      if (data.type === "Voluntariado") return salary >= 0;
+      if (isNoSalaryContract(data.type)) return salary >= 0;
       return salary > 0;
     },
     { message: "El salario debe ser mayor a 0 para este tipo de contrato", path: ["salary"] }

@@ -563,9 +563,9 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("$15000")).toBeInTheDocument();
     });
 
-    it("muestra N/A cuando el salario es null", () => {
+    it("muestra Sin salario cuando el salario es null", () => {
       render(<EmployeeAdminCard {...defaultProps} employee={{ ...mockEmployee, salary: null }} />);
-      expect(screen.getAllByText("N/A").length).toBeGreaterThan(0);
+      expect(screen.getByText("Sin salario")).toBeInTheDocument();
     });
 
     it("muestra el número de días trabajados", () => {
