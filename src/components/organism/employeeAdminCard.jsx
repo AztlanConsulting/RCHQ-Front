@@ -17,9 +17,11 @@ import {
 
 const TIPOS = [
   { value: "Nomina", label: "Nómina" },
-  { value: "Asalariado", label: "Asalariado" },
+  { value: "Asimilado a Salario", label: "Asimilado a Salario" },
   { value: "Honorarios", label: "Honorarios" },
   { value: "Voluntariado", label: "Voluntariado" },
+  { value: "Servicio Social", label: "Servicio Social" },
+  { value: "Patronato/Proveedor", label: "Patronato/Proveedor" },
 ];
 
 const isAdminRole = (roleName = "") =>
