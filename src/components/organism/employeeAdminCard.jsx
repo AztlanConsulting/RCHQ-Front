@@ -21,7 +21,8 @@ const TIPOS = [
   { value: "Honorarios", label: "Honorarios" },
   { value: "Voluntariado", label: "Voluntariado" },
   { value: "Servicio Social", label: "Servicio Social" },
-  { value: "Patronato/Proveedor", label: "Patronato/Proveedor" },
+  { value: "Patronato", label: "Patronato" },
+  { value: "Proveedor", label: "Proveedor" },
 ];
 
 const isAdminRole = (roleName = "") =>
@@ -163,7 +164,7 @@ const EmployeeAdminCard = ({
               </Type>
             </div>
             <div className="min-w-0 sm:text-right">
-              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Salario</Type>
+              <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Salario Diario Integrado</Type>
               <Type variant="metric-value" as="p" className="mt-1 text-[1.15rem] font-semibold">
                 {employee?.salary ? `$${employee.salary}` : "N/A"}
               </Type>
@@ -283,7 +284,7 @@ const EmployeeAdminCard = ({
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <Type variant="metric-label" as="p">Salario (MXN)</Type>
+                <Type variant="metric-label" as="p">Salario Diario Integrado (MXN)</Type>
                 <TextField
                   id="salary" inputMode="numeric"
                   value={adminForm.salary}
