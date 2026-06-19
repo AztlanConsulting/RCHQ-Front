@@ -1,12 +1,4 @@
-const DAY_NAME_TO_UTC = {
-  Domingo: 0,
-  Lunes: 1,
-  Martes: 2,
-  "Miércoles": 3,
-  Jueves: 4,
-  Viernes: 5,
-  "Sábado": 6,
-};
+import { getScheduledWeekdayNumbers, getShiftDurationMinutes } from "./employeeShifts";
 
 function countScheduledDaysInRange(start, end, scheduledDays) {
   const t0 = new Date(start);
@@ -22,12 +14,12 @@ function countScheduledDaysInRange(start, end, scheduledDays) {
   return count;
 }
 
-export function totalWorkDaysFromApprovedVacationRequests(vacationRequests, employeeWorkdays) {
+export function totalWorkDaysFromApprovedVacationRequests(vacationRequests, employeeShifts) {
   if (!Array.isArray(vacationRequests)) return 0;
 
   const scheduledDays =
-    Array.isArray(employeeWorkdays) && employeeWorkdays.length > 0
-      ? employeeWorkdays.map((w) => DAY_NAME_TO_UTC[w.name]).filter((d) => d !== undefined)
+    Array.isArray(employeeShifts) && employeeShifts.length > 0
+      ? getScheduledWeekdayNumbers(employeeShifts)
       : [1, 2, 3, 4, 5];
 
   return vacationRequests
@@ -35,50 +27,40 @@ export function totalWorkDaysFromApprovedVacationRequests(vacationRequests, empl
     .reduce((sum, r) => sum + countScheduledDaysInRange(r.start, r.end, scheduledDays), 0);
 }
 
-function countWorkdayHours(workday) {
-  if (!workday.start || !workday.end) return 0;
+export function countScheduledDays(shifts) {
+  return getScheduledWeekdayNumbers(shifts).length;
+}
 
-  const start = new Date(workday.start);
-  const end = new Date(workday.end);
+export function countShiftsHours(shifts) {
+  if (!Array.isArray(shifts)) return 0;
 
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+  const totalHours = shifts.reduce(
+    (sum, shift) => sum + (getShiftDurationMinutes(shift) / 60),
+    0,
+  );
 
-  const diffMs = end.getTime() - start.getTime();
-  if (diffMs > 0) {
-    return diffMs / (1000 * 60 * 60);
-  }
+  return Number.isInteger(totalHours) ? totalHours : Number(totalHours.toFixed(1));
+}
 
-  const startMinutes = (start.getUTCHours() * 60) + start.getUTCMinutes();
-  const endMinutes = (end.getUTCHours() * 60) + end.getUTCMinutes();
+/** @deprecated use countScheduledDays */
+export function countWorkdayDays(shifts) {
+  return countScheduledDays(shifts);
+}
 
-  if (endMinutes === startMinutes) {
-    return 24;
-  }
-
-  if (endMinutes < startMinutes) {
-    return ((24 * 60 - startMinutes) + endMinutes) / 60;
-  }
-
-  return 0;
+/** @deprecated use countShiftsHours */
+export function countWorkdaysHours(shifts) {
+  return countShiftsHours(shifts);
 }
 
 export function parseUTCDateToHours(isoString) {
   if (!isoString) return "N/A";
+
+  if (typeof isoString === "string" && /^\d{2}:\d{2}$/.test(isoString)) {
+    return isoString;
+  }
+
   const d = new Date(isoString);
   const h = String(d.getUTCHours()).padStart(2, "0");
   const m = String(d.getUTCMinutes()).padStart(2, "0");
   return `${h}:${m}`;
-}
-
-export function countWorkdayDays(workdays) {
-  if (!Array.isArray(workdays)) return 0;
-
-  return workdays.length;
-}
-
-export function countWorkdaysHours(workdays) {
-  if (!Array.isArray(workdays)) return 0;
-
-  const totalHours = workdays.reduce((prev, curr) => prev + countWorkdayHours(curr), 0);
-  return Number.isInteger(totalHours) ? totalHours : Number(totalHours.toFixed(1));
 }

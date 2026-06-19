@@ -5,7 +5,7 @@ export const useEmployeeDetail = (employeeId) => {
   const [employee, setEmployee]                       = useState({});
   const [employeeAddress, setEmployeeAddress]         = useState({});
   const [employeeHouse, setEmployeeHouse]             = useState({});
-  const [employeeWorkdays, setEmployeeWorkdays]       = useState([]);
+  const [employeeShifts, setEmployeeShifts]       = useState([]);
   const [employeeVacationRequests, setEmployeeVacationRequests] = useState([]);
   const [employeeAbsenceUsedDays, setEmployeeAbsenceUsedDays]   = useState(0);
   const [isLoading, setIsLoading]   = useState(true);
@@ -27,7 +27,7 @@ export const useEmployeeDetail = (employeeId) => {
       setEmployee(basicInfo.employee);
       setEmployeeAddress(basicInfo.address);
       setEmployeeHouse(basicInfo.house);
-      setEmployeeWorkdays(adminInfo.workdays ?? []);
+      setEmployeeShifts(adminInfo.shifts ?? []);
       setEmployeeVacationRequests(adminInfo.vacationRequests ?? []);
       setEmployeeAbsenceUsedDays(adminInfo.absenceUsedDays ?? 0);
     } catch (err) {
@@ -45,7 +45,7 @@ export const useEmployeeDetail = (employeeId) => {
     employee,
     employeeAddress,
     employeeHouse,
-    employeeWorkdays,
+    employeeShifts,
     employeeVacationRequests,
     employeeAbsenceUsedDays,
     isLoading,

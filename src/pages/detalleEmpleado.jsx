@@ -33,7 +33,7 @@ const DetalleEmpleado = () => {
 
   const {
     employee, employeeAddress, employeeHouse,
-    employeeWorkdays, employeeVacationRequests, employeeAbsenceUsedDays,
+    employeeShifts, employeeVacationRequests, employeeAbsenceUsedDays,
     isLoading, currentTab, setCurrentTab,
     alert, setAlert, getEmployeeDetail,
   } = useEmployeeDetail(employeeId);
@@ -43,11 +43,11 @@ const DetalleEmpleado = () => {
     basicErrors, contactErrors, adminErrors,
     basicForm, contactForm, adminForm,
     basicPicturePreview,
-    roles,
+    roles, allWorkdays,
     frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime, setWorkdayAllDay,
+    addShift, removeShift, updateShiftField,
     submitBasic, submitContact, submitAdmin, setValidationAlert,
   } = useEditEmployee(employeeId, (msg) => {
     setAlert({ type: "success", message: msg });
@@ -305,7 +305,7 @@ const DetalleEmpleado = () => {
 
           <EmployeeAdminCard
             employee={employee}
-            employeeWorkdays={employeeWorkdays}
+            employeeShifts={employeeShifts}
             employeeVacationRequests={employeeVacationRequests}
             employeeAbsenceUsedDays={employeeAbsenceUsedDays}
             workdaysDrawer={workdaysDrawer}
@@ -313,17 +313,18 @@ const DetalleEmpleado = () => {
             loadingCatalogues={loadingCatalogues}
             adminForm={adminForm}
             roles={roles}
+            allWorkdays={allWorkdays}
             frecuentPaymentTypes={frecuentPaymentTypes}
             setAdminField={setAdminField}
-            toggleWorkday={toggleWorkday}
-            setWorkdayTime={setWorkdayTime}
-            setWorkdayAllDay={setWorkdayAllDay}
+            addShift={addShift}
+            removeShift={removeShift}
+            updateShiftField={updateShiftField}
             saving={saving}
             saveError={editSection === "Administrador" ? saveError : null}
             validationAlert={editSection === "Administrador" ? validationAlert : null}
             onValidationAlertClose={() => setValidationAlert(null)}
             errors={editSection === "Administrador" ? adminErrors : {}}
-            onOpenEdit={() => openAdminEdit(employee, employeeWorkdays)}
+            onOpenEdit={() => openAdminEdit(employee, employeeShifts)}
             onSubmit={submitAdmin}
             onCancel={closeEdit}
             canEdit={canEdit}

@@ -3,14 +3,18 @@ import Loader from "../atoms/loader";
 import Drawer from "../atoms/drawer";
 import SelectField from "../atoms/selectField";
 import TextField from "../atoms/textField";
-import TimeField from "../atoms/timeField";
-import CheckboxField from "../atoms/checkboxField";
+import EmployeeShiftList from "../molecules/employeeShiftList";
 import ErrorText from "../atoms/errorText";
 import SmallButton from "../atoms/smallButton";
 import Alert from "../atoms/alerts";
 import {
-  countWorkdayDays,
-  countWorkdaysHours,
+  countScheduledDays,
+  countShiftsHours,
+  findShiftConflictMessage,
+  formatShiftTimeRange,
+  groupShiftsByStartDay,
+} from "@/utils/employeeShifts";
+import {
   parseUTCDateToHours,
   totalWorkDaysFromApprovedVacationRequests,
 } from "@/utils/detalle-empleado.utils";
@@ -35,7 +39,7 @@ const isAdminRole = (roleName = "") =>
 
 const EmployeeAdminCard = ({
   employee,
-  employeeWorkdays,
+  employeeShifts,
   employeeVacationRequests,
   employeeAbsenceUsedDays,
   workdaysDrawer,
@@ -45,9 +49,10 @@ const EmployeeAdminCard = ({
   roles,
   frecuentPaymentTypes,
   setAdminField,
-  toggleWorkday,
-  setWorkdayTime,
-  setWorkdayAllDay,
+  addShift,
+  removeShift,
+  updateShiftField,
+  allWorkdays,
   saving,
   saveError,
   validationAlert,
@@ -90,6 +95,9 @@ const EmployeeAdminCard = ({
   const contractTypeOptions = getAllowedContractTypesForRole(selectedRoleName);
 
   const salaryOptional = isNoSalaryContract(adminForm.type);
+  const shiftConflictMessage = isEditing
+    ? findShiftConflictMessage(adminForm.shifts ?? [], allWorkdays ?? [])
+    : null;
 
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
@@ -114,7 +122,7 @@ const EmployeeAdminCard = ({
               <SmallButton
                 text="Guardar"
                 onClick={onSubmit}
-                disabled={saving || loadingCatalogues}
+                disabled={saving || loadingCatalogues || Boolean(shiftConflictMessage)}
                 leadingIcon={saving ? <Loader size="sm" /> : null}
               />
             ) : null}
@@ -175,10 +183,10 @@ const EmployeeAdminCard = ({
               <Type variant="metric-label" as="p" className="text-[1.05rem] font-semibold text-slate-400">Horario</Type>
               <div className="mt-1 flex flex-wrap items-baseline gap-x-6 gap-y-1">
                 <Type variant="metric-value" as="p" className="text-[1.15rem]">
-                  {`${countWorkdayDays(employeeWorkdays)} días trabajados`}
+                  {`${countScheduledDays(employeeShifts)} días trabajados`}
                 </Type>
                 <Type variant="metric-value" as="p" className="text-[1.15rem]">
-                  {`${countWorkdaysHours(employeeWorkdays)} horas semanales`}
+                  {`${countShiftsHours(employeeShifts)} horas semanales`}
                 </Type>
               </div>
             </div>
@@ -196,12 +204,16 @@ const EmployeeAdminCard = ({
             <div className="-mt-3">
               <Drawer isOpen={workdaysDrawer.isOpen}>
                 <div className="flex flex-col gap-1 rounded-lg bg-slate-50 px-4 py-3">
-                  {employeeWorkdays?.length > 0 && employeeWorkdays.map((w) => (
-                    <div key={w.workdayId} className="w-full flex justify-between">
-                      <Type variant="metric-label" className="text-slate-500">{w.name}</Type>
-                      <Type variant="metric-label" className="text-slate-500">
-                        {`${parseUTCDateToHours(w.start)} - ${parseUTCDateToHours(w.end)}`}
-                      </Type>
+                  {groupShiftsByStartDay(employeeShifts).map(({ dayName, shifts }) => (
+                    <div key={dayName} className="flex flex-col gap-1 py-1">
+                      <Type variant="metric-label" className="text-slate-600">{dayName}</Type>
+                      {shifts.map((shift) => (
+                        <div key={shift.shiftId ?? `${dayName}-${shift.start}-${shift.end}`} className="w-full flex justify-between pl-2">
+                          <Type variant="metric-label" className="text-slate-500">
+                            {formatShiftTimeRange(shift, parseUTCDateToHours)}
+                          </Type>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -232,7 +244,7 @@ const EmployeeAdminCard = ({
             </div>
             <div className="min-w-0 sm:text-right">
               <Type variant="metric-value" as="p" className="text-[1.3rem] font-semibold leading-none text-[#24375e] sm:text-right">
-                {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeWorkdays)} / 12`}
+                {`${totalWorkDaysFromApprovedVacationRequests(employeeVacationRequests, employeeShifts)} / 12`}
               </Type>
             </div>
           </div>
@@ -321,70 +333,14 @@ const EmployeeAdminCard = ({
               </div>
             </div>
 
-            {adminForm.selectedWorkdays.length > 0 && (
-              <div>
-                <Type variant="metric-label" as="p" className="mb-2">
-                  Días y horario de trabajo
-                </Type>
-                <div className="flex flex-col gap-1.5">
-                  {adminForm.selectedWorkdays.map((w) => (
-                    <div
-                      key={w.workdayId}
-                      className={`flex flex-col gap-3 rounded-lg px-3 py-3 transition-colors sm:flex-row sm:items-center ${
-                        w.selected ? "bg-slate-50 border border-slate-200" : ""
-                      }`}
-                    >
-                      <label className="flex w-full cursor-pointer items-center gap-2 sm:w-32 sm:shrink-0">
-                        <input
-                          type="checkbox"
-                          checked={w.selected}
-                          onChange={() => toggleWorkday(w.workdayId)}
-                          className="h-4 w-4 rounded border-slate-300 accent-slate-800"
-                        />
-                        <span className="text-sm font-semibold text-slate-700">{w.name}</span>
-                      </label>
-                      {w.selected && (
-                        <div className="grid w-full grid-cols-1 gap-2">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                            <div className="w-full sm:w-[208px]">
-                              <TimeField
-                                value={w.start}
-                                onChange={(value) => setWorkdayTime(w.workdayId, "start", value)}
-                                placeholder="--:--"
-                                stepMinutes={30}
-                                disabled={w.allDay}
-                              />
-                            </div>
-                            <span className="hidden text-slate-400 text-xs sm:inline">—</span>
-                            <div className="w-full sm:w-[208px]">
-                              <TimeField
-                                value={w.end}
-                                onChange={(value) => setWorkdayTime(w.workdayId, "end", value)}
-                                minTime={w.start}
-                                placeholder="--:--"
-                                stepMinutes={30}
-                                disabled={w.allDay}
-                              />
-                            </div>
-                          </div>
-                          <div className="pl-0 sm:pl-1">
-                            <CheckboxField
-                              id={`all-day-workday-${w.workdayId}`}
-                              label="Turno de 24 horas"
-                              checked={Boolean(w.allDay)}
-                              onChange={(checked) => setWorkdayAllDay(w.workdayId, checked)}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="min-h-5">
-                  {errors.workdays && <ErrorText>{errors.workdays}</ErrorText>}
-                </div>
-              </div>
-            )}
+            <EmployeeShiftList
+              shifts={adminForm.shifts ?? []}
+              workdayCatalog={allWorkdays ?? []}
+              onAddShift={addShift}
+              onRemoveShift={removeShift}
+              onUpdateShiftField={updateShiftField}
+              error={shiftConflictMessage || errors.shifts}
+            />
           </div>
         )
       )}
