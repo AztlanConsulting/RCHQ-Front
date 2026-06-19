@@ -33,8 +33,8 @@ const EmployeeShiftList = ({
             key={shift.clientId}
             className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3"
           >
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-end">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-center">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:items-end">
                 <SelectField
                   label="Día inicio"
                   id={`shift-start-day-${shift.clientId}`}
@@ -56,7 +56,7 @@ const EmployeeShiftList = ({
 
               <span className="hidden text-center text-slate-400 lg:block">→</span>
 
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:items-end">
                 <SelectField
                   label="Día fin"
                   id={`shift-end-day-${shift.clientId}`}
@@ -77,8 +77,8 @@ const EmployeeShiftList = ({
                 />
               </div>
 
-              <div className="flex justify-end">
-        <SmallButton
+              <div className="flex items-end justify-end">
+                <SmallButton
                   type="button"
                   text="Eliminar"
                   hasNoRollback

@@ -344,12 +344,24 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       shifts: prev.shifts.map((shift) => {
         if (shift.clientId !== clientId) return shift;
 
+        if (field === "startWorkdayId") {
+          return {
+            ...shift,
+            startWorkdayId: value,
+            endWorkdayId: value,
+          };
+        }
+
         if (field === "allDay") {
           return {
             ...shift,
             allDay: value,
             ...(value
-              ? { start: "00:00", end: "00:00" }
+              ? {
+                  start: "00:00",
+                  end: "00:00",
+                  endWorkdayId: shift.startWorkdayId,
+                }
               : shift.start === "00:00" && shift.end === "00:00"
                 ? { start: "08:00", end: "17:00" }
                 : {}),
