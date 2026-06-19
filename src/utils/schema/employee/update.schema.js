@@ -146,6 +146,7 @@ import {
   getShiftDurationMinutes,
   MIN_SHIFT_MINUTES,
   MAX_SHIFT_MINUTES,
+  findShiftConflictMessage,
 } from "../../employeeShifts";
 
 export const shiftUpdateSchema = z
@@ -219,4 +220,11 @@ export const employeeAdminUpdateSchema = z
       return salary > 0;
     },
     { message: "El salario debe ser mayor a 0 para este tipo de contrato", path: ["salary"] }
+  )
+  .refine(
+    (data) => !data.shifts || !findShiftConflictMessage(data.shifts),
+    {
+      message: "No se permiten turnos duplicados o solapados en el mismo día",
+      path: ["shifts"],
+    },
   );

@@ -21,6 +21,7 @@ import {
 import {
   buildShiftPayload,
   createEmptyShift,
+  findShiftConflictMessage,
   mapShiftFromApi,
 } from "../../utils/employeeShifts";
 
@@ -322,12 +323,11 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
   const addShift = useCallback(() => {
-    clearShiftErrors();
     setAdminFormState((prev) => ({
       ...prev,
-      shifts: [...prev.shifts, createEmptyShift(allWorkdays)],
+      shifts: [...prev.shifts, createEmptyShift(allWorkdays, prev.shifts)],
     }));
-  }, [allWorkdays, clearShiftErrors]);
+  }, [allWorkdays]);
 
   const removeShift = useCallback((clientId) => {
     clearShiftErrors();
@@ -511,6 +511,13 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         return;
       }
 
+      const shiftConflictMessage = findShiftConflictMessage(adminForm.shifts, allWorkdays);
+      if (shiftConflictMessage) {
+        setAdminErrors({ shifts: shiftConflictMessage });
+        setValidationAlert(VALIDATION_ALERTS.admin);
+        return;
+      }
+
       let shiftsToSend;
       try {
         shiftsToSend = adminForm.shifts.map((shift) => buildShiftPayload(shift, allWorkdays));
@@ -538,7 +545,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       closeEdit();
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {
-      if (err.message?.startsWith("Debes asignar") || err.message?.startsWith("El turno")) {
+      if (
+        err.message?.startsWith("Debes asignar")
+        || err.message?.startsWith("El turno")
+        || err.message?.startsWith("No puedes repetir")
+        || err.message?.startsWith("Hay turnos")
+      ) {
         setAdminErrors({ shifts: err.message });
         setValidationAlert(VALIDATION_ALERTS.admin);
       } else {

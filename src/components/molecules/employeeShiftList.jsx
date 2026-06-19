@@ -6,6 +6,7 @@ import Type from "../atoms/type";
 import {
   countScheduledDays,
   countShiftsHours,
+  findConflictingShiftClientIds,
 } from "@/utils/employeeShifts";
 
 const EmployeeShiftList = ({
@@ -20,6 +21,7 @@ const EmployeeShiftList = ({
     value: day.workdayId ?? day.workday_id,
     label: day.name,
   }));
+  const conflictingShiftIds = findConflictingShiftClientIds(shifts);
 
   return (
     <div>
@@ -28,10 +30,17 @@ const EmployeeShiftList = ({
       </Type>
 
       <div className="flex flex-col gap-3">
-        {shifts.map((shift) => (
+        {shifts.map((shift) => {
+          const hasConflict = conflictingShiftIds.has(shift.clientId);
+
+          return (
           <div
             key={shift.clientId}
-            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3"
+            className={`rounded-lg border px-3 py-3 ${
+              hasConflict
+                ? "border-red-300 bg-red-50"
+                : "border-slate-200 bg-slate-50"
+            }`}
           >
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-center">
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:items-end">
@@ -97,7 +106,8 @@ const EmployeeShiftList = ({
               />
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

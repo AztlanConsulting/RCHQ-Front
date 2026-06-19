@@ -10,6 +10,7 @@ import Alert from "../atoms/alerts";
 import {
   countScheduledDays,
   countShiftsHours,
+  findShiftConflictMessage,
   formatShiftTimeRange,
   groupShiftsByStartDay,
 } from "@/utils/employeeShifts";
@@ -94,6 +95,9 @@ const EmployeeAdminCard = ({
   const contractTypeOptions = getAllowedContractTypesForRole(selectedRoleName);
 
   const salaryOptional = isNoSalaryContract(adminForm.type);
+  const shiftConflictMessage = isEditing
+    ? findShiftConflictMessage(adminForm.shifts ?? [], allWorkdays ?? [])
+    : null;
 
   return (
     <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:basis-2/3 md:min-w-0 md:flex-1">
@@ -118,7 +122,7 @@ const EmployeeAdminCard = ({
               <SmallButton
                 text="Guardar"
                 onClick={onSubmit}
-                disabled={saving || loadingCatalogues}
+                disabled={saving || loadingCatalogues || Boolean(shiftConflictMessage)}
                 leadingIcon={saving ? <Loader size="sm" /> : null}
               />
             ) : null}
@@ -335,7 +339,7 @@ const EmployeeAdminCard = ({
               onAddShift={addShift}
               onRemoveShift={removeShift}
               onUpdateShiftField={updateShiftField}
-              error={errors.shifts}
+              error={shiftConflictMessage || errors.shifts}
             />
           </div>
         )
