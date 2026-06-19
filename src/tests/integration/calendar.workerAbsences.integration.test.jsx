@@ -132,6 +132,7 @@ describe("Integración: trabajador consulta sus ausencias", () => {
         getAbsenceTypes.mockResolvedValue([
             { absenceTypeId: "type-medica", name: "Médica" },
             { absenceTypeId: "type-paternidad", name: "Paternidad" },
+            { absenceTypeId: "type-otro", name: "Otro" },
         ]);
         getHouseEmployees.mockResolvedValue([
             { employeeId: "other-worker", name: "Otro trabajador" },

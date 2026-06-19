@@ -1,10 +1,17 @@
 import { useState, useCallback } from "react";
-import { 
-  employeeBasicUpdateSchema, 
-  employeeContactUpdateSchema, 
+import {
+  employeeBasicUpdateSchema,
+  employeeContactUpdateSchema,
   employeeAdminUpdateSchema,
   normalizeEmployeeContractType,
 } from "../../utils/schema/employee/update.schema";
+import { isNoSalaryContract } from "../../utils/employeeContractTypes";
+import {
+  buildRoleContractMismatchMessage,
+  getRequiredContractTypeForRole,
+  isContractTypeAllowedForRole,
+  resolveContractTypeForRole,
+} from "../../utils/roleContractRules";
 import {
   getUpdateFormService,
   updateBasicInfoService,
@@ -137,7 +144,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       setAdminFormState({
         roleId:               employee?.roleId  ?? "",
         originalRoleId:       employee?.roleId  ?? "",
-        type:                 normalizeEmployeeContractType(employee?.type) ?? "",
+        type:                 resolveContractTypeForRole(
+          (formData?.roles ?? []).find(
+            (role) => String(role.roleId) === String(employee?.roleId),
+          )?.name,
+          normalizeEmployeeContractType(employee?.type) ?? "",
+        ),
         salary:               employee?.salary  ?? "",
         frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
         selectedWorkdays:     preselected,
@@ -295,8 +307,29 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       delete next[field];
       return next;
     });
-    setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
-  }, []);
+    setAdminFormState((prev) => {
+      if (field === "type") {
+        const roleName = roles.find(
+          (role) => String(role.roleId) === String(prev.roleId),
+        )?.name;
+
+        if (!isContractTypeAllowedForRole(roleName, finalValue)) {
+          return prev;
+        }
+      }
+
+      const next = { ...prev, [field]: finalValue };
+
+      if (field === "roleId") {
+        const roleName = roles.find(
+          (role) => String(role.roleId) === String(finalValue),
+        )?.name;
+        next.type = resolveContractTypeForRole(roleName, prev.type);
+      }
+
+      return next;
+    });
+  }, [roles]);
 
   const toggleWorkday = useCallback((workdayId) => {
     setAdminErrors((prev) => {
@@ -431,31 +464,59 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setValidationAlert(null);
     setAdminErrors({});
     try {
+      const noSalaryRequired = isNoSalaryContract(adminForm.type);
       const requiredErrors = {};
       if (!adminForm.roleId) requiredErrors.roleId = "Selecciona un puesto";
       if (!adminForm.type) requiredErrors.type = "Selecciona un tipo de contrato";
-      if (adminForm.salary === "") requiredErrors.salary = "El salario es obligatorio";
+
+      const selectedRoleName = roles.find(
+        (role) => String(role.roleId) === String(adminForm.roleId),
+      )?.name;
+
+      if (
+        selectedRoleName &&
+        adminForm.type &&
+        !isContractTypeAllowedForRole(selectedRoleName, adminForm.type)
+      ) {
+        const requiredType = getRequiredContractTypeForRole(selectedRoleName);
+        requiredErrors.type = buildRoleContractMismatchMessage(
+          selectedRoleName,
+          requiredType,
+        );
+      }
+
+      if (!noSalaryRequired && adminForm.salary === "") {
+        requiredErrors.salary = "El salario es obligatorio";
+      }
       if (Object.keys(requiredErrors).length > 0) {
         setAdminErrors(requiredErrors);
         setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
-      const salaryNum = Number(adminForm.salary);
-      if (isNaN(salaryNum) || salaryNum < 0) {
-        setAdminErrors({ salary: "El salario debe ser un número válido." });
-        setValidationAlert(VALIDATION_ALERTS.admin);
-        return;
-      }
-      if (adminForm.type !== "Voluntariado" && salaryNum === 0) {
-        setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+      let resolvedSalary = null;
+      if (adminForm.salary !== "") {
+        const salaryNum = Number(adminForm.salary);
+        if (isNaN(salaryNum) || salaryNum < 0) {
+          setAdminErrors({ salary: "El salario debe ser un número válido." });
+          setValidationAlert(VALIDATION_ALERTS.admin);
+          return;
+        }
+        if (!noSalaryRequired && salaryNum === 0) {
+          setAdminErrors({ salary: "El salario debe ser mayor a 0 para este tipo de contrato." });
+          setValidationAlert(VALIDATION_ALERTS.admin);
+          return;
+        }
+        resolvedSalary = adminForm.salary;
+      } else if (!noSalaryRequired) {
+        setAdminErrors({ salary: "El salario es obligatorio" });
         setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
       const payload = {
-        type:                 adminForm.type,
-        salary:               adminForm.salary,
+        type: adminForm.type,
+        salary: resolvedSalary,
         frequencyOfPaymentId: adminForm.frequencyOfPaymentId || null,
       };
 
@@ -529,7 +590,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [adminForm, employeeId, closeEdit, onSuccess]);
+  }, [adminForm, employeeId, closeEdit, onSuccess, roles]);
 
   return {
     editSection, saving, saveError, validationAlert, loadingCatalogues,
