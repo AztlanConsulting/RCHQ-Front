@@ -505,9 +505,9 @@ describe("EmployeeAdminCard", () => {
 
   const mockEmployee = { type: "tiempo_completo", salary: "15000", houseId: "h1", roleId: "r1" };
 
-  const mockWorkdays = [
-    { workdayId: "wd1", name: "Lunes",   start: "1970-01-01T08:00:00.000Z", end: "1970-01-01T17:00:00.000Z" },
-    { workdayId: "wd2", name: "Martes",  start: "1970-01-01T08:00:00.000Z", end: "1970-01-01T17:00:00.000Z" },
+  const mockShifts = [
+    { shiftId: "s1", startWorkdayId: "wd1", endWorkdayId: "wd1", startWorkdayName: "Lunes", endWorkdayName: "Lunes", start: "08:00", end: "17:00", allDay: false },
+    { shiftId: "s2", startWorkdayId: "wd2", endWorkdayId: "wd2", startWorkdayName: "Martes", endWorkdayName: "Martes", start: "08:00", end: "17:00", allDay: false },
   ];
 
   const mockAdminForm = {
@@ -515,9 +515,9 @@ describe("EmployeeAdminCard", () => {
     roleId:  "r1",
     type:    "tiempo_completo",
     salary:  15000,
-    selectedWorkdays: [
-      { workdayId: "wd1", name: "Lunes",   selected: true,  start: "08:00", end: "17:00", allDay: false },
-      { workdayId: "wd2", name: "Martes",  selected: false, start: "08:00", end: "17:00", allDay: false },
+    shifts: [
+      { clientId: "c1", startWorkdayId: "wd1", endWorkdayId: "wd1", start: "08:00", end: "17:00", allDay: false },
+      { clientId: "c2", startWorkdayId: "wd2", endWorkdayId: "wd2", start: "08:00", end: "17:00", allDay: false },
     ],
   };
 
@@ -525,7 +525,7 @@ describe("EmployeeAdminCard", () => {
 
   const defaultProps = {
     employee:                mockEmployee,
-    employeeWorkdays:        mockWorkdays,
+    employeeShifts:          mockShifts,
     employeeVacationRequests: [],
     employeeAbsenceUsedDays: 0,
     workdaysDrawer:          mockWorkdaysDrawer,
@@ -535,9 +535,10 @@ describe("EmployeeAdminCard", () => {
     roles:   [{ roleId: "r1", name: "Admin" }, { roleId: "r2", name: "Coordinador" }],
     houses:  [{ houseId: "h1", name: "Casa Test" }],
     setAdminField:  vi.fn(),
-    toggleWorkday:  vi.fn(),
-    setWorkdayAllDay: vi.fn(),
-    setWorkdayTime: vi.fn(),
+    allWorkdays: [{ workdayId: "wd1", name: "Lunes" }, { workdayId: "wd2", name: "Martes" }],
+    addShift:       vi.fn(),
+    removeShift:    vi.fn(),
+    updateShiftField: vi.fn(),
     saving:         false,
     saveError:      null,
     onOpenEdit:     vi.fn(),
@@ -621,42 +622,28 @@ describe("EmployeeAdminCard", () => {
       expect(screen.getByText("Admin")).toBeInTheDocument();
     });
 
-    it("muestra los checkboxes de días de trabajo", () => {
+    it("muestra la lista de turnos de trabajo", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      expect(screen.getByText("Lunes")).toBeInTheDocument();
-      expect(screen.getByText("Martes")).toBeInTheDocument();
+      expect(screen.getByText("Turnos de trabajo")).toBeInTheDocument();
+      expect(screen.getByText("+ Agregar turno")).toBeInTheDocument();
     });
 
-    it("el checkbox de Lunes está marcado (selected=true)", () => {
+    it("muestra los selects de día inicio y fin", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[0]).toBeChecked();
+      expect(screen.getAllByText("Día inicio").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Día fin").length).toBeGreaterThan(0);
     });
 
-    it("el checkbox de Martes NO está marcado (selected=false)", () => {
+    it("llama a addShift al hacer click en Agregar turno", () => {
       render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes[1]).not.toBeChecked();
+      fireEvent.click(screen.getByText("+ Agregar turno"));
+      expect(editingProps.addShift).toHaveBeenCalledTimes(1);
     });
 
-    it("llama a toggleWorkday al hacer click en un checkbox", () => {
-      render(<EmployeeAdminCard {...editingProps} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-      fireEvent.click(checkboxes[2]);
-      expect(editingProps.toggleWorkday).toHaveBeenCalledWith("wd2");
-    });
-
-    it("muestra inputs de hora cuando el día está seleccionado", () => {
+    it("muestra inputs de hora para cada turno", () => {
       render(<EmployeeAdminCard {...editingProps} />);
       const timeInputs = screen.getAllByDisplayValue("08:00");
       expect(timeInputs.length).toBeGreaterThan(0);
-    });
-
-    it("llama a setWorkdayTime al cambiar la hora de inicio", () => {
-      render(<EmployeeAdminCard {...editingProps} />);
-      const timeInputs = screen.getAllByDisplayValue("08:00");
-      fireEvent.change(timeInputs[0], { target: { value: "09:00" } });
-      expect(editingProps.setWorkdayTime).toHaveBeenCalledWith("wd1", "start", "09:00");
     });
 
     it("llama a onCancel al hacer click en Cancelar", () => {

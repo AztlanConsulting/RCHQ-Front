@@ -18,6 +18,11 @@ import {
   updateContactInfoService,
   updateAdminInfoService,
 } from "../../services/employeeUpdateService";
+import {
+  buildShiftPayload,
+  createEmptyShift,
+  mapShiftFromApi,
+} from "../../utils/employeeShifts";
 
 const mapZodFieldErrors = (issues = []) =>
   issues.reduce((fieldErrors, issue) => {
@@ -63,7 +68,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   const [adminForm, setAdminFormState] = useState({
     roleId: "", originalRoleId: "", type: "", salary: "",
     frequencyOfPaymentId: "",
-    selectedWorkdays: [],
+    shifts: [],
   });
 
   const openBasicEdit = useCallback((employee) => {
@@ -100,7 +105,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
   }, []);
 
 
-  const openAdminEdit = useCallback(async (employee, currentWorkdays) => {
+  const openAdminEdit = useCallback(async (employee, currentShifts) => {
     setSaveError(null);
     setValidationAlert(null);
     setAdminErrors({});
@@ -108,38 +113,14 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     setLoadingCatalogues(true);
     try {
       const formData = await getUpdateFormService();
+      const workdayCatalog = formData?.workdays ?? [];
       setRoles(formData?.roles ?? []);
-      setAllWorkdays(formData?.workdays ?? []);
+      setAllWorkdays(workdayCatalog);
       setFrecuentPaymentTypes(formData?.frecuencyOptions ?? []);
 
-      const preselected = (formData?.workdays ?? []).map((wd) => {
-        const wdId    = wd.workdayId ?? wd.workday_id;
-        const existing = currentWorkdays?.find((cw) => (cw.workdayId ?? cw.workday_id) === wdId);
-        const isAllDay = existing
-          ? (() => {
-              const startDate = new Date(existing.start);
-              const endDate = new Date(existing.end);
-              if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-                return false;
-              }
-
-              const diffMs = endDate.getTime() - startDate.getTime();
-              const sameUtcClock =
-                startDate.getUTCHours() === endDate.getUTCHours() &&
-                startDate.getUTCMinutes() === endDate.getUTCMinutes();
-
-              return diffMs === 24 * 60 * 60 * 1000 || sameUtcClock;
-            })()
-          : false;
-        return {
-          workdayId: wdId,
-          name:      wd.name,
-          selected:  !!existing,
-          start:     existing ? String(existing.start).slice(11, 16) : "08:00",
-          end:       existing ? String(existing.end).slice(11, 16)   : "17:00",
-          allDay:    isAllDay,
-        };
-      });
+      const initialShifts = Array.isArray(currentShifts) && currentShifts.length > 0
+        ? currentShifts.map((shift) => mapShiftFromApi(shift))
+        : [createEmptyShift(workdayCatalog)];
 
       setAdminFormState({
         roleId:               employee?.roleId  ?? "",
@@ -152,7 +133,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         ),
         salary:               employee?.salary  ?? "",
         frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
-        selectedWorkdays:     preselected,
+        shifts:               initialShifts,
       });
     } catch (err) {
       console.error("Error cargando catálogos:", err);
@@ -331,66 +312,54 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     });
   }, [roles]);
 
-  const toggleWorkday = useCallback((workdayId) => {
+  const clearShiftErrors = useCallback(() => {
     setAdminErrors((prev) => {
-      if (!prev.workdays) return prev;
+      if (!prev.shifts) return prev;
       const next = { ...prev };
-      delete next.workdays;
+      delete next.shifts;
       return next;
     });
-    setAdminFormState((prev) => ({
-      ...prev,
-      selectedWorkdays: prev.selectedWorkdays.map((w) =>
-        w.workdayId === workdayId ? { ...w, selected: !w.selected } : w
-      ),
-    }));
   }, []);
 
-  const setWorkdayTime = useCallback((workdayId, timeField, value) => {
-    setAdminErrors((prev) => {
-      if (!prev.workdays) return prev;
-      const next = { ...prev };
-      delete next.workdays;
-      return next;
-    });
+  const addShift = useCallback(() => {
+    clearShiftErrors();
     setAdminFormState((prev) => ({
       ...prev,
-      selectedWorkdays: prev.selectedWorkdays.map((w) =>
-        w.workdayId === workdayId
-          ? {
-              ...w,
-              [timeField]: value,
-              ...(w.allDay ? { end: value } : {}),
-            }
-          : w
-      ),
+      shifts: [...prev.shifts, createEmptyShift(allWorkdays)],
     }));
-  }, []);
+  }, [allWorkdays, clearShiftErrors]);
 
-  const setWorkdayAllDay = useCallback((workdayId, checked) => {
-    setAdminErrors((prev) => {
-      if (!prev.workdays) return prev;
-      const next = { ...prev };
-      delete next.workdays;
-      return next;
-    });
+  const removeShift = useCallback((clientId) => {
+    clearShiftErrors();
     setAdminFormState((prev) => ({
       ...prev,
-      selectedWorkdays: prev.selectedWorkdays.map((w) =>
-        w.workdayId === workdayId
-          ? {
-              ...w,
-              allDay: checked,
-              ...(checked
-                ? { start: "00:00", end: "00:00" }
-                : w.start === "00:00" && w.end === "00:00"
-                  ? { start: "08:00", end: "17:00" }
-                  : {}),
-            }
-          : w
-      ),
+      shifts: prev.shifts.filter((shift) => shift.clientId !== clientId),
     }));
-  }, []);
+  }, [clearShiftErrors]);
+
+  const updateShiftField = useCallback((clientId, field, value) => {
+    clearShiftErrors();
+    setAdminFormState((prev) => ({
+      ...prev,
+      shifts: prev.shifts.map((shift) => {
+        if (shift.clientId !== clientId) return shift;
+
+        if (field === "allDay") {
+          return {
+            ...shift,
+            allDay: value,
+            ...(value
+              ? { start: "00:00", end: "00:00" }
+              : shift.start === "00:00" && shift.end === "00:00"
+                ? { start: "08:00", end: "17:00" }
+                : {}),
+          };
+        }
+
+        return { ...shift, [field]: value };
+      }),
+    }));
+  }, [clearShiftErrors]);
 
   const submitBasic = useCallback(async () => {
     setSaving(true);
@@ -524,46 +493,22 @@ export const useEditEmployee = (employeeId, onSuccess) => {
         payload.roleId = adminForm.roleId;
       }
 
-      const selectedWorkdays = adminForm.selectedWorkdays.filter((w) => w.selected);
-      if (selectedWorkdays.length === 0) {
-        setAdminErrors({ workdays: "Debes seleccionar al menos un día de trabajo." });
+      if (!Array.isArray(adminForm.shifts) || adminForm.shifts.length === 0) {
+        setAdminErrors({ shifts: "Debes agregar al menos un turno de trabajo." });
         setValidationAlert(VALIDATION_ALERTS.admin);
         return;
       }
 
-      const workdaysToSend = selectedWorkdays.map(({ workdayId, name, start, end, allDay }) => {
-        if (!start || !end) {
-          throw new Error(`Debes asignar un horario completo para el día ${name}.`);
-        }
+      let shiftsToSend;
+      try {
+        shiftsToSend = adminForm.shifts.map((shift) => buildShiftPayload(shift, allWorkdays));
+      } catch (err) {
+        setAdminErrors({ shifts: err.message });
+        setValidationAlert(VALIDATION_ALERTS.admin);
+        return;
+      }
 
-        const normalizedStart = allDay ? "00:00" : start;
-        const normalizedEnd = allDay ? "00:00" : end;
-        const [sh, sm] = normalizedStart.split(":").map(Number);
-        const [eh, em] = normalizedEnd.split(":").map(Number);
-        const startMinutes = (sh * 60) + sm;
-        const endMinutes = (eh * 60) + em;
-        const durationMinutes = allDay
-          ? 24 * 60
-          : normalizedEnd <= normalizedStart
-            ? (24 * 60 - startMinutes) + endMinutes
-            : endMinutes - startMinutes;
-
-        if (durationMinutes < 60) {
-          throw new Error(`El turno del ${name} debe durar al menos 1 hora.`);
-        }
-        if (durationMinutes > 24 * 60) {
-          throw new Error(`El turno del ${name} no puede durar más de 24 horas.`);
-        }
-
-        return {
-          workdayId,
-          start: normalizedStart,
-          end: normalizedEnd,
-          allDay: Boolean(allDay),
-        };
-      });
-
-      payload.workdays = workdaysToSend;
+      payload.shifts = shiftsToSend;
 
       const validation = employeeAdminUpdateSchema.safeParse(payload);
       if (!validation.success) {
@@ -582,7 +527,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       onSuccess?.("Información administrativa actualizada con éxito");
     } catch (err) {
       if (err.message?.startsWith("Debes asignar") || err.message?.startsWith("El turno")) {
-        setAdminErrors({ workdays: err.message });
+        setAdminErrors({ shifts: err.message });
         setValidationAlert(VALIDATION_ALERTS.admin);
       } else {
         setSaveError(err.message ?? "Error al guardar");
@@ -590,7 +535,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [adminForm, employeeId, closeEdit, onSuccess, roles]);
+  }, [adminForm, allWorkdays, employeeId, closeEdit, onSuccess, roles]);
 
   return {
     editSection, saving, saveError, validationAlert, loadingCatalogues,
@@ -600,7 +545,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     roles, allWorkdays, frecuentPaymentTypes,
     openBasicEdit, openContactEdit, openAdminEdit, closeEdit,
     setBasicField, setBasicPicture, setContactField, setAdminField,
-    toggleWorkday, setWorkdayTime, setWorkdayAllDay,
+    addShift, removeShift, updateShiftField,
     submitBasic, submitContact, submitAdmin, setValidationAlert,
   };
 };
