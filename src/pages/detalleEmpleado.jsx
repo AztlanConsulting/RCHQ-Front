@@ -56,7 +56,8 @@ const DetalleEmpleado = () => {
 
   const {
     documents,
-    documentTypes,
+    groupedDocumentOptions,
+    flatDocumentOptions,
     loadingDocs,
     fetchError,
     showUploadModal,
@@ -336,6 +337,8 @@ const DetalleEmpleado = () => {
         <div className="flex flex-col gap-10">
           <DocumentsSection
             documents={documents}
+            groupedDocumentOptions={groupedDocumentOptions}
+            flatDocumentOptions={flatDocumentOptions}
             loadingDocs={loadingDocs}
             fetchError={fetchError}
             onFetchErrorClose={clearFetchError}
@@ -347,7 +350,6 @@ const DetalleEmpleado = () => {
             conflictDocument={conflictDocument}
             showUploadModal={showUploadModal}
             isEditing={isEditing}
-            documentTypes={documentTypes}
             documentType={documentType}
             fileName={fileName}
             displayError={displayError}

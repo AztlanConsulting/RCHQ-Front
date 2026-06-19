@@ -11,7 +11,7 @@ const DocumentUploadModal = ({
   isEditing,
   documentTypeValue,
   setDocumentType,
-  documentOptions,
+  groupedDocumentOptions,
   fileName,
   handleFileChange,
   handleSubmit,
@@ -50,7 +50,7 @@ const DocumentUploadModal = ({
           id="document-type"
           value={documentTypeValue}
           setValue={setDocumentType}
-          options={documentOptions}
+          groupedOptions={groupedDocumentOptions}
           placeholder="Selecciona un tipo"
           labelColor="text-slate-700"
         />

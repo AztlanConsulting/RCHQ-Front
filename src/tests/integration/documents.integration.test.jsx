@@ -10,19 +10,24 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Documents from "../../pages/documents";
 
+const MOCK_CV = {
+  value: "cv",
+  label: "Curriculum Vitae",
+};
+const MOCK_NSS = {
+  value: "nss",
+  label: "Número IMSS / NSS",
+};
+
 vi.mock("../../services/documentService", () => ({
   getDocumentsService:     vi.fn(),
   uploadDocumentService:   vi.fn(),
   updateDocumentService:   vi.fn(),
   deleteDocumentService:   vi.fn(),
   getDocumentTypesService: vi.fn(() => Promise.resolve([
-    { value: "cv",  label: "CV" },
-      { value: "nss", label: "NSS" },
+    MOCK_CV,
+    MOCK_NSS,
   ])),
-  DOCUMENT_TYPES: [
-    { value: "cv",  label: "CV" },
-    { value: "nss", label: "NSS" },
-  ],
 }));
 
 vi.mock("../../services/trainingService", () => ({
@@ -65,15 +70,23 @@ const renderPage = (role = "Coordinador") => {
 const mockDocumentsResponse = {
   success: true,
   data: [
-    { documentId: "cv", name: "CV", url: "uploads/documents/cv.pdf" },
+    {
+      documentId: "cv",
+      name: "Curriculum Vitae",
+      url: "uploads/documents/cv.pdf",
+    },
   ],
 };
 
 const mockDocumentsMultiple = {
   success: true,
   data: [
-    { documentId: "cv",  name: "CV",  url: "uploads/documents/cv.pdf" },
-    { documentId: "nss", name: "NSS", url: null },
+    {
+      documentId: "cv",
+      name: "Curriculum Vitae",
+      url: "uploads/documents/cv.pdf",
+    },
+    { documentId: "nss", name: "Número IMSS / NSS", url: null },
   ],
 };
 
@@ -112,10 +125,7 @@ beforeEach(() => {
   localStorage.clear();
   getDocumentsService.mockResolvedValue({ success: true, data: [] });
   getTrainingsService.mockResolvedValue({ success: true, data: [] });
-  getDocumentTypesService.mockResolvedValue([
-    { value: "cv",  label: "CV" },
-    { value: "nss", label: "NSS" },
-  ]);
+  getDocumentTypesService.mockResolvedValue([MOCK_CV, MOCK_NSS]);
 });
 
 
@@ -124,17 +134,19 @@ describe("Documents — carga inicial", () => {
     getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     expect(getDocumentsService).toHaveBeenCalledWith(TEST_EMPLOYEE_ID);
   });
 
-  it("muestra mensaje vacío cuando el empleado no tiene documentos", async () => {
+  it("muestra las categorías del expediente cuando el empleado no tiene documentos", async () => {
     getDocumentsService.mockResolvedValue(mockEmptyResponse);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText(/aún no tiene documentos/i)).toBeInTheDocument();
+      expect(screen.getByText("Verificación e ingreso")).toBeInTheDocument();
     });
+    expect(screen.getByText("Documentos laborales")).toBeInTheDocument();
+    expect(screen.getAllByText("Sin documentos").length).toBeGreaterThan(0);
   });
 
   it("muestra el error cuando el servicio falla", async () => {
@@ -192,6 +204,25 @@ describe("Documents — subir documento", () => {
     fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
     expect(screen.getByRole("heading", { name: /subir documento/i })).toBeInTheDocument();
     expect(screen.getByText(/selecciona un tipo/i)).toBeInTheDocument();
+  });
+
+  it("muestra el dropdown agrupado por categoría al abrir el modal", async () => {
+    getDocumentsService.mockResolvedValue(mockEmptyResponse);
+    renderPage();
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /subir documento/i }),
+      ).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /subir documento/i }));
+
+    const optgroups = document.querySelectorAll("optgroup");
+    expect(optgroups.length).toBeGreaterThan(0);
+    expect(
+      Array.from(optgroups).some(
+        (group) => group.label === "Verificación e ingreso",
+      ),
+    ).toBe(true);
   });
 
   it("cierra el modal al hacer click en Cancelar", async () => {
@@ -266,7 +297,7 @@ describe("Documents — editar documento", () => {
     getDocumentsService.mockResolvedValue(mockDocumentsResponse);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     fireEvent.click(screen.getByTitle("Editar"));
     expect(screen.getByText("Editar documento")).toBeInTheDocument();
@@ -278,7 +309,7 @@ describe("Documents — editar documento", () => {
     updateDocumentService.mockResolvedValue({ success: true });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     fireEvent.click(screen.getByTitle("Editar"));
     await waitFor(() =>
@@ -320,7 +351,7 @@ describe("Documents — eliminar documento", () => {
     getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
@@ -333,7 +364,7 @@ describe("Documents — eliminar documento", () => {
     getDocumentsService.mockResolvedValue(mockDocumentsMultiple);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     clickFirstDelete();
     expect(screen.getByText(/eliminar documento/i)).toBeInTheDocument();
@@ -351,7 +382,7 @@ describe("Documents — eliminar documento", () => {
     deleteDocumentService.mockResolvedValue({ success: true });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>
@@ -367,7 +398,7 @@ describe("Documents — eliminar documento", () => {
       );
     });
     await waitFor(() => {
-      expect(screen.queryByText("CV")).toBeNull();
+      expect(screen.queryByText("Curriculum Vitae")).toBeNull();
     });
   });
 
@@ -376,7 +407,7 @@ describe("Documents — eliminar documento", () => {
     deleteDocumentService.mockRejectedValue(new Error("Error al eliminar"));
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText("CV")).toBeInTheDocument();
+      expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     });
     fireEvent.click(screen.getByTitle("Eliminar"));
     await waitFor(() =>

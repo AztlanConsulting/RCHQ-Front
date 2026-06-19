@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useDocuments } from "../../hooks/organism/useDocuments";
 
 vi.mock("../../services/documentService", () => ({
@@ -35,6 +35,28 @@ const openEditModal = async (result, doc = { documentId: "cv" }) => {
     result.current.handleOpenEdit(doc);
   });
 };
+
+describe("useDocuments — grouped options", () => {
+  it("expone opciones agrupadas por categoría", async () => {
+    const { result } = renderHook(() => useDocuments(EMPLOYEE_ID));
+
+    await waitFor(() => {
+      expect(result.current.groupedDocumentOptions.length).toBeGreaterThan(0);
+    });
+
+    expect(
+      result.current.groupedDocumentOptions.some(
+        (group) => group.label === "Otros",
+      ),
+    ).toBe(true);
+    expect(result.current.flatDocumentOptions).toEqual(
+      expect.arrayContaining([
+        { value: "cv", label: "CV" },
+        { value: "nss", label: "NSS" },
+      ]),
+    );
+  });
+});
 
 describe("useDocuments — modal: estado inicial", () => {
   it("isEditing=false cuando se abre en modo subida", async () => {

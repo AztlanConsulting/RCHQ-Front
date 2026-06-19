@@ -6,12 +6,14 @@ const SelectField = ({
   setValue,
   onChange,
   options = [],
+  groupedOptions = [],
   placeholder = "Selecciona una opción",
   required = false,
   labelColor = "text-[#374151]",
   disabled = false,
   error = false,
 }) => {
+  const hasGroupedOptions = groupedOptions.length > 0;
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
@@ -40,15 +42,29 @@ const SelectField = ({
           <option value="" disabled hidden>
             {placeholder}
           </option>
-          {options.map((opt) => (
-            <option
-              key={opt.value}
-              value={opt.value}
-              style={{ color: "#121212" }}
-            >
-              {opt.label}
-            </option>
-          ))}
+          {hasGroupedOptions
+            ? groupedOptions.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((opt) => (
+                    <option
+                      key={opt.value}
+                      value={opt.value}
+                      style={{ color: "#121212" }}
+                    >
+                      {opt.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))
+            : options.map((opt) => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  style={{ color: "#121212" }}
+                >
+                  {opt.label}
+                </option>
+              ))}
         </select>
 
         <div className="pointer-events-none absolute right-[13px] top-1/2 -translate-y-1/2">
