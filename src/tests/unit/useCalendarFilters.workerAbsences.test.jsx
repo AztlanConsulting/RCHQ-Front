@@ -1078,6 +1078,64 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         });
     });
 
+    it("incluye el tipo Otro en el catálogo de filtros y permite filtrar solo ausencias Otro", async () => {
+        getAbsenceTypes.mockResolvedValue([
+            { absenceTypeId: "type-medica", name: "Médica" },
+            { absenceTypeId: "type-otro", name: "Otro" },
+        ]);
+
+        const events = [
+            buildAbsence({
+                absenceId: "medica",
+                absenceTypeId: "type-medica",
+                type: "Médica",
+            }),
+            buildAbsence({
+                absenceId: "otro",
+                absenceTypeId: "type-otro",
+                type: "Otro",
+                description: "Motivo personal",
+                startDate: "2026-05-12",
+                endDate: "2026-05-12",
+                start: "2026-05-12T06:00:00.000Z",
+                end: "2026-05-13T06:00:00.000Z",
+            }),
+        ];
+
+        const { result } = renderHook(() =>
+            useCalendarFilters(events, {
+                isList: false,
+                viewerRole: "Psicóloga",
+            }),
+        );
+
+        await waitFor(() => expect(getAbsenceTypes).toHaveBeenCalledTimes(1));
+
+        expect(result.current.absenceTypeOptions).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ value: "type-medica", label: "Médica" }),
+                expect.objectContaining({ value: "type-otro", label: "Otro" }),
+            ]),
+        );
+        expect(result.current.absenceTypeFilters).toEqual([
+            "type-medica",
+            "type-otro",
+        ]);
+        expect(result.current.visibleEvents).toHaveLength(2);
+
+        act(() => {
+            result.current.setAbsenceTypeFilters(["type-otro"]);
+        });
+
+        await waitFor(() => {
+            expect(result.current.visibleEvents).toHaveLength(1);
+        });
+        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+            absenceId: "otro",
+            type: "Otro",
+        });
+    });
+
     it("quita detailAllDay cuando un evento all-day no cae como todo el día en la zona activa", async () => {
         const event = {
             focus: "eventos",
