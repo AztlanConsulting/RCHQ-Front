@@ -1,9 +1,15 @@
+import { useMemo } from "react";
 import { useLocation, useNavigate, matchPath } from "react-router-dom";
 import Alert from "../atoms/alerts";
 import BigButton from "../atoms/bigButton";
 import DocumentCard from "../molecules/documentCard";
 import DocumentUploadModal from "../molecules/documentsUploads";
 import ConfirmDeleteModal from "../molecules/confirmDeleteModal";
+import {
+  getAllDisplayCategories,
+  groupDocumentsByCategory,
+} from "../../utils/documentGrouping";
+import { UNCATEGORIZED_CATEGORY_ID } from "../../utils/documentCategories";
 
 const formatDocumentDate = (dateString) => {
   if (!dateString) return "";
@@ -21,7 +27,8 @@ const isDocumentPdf = (doc) => {
 
 const DocumentsSection = ({
   documents,
-  documentTypes,
+  groupedDocumentOptions,
+  flatDocumentOptions,
   loadingDocs,
   fetchError,
   onFetchErrorClose,
@@ -51,6 +58,21 @@ const DocumentsSection = ({
 }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const groupedDocuments = useMemo(
+    () => groupDocumentsByCategory(documents),
+    [documents],
+  );
+
+  const displayCategories = useMemo(
+    () =>
+      getAllDisplayCategories().filter(
+        (category) =>
+          category.id !== UNCATEGORIZED_CATEGORY_ID ||
+          (groupedDocuments[category.id]?.length ?? 0) > 0,
+      ),
+    [groupedDocuments],
+  );
 
   const showDocumentsPageBack =
     matchPath({ path: "/app/:employeeId/documentos", end: true }, pathname) !=
@@ -106,26 +128,43 @@ const DocumentsSection = ({
 
       {loadingDocs ? (
         <p className="text-slate-500 text-sm">Cargando documentos...</p>
-      ) : documents.length === 0 ? (
-        <p className="text-slate-400 text-sm">
-          Este empleado aún no tiene documentos.
-        </p>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
-          {documents.map((doc) => (
-            <DocumentCard
-              key={doc.documentId}
-              doc={doc}
-              label={doc.name}
-              date={formatDocumentDate(doc.uploadedAt)}
-              fileUrl={doc.url}
-              isPdf={isDocumentPdf(doc)}
-              onEdit={handleOpenEdit}
-              onDelete={setDocToDelete}
-              isBeingDeleted={deletingId === doc.documentId}
-              canModify={canModify}
-            />
-          ))}
+        <div className="flex flex-col gap-10">
+          {displayCategories.map((category) => {
+            const docsInCategory = groupedDocuments[category.id] ?? [];
+
+            return (
+              <section key={category.id} className="flex flex-col gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    {category.title}
+                  </h2>
+                  <p className="text-sm text-slate-500">{category.description}</p>
+                </div>
+
+                {docsInCategory.length === 0 ? (
+                  <p className="text-slate-400 text-sm">Sin documentos</p>
+                ) : (
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
+                    {docsInCategory.map((doc) => (
+                      <DocumentCard
+                        key={doc.documentId}
+                        doc={doc}
+                        label={doc.name}
+                        date={formatDocumentDate(doc.uploadedAt)}
+                        fileUrl={doc.url}
+                        isPdf={isDocumentPdf(doc)}
+                        onEdit={handleOpenEdit}
+                        onDelete={setDocToDelete}
+                        isBeingDeleted={deletingId === doc.documentId}
+                        canModify={canModify}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
       )}
 
@@ -135,7 +174,7 @@ const DocumentsSection = ({
         isEditing={isEditing}
         documentTypeValue={documentType.value}
         setDocumentType={documentType.handleValue}
-        documentOptions={documentTypes}
+        groupedDocumentOptions={groupedDocumentOptions}
         fileName={fileName}
         handleFileChange={handleFileChange}
         handleSubmit={handleModalSubmit}
@@ -155,8 +194,9 @@ const DocumentsSection = ({
       <ConfirmDeleteModal
         label={
           conflictDocument
-            ? (documentTypes.find((d) => d.value === conflictDocument.field)
-                ?.label ?? null)
+            ? (flatDocumentOptions.find(
+                (d) => d.value === conflictDocument.field,
+              )?.label ?? null)
             : null
         }
         onConfirm={handleConflictConfirm}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useField } from "../atoms/useField";
 import { useDocumentFile } from "../atoms/useDocumentFile";
 import {
@@ -8,6 +8,10 @@ import {
   updateDocumentService,
   deleteDocumentService,
 } from "../../services/documentService";
+import {
+  buildGroupedSelectOptions,
+  flattenGroupedOptions,
+} from "../../utils/documentGrouping";
 
 const getUserInfoFromToken = () => {
   try {
@@ -49,6 +53,16 @@ export const useDocuments = (employeeId) => {
   const isEditing = Boolean(editingDocument);
   const { handleValue: setDocumentType } = documentType;
   const displayError = localError || fileError;
+
+  const groupedDocumentOptions = useMemo(
+    () => buildGroupedSelectOptions(documentTypes),
+    [documentTypes],
+  );
+
+  const flatDocumentOptions = useMemo(
+    () => flattenGroupedOptions(groupedDocumentOptions),
+    [groupedDocumentOptions],
+  );
 
   useEffect(() => {
     getDocumentTypesService()
@@ -221,6 +235,8 @@ export const useDocuments = (employeeId) => {
   return {
     documents,
     documentTypes,
+    groupedDocumentOptions,
+    flatDocumentOptions,
     loadingDocs,
     fetchError,
     clearFetchError,
