@@ -16,12 +16,15 @@ import {
 } from "@/utils/detalle-empleado.utils";
 
 import {
-  EMPLOYEE_CONTRACT_TYPES,
   formatContractTypeLabel,
   formatFrequencyDisplay,
   formatSalaryDisplay,
   isNoSalaryContract,
 } from "@/utils/employeeContractTypes";
+import {
+  getAllowedContractTypesForRole,
+  getRequiredContractTypeForRole,
+} from "@/utils/roleContractRules";
 
 const isAdminRole = (roleName = "") =>
   String(roleName)
@@ -78,6 +81,13 @@ const EmployeeAdminCard = ({
       label: currentRoleOption.name,
     });
   }
+
+  const selectedRoleName =
+    roles.find((role) => String(role.roleId) === String(adminForm.roleId))?.name ??
+    currentRoleOption?.name ??
+    "";
+  const requiredContractType = getRequiredContractTypeForRole(selectedRoleName);
+  const contractTypeOptions = getAllowedContractTypesForRole(selectedRoleName);
 
   const salaryOptional = isNoSalaryContract(adminForm.type);
 
@@ -256,13 +266,19 @@ const EmployeeAdminCard = ({
                   label="Tipo de contrato" id="type"
                   value={adminForm.type}
                   onChange={(e) => setAdminField("type", e.target.value)}
-                  options={EMPLOYEE_CONTRACT_TYPES}
+                  options={contractTypeOptions}
                   placeholder="Selecciona tipo"
                   labelColor="text-slate-500"
                   error={!!errors.type}
+                  disabled={Boolean(requiredContractType)}
                 />
                 <div className="min-h-5">
                   {errors.type && <ErrorText>{errors.type}</ErrorText>}
+                  {requiredContractType && !errors.type && (
+                    <p className="text-xs text-slate-500">
+                      {`Este puesto requiere contrato ${formatContractTypeLabel(requiredContractType)}.`}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-1">

@@ -7,6 +7,12 @@ import {
 } from "../../utils/schema/employee/update.schema";
 import { isNoSalaryContract } from "../../utils/employeeContractTypes";
 import {
+  buildRoleContractMismatchMessage,
+  getRequiredContractTypeForRole,
+  isContractTypeAllowedForRole,
+  resolveContractTypeForRole,
+} from "../../utils/roleContractRules";
+import {
   getUpdateFormService,
   updateBasicInfoService,
   updateContactInfoService,
@@ -138,7 +144,12 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       setAdminFormState({
         roleId:               employee?.roleId  ?? "",
         originalRoleId:       employee?.roleId  ?? "",
-        type:                 normalizeEmployeeContractType(employee?.type) ?? "",
+        type:                 resolveContractTypeForRole(
+          (formData?.roles ?? []).find(
+            (role) => String(role.roleId) === String(employee?.roleId),
+          )?.name,
+          normalizeEmployeeContractType(employee?.type) ?? "",
+        ),
         salary:               employee?.salary  ?? "",
         frequencyOfPaymentId: employee?.frequencyOfPaymentId ?? "",
         selectedWorkdays:     preselected,
@@ -296,8 +307,29 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       delete next[field];
       return next;
     });
-    setAdminFormState((prev) => ({ ...prev, [field]: finalValue }));
-  }, []);
+    setAdminFormState((prev) => {
+      if (field === "type") {
+        const roleName = roles.find(
+          (role) => String(role.roleId) === String(prev.roleId),
+        )?.name;
+
+        if (!isContractTypeAllowedForRole(roleName, finalValue)) {
+          return prev;
+        }
+      }
+
+      const next = { ...prev, [field]: finalValue };
+
+      if (field === "roleId") {
+        const roleName = roles.find(
+          (role) => String(role.roleId) === String(finalValue),
+        )?.name;
+        next.type = resolveContractTypeForRole(roleName, prev.type);
+      }
+
+      return next;
+    });
+  }, [roles]);
 
   const toggleWorkday = useCallback((workdayId) => {
     setAdminErrors((prev) => {
@@ -436,6 +468,23 @@ export const useEditEmployee = (employeeId, onSuccess) => {
       const requiredErrors = {};
       if (!adminForm.roleId) requiredErrors.roleId = "Selecciona un puesto";
       if (!adminForm.type) requiredErrors.type = "Selecciona un tipo de contrato";
+
+      const selectedRoleName = roles.find(
+        (role) => String(role.roleId) === String(adminForm.roleId),
+      )?.name;
+
+      if (
+        selectedRoleName &&
+        adminForm.type &&
+        !isContractTypeAllowedForRole(selectedRoleName, adminForm.type)
+      ) {
+        const requiredType = getRequiredContractTypeForRole(selectedRoleName);
+        requiredErrors.type = buildRoleContractMismatchMessage(
+          selectedRoleName,
+          requiredType,
+        );
+      }
+
       if (!noSalaryRequired && adminForm.salary === "") {
         requiredErrors.salary = "El salario es obligatorio";
       }
@@ -541,7 +590,7 @@ export const useEditEmployee = (employeeId, onSuccess) => {
     } finally {
       setSaving(false);
     }
-  }, [adminForm, employeeId, closeEdit, onSuccess]);
+  }, [adminForm, employeeId, closeEdit, onSuccess, roles]);
 
   return {
     editSection, saving, saveError, validationAlert, loadingCatalogues,
