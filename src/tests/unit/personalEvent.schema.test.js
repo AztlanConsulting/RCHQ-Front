@@ -16,6 +16,24 @@ const baseForm = {
 };
 
 describe("personalEvent buildPersonalPayload", () => {
+    it("mantiene 12:00 como mediodía sin mover el fin al día siguiente", () => {
+        expect(
+            buildPersonalPayload({
+                ...baseForm,
+                allDay: false,
+                endDate: "2026-06-05",
+                startTime: "11:00",
+                endTime: "12:00",
+                timeZone: "Europe/London",
+            }),
+        ).toMatchObject({
+            date: "2026-06-05",
+            start: "2026-06-05T10:00:00.000Z",
+            end: "2026-06-05T11:00:00.000Z",
+            timeZone: "Europe/London",
+        });
+    });
+
     it("respeta la fecha final en horario local foráneo", () => {
         expect(
             buildPersonalPayload({

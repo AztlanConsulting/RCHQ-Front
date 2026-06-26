@@ -1,5 +1,6 @@
 import SmallButton from "../../../atoms/smallButton";
 import DateField from "../../../atoms/dateField";
+import { formatDateMx } from "../../../../utils/dates";
 import Type from "../../../atoms/type";
 import { isMexicoTimeZone } from "../../../../utils/timeZone";
 import {
@@ -102,8 +103,8 @@ const VacationEditForm = ({
                             </p>
                             <p className="text-xs text-slate-500">
                                 Periodo actual:{" "}
-                                {String(vacationRemainingInfo.startDate).split("T")[0]} a{" "}
-                                {String(vacationRemainingInfo.endDate).split("T")[0]}
+                                {formatDateMx(vacationRemainingInfo.startDate, "-")} a{" "}
+                                {formatDateMx(vacationRemainingInfo.endDate, "-")}
                             </p>
                         </>
                     ) : (

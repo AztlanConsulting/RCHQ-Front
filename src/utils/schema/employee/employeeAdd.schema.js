@@ -4,6 +4,29 @@ const CURP_REGEX = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 const RFC_REGEX = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
 const ONLY_NUMBERS_REGEX = /^\d+$/;
 const NAMES_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+const parseDateOnly = (value) => {
+  if (!DATE_REGEX.test(value)) return null;
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day, 12, 0, 0);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+};
+
+const getToday = () => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
+};
 
 export const employeeCreateSchema = z.object({
   name: z
@@ -61,20 +84,19 @@ export const employeeCreateSchema = z.object({
     .optional()
     .refine((val) => {
       if (!val) return true;
-      const birthDate = new Date(val + "T00:00:00");
-      const today = new Date();
-      return birthDate <= today;
+      const birthDate = parseDateOnly(val);
+      const today = getToday();
+      return birthDate && birthDate <= today;
     }, "La fecha de nacimiento no puede ser en el futuro")
-
     .refine((val) => {
       if (!val) return true;
-      const birthDate = new Date(val + "T00:00:00");
-      const today = new Date();
-      const year = birthDate.getFullYear();
+      const birthDate = parseDateOnly(val);
+      const today = getToday();
 
-      if (year < 1900) return false;
+      if (!birthDate) return false;
+      if (birthDate.getFullYear() < 1900) return false;
 
-      let age = today.getFullYear() - year;
+      let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
 
       if (
@@ -83,6 +105,27 @@ export const employeeCreateSchema = z.object({
       ) {
         age--;
       }
+
       return age >= 18;
     }, "El usuario debe tener al menos 18 años"),
+  startDate: z
+    .string()
+    .trim()
+    .min(1, "La antigüedad es obligatoria")
+    .refine((val) => DATE_REGEX.test(val), {
+      message: "Formato de fecha inválido (YYYY-MM-DD)",
+    })
+    .refine((val) => parseDateOnly(val) !== null, {
+      message: "La fecha de antigüedad no es válida",
+    })
+    .refine((val) => {
+      const startDate = parseDateOnly(val);
+      if (!startDate) return false;
+      return startDate >= new Date(1900, 0, 1, 12, 0, 0);
+    }, "La antigüedad no puede ser anterior a 1900")
+    .refine((val) => {
+      const startDate = parseDateOnly(val);
+      if (!startDate) return false;
+      return startDate <= getToday();
+    }, "La antigüedad no puede estar en el futuro"),
 });

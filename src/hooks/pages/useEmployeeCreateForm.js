@@ -16,6 +16,7 @@ const INITIAL_FORM = {
     nss: "",
     bankAccount: "",
     birthDate: "",
+    startDate: "",
 };
 
 const useEmployeeCreateForm = (onSuccess) => {
@@ -28,6 +29,9 @@ const useEmployeeCreateForm = (onSuccess) => {
     const [serverError, setServerError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [showScheduleReminder, setShowScheduleReminder] = useState(false);
+    const [createdEmployeeName, setCreatedEmployeeName] = useState("");
+    const [pendingRedirect, setPendingRedirect] = useState(null);
 
     useEffect(() => {
         const load = async () => {
@@ -114,16 +118,15 @@ const useEmployeeCreateForm = (onSuccess) => {
 
             const response = await createEmployee(payload);
 
+            const employeeName = `${result.data.name} ${result.data.surname}`.trim();
+            const redirectPath = response.redirect || "/app/personal";
+
             setForm(INITIAL_FORM);
             setPhoto(null);
-
             onSuccess?.();
-
-            if (response.redirect) {
-                navigate(response.redirect);
-            } else {
-                navigate("/empleados");
-            }
+            setCreatedEmployeeName(employeeName);
+            setPendingRedirect(redirectPath);
+            setShowScheduleReminder(true);
         } catch (err) {
             setServerError(err.message);
 
@@ -137,6 +140,11 @@ const useEmployeeCreateForm = (onSuccess) => {
         }
     };
 
+    const handleScheduleReminderConfirm = () => {
+        setShowScheduleReminder(false);
+        navigate(pendingRedirect || "/app/personal");
+    };
+
     return {
         form,
         roles,
@@ -145,6 +153,9 @@ const useEmployeeCreateForm = (onSuccess) => {
         serverError,
         isLoading,
         isLoadingData,
+        showScheduleReminder,
+        createdEmployeeName,
+        handleScheduleReminderConfirm,
         setServerError,
         setPhoto,
         handleChange,

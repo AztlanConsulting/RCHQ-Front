@@ -1,4 +1,5 @@
 import UserInfoSection from "../../components/organism/userInfoSection";
+import EmployeeScheduleReminderModal from "../../components/molecules/employeeScheduleReminderModal";
 import useEmployeeCreateForm from "../../hooks/pages/useEmployeeCreateForm";
 
 const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
@@ -15,6 +16,9 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
         handleChange,
         handleSubmit,
         navigate,
+        showScheduleReminder,
+        createdEmployeeName,
+        handleScheduleReminderConfirm,
     } = useEmployeeCreateForm(onSuccess);
 
     return (
@@ -46,6 +50,12 @@ const AltaNuevoUsuarioPage = ({ onCancel, onSuccess }) => {
                     />
                 )}
             </div>
+
+            <EmployeeScheduleReminderModal
+                isOpen={showScheduleReminder}
+                employeeName={createdEmployeeName}
+                onConfirm={handleScheduleReminderConfirm}
+            />
         </div>
     );
 };

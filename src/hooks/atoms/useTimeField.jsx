@@ -6,11 +6,19 @@ export const generateTimes = (stepMinutes = 15) => {
     for (let h = 0; h < 24; h++) {
         for (let m = 0; m < 60; m += stepMinutes) {
             const hour12 = h % 12 === 0 ? 12 : h % 12;
-            const ampm = h < 12 ? "AM" : "PM";
+            const ampm = h < 12 ? "a.m." : "p.m.";
+            const minuteLabel = String(m).padStart(2, "0");
+            const baseLabel = `${hour12}:${minuteLabel} ${ampm}`;
+            const label =
+                m === 0 && h === 0
+                    ? `${baseLabel} (medianoche)`
+                    : m === 0 && h === 12
+                      ? `${baseLabel} (mediodía)`
+                      : baseLabel;
 
             times.push({
-                label: `${hour12}:${String(m).padStart(2, "0")} ${ampm}`,
-                value: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+                label,
+                value: `${String(h).padStart(2, "0")}:${minuteLabel}`,
             });
         }
     }

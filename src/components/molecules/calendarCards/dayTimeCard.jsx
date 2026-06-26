@@ -35,7 +35,7 @@ const DayTimeCard = ({ arg }) => {
   const isTimeGridView =
     arg.view.type === "timeGridWeek" || arg.view.type === "timeGridDay";
   const isAllDaySlot = Boolean(ev.allDay && isTimeGridView);
-  const showAsAllDay = ev.allDay || (isMultiDay && isTimeGridView);
+  const showAsAllDay = ev.allDay;
   const icon = x.icon;
   const subtitle = String(x.subtitle ?? "").trim();
   const description = String(x.description ?? "").trim();

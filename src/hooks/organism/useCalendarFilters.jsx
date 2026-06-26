@@ -10,34 +10,6 @@ import {
     normalizeDateOnly,
 } from "../../utils/calendarEventDetail";
 
-const DATE_ONLY_PATTERN = /^(\d{4}-\d{2}-\d{2})/;
-
-const normalizeUTCDateOnly = (value) => {
-    if (value == null || value === "") return "";
-
-    if (typeof value === "string") {
-        const matchedDate = value.trim().match(DATE_ONLY_PATTERN);
-        if (matchedDate) return matchedDate[1];
-    }
-
-    const parsedDate = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(parsedDate.getTime())) return "";
-
-    const year = parsedDate.getUTCFullYear();
-    const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(parsedDate.getUTCDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-};
-
-const addDaysToUTCDateOnly = (value, days) => {
-    const normalizedValue = normalizeUTCDateOnly(value);
-    if (!normalizedValue) return "";
-
-    const [year, month, day] = normalizedValue.split("-").map(Number);
-    const date = new Date(Date.UTC(year, month - 1, day + days, 0, 0, 0, 0));
-    return normalizeUTCDateOnly(date);
-};
 import {
     ABSENCE_EVIDENCE_OPTIONS,
     ABSENCE_STATUS_OPTIONS,
@@ -97,6 +69,13 @@ const isEventMultiDay = (rawEvent, calendarTimeZone) => {
 const isTimeGridCalendarView = (calendarView) =>
     calendarView === "timeGridWeek" || calendarView === "timeGridDay";
 
+const MIDNIGHT_TIME = "T00:00:00";
+
+const buildCalendarDateTime = (dateValue) => `${dateValue}${MIDNIGHT_TIME}`;
+
+const isMidnightCalendarDateTime = (value) =>
+    typeof value === "string" && value.endsWith(MIDNIGHT_TIME);
+
 const getTimedRangeInTimeZone = (event, calendarTimeZone) => {
     const startDate = dateInTimeZoneToInputValue(
         event.start,
@@ -108,18 +87,156 @@ const getTimedRangeInTimeZone = (event, calendarTimeZone) => {
         return null;
     }
 
+    const calendarEnd = dateTimeInTimeZoneToCalendarValue(
+        event.end,
+        calendarTimeZone,
+    );
+    const displayEndDate =
+        endDate > startDate && isMidnightCalendarDateTime(calendarEnd)
+            ? addDaysToDateOnly(endDate, -1)
+            : endDate;
+
     return {
         startDate,
-        displayEndDate: endDate,
+        displayEndDate,
         calendarStart: dateTimeInTimeZoneToCalendarValue(
             event.start,
             calendarTimeZone,
         ),
-        calendarEnd: dateTimeInTimeZoneToCalendarValue(
+        calendarEnd,
+    };
+};
+
+const buildTimeGridAllDayEvent = (event, allDayRange) => ({
+    ...event,
+    calendarEventStart: allDayRange.startDate,
+    calendarEventEnd: allDayRange.calendarEndDate,
+    calendarEventAllDay: true,
+    calendarStartReadableDate: allDayRange.startDate,
+    calendarEndReadableDate: allDayRange.displayEndDate,
+    totalDays:
+        event.totalDays ??
+        calculateTotalDays(allDayRange.startDate, allDayRange.displayEndDate),
+});
+
+const expandEventsForTimeGrid = (
+    events = [],
+    isList,
+    calendarView,
+    calendarTimeZone,
+) => {
+    if (isList || !isTimeGridCalendarView(calendarView)) return events;
+
+    const expanded = [];
+
+    events.forEach((event) => {
+        if (!event.start || !event.end) {
+            expanded.push(event);
+            return;
+        }
+
+        const allDayRange = getAllDayRangeInTimeZone(
+            event.start,
             event.end,
             calendarTimeZone,
-        ),
-    };
+        );
+
+        if (allDayRange.isAllDay) {
+            expanded.push(buildTimeGridAllDayEvent(event, allDayRange));
+            return;
+        }
+
+        const visibleRange = getTimedRangeInTimeZone(event, calendarTimeZone);
+
+        if (!visibleRange) {
+            expanded.push(event);
+            return;
+        }
+
+        const start = toDateOnly(visibleRange.startDate);
+        const end = toDateOnly(visibleRange.displayEndDate);
+
+        if (!start || !end || end < start) {
+            expanded.push(event);
+            return;
+        }
+
+        const totalDays = calculateTotalDays(start, end);
+
+        if (totalDays <= 1) {
+            expanded.push({
+                ...event,
+                calendarEventStart: visibleRange.calendarStart,
+                calendarEventEnd: visibleRange.calendarEnd,
+                calendarEventAllDay: false,
+                calendarStartReadableDate: visibleRange.startDate,
+                calendarEndReadableDate: visibleRange.displayEndDate,
+                totalDays: event.totalDays ?? totalDays,
+            });
+            return;
+        }
+
+        let pendingAllDaySegment = null;
+
+        const pushPendingAllDaySegment = () => {
+            if (!pendingAllDaySegment) return;
+            expanded.push(pendingAllDaySegment);
+            pendingAllDaySegment = null;
+        };
+
+        for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
+            const currentDay = new Date(start);
+            currentDay.setDate(start.getDate() + dayIndex);
+            const currentDayValue = normalizeDateOnly(currentDay);
+            const nextDayValue = addDaysToDateOnly(currentDayValue, 1);
+            const isFirstDay = dayIndex === 0;
+            const isLastDay = dayIndex === totalDays - 1;
+            const fullDayStart = buildCalendarDateTime(currentDayValue);
+            const fullDayEnd = buildCalendarDateTime(nextDayValue);
+            const segmentStart = isFirstDay
+                ? visibleRange.calendarStart
+                : fullDayStart;
+            const segmentEnd = isLastDay
+                ? visibleRange.calendarEnd
+                : fullDayEnd;
+            const segmentAllDay =
+                segmentStart === fullDayStart && segmentEnd === fullDayEnd;
+
+            const segmentEvent = {
+                ...event,
+                calendarEventStart: segmentAllDay
+                    ? currentDayValue
+                    : segmentStart,
+                calendarEventEnd: segmentAllDay ? nextDayValue : segmentEnd,
+                calendarEventAllDay: segmentAllDay,
+                calendarStartReadableDate: currentDayValue,
+                calendarEndReadableDate: currentDayValue,
+                totalDays: event.totalDays ?? totalDays,
+            };
+
+            if (!segmentAllDay) {
+                pushPendingAllDaySegment();
+                expanded.push(segmentEvent);
+                continue;
+            }
+
+            if (pendingAllDaySegment) {
+                pendingAllDaySegment = {
+                    ...pendingAllDaySegment,
+                    calendarEventEnd: segmentEvent.calendarEventEnd,
+                    calendarEndReadableDate:
+                        segmentEvent.calendarEndReadableDate,
+                };
+                continue;
+            }
+
+            pendingAllDaySegment = segmentEvent;
+        }
+
+        pushPendingAllDaySegment();
+    });
+
+    return expanded;
 };
 
 const expandEventsForList = (events = [], isList, calendarTimeZone) => {
@@ -221,7 +338,12 @@ const getFilteredEvents = (
             ),
     );
 
-    return expandEventsForList(allEvents, isList, calendarTimeZone)
+    return expandEventsForTimeGrid(
+        expandEventsForList(allEvents, isList, calendarTimeZone),
+        isList,
+        calendarView,
+        calendarTimeZone,
+    )
         .filter((e) => focusFilters.includes(e.focus))
         .filter((e) => e.focus !== "eventos" || scopeFilters.includes(e.scope))
         .filter(
@@ -275,10 +397,11 @@ const getFilteredEvents = (
                 rawEvent.focus === "ausencias" ||
                 rawEvent.focus === "vacaciones";
             const isMultiDay = isEventMultiDay(rawEvent, calendarTimeZone);
-            const showInAllDayRow =
-                isMultiDay && isTimeGridCalendarView(calendarView);
             const isExpandedListEvent = Boolean(
                 isList && rawEvent.currentDayIndex && rawEvent.totalDays,
+            );
+            const isExpandedTimeGridEvent = Boolean(
+                !isList && rawEvent.calendarEventStart,
             );
             const allDayRange = isExpandedListEvent && rawEvent.listEventAllDay
                 ? {
@@ -287,6 +410,13 @@ const getFilteredEvents = (
                       displayEndDate: rawEvent.listEndReadableDate,
                       calendarEndDate: rawEvent.listEventEnd,
                   }
+                : isExpandedTimeGridEvent && rawEvent.calendarEventAllDay
+                  ? {
+                        isAllDay: true,
+                        startDate: rawEvent.calendarStartReadableDate,
+                        displayEndDate: rawEvent.calendarEndReadableDate,
+                        calendarEndDate: rawEvent.calendarEventEnd,
+                    }
                 : getAllDayRangeInTimeZone(
                       rawEvent.start,
                       rawEvent.end,
@@ -294,16 +424,17 @@ const getFilteredEvents = (
                   );
             const isAllDay = isExpandedListEvent
                 ? rawEvent.listEventAllDay === true
-                : showInAllDayRow ||
-                  (rawEvent.allDay === true && allDayRange.isAllDay);
+                : isExpandedTimeGridEvent
+                  ? rawEvent.calendarEventAllDay === true
+                  : rawEvent.allDay === true && allDayRange.isAllDay;
             const normalizedStartDate =
                 allDayRange.startDate ||
                 normalizeDateOnly(rawEvent.startDate ?? rawEvent.start);
             const normalizedEndDate =
                 allDayRange.displayEndDate ||
                 normalizeDateOnly(rawEvent.endDate ?? rawEvent.end);
-            const eventStart = showInAllDayRow
-                ? normalizeUTCDateOnly(rawEvent.start ?? rawEvent.startDate)
+            const eventStart = isExpandedTimeGridEvent
+                ? rawEvent.calendarEventStart
                 : isAllDay && normalizedStartDate && !isExpandedListEvent
                   ? allDayRange.startDate || normalizedStartDate
                   : rawEvent.listEventStart
@@ -312,8 +443,8 @@ const getFilteredEvents = (
                           rawEvent.start,
                           calendarTimeZone,
                       );
-            const eventEnd = showInAllDayRow
-                ? addDaysToUTCDateOnly(rawEvent.end ?? rawEvent.endDate, 1)
+            const eventEnd = isExpandedTimeGridEvent
+                ? rawEvent.calendarEventEnd
                 : isAllDay && normalizedEndDate && !isExpandedListEvent
                   ? allDayRange.calendarEndDate ||
                     (isRangeRecord
