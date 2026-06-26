@@ -177,7 +177,10 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
 
     it("crea el empleado exitosamente", async () => {
         getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
-        createEmployee.mockResolvedValue({ success: true });
+        createEmployee.mockResolvedValue({
+            success: true,
+            redirect: "/app/personal/ver/emp-new-1",
+        });
         renderPage();
         await waitFor(() =>
             expect(
@@ -191,6 +194,40 @@ describe("AltaPersonal — integración de formulario y servicios", () => {
             expect(createEmployee).toHaveBeenCalledTimes(1);
         });
         expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+        expect(
+            screen.getByRole("dialog", { name: /registra los horarios laborales/i }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Juan Pérez")).toBeInTheDocument();
+        expect(
+            screen.getByText(/fue registrado correctamente/i),
+        ).toBeInTheDocument();
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it("redirige al expediente al confirmar el aviso de horarios", async () => {
+        getEmployeeFormData.mockResolvedValue({ roles: mockRoles });
+        createEmployee.mockResolvedValue({
+            success: true,
+            redirect: "/app/personal/ver/emp-new-1",
+        });
+        renderPage();
+        await waitFor(() =>
+            expect(
+                screen.queryByText(/cargando datos/i),
+            ).not.toBeInTheDocument(),
+        );
+
+        await fillAndSubmit(validFormData);
+
+        await waitFor(() => {
+            expect(
+                screen.getByRole("dialog", { name: /registra los horarios laborales/i }),
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: /entendido/i }));
+
+        expect(mockNavigate).toHaveBeenCalledWith("/app/personal/ver/emp-new-1");
     });
 
     it("muestra error si el backend falla", async () => {
