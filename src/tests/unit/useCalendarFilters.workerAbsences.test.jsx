@@ -1137,6 +1137,11 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
     });
 
     it("quita detailAllDay cuando un evento all-day no cae como todo el día en la zona activa", async () => {
+        getEventsTypes.mockResolvedValue([
+            { name: "General" },
+            { name: "Capacitaciones" },
+        ]);
+
         const event = {
             focus: "eventos",
             name: "Capacitacion all-day",
@@ -1158,19 +1163,18 @@ describe("useCalendarFilters - trabajador consulta ausencias", () => {
         );
 
         await waitFor(() => expect(getEventsTypes).toHaveBeenCalledTimes(1));
-        await waitFor(() =>
-            expect(result.current.visibleEvents).toHaveLength(1),
-        );
-
-        expect(result.current.visibleEvents[0]).toMatchObject({
-            start: "2026-05-05T01:00:00",
-            end: "2026-05-06T01:00:00",
-            allDay: false,
-        });
-        expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
-            detailAllDay: false,
-            startReadableDate: "2026-05-05",
-            endReadableDate: "2026-05-06",
+        await waitFor(() => {
+            expect(result.current.visibleEvents).toHaveLength(1);
+            expect(result.current.visibleEvents[0]).toMatchObject({
+                start: "2026-05-05T01:00:00",
+                end: "2026-05-06T01:00:00",
+                allDay: false,
+            });
+            expect(result.current.visibleEvents[0].extendedProps).toMatchObject({
+                detailAllDay: false,
+                startReadableDate: "2026-05-05",
+                endReadableDate: "2026-05-06",
+            });
         });
     });
 });
